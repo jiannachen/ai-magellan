@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db/db";
-import HomePage from "@/app/home-page";
+import SimplifiedHomePage from "@/app/simplified-home-page";
 import { cachedPrismaQuery } from "@/lib/db/cache";
+import { StructuredData } from "@/components/seo/structured-data";
 
 export const dynamic = "force-dynamic";
 
@@ -21,11 +22,12 @@ export default async function Home() {
             description: true,
             category_id: true,
             thumbnail: true,
-            thumbnail_base64: true,
             status: true,
             visits: true,
             likes: true,
-            active: true,
+            quality_score: true,
+            is_featured: true,
+            is_trusted: true,
           },
         }),
       { ttl: 1 } // 1天缓存
@@ -54,9 +56,16 @@ export default async function Home() {
   }));
 
   return (
-    <HomePage
-      initialWebsites={preFilteredWebsites}
-      initialCategories={categoriesData}
-    />
+    <>
+      {/* JSON-LD结构化数据 */}
+      <StructuredData type="website" />
+      <StructuredData type="organization" />
+      <StructuredData type="itemList" websites={preFilteredWebsites.slice(0, 20)} />
+      
+      <SimplifiedHomePage
+        initialWebsites={preFilteredWebsites}
+        initialCategories={categoriesData}
+      />
+    </>
   );
 }

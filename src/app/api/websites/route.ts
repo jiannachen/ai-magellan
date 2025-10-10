@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
+import { auth, currentUser } from '@clerk/nextjs/server';
 import type { Website } from "@/lib/types";
 import { AjaxResponse } from "@/lib/utils";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/db/db";
 
 // GET /api/websites
 // 获取所有指定分类的网站
@@ -27,6 +26,34 @@ export async function POST(request: Request) {
   }
 
   try {
+    // 获取当前用户信息
+    const { userId } = await auth();
+    const user = await currentUser();
+    
+    // 检查用户是否已登录
+    if (!userId || !user) {
+      return NextResponse.json(
+        AjaxResponse.fail("Please login to submit a website"),
+        { status: 401 }
+      );
+    }
+    
+    // 确保用户在数据库中存在
+    const dbUser = await prisma.user.upsert({
+      where: { id: userId },
+      update: {
+        name: user.fullName || user.firstName || 'User',
+        email: user.emailAddresses[0]?.emailAddress || '',
+        image: user.imageUrl,
+      },
+      create: {
+        id: userId,
+        name: user.fullName || user.firstName || 'User',
+        email: user.emailAddresses[0]?.emailAddress || '',
+        image: user.imageUrl,
+      }
+    });
+    
     const data = await request.json();
 
     // Validate required fields
@@ -72,22 +99,53 @@ export async function POST(request: Request) {
       });
     }
 
-    // 将图片转换为base64
-    const image = await fetch(data.thumbnail);
-    const imageBuffer = await image.arrayBuffer();
-    const imageBase64 = `data:${image.headers.get(
-      "content-type"
-    )};base64,${Buffer.from(imageBuffer).toString("base64")}`;
-
     const website = await prisma.website.create({
       data: {
+        // 基本信息
         title: data.title.trim(),
         url: data.url.trim(),
-        description: data.description?.trim() || "",
+        email: data.email?.trim() || null,
         category_id: Number(data.category_id),
-        thumbnail: data.thumbnail?.trim() || "",
         status: data.status || "pending",
-        thumbnail_base64: imageBase64 as string,
+        submittedBy: userId,
+        
+        // 标签和描述
+        tags: data.tags?.trim() || null,
+        tagline: data.tagline?.trim() || null,
+        description: data.description?.trim() || "",
+        
+        // 功能特性
+        features: data.features || [],
+        
+        // 使用场景和目标受众
+        use_cases: data.use_cases || [],
+        target_audience: data.target_audience || [],
+        
+        // 常见问题
+        faq: data.faq || [],
+        
+        // 定价信息
+        pricing_model: data.pricing_model || "free",
+        has_free_version: data.has_free_version || false,
+        api_available: data.api_available || false,
+        pricing_plans: data.pricing_plans || [],
+        
+        // 社交媒体链接
+        twitter_url: data.twitter_url?.trim() || null,
+        linkedin_url: data.linkedin_url?.trim() || null,
+        facebook_url: data.facebook_url?.trim() || null,
+        instagram_url: data.instagram_url?.trim() || null,
+        youtube_url: data.youtube_url?.trim() || null,
+        discord_url: data.discord_url?.trim() || null,
+        
+        // 集成
+        integrations: data.integrations || [],
+        
+        // 平台支持
+        ios_app_url: data.ios_app_url?.trim() || null,
+        android_app_url: data.android_app_url?.trim() || null,
+        web_app_url: data.web_app_url?.trim() || null,
+        desktop_platforms: data.desktop_platforms || [],
       },
     });
 

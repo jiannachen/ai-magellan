@@ -5,11 +5,22 @@ export interface Website {
   description: string;
   category_id: number;
   thumbnail: string | null;
-  thumbnail_base64: string | null;
   active: number;
   status: string;
   visits: number;
   likes: number;
+  // 新增质量评估字段
+  quality_score?: number;
+  is_trusted?: boolean;
+  is_featured?: boolean;
+  weight?: number;
+  tags?: string;
+  domain_authority?: number;
+  last_checked?: string;
+  response_time?: number;
+  ssl_enabled?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Category {

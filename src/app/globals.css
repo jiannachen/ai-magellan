@@ -48,50 +48,144 @@
 */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
-    --primary: 0 0% 9%;
+    /* Apple标准色彩系统 - Light Mode */
+    /* 主要色彩 */
+    --color-blue: 211 100% 50%;          /* #007AFF Apple Blue */
+    --color-green: 144 61% 49%;          /* #34C759 Apple Green */
+    --color-indigo: 251 33% 59%;         /* #5856D6 Apple Indigo */
+    --color-orange: 32 100% 50%;         /* #FF9500 Apple Orange */
+    --color-pink: 322 79% 58%;           /* #FF2D92 Apple Pink */
+    --color-purple: 253 42% 58%;         /* #AF52DE Apple Purple */
+    --color-red: 4 90% 58%;              /* #FF3B30 Apple Red */
+    --color-teal: 199 100% 66%;          /* #5AC8FA Apple Teal */
+    --color-yellow: 48 100% 50%;         /* #FFCC00 Apple Yellow */
+    
+    /* 主色调 */
+    --primary: var(--color-blue);
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --radius: 0.75rem;
-    --primary-rgb: 124, 58, 237; /* 这是紫色的RGB值，你可以根据你的主题色调整 */
+    
+    /* Apple灰度系统 */
+    --gray-1: 220 9% 46%;               /* #6D6D70 */
+    --gray-2: 240 6% 68%;               /* #AEAEB2 */
+    --gray-3: 240 5% 78%;               /* #C7C7CC */
+    --gray-4: 240 6% 84%;               /* #D1D1D6 */
+    --gray-5: 240 5% 91%;               /* #E5E5EA */
+    --gray-6: 240 5% 95%;               /* #F2F2F7 */
+    
+    /* 标签色彩 (Apple Label Colors) */
+    --label-primary: 240 6% 0%;          /* #000000 */
+    --label-secondary: 240 6% 24% / 0.6; /* rgba(60, 60, 67, 0.6) */
+    --label-tertiary: 240 6% 24% / 0.3;  /* rgba(60, 60, 67, 0.3) */
+    --label-quaternary: 240 6% 24% / 0.18; /* rgba(60, 60, 67, 0.18) */
+    
+    /* 填充色彩 (Apple Fill Colors) */
+    --fill-primary: 240 4% 50% / 0.2;    /* rgba(120, 120, 128, 0.2) */
+    --fill-secondary: 240 4% 50% / 0.16; /* rgba(120, 120, 128, 0.16) */
+    --fill-tertiary: 240 4% 50% / 0.12;  /* rgba(120, 120, 128, 0.12) */
+    --fill-quaternary: 240 4% 50% / 0.08; /* rgba(120, 120, 128, 0.08) */
+    
+    /* 背景色彩 (Apple Background Colors) */
+    --background: 0 0% 100%;             /* #FFFFFF */
+    --background-secondary: var(--gray-6); /* #F2F2F7 */
+    --background-tertiary: 0 0% 100%;    /* #FFFFFF */
+    
+    /* 分组背景 (Apple Grouped Background) */
+    --grouped-background-primary: var(--gray-6);   /* #F2F2F7 */
+    --grouped-background-secondary: 0 0% 100%;     /* #FFFFFF */
+    --grouped-background-tertiary: var(--gray-6);  /* #F2F2F7 */
+    
+    /* 系统语义色彩 */
+    --foreground: var(--label-primary);
+    --muted-foreground: var(--label-secondary);
+    --card: var(--background-secondary);
+    --card-foreground: var(--label-primary);
+    --popover: var(--background);
+    --popover-foreground: var(--label-primary);
+    --secondary: var(--fill-primary);
+    --secondary-foreground: var(--label-primary);
+    --muted: var(--fill-primary);
+    --accent: var(--fill-primary);
+    --accent-foreground: var(--label-primary);
+    --border: var(--fill-tertiary);
+    --input: var(--fill-tertiary);
+    --ring: var(--primary);
+    --destructive: var(--color-red);
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Apple圆角系统 */
+    --radius-xs: 0.25rem;   /* 4px */
+    --radius-sm: 0.375rem;  /* 6px */
+    --radius-md: 0.5rem;    /* 8px */
+    --radius-lg: 0.75rem;   /* 12px */
+    --radius-xl: 1rem;      /* 16px */
+    --radius-2xl: 1.25rem;  /* 20px */
+    --radius: var(--radius-md);
   }
 
   .dark {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 91%;
-    --popover: 224 71% 4%;
-    --popover-foreground: 215 20.2% 65.1%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 1.2%;
-    --secondary: 222.2 47.4% 11.2%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --primary-rgb: 139, 92, 246; /* 暗色模式下的紫色RGB值 */
+    /* Apple标准色彩系统 - Dark Mode */
+    /* 主要色彩 (深色模式下稍微调亮) */
+    --color-blue: 211 100% 60%;          /* #0A84FF Apple Blue Dark */
+    --color-green: 144 61% 55%;          /* #30D158 Apple Green Dark */
+    --color-indigo: 251 33% 65%;         /* #5E5CE6 Apple Indigo Dark */
+    --color-orange: 32 100% 60%;         /* #FF9F0A Apple Orange Dark */
+    --color-pink: 322 79% 64%;           /* #FF375F Apple Pink Dark */
+    --color-purple: 253 42% 64%;         /* #BF5AF2 Apple Purple Dark */
+    --color-red: 4 90% 64%;              /* #FF453A Apple Red Dark */
+    --color-teal: 199 100% 72%;          /* #64D2FF Apple Teal Dark */
+    --color-yellow: 48 100% 60%;         /* #FFD60A Apple Yellow Dark */
+    
+    /* 主色调 */
+    --primary: var(--color-blue);
+    --primary-foreground: 240 6% 9%;
+    
+    /* Apple暗色灰度系统 */
+    --gray-1: 240 1% 68%;               /* #AEAEB2 */
+    --gray-2: 240 2% 52%;               /* #636366 */
+    --gray-3: 240 3% 35%;               /* #48484A */
+    --gray-4: 240 3% 22%;               /* #3A3A3C */
+    --gray-5: 240 3% 17%;               /* #2C2C2E */
+    --gray-6: 240 3% 11%;               /* #1C1C1E */
+    
+    /* 标签色彩 (Apple Label Colors Dark) */
+    --label-primary: 0 0% 100%;          /* #FFFFFF */
+    --label-secondary: 240 5% 92% / 0.6; /* rgba(235, 235, 245, 0.6) */
+    --label-tertiary: 240 5% 92% / 0.3;  /* rgba(235, 235, 245, 0.3) */
+    --label-quaternary: 240 5% 92% / 0.18; /* rgba(235, 235, 245, 0.18) */
+    
+    /* 填充色彩 (Apple Fill Colors Dark) */
+    --fill-primary: 240 4% 50% / 0.36;   /* rgba(120, 120, 128, 0.36) */
+    --fill-secondary: 240 4% 50% / 0.32; /* rgba(120, 120, 128, 0.32) */
+    --fill-tertiary: 240 4% 50% / 0.28;  /* rgba(120, 120, 128, 0.28) */
+    --fill-quaternary: 240 4% 50% / 0.24; /* rgba(120, 120, 128, 0.24) */
+    
+    /* 背景色彩 (Apple Background Colors Dark) */
+    --background: 240 6% 0%;             /* #000000 */
+    --background-secondary: var(--gray-6); /* #1C1C1E */
+    --background-tertiary: var(--gray-5);  /* #2C2C2E */
+    
+    /* 分组背景 (Apple Grouped Background Dark) */
+    --grouped-background-primary: 240 6% 0%;      /* #000000 */
+    --grouped-background-secondary: var(--gray-6); /* #1C1C1E */
+    --grouped-background-tertiary: var(--gray-5);  /* #2C2C2E */
+    
+    /* 系统语义色彩 */
+    --foreground: var(--label-primary);
+    --muted-foreground: var(--label-secondary);
+    --card: var(--background-secondary);
+    --card-foreground: var(--label-primary);
+    --popover: var(--background);
+    --popover-foreground: var(--label-primary);
+    --secondary: var(--fill-primary);
+    --secondary-foreground: var(--label-primary);
+    --muted: var(--fill-primary);
+    --accent: var(--fill-primary);
+    --accent-foreground: var(--label-primary);
+    --border: var(--fill-tertiary);
+    --input: var(--fill-tertiary);
+    --ring: var(--primary);
+    --destructive: var(--color-red);
+    --destructive-foreground: var(--label-primary);
   }
 }
 
@@ -102,113 +196,159 @@
 
   html {
     -webkit-tap-highlight-color: transparent;
+    /* Apple系统字体 */
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
 
   body {
     @apply bg-background text-foreground antialiased overflow-x-hidden;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Apple标准字体设置 */
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.022em;
   }
 
-  /* 主背景效果 - 仅桌面端 */
+  /* Apple字体层级系统 */
+  .text-largeTitle {
+    font-size: 34px;
+    font-weight: 400;
+    line-height: 41px;
+    letter-spacing: 0.374px;
+  }
+
+  .text-title1 {
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 34px;
+    letter-spacing: 0.364px;
+  }
+
+  .text-title2 {
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 28px;
+    letter-spacing: 0.352px;
+  }
+
+  .text-title3 {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 25px;
+    letter-spacing: 0.38px;
+  }
+
+  .text-headline {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 22px;
+    letter-spacing: -0.43px;
+  }
+
+  .text-body {
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 22px;
+    letter-spacing: -0.43px;
+  }
+
+  .text-callout {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 21px;
+    letter-spacing: -0.32px;
+  }
+
+  .text-subhead {
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: -0.24px;
+  }
+
+  .text-footnote {
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.08px;
+  }
+
+  .text-caption1 {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0px;
+  }
+
+  .text-caption2 {
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 13px;
+    letter-spacing: 0.066px;
+  }
+
+  /* Apple 8pt网格间距系统 */
+  .space-0 { @apply p-0; }
+  .space-1 { @apply p-1; }      /* 4px */
+  .space-2 { @apply p-2; }      /* 8px */
+  .space-3 { @apply p-3; }      /* 12px */
+  .space-4 { @apply p-4; }      /* 16px */
+  .space-5 { @apply p-5; }      /* 20px */
+  .space-6 { @apply p-6; }      /* 24px */
+  .space-8 { @apply p-8; }      /* 32px */
+  .space-10 { @apply p-10; }    /* 40px */
+  .space-12 { @apply p-12; }    /* 48px */
+  .space-16 { @apply p-16; }    /* 64px */
+  .space-20 { @apply p-20; }    /* 80px */
+  .space-24 { @apply p-24; }    /* 96px */
+
+  /* Apple阴影系统 */
+  .shadow-apple-1 {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .shadow-apple-2 {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .shadow-apple-3 {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .shadow-apple-4 {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Apple标准缓动曲线 */
+  .transition-apple {
+    transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .transition-apple-decelerate {
+    transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .transition-apple-accelerate {
+    transition: all 0.2s cubic-bezier(0.4, 0, 1, 1);
+  }
+
+  .transition-apple-sharp {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.6, 1);
+  }
+
+  /* 简化的装饰性背景 - 仅桌面端 */
   @media (min-width: 768px) {
     body::before {
-      @apply content-[''] fixed inset-0 pointer-events-none;
+      content: '';
+      position: fixed;
+      inset: 0;
       background: radial-gradient(
-          circle at 50% 50%,
-          rgba(96, 165, 250, 0.2),
-          transparent 50%
-        ),
-        radial-gradient(
-          circle at 80% 20%,
-          rgba(59, 130, 246, 0.3),
-          transparent 35%
-        ),
-        radial-gradient(
-          circle at 20% 80%,
-          rgba(236, 72, 153, 0.3),
-          transparent 35%
-        ),
-        radial-gradient(
-          circle at 0% 0%,
-          rgba(99, 102, 241, 0.25),
-          transparent 30%
-        ),
-        radial-gradient(
-          circle at 100% 100%,
-          rgba(192, 38, 211, 0.25),
-          transparent 30%
-        );
-      filter: blur(32px);
-      z-index: -2;
-      animation: pulse 8s ease-in-out infinite;
-    }
-
-    /* 点状格子效果 */
-    body::after {
-      @apply content-[''] fixed inset-0 pointer-events-none opacity-40;
-      background: radial-gradient(
-          circle at center,
-          rgba(59, 130, 246, 0.15) 1px,
-          transparent 1px
-        ),
-        radial-gradient(
-          circle at center,
-          rgba(236, 72, 153, 0.15) 1px,
-          transparent 1px
-        );
-      background-size: 24px 24px;
-      background-position: 0 0, 12px 12px;
-      mask-image: radial-gradient(
-        ellipse at center,
-        black 40%,
-        transparent 70%
+        circle at 50% 0%,
+        hsl(var(--primary) / 0.02),
+        transparent 50%
       );
+      pointer-events: none;
       z-index: -1;
-      animation: grain 8s linear infinite;
-    }
-
-    /* 暗色模式特殊效果 */
-    .dark body::before {
-      background: radial-gradient(
-          circle at 50% 50%,
-          rgba(59, 130, 246, 0.25),
-          transparent 50%
-        ),
-        radial-gradient(
-          circle at 80% 20%,
-          rgba(37, 99, 235, 0.3),
-          transparent 35%
-        ),
-        radial-gradient(
-          circle at 20% 80%,
-          rgba(236, 72, 153, 0.3),
-          transparent 35%
-        ),
-        radial-gradient(
-          circle at 0% 0%,
-          rgba(99, 102, 241, 0.3),
-          transparent 30%
-        ),
-        radial-gradient(
-          circle at 100% 100%,
-          rgba(192, 38, 211, 0.3),
-          transparent 30%
-        );
-      filter: blur(48px);
-    }
-
-    .dark body::after {
-      opacity: 0.25;
-      background: radial-gradient(
-          circle at center,
-          rgba(59, 130, 246, 0.2) 1px,
-          transparent 1px
-        ),
-        radial-gradient(
-          circle at center,
-          rgba(236, 72, 153, 0.2) 1px,
-          transparent 1px
-        );
     }
   }
 
@@ -218,14 +358,19 @@
   }
 }
 
-/* 卡片悬浮效果 */
+/* Apple风格卡片悬浮效果 */
 .card-hover {
-  @apply transition-all duration-300 ease-out;
+  @apply transition-apple;
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     .dark & {
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     }
+  }
+  
+  &:active {
+    transform: translateY(0px);
+    transition: all 0.1s cubic-bezier(0.4, 0, 1, 1);
   }
 }

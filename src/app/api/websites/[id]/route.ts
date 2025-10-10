@@ -1,17 +1,24 @@
 import { NextResponse } from "next/server";
+import { auth } from '@clerk/nextjs/server';
 import { AjaxResponse } from "@/lib/utils";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/db/db";
 
 // GET /api/websites/[id]
-// 获取单个网站
-export async function GET({ params }: { params: Promise<{ id: string }> }) {
+// 获取单个网站详细信息
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    const websiteId = parseInt((await params).id);
+    const websiteId = parseInt(params.id);
     const website = await prisma.website.findUnique({
       where: { id: websiteId },
-      include: { category: true },
+      include: { 
+        category: true,
+        _count: {
+          select: {
+            websiteLikes: true,
+            websiteFavorites: true
+          }
+        }
+      },
     });
 
     if (!website) {
@@ -31,13 +38,13 @@ export async function GET({ params }: { params: Promise<{ id: string }> }) {
 
 // DELETE /api/websites/[id]
 // 删除网站
-export async function DELETE({ params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
-    if (!(await params).id) {
+    if (!params.id) {
       return NextResponse.json(AjaxResponse.fail("Website ID is required"), {});
     }
 
-    const websiteId = parseInt((await params).id);
+    const websiteId = parseInt(params.id);
 
     // Check if website exists first
     const website = await prisma.website.findUnique({
@@ -76,11 +83,20 @@ export async function DELETE({ params }: { params: Promise<{ id: string }> }) {
 // 更新网站
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
+    // 获取当前用户信息
+    const { userId } = await auth();
+    
+    if (!userId) {
+      return NextResponse.json(AjaxResponse.fail("Unauthorized"), {
+        status: 401,
+      });
+    }
+
     const data = await request.json();
-    const websiteId = parseInt((await params).id);
+    const websiteId = parseInt(params.id);
 
     const existingWebsite = await prisma.website.findUnique({
       where: { id: websiteId },
@@ -89,6 +105,13 @@ export async function PUT(
     if (!existingWebsite) {
       return NextResponse.json(AjaxResponse.fail("Website not found"), {
         status: 404,
+      });
+    }
+
+    // 检查是否是当前用户提交的网站
+    if (existingWebsite.submittedBy !== userId) {
+      return NextResponse.json(AjaxResponse.fail("You can only edit your own submissions"), {
+        status: 403,
       });
     }
 
@@ -111,16 +134,34 @@ export async function PUT(
       });
     }
 
+    // 检查URL是否已存在（排除当前网站）
+    const urlExists = await prisma.website.findFirst({
+      where: { 
+        url: data.url,
+        id: { not: websiteId }
+      }
+    });
+
+    if (urlExists) {
+      return NextResponse.json(AjaxResponse.fail("URL already exists"), {
+        status: 400,
+      });
+    }
+
     const website = await prisma.website.update({
       where: { id: websiteId },
       data: {
-        title: data.title,
-        url: data.url,
-        description: data.description || "",
+        title: data.title.trim(),
+        url: data.url.trim(),
+        description: data.description?.trim() || "",
         category_id: Number(data.category_id),
-        thumbnail: data.thumbnail || "",
-        status: data.status || existingWebsite.status,
+        thumbnail: data.thumbnail?.trim() || null,
+        // 保持原状态或根据需要重置为待审核
+        status: existingWebsite.status,
       },
+      include: {
+        category: true
+      }
     });
 
     return NextResponse.json(AjaxResponse.ok(website));

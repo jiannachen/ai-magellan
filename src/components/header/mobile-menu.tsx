@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Trophy, Plus, Download, Info, Menu, X } from "lucide-react";
+import { Trophy, Plus, Download, Info, Menu, X, ChevronDown, TrendingUp, Star, CheckCircle } from "lucide-react";
 import { Button } from "@/ui/common/button";
 import ThemeSwitch from "@/components/theme-switcher/theme-switch";
 import {
@@ -14,6 +14,16 @@ import {
 
 export default function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const [rankingsOpen, setRankingsOpen] = useState(false);
+
+  const rankingLinks = [
+    { href: "/rankings/popular", title: "Most Popular", icon: TrendingUp },
+    { href: "/rankings/top-rated", title: "Top Rated", icon: Star },
+    { href: "/rankings/trending", title: "Trending Now", icon: Trophy },
+    { href: "/rankings/free", title: "Best Free Tools", icon: CheckCircle },
+    { href: "/rankings/new", title: "Recently Added", icon: Plus },
+    { href: "/rankings/monthly-hot", title: "Monthly Hot", icon: TrendingUp },
+  ];
 
   return (
     <div className="md:hidden">
@@ -25,15 +35,49 @@ export default function MobileMenu() {
         <div className="absolute left-0 right-0 mt-2 mx-4 p-4 rounded-xl shadow-lg bg-background/90 backdrop-blur-xl border">
           <div className="flex flex-col gap-3">
             <div className="space-y-2">
-              <Link href="/rankings" className="w-full">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start hover:bg-primary/5 font-medium text-base rounded-lg h-12"
+              {/* Rankings Section */}
+              <div>
+                <button
+                  onClick={() => setRankingsOpen(!rankingsOpen)}
+                  className="w-full"
                 >
-                  <Trophy className="h-5 w-5 mr-3 text-primary" />
-                  排行榜
-                </Button>
-              </Link>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-between hover:bg-primary/5 font-medium text-base rounded-lg h-12"
+                  >
+                    <div className="flex items-center">
+                      <Trophy className="h-5 w-5 mr-3 text-primary" />
+                      排行榜
+                    </div>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${rankingsOpen ? 'rotate-180' : ''}`} />
+                  </Button>
+                </button>
+                
+                {rankingsOpen && (
+                  <div className="mt-2 pl-8 space-y-1">
+                    <Link href="/rankings" className="block">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start hover:bg-primary/5 text-sm rounded-lg h-10"
+                      >
+                        <Trophy className="h-4 w-4 mr-2 text-primary" />
+                        All Rankings
+                      </Button>
+                    </Link>
+                    {rankingLinks.map((link) => (
+                      <Link key={link.href} href={link.href} className="block">
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start hover:bg-primary/5 text-sm rounded-lg h-10"
+                        >
+                          <link.icon className="h-4 w-4 mr-2 text-primary" />
+                          {link.title}
+                        </Button>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>

@@ -85,7 +85,6 @@ export async function updateWebsiteThumbnails() {
         await prisma.website.update({
           where: { id: website.id },
           data: {
-            thumbnail_base64: imageBase64,
             updated_at: new Date(),
           },
         });

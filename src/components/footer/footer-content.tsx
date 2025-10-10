@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import { useAtom } from "jotai";
 import { motion } from "framer-motion";
 import { Button } from "@/ui/common/button";
-import { Plus } from "lucide-react";
+import { Plus, Brain } from "lucide-react";
 import { isAdminModeAtom, footerSettingsAtom } from "@/lib/atoms";
+import { useTranslations } from 'next-intl';
+import Link from "next/link";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +25,7 @@ export default function FooterContent({
 }: {
   initialSettings: FooterSettings;
 }) {
+  const t = useTranslations();
   const [isAdmin] = useAtom(isAdminModeAtom);
   const [settings, setSettings] = useAtom(footerSettingsAtom);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -46,7 +49,7 @@ export default function FooterContent({
   const handleAddLink = async () => {
     if (!newLink.title || !newLink.url) {
       toast({
-        title: "错误",
+        title: t('common.error'),
         description: "请填写完整的链接信息",
         variant: "destructive",
       });
@@ -73,12 +76,12 @@ export default function FooterContent({
       setIsDialogOpen(false);
 
       toast({
-        title: "添加成功",
+        title: t('common.success'),
         description: "新的页脚链接已添加",
       });
     } catch (error) {
       toast({
-        title: "添加失败",
+        title: t('common.error'),
         description: "添加页脚链接时出错",
         variant: "destructive",
       });
@@ -99,17 +102,33 @@ export default function FooterContent({
       }));
 
       toast({
-        title: "删除成功",
+        title: t('common.success'),
         description: "页脚链接已删除",
       });
     } catch (error) {
       toast({
-        title: "删除失败",
+        title: t('common.error'),
         description: "删除页脚链接时出错",
         variant: "destructive",
       });
     }
   };
+
+  // 快速链接数据
+  const quickLinks = [
+    { href: "/", label: t('navigation.home') },
+    { href: "/categories", label: t('navigation.categories') },
+    { href: "/submit", label: t('navigation.submit') },
+  ];
+
+  // 排行榜链接数据
+  const rankingLinks = [
+    { href: "/rankings", label: "All Rankings" },
+    { href: "/rankings/popular", label: "Most Popular" },
+    { href: "/rankings/top-rated", label: "Top Rated" },
+    { href: "/rankings/trending", label: "Trending" },
+    { href: "/rankings/free", label: "Best Free" },
+  ];
 
   return (
     <motion.footer
@@ -117,99 +136,174 @@ export default function FooterContent({
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         "w-full border-t border-border",
-        "bg-background/80 backdrop-blur-sm",
+        "bg-background/95 backdrop-blur-sm",
         "transition-colors duration-300"
       )}
     >
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            {settings.links.length > 0 ? (
-              settings.links.map((link, index) => (
-                <div key={index} className="flex items-center gap-1.5">
-                  <a
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.title}
-                  </a>
-                  {isAdmin && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={cn(
-                        "h-5 w-5 p-0 rounded-full",
-                        "hover:bg-destructive/10 hover:text-destructive",
-                        "transition-colors duration-200"
-                      )}
-                      onClick={() => handleRemoveLink(index)}
-                    >
-                      ×
-                    </Button>
-                  )}
-                </div>
-              ))
-            ) : (
-              <div className="text-xs text-muted-foreground/60 italic">
-                {isAdmin ? "点击右侧加号添加页脚链接" : "暂无页脚链接"}
-              </div>
-            )}
-            {isAdmin && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "h-5 w-5 p-0 rounded-full",
-                  "hover:bg-primary/10 hover:text-primary",
-                  "transition-colors duration-200"
-                )}
-                onClick={() => setIsDialogOpen(true)}
-              >
-                <Plus className="h-3 w-3" />
-              </Button>
-            )}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* 网站信息 */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Brain className="h-6 w-6 text-primary" />
+              <span className="font-bold text-lg">AI Navigation</span>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {t('footer.description')}
+            </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-            <a
-              href="https://github.com/liyown/ai-navigation"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors"
-            >
-              {settings.copyright}
-            </a>
-            {settings.icpBeian && (
-              <>
-                <span className="hidden md:inline text-muted-foreground/60">
-                  |
-                </span>
-                <a
-                  href="https://beian.miit.gov.cn/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-foreground transition-colors"
+          {/* 快速链接 */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-foreground">{t('footer.quick_links')}</h3>
+            <ul className="space-y-2">
+              {quickLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                  href="/about"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {settings.icpBeian}
+                  {t('navigation.about')}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* 排行榜链接 */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-foreground">Rankings</h3>
+            <ul className="space-y-2">
+              {rankingLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* 实用链接 */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-foreground">{t('footer.useful_links')}</h3>
+              {isAdmin && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 rounded-full hover:bg-primary/10 hover:text-primary"
+                  onClick={() => setIsDialogOpen(true)}
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+            <ul className="space-y-2">
+              {settings.links.length > 0 ? (
+                settings.links.map((link, index) => (
+                  <li key={index} className="flex items-center gap-2">
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.title}
+                    </a>
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 w-4 p-0 rounded-full hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => handleRemoveLink(index)}
+                      >
+                        ×
+                      </Button>
+                    )}
+                  </li>
+                ))
+              ) : (
+                <li className="text-sm text-muted-foreground/60 italic">
+                  {isAdmin ? "点击右侧加号添加链接" : "暂无链接"}
+                </li>
+              )}
+            </ul>
+          </div>
+
+          {/* 法律信息 */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-foreground">法律信息</h3>
+            <ul className="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {t('footer.privacy')}
                 </a>
-              </>
-            )}
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {t('footer.terms')}
+                </a>
+              </li>
+              {settings.icpBeian && (
+                <li>
+                  <a
+                    href="https://beian.miit.gov.cn/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {settings.icpBeian}
+                  </a>
+                </li>
+              )}
+            </ul>
           </div>
         </div>
+
+        {/* 底部版权信息 */}
+        <div className="mt-8 pt-6 border-t border-border">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} AI Navigation. {t('footer.copyright')}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {t('footer.site_info')}
+            </div>
+          </div>
+        </div>
+
+        {/* 自定义HTML */}
         {settings.customHtml && (
           <div
-            className="mt-2 text-xs text-muted-foreground"
+            className="mt-4 text-xs text-muted-foreground"
             dangerouslySetInnerHTML={{ __html: settings.customHtml }}
           />
         )}
       </div>
 
+      {/* 添加链接对话框 */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="bg-background border-border">
           <DialogHeader>
-            <DialogTitle>添加页脚链接</DialogTitle>
+            <DialogTitle>添加实用链接</DialogTitle>
             <DialogDescription className="text-muted-foreground">
               请填写链接的名称和地址
             </DialogDescription>
@@ -247,7 +341,7 @@ export default function FooterContent({
                 onClick={() => setIsDialogOpen(false)}
                 className="border-input hover:bg-accent hover:text-accent-foreground"
               >
-                取消
+                {t('common.cancel')}
               </Button>
               <Button
                 onClick={handleAddLink}

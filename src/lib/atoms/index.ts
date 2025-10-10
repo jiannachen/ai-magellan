@@ -9,6 +9,10 @@ export const selectedCategoryAtom = atom<number | null>(1);
 export const isAdminModeAtom = atomWithStorage("isAdminMode", false);
 export const isCompactModeAtom = atomWithStorage("isCompactMode", false);
 
+// 对比功能状态
+export const compareListAtom = atomWithStorage<number[]>("compareList", []);
+export const compareModalOpenAtom = atom<boolean>(false);
+
 // OSS 设置
 export interface OSSSettings {
   provider: string;

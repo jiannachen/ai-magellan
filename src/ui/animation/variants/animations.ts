@@ -140,55 +140,55 @@ export const headerVariants: Variants = {
   }
 };
 
-// Card hover animations
+// Card hover animations - 简化优化版本
 export const cardHoverVariants: Variants = {
   initial: {
+    y: 0,
     scale: 1,
   },
   hover: {
+    y: -4,
     scale: 1.02,
     transition: {
-      type: "spring",
-      stiffness: 400,
-      damping: 25,
+      duration: 0.2,
+      ease: [0.4, 0, 0.2, 1], // 更自然的缓动函数
     }
   },
   tap: {
     scale: 0.98,
     transition: {
-      type: "spring",
-      stiffness: 400,
-      damping: 25,
+      duration: 0.1,
+      ease: [0.4, 0, 0.2, 1],
     }
   },
 };
 
-// Layout animation for shared elements
+// Layout animation for shared elements - 优化版本
 export const sharedLayoutTransition = {
   type: "spring",
-  stiffness: 350,
+  stiffness: 300,
   damping: 25,
-  mass: 1,
-  duration: 0.35,
+  duration: 0.3, // 缩短持续时间
 };
 
-// Common transitions
+// Common transitions - 优化版本
 export const springTransition = {
   type: "spring",
-  stiffness: 200,
-  damping: 20,
+  stiffness: 300,
+  damping: 25,
+  duration: 0.3,
 };
 
 export const easeTransition = {
-  type: "ease",
-  duration: 0.5,
+  duration: 0.3,
+  ease: [0.4, 0, 0.2, 1],
 };
 
 export const springTransitionProps = {
   type: "spring",
   stiffness: 300,
-  damping: 30,
-  mass: 0.8,
+  damping: 25,
+  duration: 0.3,
 };
 
 // Text hover animations for home page

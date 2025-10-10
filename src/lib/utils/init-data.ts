@@ -1,17 +1,17 @@
-const { prisma } = require('./db');
+import { prisma } from '../db/db';
 import type { Prisma, PrismaClient, Category } from '@prisma/client';
-import { WebsiteSettings } from '@/lib/constraint';
+import { WebsiteSettings } from '../constraint';
 
 
 
 
 const defaultCategories = [
-  { name: 'AI 聊天', slug: 'ai-chat' },
-  { name: 'AI 绘画', slug: 'ai-art' },
-  { name: 'AI 写作', slug: 'ai-writing' },
-  { name: 'AI 编程', slug: 'ai-coding' },
-  { name: 'AI 工具', slug: 'ai-tools' },
-  { name: '大语言模型', slug: 'llm' },
+  { name: 'AI Chat', slug: 'ai-chat' },
+  { name: 'AI Art', slug: 'ai-art' },
+  { name: 'AI Writing', slug: 'ai-writing' },
+  { name: 'AI Coding', slug: 'ai-coding' },
+  { name: 'AI Tools', slug: 'ai-tools' },
+  { name: 'LLM', slug: 'llm' },
 ];
 
 interface WebsiteInput {
@@ -187,3 +187,18 @@ module.exports = {
   initializeData,
   initializeSettings
 }; 
+
+// 如果直接运行此文件，则执行初始化
+if (require.main === module) {
+  (async () => {
+    try {
+      await initializeData();
+      await initializeSettings();
+      console.log('所有数据初始化完成！');
+      process.exit(0);
+    } catch (error) {
+      console.error('初始化失败:', error);
+      process.exit(1);
+    }
+  })();
+} 

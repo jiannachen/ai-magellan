@@ -1,0 +1,205 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "view": "View",
+    "close": "Close",
+    "open": "Open",
+    "copy": "Copy",
+    "share": "Share",
+    "like": "Like",
+    "favorite": "Favorite",
+    "visit": "Visit"
+  },
+  "navigation": {
+    "home": "Home",
+    "categories": "Categories",
+    "rankings": "Rankings",
+    "submit": "Submit",
+    "about": "About",
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile",
+    "settings": "Settings",
+    "admin": "Admin",
+    "tagline": "Explore AI World",
+    "submit_website": "Submit Website"
+  },
+  "header": {
+    "title": "AI Navigation",
+    "subtitle": "Explore the AI World",
+    "description": "Discover Quality AI Tools & Resources"
+  },
+  "auth": {
+    "signin": "Sign In",
+    "signout": "Sign Out",
+    "signup": "Sign Up",
+    "profile": "Profile",
+    "settings": "Settings",
+    "welcome": "Welcome back",
+    "login_with_google": "Sign in with Google",
+    "logout_confirm": "Are you sure you want to sign out?"
+  },
+  "website": {
+    "title": "Website Title",
+    "description": "Website Description",
+    "category": "Category",
+    "url": "URL",
+    "thumbnail": "Thumbnail",
+    "visits": "Visits",
+    "likes": "Likes",
+    "quality_score": "Quality Score",
+    "featured": "Featured",
+    "trusted": "Trusted",
+    "status": "Status",
+    "tags": "Tags",
+    "submit_date": "Submit Date",
+    "last_check": "Last Check",
+    "response_time": "Response Time",
+    "ssl_enabled": "SSL Enabled",
+    "visit_website": "Visit Website",
+    "view_details": "View Details"
+  },
+  "categories": {
+    "all": "All",
+    "ai_writing": "AI Writing",
+    "ai_image": "AI Image",
+    "ai_video": "AI Video",
+    "ai_audio": "AI Audio",
+    "ai_code": "AI Code",
+    "ai_chat": "AI Chat",
+    "ai_search": "AI Search",
+    "ai_translate": "AI Translate",
+    "ai_design": "AI Design",
+    "ai_productivity": "AI Productivity",
+    "ai_education": "AI Education",
+    "ai_business": "AI Business",
+    "others": "Others"
+  },
+  "pages": {
+    "home": {
+      "title": "AI Navigation - Discover Quality AI Tools & Resources",
+      "hero_title": "Discover the Joy of Exploring the AI World",
+      "hero_subtitle": "Discover, share, and bookmark quality AI tools and resources to make your artificial intelligence life better",
+      "search_placeholder": "Search AI tools...",
+      "featured_section": "Featured Tools",
+      "popular_section": "Popular Tools",
+      "recent_section": "Recent Tools",
+      "all_categories": "All Categories"
+    },
+    "rankings": {
+      "title": "AI Tools Rankings",
+      "description": "AI tools ranking based on visits, likes, and quality scores",
+      "sort_by_visits": "Sort by Visits",
+      "sort_by_likes": "Sort by Likes",
+      "sort_by_quality": "Sort by Quality",
+      "top_100": "Top 100"
+    },
+    "submit": {
+      "title": "Submit AI Tool",
+      "description": "Share the quality AI tools you discovered",
+      "form": {
+        "website_title": "Website Title",
+        "website_url": "Website URL",
+        "website_description": "Website Description",
+        "category": "Select Category",
+        "tags": "Tags (comma separated)",
+        "submit_button": "Submit Website",
+        "success_message": "Submitted successfully! We will review your submission soon.",
+        "error_message": "Submission failed, please try again later."
+      }
+    },
+    "about": {
+      "title": "About AI Navigation",
+      "description": "AI Navigation is a professional AI tools navigation platform",
+      "content": {
+        "intro": "AI Navigation is dedicated to providing users with the highest quality artificial intelligence tools and resource navigation services.",
+        "mission": "Our mission is to help users discover, share, and bookmark the latest and best AI products.",
+        "features": [
+          "Curated quality AI tools",
+          "Smart categorization and tagging",
+          "User reviews and feedback",
+          "Regular updates and maintenance",
+          "Free and open access"
+        ]
+      }
+    }
+  },
+  "search": {
+    "placeholder": "Search AI tools...",
+    "no_results": "No results found",
+    "results_count": "Found {count} results",
+    "suggestions": "Search suggestions",
+    "recent_searches": "Recent searches",
+    "clear_history": "Clear search history"
+  },
+  "filters": {
+    "all_categories": "All Categories",
+    "sort_by": "Sort by",
+    "sort_newest": "Newest",
+    "sort_popular": "Most Popular",
+    "sort_rating": "Highest Rated",
+    "sort_visits": "Most Visited",
+    "filter_featured": "Featured Only",
+    "filter_free": "Free Tools",
+    "filter_paid": "Paid Tools"
+  },
+  "footer": {
+    "description": "The best platform to discover quality AI tools and resources",
+    "quick_links": "Quick Links",
+    "useful_links": "Useful Links",
+    "contact": "Contact Us",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "copyright": "All rights reserved.",
+    "site_info": "Professional AI tools navigation platform"
+  },
+  "messages": {
+    "welcome": "Welcome to AI Navigation!",
+    "login_success": "Login successful",
+    "logout_success": "Logged out successfully",
+    "like_success": "Liked successfully",
+    "unlike_success": "Unliked",
+    "favorite_success": "Favorited successfully",
+    "unfavorite_success": "Unfavorited",
+    "copy_success": "Link copied to clipboard",
+    "share_success": "Shared successfully",
+    "network_error": "Network error, please try again later",
+    "permission_denied": "Permission denied",
+    "not_found": "Page not found",
+    "server_error": "Server error"
+  },
+  "seo": {
+    "site_name": "AI Navigation",
+    "site_description": "Professional AI tools navigation platform, featuring quality artificial intelligence tools and resources",
+    "ai_tools_list": "AI Tools Recommendation List",
+    "curated_list_description": "Curated list of AI tools and resources"
+  },
+  "admin": {
+    "websites": "Website Management",
+    "categories": "Category Management",
+    "users": "User Management",
+    "settings": "System Settings",
+    "statistics": "Statistics",
+    "pending_review": "Pending Review",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "bulk_actions": "Bulk Actions",
+    "approve_selected": "Approve Selected",
+    "reject_selected": "Reject Selected",
+    "delete_selected": "Delete Selected"
+  }
+}

@@ -5,6 +5,7 @@ import { isAdminModeAtom, isCompactModeAtom, websitesAtom } from "@/lib/atoms";
 import { useToast } from "@/hooks/use-toast";
 import { WebsiteCard } from "./website-card";
 import { CompactCard } from "./compact-card";
+import { ModernWebsiteCard } from "./modern-website-card";
 import { ViewModeToggle } from "./view-mode-toggle";
 import { cn } from "@/lib/utils/utils";
 import type { Website, Category } from "@/lib/types";
@@ -72,10 +73,10 @@ export default function WebsiteGrid({
       <motion.div
         layout
         className={cn(
-          "grid gap-2 sm:gap-4",
+          "grid gap-3 sm:gap-4",
           isCompact
-            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8"
+            : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4"
         )}
       >
         <AnimatePresence mode="popLayout">
@@ -119,7 +120,7 @@ export default function WebsiteGrid({
                 {isCompact ? (
                   <CompactCard website={website} onVisit={handleVisit} />
                 ) : (
-                  <WebsiteCard
+                  <ModernWebsiteCard
                     website={website}
                     category={categories.find(
                       (c) => c.id === website.category_id

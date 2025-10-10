@@ -13,14 +13,18 @@ import {
   categoriesAtom,
   searchQueryAtom,
   selectedCategoryAtom,
+  compareListAtom,
+  compareModalOpenAtom,
 } from "@/lib/atoms";
 import WebsiteGrid from "@/components/website/website-grid";
-import { PersistentHeader } from "@/components/header/persistent-header";
+import { SearchManager } from "@/components/search/search-manager";
+import { CompareModal } from "@/components/compare/compare-modal";
 import { Typewriter } from "@/ui/animation/typewriter";
-import { Brain, Cpu, Sparkles, Zap } from "lucide-react";
+import { Brain, Cpu, Sparkles, Zap, BarChart3 } from "lucide-react";
 import type { Website, Category } from "@/lib/types";
 import { useTheme } from "next-themes";
 import { WaveText } from "@/ui/animation/wave-text";
+import { useTranslations } from 'next-intl';
 
 interface HomePageProps {
   initialWebsites: Website[];
@@ -31,11 +35,14 @@ export default function HomePage({
   initialWebsites,
   initialCategories,
 }: HomePageProps) {
+  const t = useTranslations();
   const [websites, setWebsites] = useAtom(websitesAtom);
   // console.log("🚀 ~ websites:", websites);
   const [categories, setCategories] = useAtom(categoriesAtom);
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const [selectedCategory] = useAtom(selectedCategoryAtom);
+  const [compareList, setCompareList] = useAtom(compareListAtom);
+  const [compareModalOpen, setCompareModalOpen] = useAtom(compareModalOpenAtom);
   const { scrollY } = useScroll();
   const { theme } = useTheme();
   // Enhanced scroll-based animations
@@ -51,25 +58,6 @@ export default function HomePage({
     setCategories(initialCategories);
   }, [initialWebsites, initialCategories, setWebsites, setCategories]);
 
-  // 处理搜索和分类过滤
-  useEffect(() => {
-    if (!websites) return;
-
-    const filtered = websites.filter((website) => {
-      const matchesSearch =
-        !searchQuery ||
-        website.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        website.description.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesCategory =
-        !selectedCategory || website.category_id === Number(selectedCategory);
-
-      return matchesSearch && matchesCategory;
-    });
-
-    setFilteredWebsites(filtered);
-  }, [websites, searchQuery, selectedCategory]);
-
   // 处理主题切换
   useEffect(() => {
     if (theme === "dark") {
@@ -83,6 +71,10 @@ export default function HomePage({
   //   fetch(`/api/websites/${website.id}/visit`, { method: "POST" });
   //   window.open(website.url, "_blank");
   // };
+
+  const handleRemoveFromCompare = (id: number) => {
+    setCompareList(prev => prev.filter(webId => webId !== id));
+  };
 
   return (
     <div className="relative min-h-screen">
@@ -104,13 +96,19 @@ export default function HomePage({
         />
       </motion.div>
 
-      {/* Persistent Header */}
-      <PersistentHeader
-        searchQuery={searchQuery}
-        onSearchChange={(searchQuery) => setSearchQuery(searchQuery)}
-        categories={categories}
-        isScrolled={isScrolled.get()}
-      />
+      {/* Search and Filter Section */}
+      <div className="sticky top-14 z-40 w-full transition-[background,border] duration-100 md:duration-300">
+        <div className="w-full px-2 py-3 sm:py-2 md:px-4 md:py-4">
+          <SearchManager
+            websites={websites}
+            categories={categories}
+            searchQuery={searchQuery}
+            selectedCategory={selectedCategory}
+            onSearchChange={setSearchQuery}
+            onResultsChange={setFilteredWebsites}
+          />
+        </div>
+      </div>
 
       {/* Main Content */}
       <motion.div
@@ -156,14 +154,15 @@ export default function HomePage({
                   opacity: 1,
                   y: 0,
                   transition: {
-                    delay: index * 0.2,
-                    duration: 0.8,
+                    delay: index * 0.1,
+                    duration: 0.4,
+                    ease: [0.4, 0, 0.2, 1],
                   },
                 }}
                 whileHover={{
-                  scale: 1.2,
-                  rotate: 10,
-                  transition: { duration: 0.3 },
+                  scale: 1.1,
+                  rotate: 5,
+                  transition: { duration: 0.2 },
                 }}
               >
                 <Icon className={`${size} text-primary/20`} />
@@ -171,22 +170,22 @@ export default function HomePage({
             ))}
           </AnimatePresence>
 
-          <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8 px-4">
+          <div className="container mx-auto text-center space-y-6 sm:space-y-8 px-4">
             {/* Title */}
             <motion.div className="space-y-3 sm:space-y-4">
               <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight sm:leading-normal">
                 <WaveText className="text-primary">
-                  发现探索AI新世界的乐趣
+                  {t('pages.home.hero_title')}
                 </WaveText>
               </div>
               <motion.div
                 initial={false}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-muted-foreground/90"
+                className="container mx-auto text-base sm:text-lg md:text-xl text-muted-foreground/90"
               >
                 <Typewriter
-                  text="发现、分享和收藏优质AI工具与资源，让你的人工智能生活更美好"
+                  text={t('pages.home.hero_subtitle')}
                   speed={80}
                   delay={500}
                 />
@@ -209,6 +208,45 @@ export default function HomePage({
           />
         </motion.div>
       </motion.div>
+
+      {/* Floating Compare Button */}
+      <AnimatePresence>
+        {compareList.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 100 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 100 }}
+            className="fixed bottom-6 right-6 z-50"
+          >
+            <motion.button
+              onClick={() => setCompareModalOpen(true)}
+              className="group relative bg-purple-600 hover:bg-purple-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-200"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <BarChart3 className="h-6 w-6" />
+              
+              {/* Badge */}
+              <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center text-xs font-bold">
+                {compareList.length}
+              </div>
+              
+              {/* Tooltip */}
+              <div className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-black text-white text-sm rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                对比 {compareList.length} 个工具
+              </div>
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Compare Modal */}
+      <CompareModal
+        isOpen={compareModalOpen}
+        onClose={() => setCompareModalOpen(false)}
+        compareList={compareList}
+        onRemoveFromCompare={handleRemoveFromCompare}
+      />
     </div>
   );
 }
