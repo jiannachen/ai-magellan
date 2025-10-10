@@ -63,7 +63,7 @@ export default function MVPHomePage({
   // Get featured websites (top rated or featured)
   useEffect(() => {
     const featured = websites
-      .filter(w => w.is_featured || w.quality_score > 80)
+      .filter(w => w.is_featured || (w.quality_score ?? 50) > 80)
       .slice(0, 8);
     setFeaturedWebsites(featured);
   }, [websites]);

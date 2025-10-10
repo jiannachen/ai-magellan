@@ -10,6 +10,7 @@ import { Button } from "@/ui/common/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/common/card";
 import { Badge } from "@/ui/common/badge";
 import { Input } from "@/ui/common/input";
+import { cn } from "@/lib/utils/utils";
 import { 
   Search, 
   TrendingUp, 
@@ -155,38 +156,59 @@ export default function SimplifiedHomePage({
 
   // Process websites for different rankings
   useEffect(() => {
-    const approvedWebsites = websites.filter(w => w.status === 'approved');
+    // 直接使用传入的websites，因为在page.tsx中已经过滤了approved状态
+    const approvedWebsites = websites;
+    console.log('=== DEBUGGING WEBSITE DATA ===');
+    console.log('Processing websites - total:', websites.length);
+    console.log('Sample website data:', websites[0]);
+    
+    // 检查数据质量
+    const hasQualityScore = websites.filter(w => w.quality_score != null && w.quality_score > 0);
+    const hasVisits = websites.filter(w => w.visits > 0);
+    const hasCreatedAt = websites.filter(w => w.created_at != null);
+    const hasPricingModel = websites.filter(w => w.pricing_model != null);
+    
+    console.log('Data quality check:');
+    console.log('- With quality_score > 0:', hasQualityScore.length);
+    console.log('- With visits > 0:', hasVisits.length); 
+    console.log('- With created_at:', hasCreatedAt.length);
+    console.log('- With pricing_model:', hasPricingModel.length);
 
     // Top rated by quality score
     const topRated = [...approvedWebsites]
-      .sort((a, b) => b.quality_score - a.quality_score)
+      .sort((a, b) => (b.quality_score ?? 50) - (a.quality_score ?? 50))
       .slice(0, 12);
+    console.log('Top rated websites:', topRated.length, topRated.map(w => `${w.title}: ${w.quality_score}`));
     setTopRatedWebsites(topRated);
 
     // Most popular by visits
     const mostPopular = [...approvedWebsites]
       .sort((a, b) => b.visits - a.visits)
       .slice(0, 12);
+    console.log('Most popular websites:', mostPopular.length, mostPopular.map(w => `${w.title}: ${w.visits} visits`));
     setMostPopularWebsites(mostPopular);
 
     // Recent websites
     const recent = [...approvedWebsites]
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
       .slice(0, 12);
+    console.log('Recent websites:', recent.length, recent.map(w => `${w.title}: ${w.created_at}`));
     setRecentWebsites(recent);
 
     // Top free tools
     const topFree = approvedWebsites
       .filter(w => w.pricing_model === 'free' || w.has_free_version)
-      .sort((a, b) => b.quality_score - a.quality_score)
+      .sort((a, b) => (b.quality_score ?? 50) - (a.quality_score ?? 50))
       .slice(0, 12);
+    console.log('Top free websites:', topFree.length, 'filtered from', approvedWebsites.length);
     setTopFreeWebsites(topFree);
 
     // Top paid tools
     const topPaid = approvedWebsites
       .filter(w => w.pricing_model !== 'free' && !w.has_free_version)
-      .sort((a, b) => b.quality_score - a.quality_score)
+      .sort((a, b) => (b.quality_score ?? 50) - (a.quality_score ?? 50))
       .slice(0, 12);
+    console.log('Top paid websites:', topPaid.length);
     setTopPaidWebsites(topPaid);
   }, [websites]);
 
@@ -273,43 +295,64 @@ export default function SimplifiedHomePage({
     icon: any; 
     viewAllLink: string; 
   }) => (
-    <section className="py-16 px-4">
+    <section className="py-12 px-4"> {/* 减少padding，更精简 */}
       <div className="container mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6"> {/* 减少margin-bottom */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <div className={cn(
+              "w-10 h-10 rounded-lg flex items-center justify-center", // 使用8px圆角
+              "bg-primary/10 border border-primary/20"
+            )}>
               <Icon className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h2 className="text-title1 font-semibold text-label-primary">{title}</h2>
-              <p className="text-subhead text-label-secondary">{description}</p>
+              <h2 className="text-atlassian-h3 font-medium text-foreground">{title}</h2>
+       310 -                <p className="text-atlassian-body text-muted-foreground">{description}</p>
             </div>
           </div>
           <Link href={viewAllLink}>
-            <Button variant="ghost" className="hidden md:flex items-center gap-2 text-primary">
+            <Button 
+              variant="ghost" 
+              className={cn(
+                "hidden md:flex items-center gap-2 text-primary",
+                "hover:bg-primary/5 transition-atlassian-standard",
+                "rounded-md px-3 py-2" // Atlassian风格的按钮
+              )}
+            >
               View All
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"> {/* 调整为3-4列布局 */}
           {websites.slice(0, 12).map((website, index) => (
             <motion.div
               key={website.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.05 }}
+              transition={{ 
+                duration: 0.3, // 缩短动画时间
+                delay: index * 0.03, // 减少延迟间隔
+                ease: [0.25, 0.1, 0.25, 1] // 使用Atlassian缓动曲线
+              }}
             >
               <WebsiteCard website={website} rank={index + 1} />
             </motion.div>
           ))}
         </div>
 
-        {/* Mobile View All Button */}
+        {/* Mobile View All Button - Atlassian风格 */}
         <div className="mt-6 text-center md:hidden">
           <Link href={viewAllLink}>
-            <Button variant="secondary" className="w-full">
+            <Button 
+              variant="secondary" 
+              className={cn(
+                "w-full max-w-sm",
+                "rounded-md border border-border",
+                "hover:bg-muted transition-atlassian-standard"
+              )}
+            >
               View All {title}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
@@ -321,41 +364,56 @@ export default function SimplifiedHomePage({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="relative py-24 px-4 bg-background">
+      {/* Hero Section - Atlassian风格 */}
+      <section className="relative py-20 px-4 bg-background"> {/* 减少垂直间距 */}
         <div className="container mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-8"
+            transition={{ 
+              duration: 0.3, 
+              ease: [0.15, 1, 0.3, 1] // Atlassian entrance缓动
+            }}
+            className="space-y-6" // 减少间距
           >
-            {/* Badge */}
+            {/* Badge - Atlassian风格 */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-fill-quaternary text-label-primary text-subhead font-medium"
+              transition={{ 
+                duration: 0.2, 
+                delay: 0.1,
+                ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+              }}
+              className={cn(
+                "inline-flex items-center gap-2",
+                "px-3 py-1.5 rounded-md", // 使用4px圆角
+                "bg-primary/10 border border-primary/20",
+                "text-atlassian-body-small font-medium text-primary"
+              )}
             >
-              <Rocket className="h-4 w-4" />
+              <Rocket className="h-3.5 w-3.5" />
               <span>Discover Quality AI Tools</span>
             </motion.div>
 
-            {/* Main Title */}
-            <div className="space-y-4">
-              <h1 className="text-largeTitle md:text-[48px] font-semibold tracking-tight leading-tight max-w-4xl mx-auto">
+            {/* Main Title - Atlassian字体层级 */}
+            <div className="space-y-3"> {/* 减少间距 */}
+              <h1 className={cn(
+                "text-atlassian-display md:text-atlassian-display", // 使用Atlassian字体
+                "font-medium tracking-tight leading-tight max-w-4xl mx-auto"
+              )}>
                 Find the Best{" "}
                 <span className="text-primary">
                   AI Tools
                 </span>
                 <br />
-                <span className="text-title1 text-label-secondary font-normal">
+                <span className="text-atlassian-h3 text-muted-foreground font-normal">
                   That Actually Work
                 </span>
               </h1>
 
-              {/* Subtitle */}
-              <p className="text-title3 text-label-secondary max-w-2xl mx-auto leading-relaxed font-normal">
+              {/* Subtitle - Atlassian字体 */}
+              <p className="text-atlassian-body-large text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                 Curated collection of AI tools to boost your productivity.
                 <br className="hidden md:block" />
                 Find, compare, and use the tools trusted by professionals.
@@ -363,68 +421,103 @@ export default function SimplifiedHomePage({
             </div>
           </motion.div>
 
-          {/* Search */}
+          {/* Search - Atlassian风格 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-12 max-w-xl mx-auto"
+            transition={{ 
+              duration: 0.3, 
+              delay: 0.2,
+              ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+            }}
+            className="mt-8 max-w-xl mx-auto" // 减少上边距
           >
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-label-tertiary" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search AI tools..."
-                className="pl-12 pr-4 h-14 text-body rounded-2xl border-2 border-fill-tertiary focus-visible:border-primary bg-background shadow-apple-1 focus-visible:shadow-apple-2"
+                className={cn(
+                  "pl-10 pr-4 h-12", // 调整高度符合Atlassian
+                  "text-atlassian-body rounded-md", // 使用4px圆角和Atlassian字体
+                  "border-2 border-border focus-visible:border-primary",
+                  "bg-background shadow-atlassian-100 focus-visible:shadow-atlassian-200",
+                  "transition-atlassian-standard"
+                )}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <p className="text-footnote text-label-tertiary mt-3">
+            <p className="text-atlassian-caption text-muted-foreground mt-2">
               Try: "image generator", "code assistant", "writing tool"
             </p>
           </motion.div>
 
-          {/* Quick Stats */}
+          {/* Quick Stats - Atlassian风格 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-2xl mx-auto"
+            transition={{ 
+              duration: 0.3, 
+              delay: 0.3,
+              ease: [0.25, 0.1, 0.25, 1]
+            }}
+            className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto" // 减少gap
           >
             <div className="text-center">
-              <div className="text-title2 font-semibold text-primary mb-1">{websites.length}+</div>
-              <div className="text-caption1 text-label-secondary font-medium">AI Tools</div>
+              <div className="text-atlassian-h4 font-medium text-primary mb-1">{websites.length}+</div>
+              <div className="text-atlassian-caption text-muted-foreground font-medium">AI Tools</div>
             </div>
             <div className="text-center">
-              <div className="text-title2 font-semibold text-primary mb-1">50K+</div>
-              <div className="text-caption1 text-label-secondary font-medium">Users</div>
+              <div className="text-atlassian-h4 font-medium text-primary mb-1">50K+</div>
+              <div className="text-atlassian-caption text-muted-foreground font-medium">Users</div>
             </div>
             <div className="text-center">
-              <div className="text-title2 font-semibold text-primary mb-1">Daily</div>
-              <div className="text-caption1 text-label-secondary font-medium">Updated</div>
+              <div className="text-atlassian-h4 font-medium text-primary mb-1">Daily</div>
+              <div className="text-atlassian-caption text-muted-foreground font-medium">Updated</div>
             </div>
             <div className="text-center">
-              <div className="text-title2 font-semibold text-primary mb-1">Quality</div>
-              <div className="text-caption1 text-label-secondary font-medium">Curated</div>
+              <div className="text-atlassian-h4 font-medium text-primary mb-1">Quality</div>
+              <div className="text-atlassian-caption text-muted-foreground font-medium">Curated</div>
             </div>
           </motion.div>
 
-          {/* CTA Buttons */}
+          {/* CTA Buttons - Atlassian风格 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-12 flex flex-col sm:flex-row gap-4 justify-center"
+            transition={{ 
+              duration: 0.3, 
+              delay: 0.4,
+              ease: [0.25, 0.1, 0.25, 1]
+            }}
+            className="mt-10 flex flex-col sm:flex-row gap-3 justify-center" // 减少间距
           >
             <Link href="/categories">
-              <Button size="lg" className="w-full sm:w-auto">
-                <Grid3X3 className="h-5 w-5 mr-2" />
+              <Button 
+                size="lg" 
+                className={cn(
+                  "w-full sm:w-auto",
+                  "btn-atlassian-primary",
+                  "rounded-md px-6 py-3", // Atlassian按钮尺寸
+                  "text-atlassian-body font-medium"
+                )}
+              >
+                <Grid3X3 className="h-4 w-4 mr-2" />
                 Browse Categories
               </Button>
             </Link>
             <Link href="/submit">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto">
-                <Plus className="h-5 w-5 mr-2" />
+              <Button 
+                size="lg" 
+                variant="secondary" 
+                className={cn(
+                  "w-full sm:w-auto",
+                  "btn-atlassian-secondary",
+                  "rounded-md px-6 py-3",
+                  "text-atlassian-body font-medium"
+                )}
+              >
+                <Plus className="h-4 w-4 mr-2" />
                 Submit Tool
               </Button>
             </Link>
@@ -469,41 +562,56 @@ export default function SimplifiedHomePage({
         />
       </div>
 
-      {/* Value Proposition Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-primary/5 to-purple-500/5">
+      {/* Value Proposition Section - Atlassian风格 */}
+      <section className="py-16 px-4 bg-primary/5"> {/* 减少垂直间距，使用更简洁的背景 */}
         <div className="container mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12"> {/* 减少底部间距 */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+              transition={{ 
+                duration: 0.3,
+                ease: [0.15, 1, 0.3, 1] // Atlassian entrance缓动
+              }}
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              <h2 className="text-atlassian-h2 font-medium mb-4"> {/* 使用Atlassian字体层级 */}
                 Why Choose Our AI Tools Directory?
               </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              <p className="text-atlassian-body-large text-muted-foreground max-w-3xl mx-auto">
                 We don't just list tools - we curate, test, and rank every AI tool to save you time and help you make informed decisions.
               </p>
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> {/* 减少间距 */}
             {valueProps.map((prop, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ 
+                  duration: 0.3, 
+                  delay: index * 0.05, // 减少延迟间隔
+                  ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+                }}
               >
-                <Card className="h-full text-center hover:shadow-lg transition-all duration-300 border-primary/10 hover:border-primary/30">
-                  <CardContent className="p-8">
-                    <div className="mb-6 flex justify-center">
-                      <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-purple-500/10">
-                        <prop.icon className="h-8 w-8 text-primary" />
+                <Card className={cn(
+                  "h-full text-center",
+                  "card-atlassian", // 使用Atlassian卡片样式
+                  "border-border/60 hover:border-primary/30",
+                  "transition-atlassian-standard"
+                )}>
+                  <CardContent className="p-6"> {/* 减少内边距 */}
+                    <div className="mb-4 flex justify-center"> {/* 减少底部间距 */}
+                      <div className={cn(
+                        "p-3 rounded-lg", // 使用8px圆角
+                        "bg-primary/10 border border-primary/20"
+                      )}>
+                        <prop.icon className="h-6 w-6 text-primary" /> {/* 稍微减小图标 */}
                       </div>
                     </div>
-                    <h3 className="text-xl font-bold mb-4">{prop.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed">
+                    <h3 className="text-atlassian-h5 font-medium mb-3">{prop.title}</h3> {/* 使用Atlassian字体 */}
+                    <p className="text-atlassian-body text-muted-foreground leading-relaxed">
                       {prop.description}
                     </p>
                   </CardContent>
@@ -514,44 +622,58 @@ export default function SimplifiedHomePage({
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-20 px-4">
+      {/* FAQ Section - Atlassian风格 */}
+      <section className="py-16 px-4"> {/* 减少垂直间距 */}
         <div className="container mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12"> {/* 减少底部间距 */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+              transition={{ 
+                duration: 0.3,
+                ease: [0.15, 1, 0.3, 1] // Atlassian entrance缓动
+              }}
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              <h2 className="text-atlassian-h2 font-medium mb-4"> {/* 使用Atlassian字体层级 */}
                 Frequently Asked Questions
               </h2>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-atlassian-body-large text-muted-foreground">
                 Everything you need to know about our AI tools directory
               </p>
             </motion.div>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3"> {/* 减少间距 */}
             {faqs.map((faq, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ 
+                  duration: 0.3, 
+                  delay: index * 0.05, // 减少延迟间隔
+                  ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+                }}
               >
-                <Card className="overflow-hidden">
+                <Card className={cn(
+                  "overflow-hidden",
+                  "card-atlassian", // 使用Atlassian卡片样式
+                  "border-border/60"
+                )}>
                   <CardContent className="p-0">
                     <button
                       onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                      className="w-full text-left p-6 hover:bg-muted/50 transition-colors flex items-center justify-between"
+                      className={cn(
+                        "w-full text-left p-5 transition-atlassian-standard", // 减少内边距，使用Atlassian缓动
+                        "hover:bg-muted/30 flex items-center justify-between"
+                      )}
                     >
-                      <h3 className="text-lg font-semibold pr-4">{faq.question}</h3>
+                      <h3 className="text-atlassian-h6 font-medium pr-4">{faq.question}</h3>
                       <div className="flex-shrink-0">
                         {openFaqIndex === index ? (
-                          <Minus className="h-5 w-5 text-primary" />
+                          <Minus className="h-4 w-4 text-primary" />
                         ) : (
-                          <Plus className="h-5 w-5 text-primary" />
+                          <Plus className="h-4 w-4 text-primary" />
                         )}
                       </div>
                     </button>
@@ -561,10 +683,13 @@ export default function SimplifiedHomePage({
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                          transition={{ 
+                            duration: 0.2, // 缩短动画时间
+                            ease: [0.25, 0.1, 0.25, 1] // Atlassian缓动
+                          }}
                           className="overflow-hidden"
                         >
-                          <div className="px-6 pb-6 text-muted-foreground leading-relaxed">
+                          <div className="px-5 pb-5 text-atlassian-body text-muted-foreground leading-relaxed">
                             {faq.answer}
                           </div>
                         </motion.div>
@@ -576,26 +701,46 @@ export default function SimplifiedHomePage({
             ))}
           </div>
 
-          {/* Contact CTA */}
+          {/* Contact CTA - Atlassian风格 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="mt-12 text-center"
+            transition={{ 
+              duration: 0.3, 
+              delay: 0.4,
+              ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+            }}
+            className="mt-10 text-center" // 减少上边距
           >
-            <Card className="bg-gradient-to-r from-primary/5 to-purple-500/5 border-primary/20">
-              <CardContent className="p-8">
-                <div className="space-y-4">
-                  <Lightbulb className="h-12 w-12 text-primary mx-auto" />
-                  <h3 className="text-xl font-bold">Still have questions?</h3>
-                  <p className="text-muted-foreground">
+            <Card className={cn(
+              "bg-primary/5 border-primary/20",
+              "card-atlassian"
+            )}>
+              <CardContent className="p-6"> {/* 减少内边距 */}
+                <div className="space-y-3"> {/* 减少间距 */}
+                  <Lightbulb className="h-10 w-10 text-primary mx-auto" /> {/* 稍微减小图标 */}
+                  <h3 className="text-atlassian-h5 font-medium">Still have questions?</h3>
+                  <p className="text-atlassian-body text-muted-foreground">
                     Can't find the answer you're looking for? Our team is here to help.
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Button variant="outline">
+                  <div className="flex flex-col sm:flex-row gap-2 justify-center"> {/* 减少间距 */}
+                    <Button 
+                      variant="outline"
+                      className={cn(
+                        "btn-atlassian-secondary",
+                        "rounded-md px-4 py-2",
+                        "text-atlassian-body"
+                      )}
+                    >
                       Contact Support
                     </Button>
-                    <Button>
+                    <Button 
+                      className={cn(
+                        "btn-atlassian-primary",
+                        "rounded-md px-4 py-2",
+                        "text-atlassian-body"
+                      )}
+                    >
                       Join Community
                     </Button>
                   </div>
@@ -606,29 +751,49 @@ export default function SimplifiedHomePage({
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4">
+      {/* CTA Section - Atlassian风格 */}
+      <section className="py-16 px-4"> {/* 减少垂直间距 */}
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-6"
+            transition={{ 
+              duration: 0.3,
+              ease: [0.15, 1, 0.3, 1] // Atlassian entrance缓动
+            }}
+            className="space-y-4" // 减少间距
           >
-            <h2 className="text-3xl md:text-4xl font-bold">
+            <h2 className="text-atlassian-h2 font-medium"> {/* 使用Atlassian字体层级 */}
               Ready to discover your next AI tool?
             </h2>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-atlassian-body-large text-muted-foreground">
               Join thousands of professionals who use our rankings to find the best AI tools.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center"> {/* 减少间距 */}
               <Link href="/submit">
-                <Button size="lg" className="w-full sm:w-auto">
+                <Button 
+                  size="lg" 
+                  className={cn(
+                    "w-full sm:w-auto",
+                    "btn-atlassian-primary",
+                    "rounded-md px-6 py-3",
+                    "text-atlassian-body font-medium"
+                  )}
+                >
                   Submit Your Tool
                 </Button>
               </Link>
               <Link href="/categories">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className={cn(
+                    "w-full sm:w-auto",
+                    "btn-atlassian-secondary",
+                    "rounded-md px-6 py-3",
+                    "text-atlassian-body font-medium"
+                  )}
+                >
                   Browse Categories
                 </Button>
               </Link>

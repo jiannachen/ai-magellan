@@ -8,10 +8,9 @@ import { prisma } from "@/lib/db/db";
 // 获取所有指定分类的网站
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const status =
-    (searchParams.get("status") as Website["status"]) || "approved";
+  const statusParam = searchParams.get("status");
   const websites = await prisma.website.findMany({
-    where: { status: status === "all" ? undefined : status },
+    where: statusParam && statusParam !== "all" ? { status: statusParam as any } : {},
   });
   return NextResponse.json(AjaxResponse.ok(websites));
 }
@@ -76,8 +75,6 @@ export async function POST(request: Request) {
         status: 400,
       });
     }
-
-    console.log(data);
 
     // Check if URL already exists
     const existingWebsite = await prisma.website.findFirst({

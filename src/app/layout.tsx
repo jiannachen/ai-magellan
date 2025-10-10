@@ -10,16 +10,6 @@ import Footer from "@/components/footer/index";
 import SWRProvider from "@/components/providers/swr-provider";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { Analytics as OtherAnalytics } from "@/components/analytics";
-import { thumbnailUpdateJob, websiteCheckJob, healthCheckJob, deadLinkCleanupJob } from "@/lib/tasks/cron";
-
-// 启动定时任务
-if (process.env.NODE_ENV === "production") {
-  thumbnailUpdateJob.start();
-  websiteCheckJob.start();
-  healthCheckJob.start();
-  deadLinkCleanupJob.start();
-  console.log("所有定时任务已启动");
-}
 
 // 全局SEO配置
 export const metadata: Metadata = {

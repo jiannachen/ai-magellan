@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/ui/common/card';
 import { Badge } from '@/ui/common/badge';
 import { Button } from '@/ui/common/button';
+import { cn } from '@/lib/utils/utils';
 import {
   Brain,
   Code,
@@ -47,32 +48,42 @@ const categoryIcons = {
 export default function CategoriesListPage({ categories }: CategoriesListPageProps) {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <section className="py-16 px-4 bg-gradient-to-b from-primary/5 to-background">
+      {/* Header - Atlassian风格 */}
+      <section className="py-12 px-4 bg-primary/5"> {/* 减少垂直间距，使用简洁背景 */}
         <div className="max-w-6xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-6"
+            transition={{ 
+              duration: 0.3,
+              ease: [0.15, 1, 0.3, 1] // Atlassian entrance缓动
+            }}
+            className="space-y-4" // 减少间距
           >
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+            <h1 className={cn(
+              "text-atlassian-display md:text-atlassian-display", // 使用Atlassian字体层级
+              "font-medium tracking-tight"
+            )}>
               Browse AI Tools by{" "}
-              <span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
+              <span className="text-primary"> {/* 简化为单一主色调 */}
                 Category
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-atlassian-body-large text-muted-foreground max-w-3xl mx-auto">
               Find the perfect AI tool for your specific needs. Explore our curated categories with top-rated tools.
             </p>
           </motion.div>
 
-          {/* Quick Stats */}
+          {/* Quick Stats - Atlassian风格 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-12 flex justify-center gap-8 text-sm text-muted-foreground"
+            transition={{ 
+              duration: 0.3, 
+              delay: 0.1,
+              ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+            }}
+            className="mt-8 flex justify-center gap-6 text-atlassian-body text-muted-foreground" // 减少间距，使用Atlassian字体
           >
             <div className="flex items-center gap-2">
               <Grid3X3 className="h-4 w-4" />
@@ -90,10 +101,10 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
         </div>
       </section>
 
-      {/* Categories Grid */}
-      <section className="py-16 px-4">
+      {/* Categories Grid - Atlassian风格 */}
+      <section className="py-12 px-4"> {/* 减少垂直间距 */}
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* 减少grid间距 */}
             {categories.map((category, index) => {
               const IconComponent = categoryIcons[category.slug as keyof typeof categoryIcons] || Brain;
               
@@ -102,55 +113,80 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                   key={category.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  transition={{ 
+                    duration: 0.3, 
+                    delay: index * 0.05, // 减少延迟间隔
+                    ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+                  }}
                 >
-                  <Card className="h-full hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group border-2 border-transparent hover:border-primary/20">
-                    <CardContent className="p-8">
-                      {/* Category Header */}
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-4">
-                          <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/10 to-purple-500/10 group-hover:from-primary/20 group-hover:to-purple-500/20 transition-all duration-300">
-                            <IconComponent className="h-8 w-8 text-primary" />
+                  <Card className={cn(
+                    "h-full group",
+                    "card-atlassian", // 使用Atlassian卡片样式
+                    "border-border/60 hover:border-primary/30",
+                    "transition-atlassian-standard"
+                  )}>
+                    <CardContent className="p-6"> {/* 减少内边距 */}
+                      {/* Category Header - Atlassian风格 */}
+                      <div className="flex items-center justify-between mb-5"> {/* 减少底部间距 */}
+                        <div className="flex items-center gap-3"> {/* 减少gap */}
+                          <div className={cn(
+                            "p-2.5 rounded-lg", // 使用8px圆角，减少padding
+                            "bg-primary/10 border border-primary/20",
+                            "group-hover:bg-primary/15 transition-atlassian-standard"
+                          )}>
+                            <IconComponent className="h-6 w-6 text-primary" /> {/* 稍微减小图标 */}
                           </div>
                           <div>
-                            <h2 className="text-2xl font-bold">{category.name}</h2>
-                            <p className="text-muted-foreground">
+                            <h2 className="text-atlassian-h4 font-medium">{category.name}</h2> {/* 使用Atlassian字体层级 */}
+                            <p className="text-atlassian-body text-muted-foreground">
                               {category.toolCount} tools available
                             </p>
                           </div>
                         </div>
-                        <Badge variant="outline" className="text-sm">
+                        <Badge 
+                          variant="outline" 
+                          className={cn(
+                            "text-atlassian-body-small",
+                            "border-border/60 bg-background/80"
+                          )}
+                        >
                           {category.toolCount}
                         </Badge>
                       </div>
 
-                      {/* Featured Tools Preview */}
+                      {/* Featured Tools Preview - Atlassian风格 */}
                       {category.featuredTools.length > 0 && (
-                        <div className="mb-6">
-                          <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
+                        <div className="mb-5"> {/* 减少底部间距 */}
+                          <h3 className="text-atlassian-caption font-medium text-muted-foreground mb-3 uppercase tracking-wide">
                             Featured Tools
                           </h3>
-                          <div className="space-y-3">
+                          <div className="space-y-2"> {/* 减少间距 */}
                             {category.featuredTools.map((tool) => (
-                              <div key={tool.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                              <div 
+                                key={tool.id} 
+                                className={cn(
+                                  "flex items-center gap-3 p-3 rounded-md", // 使用4px圆角
+                                  "bg-muted/20 hover:bg-muted/30 transition-atlassian-standard"
+                                )}
+                              >
                                 {tool.thumbnail ? (
                                   <img 
                                     src={tool.thumbnail} 
                                     alt={tool.title}
-                                    className="w-8 h-8 rounded object-cover flex-shrink-0"
+                                    className="w-7 h-7 rounded object-cover flex-shrink-0" // 稍微减小尺寸
                                   />
                                 ) : (
-                                  <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                    <IconComponent className="h-4 w-4 text-primary" />
+                                  <div className="w-7 h-7 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                    <IconComponent className="h-3.5 w-3.5 text-primary" />
                                   </div>
                                 )}
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-sm truncate">{tool.title}</p>
+                                  <p className="text-atlassian-body font-medium truncate">{tool.title}</p>
                                   {tool.tagline && (
-                                    <p className="text-xs text-muted-foreground truncate">{tool.tagline}</p>
+                                    <p className="text-atlassian-body-small text-muted-foreground truncate">{tool.tagline}</p>
                                   )}
                                 </div>
-                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-1 text-atlassian-caption text-muted-foreground">
                                   <Star className="h-3 w-3" />
                                   <span>{tool.quality_score}</span>
                                 </div>
@@ -160,11 +196,17 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                         </div>
                       )}
 
-                      {/* CTA */}
+                      {/* CTA - Atlassian风格 */}
                       <Link href={`/categories/${category.slug}`}>
-                        <Button className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+                        <Button className={cn(
+                          "w-full",
+                          "btn-atlassian-primary",
+                          "rounded-md",
+                          "text-atlassian-body font-medium",
+                          "group-hover:shadow-atlassian-200"
+                        )}>
                           Explore {category.name} Tools
-                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform duration-200" />
                         </Button>
                       </Link>
                     </CardContent>
@@ -176,29 +218,49 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-primary/5 to-purple-500/5">
+      {/* CTA Section - Atlassian风格 */}
+      <section className="py-16 px-4 bg-primary/5"> {/* 减少垂直间距，使用简洁背景 */}
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-6"
+            transition={{ 
+              duration: 0.3,
+              ease: [0.15, 1, 0.3, 1] // Atlassian entrance缓动
+            }}
+            className="space-y-4" // 减少间距
           >
-            <h2 className="text-3xl md:text-4xl font-bold">
+            <h2 className="text-atlassian-h2 font-medium"> {/* 使用Atlassian字体层级 */}
               Can't find the right category?
             </h2>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-atlassian-body-large text-muted-foreground">
               We're constantly adding new categories and tools. Submit your suggestion or tool!
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center"> {/* 减少间距 */}
               <Link href="/submit">
-                <Button size="lg" className="w-full sm:w-auto">
+                <Button 
+                  size="lg" 
+                  className={cn(
+                    "w-full sm:w-auto",
+                    "btn-atlassian-primary",
+                    "rounded-md px-6 py-3",
+                    "text-atlassian-body font-medium"
+                  )}
+                >
                   Submit a Tool
                 </Button>
               </Link>
               <Link href="/">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className={cn(
+                    "w-full sm:w-auto",
+                    "btn-atlassian-secondary",
+                    "rounded-md px-6 py-3",
+                    "text-atlassian-body font-medium"
+                  )}
+                >
                   Back to Home
                 </Button>
               </Link>

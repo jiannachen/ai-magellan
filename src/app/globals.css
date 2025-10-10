@@ -48,329 +48,497 @@
 */
 @layer base {
   :root {
-    /* Apple标准色彩系统 - Light Mode */
-    /* 主要色彩 */
-    --color-blue: 211 100% 50%;          /* #007AFF Apple Blue */
-    --color-green: 144 61% 49%;          /* #34C759 Apple Green */
-    --color-indigo: 251 33% 59%;         /* #5856D6 Apple Indigo */
-    --color-orange: 32 100% 50%;         /* #FF9500 Apple Orange */
-    --color-pink: 322 79% 58%;           /* #FF2D92 Apple Pink */
-    --color-purple: 253 42% 58%;         /* #AF52DE Apple Purple */
-    --color-red: 4 90% 58%;              /* #FF3B30 Apple Red */
-    --color-teal: 199 100% 66%;          /* #5AC8FA Apple Teal */
-    --color-yellow: 48 100% 50%;         /* #FFCC00 Apple Yellow */
+    /* Atlassian Brand Colors */
+    --atlassian-blue-50: 233 242 255;    /* #E9F2FF */
+    --atlassian-blue-100: 204 224 255;   /* #CCE0FF */
+    --atlassian-blue-200: 133 184 255;   /* #85B8FF */
+    --atlassian-blue-300: 74 144 226;    /* #4A90E2 */
+    --atlassian-blue-400: 38 132 255;    /* #2684FF Primary Blue */
+    --atlassian-blue-500: 0 101 255;     /* #0065FF */
+    --atlassian-blue-600: 0 82 204;      /* #0052CC */
+    --atlassian-blue-700: 0 67 163;      /* #0043A3 */
+    --atlassian-blue-800: 0 48 128;      /* #003080 */
+    --atlassian-blue-900: 0 33 89;       /* #002159 */
+
+    /* Atlassian Success - Green */
+    --atlassian-success-50: 232 245 232; /* #E8F5E8 */
+    --atlassian-success-100: 211 241 216;/* #D3F1D8 */
+    --atlassian-success-200: 157 217 175;/* #9DD9AF */
+    --atlassian-success-300: 110 192 113;/* #6EC071 */
+    --atlassian-success-400: 75 206 71;  /* #4BCE47 */
+    --atlassian-success-500: 54 179 126; /* #36B37E */
+    --atlassian-success-600: 43 157 95;  /* #2B9D5F */
+    --atlassian-success-700: 34 128 79;  /* #22804F */
+    --atlassian-success-800: 26 99 63;   /* #1A633F */
+    --atlassian-success-900: 19 71 47;   /* #13472F */
+
+    /* Atlassian Warning - Yellow */
+    --atlassian-warning-50: 255 247 230; /* #FFF7E6 */
+    --atlassian-warning-100: 255 236 179;/* #FFECB3 */
+    --atlassian-warning-200: 255 214 102;/* #FFD666 */
+    --atlassian-warning-300: 255 196 0;  /* #FFC400 */
+    --atlassian-warning-400: 255 171 0;  /* #FFAB00 */
+    --atlassian-warning-500: 255 153 31; /* #FF991F */
+    --atlassian-warning-600: 255 139 0;  /* #FF8B00 */
+    --atlassian-warning-700: 255 122 0;  /* #FF7A00 */
+    --atlassian-warning-800: 230 90 0;   /* #E65A00 */
+    --atlassian-warning-900: 191 74 0;   /* #BF4A00 */
+
+    /* Atlassian Error - Red */
+    --atlassian-error-50: 255 233 230;   /* #FFE9E6 */
+    --atlassian-error-100: 255 189 186;  /* #FFBDBA */
+    --atlassian-error-200: 255 143 130;  /* #FF8F82 */
+    --atlassian-error-300: 255 86 48;    /* #FF5630 */
+    --atlassian-error-400: 222 53 11;    /* #DE350B */
+    --atlassian-error-500: 196 41 20;    /* #C42914 */
+    --atlassian-error-600: 174 31 12;    /* #AE1F0C */
+    --atlassian-error-700: 152 22 17;    /* #981611 */
+    --atlassian-error-800: 122 14 10;    /* #7A0E0A */
+    --atlassian-error-900: 93 15 8;      /* #5D0F08 */
+
+    /* Atlassian Neutral Colors */
+    --atlassian-neutral-0: 0 0% 100%;    /* #FFFFFF */
+    --atlassian-neutral-50: 219 14% 98%; /* #FAFBFC */
+    --atlassian-neutral-100: 216 12% 96%;/* #F4F5F7 */
+    --atlassian-neutral-200: 218 11% 93%;/* #EBECF0 */
+    --atlassian-neutral-300: 219 12% 89%;/* #DFE1E6 */
+    --atlassian-neutral-400: 221 14% 78%;/* #C1C7D0 */
+    --atlassian-neutral-500: 221 13% 63%;/* #8993A4 Body Text */
+    --atlassian-neutral-600: 221 14% 54%;/* #6B778C */
+    --atlassian-neutral-700: 220 15% 51%;/* #5E6C84 */
+    --atlassian-neutral-800: 221 39% 35%;/* #42526E Heading Text */
+    --atlassian-neutral-900: 221 43% 20%;/* #172B4D Dark Text */
+    --atlassian-neutral-1000: 224 71% 14%;/* #091E42 Darkest */
     
-    /* 主色调 */
-    --primary: var(--color-blue);
-    --primary-foreground: 0 0% 100%;
+    /* Primary Brand Color */
+    --primary: var(--atlassian-blue-400);
+    --primary-foreground: var(--atlassian-neutral-0);
     
-    /* Apple灰度系统 */
-    --gray-1: 220 9% 46%;               /* #6D6D70 */
-    --gray-2: 240 6% 68%;               /* #AEAEB2 */
-    --gray-3: 240 5% 78%;               /* #C7C7CC */
-    --gray-4: 240 6% 84%;               /* #D1D1D6 */
-    --gray-5: 240 5% 91%;               /* #E5E5EA */
-    --gray-6: 240 5% 95%;               /* #F2F2F7 */
-    
-    /* 标签色彩 (Apple Label Colors) */
-    --label-primary: 240 6% 0%;          /* #000000 */
-    --label-secondary: 240 6% 24% / 0.6; /* rgba(60, 60, 67, 0.6) */
-    --label-tertiary: 240 6% 24% / 0.3;  /* rgba(60, 60, 67, 0.3) */
-    --label-quaternary: 240 6% 24% / 0.18; /* rgba(60, 60, 67, 0.18) */
-    
-    /* 填充色彩 (Apple Fill Colors) */
-    --fill-primary: 240 4% 50% / 0.2;    /* rgba(120, 120, 128, 0.2) */
-    --fill-secondary: 240 4% 50% / 0.16; /* rgba(120, 120, 128, 0.16) */
-    --fill-tertiary: 240 4% 50% / 0.12;  /* rgba(120, 120, 128, 0.12) */
-    --fill-quaternary: 240 4% 50% / 0.08; /* rgba(120, 120, 128, 0.08) */
-    
-    /* 背景色彩 (Apple Background Colors) */
-    --background: 0 0% 100%;             /* #FFFFFF */
-    --background-secondary: var(--gray-6); /* #F2F2F7 */
-    --background-tertiary: 0 0% 100%;    /* #FFFFFF */
-    
-    /* 分组背景 (Apple Grouped Background) */
-    --grouped-background-primary: var(--gray-6);   /* #F2F2F7 */
-    --grouped-background-secondary: 0 0% 100%;     /* #FFFFFF */
-    --grouped-background-tertiary: var(--gray-6);  /* #F2F2F7 */
-    
-    /* 系统语义色彩 */
-    --foreground: var(--label-primary);
-    --muted-foreground: var(--label-secondary);
-    --card: var(--background-secondary);
-    --card-foreground: var(--label-primary);
-    --popover: var(--background);
-    --popover-foreground: var(--label-primary);
-    --secondary: var(--fill-primary);
-    --secondary-foreground: var(--label-primary);
-    --muted: var(--fill-primary);
-    --accent: var(--fill-primary);
-    --accent-foreground: var(--label-primary);
-    --border: var(--fill-tertiary);
-    --input: var(--fill-tertiary);
+    /* System Semantic Colors */
+    --foreground: var(--atlassian-neutral-1000);
+    --muted-foreground: var(--atlassian-neutral-500);
+    --card: var(--atlassian-neutral-0);
+    --card-foreground: var(--atlassian-neutral-1000);
+    --popover: var(--atlassian-neutral-0);
+    --popover-foreground: var(--atlassian-neutral-1000);
+    --secondary: var(--atlassian-neutral-100);
+    --secondary-foreground: var(--atlassian-neutral-800);
+    --muted: var(--atlassian-neutral-100);
+    --accent: var(--atlassian-neutral-100);
+    --accent-foreground: var(--atlassian-neutral-800);
+    --border: var(--atlassian-neutral-300);
+    --input: var(--atlassian-neutral-300);
     --ring: var(--primary);
-    --destructive: var(--color-red);
-    --destructive-foreground: 0 0% 100%;
+    --background: var(--atlassian-neutral-0);
+    --destructive: var(--atlassian-error-300);
+    --destructive-foreground: var(--atlassian-neutral-0);
+    --success: var(--atlassian-success-500);
+    --success-foreground: var(--atlassian-neutral-0);
+    --warning: var(--atlassian-warning-300);
+    --warning-foreground: var(--atlassian-neutral-1000);
     
-    /* Apple圆角系统 */
-    --radius-xs: 0.25rem;   /* 4px */
-    --radius-sm: 0.375rem;  /* 6px */
-    --radius-md: 0.5rem;    /* 8px */
-    --radius-lg: 0.75rem;   /* 12px */
-    --radius-xl: 1rem;      /* 16px */
-    --radius-2xl: 1.25rem;  /* 20px */
-    --radius: var(--radius-md);
+    /* Atlassian Border Radius System */
+    --radius-2: 2px;
+    --radius-4: 4px;      /* Small elements */
+    --radius-8: 8px;      /* Medium elements */
+    --radius-12: 12px;    /* Large elements */
+    --radius-16: 16px;    /* Extra large */
+    --radius-full: 50%;   /* Circular */
+    --radius: var(--radius-4);
+    
+    /* Atlassian Spacing System - 8px Grid */
+    --space-0: 0;
+    --space-2: 2px;       /* 0.25 * 8px */
+    --space-4: 4px;       /* 0.5 * 8px */
+    --space-8: 8px;       /* 1 * 8px */
+    --space-12: 12px;     /* 1.5 * 8px */
+    --space-16: 16px;     /* 2 * 8px */
+    --space-20: 20px;     /* 2.5 * 8px */
+    --space-24: 24px;     /* 3 * 8px */
+    --space-32: 32px;     /* 4 * 8px */
+    --space-40: 40px;     /* 5 * 8px */
+    --space-48: 48px;     /* 6 * 8px */
+    --space-56: 56px;     /* 7 * 8px */
+    --space-64: 64px;     /* 8 * 8px */
+    --space-80: 80px;     /* 10 * 8px */
+    --space-96: 96px;     /* 12 * 8px */
+    --space-128: 128px;   /* 16 * 8px */
   }
 
   .dark {
-    /* Apple标准色彩系统 - Dark Mode */
-    /* 主要色彩 (深色模式下稍微调亮) */
-    --color-blue: 211 100% 60%;          /* #0A84FF Apple Blue Dark */
-    --color-green: 144 61% 55%;          /* #30D158 Apple Green Dark */
-    --color-indigo: 251 33% 65%;         /* #5E5CE6 Apple Indigo Dark */
-    --color-orange: 32 100% 60%;         /* #FF9F0A Apple Orange Dark */
-    --color-pink: 322 79% 64%;           /* #FF375F Apple Pink Dark */
-    --color-purple: 253 42% 64%;         /* #BF5AF2 Apple Purple Dark */
-    --color-red: 4 90% 64%;              /* #FF453A Apple Red Dark */
-    --color-teal: 199 100% 72%;          /* #64D2FF Apple Teal Dark */
-    --color-yellow: 48 100% 60%;         /* #FFD60A Apple Yellow Dark */
+    /* Atlassian Dark Mode Colors */
+    --atlassian-neutral-0: 224 71% 4%;   /* #0D1117 */
+    --atlassian-neutral-50: 220 13% 9%;  /* #161B22 */
+    --atlassian-neutral-100: 219 11% 15%;/* #21262D */
+    --atlassian-neutral-200: 218 11% 20%;/* #30363D */
+    --atlassian-neutral-300: 221 12% 31%;/* #484F58 */
+    --atlassian-neutral-400: 220 9% 43%; /* #6E7681 */
+    --atlassian-neutral-500: 220 9% 55%; /* #8B949E */
+    --atlassian-neutral-600: 218 9% 69%; /* #B1BAC4 */
+    --atlassian-neutral-700: 218 10% 79%;/* #C9D1D9 */
+    --atlassian-neutral-800: 218 17% 95%;/* #F0F6FC */
+    --atlassian-neutral-900: 218 17% 95%;/* #F0F6FC */
+    --atlassian-neutral-1000: 0 0% 100%; /* #FFFFFF */
+
+    /* Adjusted brand colors for dark mode */
+    --atlassian-blue-400: 211 100% 65%; /* Brighter for dark */
+    --atlassian-success-500: 148 58% 58%; /* Brighter for dark */
+    --atlassian-warning-300: 48 100% 55%; /* Brighter for dark */
+    --atlassian-error-300: 11 82% 65%;   /* Brighter for dark */
     
-    /* 主色调 */
-    --primary: var(--color-blue);
-    --primary-foreground: 240 6% 9%;
+    /* Primary Color */
+    --primary: var(--atlassian-blue-400);
+    --primary-foreground: var(--atlassian-neutral-50);
     
-    /* Apple暗色灰度系统 */
-    --gray-1: 240 1% 68%;               /* #AEAEB2 */
-    --gray-2: 240 2% 52%;               /* #636366 */
-    --gray-3: 240 3% 35%;               /* #48484A */
-    --gray-4: 240 3% 22%;               /* #3A3A3C */
-    --gray-5: 240 3% 17%;               /* #2C2C2E */
-    --gray-6: 240 3% 11%;               /* #1C1C1E */
-    
-    /* 标签色彩 (Apple Label Colors Dark) */
-    --label-primary: 0 0% 100%;          /* #FFFFFF */
-    --label-secondary: 240 5% 92% / 0.6; /* rgba(235, 235, 245, 0.6) */
-    --label-tertiary: 240 5% 92% / 0.3;  /* rgba(235, 235, 245, 0.3) */
-    --label-quaternary: 240 5% 92% / 0.18; /* rgba(235, 235, 245, 0.18) */
-    
-    /* 填充色彩 (Apple Fill Colors Dark) */
-    --fill-primary: 240 4% 50% / 0.36;   /* rgba(120, 120, 128, 0.36) */
-    --fill-secondary: 240 4% 50% / 0.32; /* rgba(120, 120, 128, 0.32) */
-    --fill-tertiary: 240 4% 50% / 0.28;  /* rgba(120, 120, 128, 0.28) */
-    --fill-quaternary: 240 4% 50% / 0.24; /* rgba(120, 120, 128, 0.24) */
-    
-    /* 背景色彩 (Apple Background Colors Dark) */
-    --background: 240 6% 0%;             /* #000000 */
-    --background-secondary: var(--gray-6); /* #1C1C1E */
-    --background-tertiary: var(--gray-5);  /* #2C2C2E */
-    
-    /* 分组背景 (Apple Grouped Background Dark) */
-    --grouped-background-primary: 240 6% 0%;      /* #000000 */
-    --grouped-background-secondary: var(--gray-6); /* #1C1C1E */
-    --grouped-background-tertiary: var(--gray-5);  /* #2C2C2E */
-    
-    /* 系统语义色彩 */
-    --foreground: var(--label-primary);
-    --muted-foreground: var(--label-secondary);
-    --card: var(--background-secondary);
-    --card-foreground: var(--label-primary);
-    --popover: var(--background);
-    --popover-foreground: var(--label-primary);
-    --secondary: var(--fill-primary);
-    --secondary-foreground: var(--label-primary);
-    --muted: var(--fill-primary);
-    --accent: var(--fill-primary);
-    --accent-foreground: var(--label-primary);
-    --border: var(--fill-tertiary);
-    --input: var(--fill-tertiary);
+    /* System Semantic Colors for Dark Mode */
+    --foreground: var(--atlassian-neutral-1000);
+    --muted-foreground: var(--atlassian-neutral-700);
+    --card: var(--atlassian-neutral-50);
+    --card-foreground: var(--atlassian-neutral-1000);
+    --popover: var(--atlassian-neutral-0);
+    --popover-foreground: var(--atlassian-neutral-1000);
+    --secondary: var(--atlassian-neutral-100);
+    --secondary-foreground: var(--atlassian-neutral-1000);
+    --muted: var(--atlassian-neutral-100);
+    --accent: var(--atlassian-neutral-100);
+    --accent-foreground: var(--atlassian-neutral-1000);
+    --border: var(--atlassian-neutral-300);
+    --input: var(--atlassian-neutral-300);
     --ring: var(--primary);
-    --destructive: var(--color-red);
-    --destructive-foreground: var(--label-primary);
+    --background: var(--atlassian-neutral-0);
+    --destructive: var(--atlassian-error-300);
+    --destructive-foreground: var(--atlassian-neutral-1000);
+    --success: var(--atlassian-success-500);
+    --success-foreground: var(--atlassian-neutral-1000);
+    --warning: var(--atlassian-warning-300);
+    --warning-foreground: var(--atlassian-neutral-1000);
   }
 }
 
 @layer base {
-  * {
-    @apply border-neutral-200 dark:border-neutral-800;
-  }
-
   html {
     -webkit-tap-highlight-color: transparent;
-    /* Apple系统字体 */
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    /* Atlassian Typography - Charlie Text font family */
+    font-family: 'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   }
 
   body {
     @apply bg-background text-foreground antialiased overflow-x-hidden;
     font-feature-settings: "rlig" 1, "calt" 1;
-    /* Apple标准字体设置 */
-    font-size: 17px;
-    line-height: 1.47;
-    letter-spacing: -0.022em;
+    /* Atlassian body text styling */
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0;
   }
 
-  /* Apple字体层级系统 */
-  .text-largeTitle {
-    font-size: 34px;
-    font-weight: 400;
-    line-height: 41px;
-    letter-spacing: 0.374px;
+  /* Atlassian Typography Scale */
+  .text-display {
+    font-size: 48px;
+    font-weight: 500;
+    line-height: 56px;
+    letter-spacing: -0.02em;
   }
 
-  .text-title1 {
-    font-size: 28px;
-    font-weight: 400;
-    line-height: 34px;
-    letter-spacing: 0.364px;
+  .text-h1 {
+    font-size: 40px;
+    font-weight: 500;
+    line-height: 48px;
+    letter-spacing: -0.02em;
   }
 
-  .text-title2 {
-    font-size: 22px;
-    font-weight: 400;
-    line-height: 28px;
-    letter-spacing: 0.352px;
+  .text-h2 {
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 40px;
+    letter-spacing: -0.01em;
   }
 
-  .text-title3 {
+  .text-h3 {
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 32px;
+    letter-spacing: -0.01em;
+  }
+
+  .text-h4 {
     font-size: 20px;
-    font-weight: 400;
-    line-height: 25px;
-    letter-spacing: 0.38px;
+    font-weight: 500;
+    line-height: 28px;
+    letter-spacing: -0.01em;
   }
 
-  .text-headline {
-    font-size: 17px;
+  .text-h5 {
+    font-size: 16px;
     font-weight: 600;
-    line-height: 22px;
-    letter-spacing: -0.43px;
+    line-height: 24px;
+    letter-spacing: 0;
+  }
+
+  .text-h6 {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .text-body-large {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0;
   }
 
   .text-body {
-    font-size: 17px;
-    font-weight: 400;
-    line-height: 22px;
-    letter-spacing: -0.43px;
-  }
-
-  .text-callout {
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 21px;
-    letter-spacing: -0.32px;
-  }
-
-  .text-subhead {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 400;
     line-height: 20px;
-    letter-spacing: -0.24px;
+    letter-spacing: 0;
   }
 
-  .text-footnote {
-    font-size: 13px;
-    font-weight: 400;
-    line-height: 18px;
-    letter-spacing: -0.08px;
-  }
-
-  .text-caption1 {
+  .text-body-small {
     font-size: 12px;
     font-weight: 400;
     line-height: 16px;
-    letter-spacing: 0px;
+    letter-spacing: 0;
   }
 
-  .text-caption2 {
+  .text-caption {
     font-size: 11px;
     font-weight: 400;
-    line-height: 13px;
-    letter-spacing: 0.066px;
+    line-height: 16px;
+    letter-spacing: 0.5px;
   }
 
-  /* Apple 8pt网格间距系统 */
-  .space-0 { @apply p-0; }
-  .space-1 { @apply p-1; }      /* 4px */
-  .space-2 { @apply p-2; }      /* 8px */
-  .space-3 { @apply p-3; }      /* 12px */
-  .space-4 { @apply p-4; }      /* 16px */
-  .space-5 { @apply p-5; }      /* 20px */
-  .space-6 { @apply p-6; }      /* 24px */
-  .space-8 { @apply p-8; }      /* 32px */
-  .space-10 { @apply p-10; }    /* 40px */
-  .space-12 { @apply p-12; }    /* 48px */
-  .space-16 { @apply p-16; }    /* 64px */
-  .space-20 { @apply p-20; }    /* 80px */
-  .space-24 { @apply p-24; }    /* 96px */
+  /* Atlassian specific aliases for easier migration */
+  .text-atlassian-display { @apply text-display; }
+  .text-atlassian-h1 { @apply text-h1; }
+  .text-atlassian-h2 { @apply text-h2; }
+  .text-atlassian-h3 { @apply text-h3; }
+  .text-atlassian-h4 { @apply text-h4; }
+  .text-atlassian-h5 { @apply text-h5; }
+  .text-atlassian-h6 { @apply text-h6; }
+  .text-atlassian-body-large { @apply text-body-large; }
+  .text-atlassian-body { @apply text-body; }
+  .text-atlassian-body-small { @apply text-body-small; }
+  .text-atlassian-caption { @apply text-caption; }
 
-  /* Apple阴影系统 */
-  .shadow-apple-1 {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  /* Atlassian Shadow Aliases */
+  .shadow-atlassian-100 { @apply elevation-100; }
+  .shadow-atlassian-200 { @apply elevation-200; }
+  .shadow-atlassian-300 { @apply elevation-300; }
+}
+@layer utilities {
+  /* Atlassian 8px Grid Spacing System */
+  .atlassian-space-0 { @apply p-0; }                /* 0px */
+  .atlassian-space-2 { padding: var(--space-2); }   /* 2px */
+  .atlassian-space-4 { padding: var(--space-4); }   /* 4px */
+  .atlassian-space-8 { padding: var(--space-8); }   /* 8px */
+  .atlassian-space-12 { padding: var(--space-12); } /* 12px */
+  .atlassian-space-16 { padding: var(--space-16); } /* 16px */
+  .atlassian-space-20 { padding: var(--space-20); } /* 20px */
+  .atlassian-space-24 { padding: var(--space-24); } /* 24px */
+  .atlassian-space-32 { padding: var(--space-32); } /* 32px */
+  .atlassian-space-40 { padding: var(--space-40); } /* 40px */
+  .atlassian-space-48 { padding: var(--space-48); } /* 48px */
+  .atlassian-space-56 { padding: var(--space-56); } /* 56px */
+  .atlassian-space-64 { padding: var(--space-64); } /* 64px */
+  .atlassian-space-80 { padding: var(--space-80); } /* 80px */
+  .atlassian-space-96 { padding: var(--space-96); } /* 96px */
+  .atlassian-space-128 { padding: var(--space-128); } /* 128px */
+
+  /* Atlassian Margin Utilities */
+  .atlassian-m-0 { margin: var(--space-0); }
+  .atlassian-m-2 { margin: var(--space-2); }
+  .atlassian-m-4 { margin: var(--space-4); }
+  .atlassian-m-8 { margin: var(--space-8); }
+  .atlassian-m-12 { margin: var(--space-12); }
+  .atlassian-m-16 { margin: var(--space-16); }
+  .atlassian-m-24 { margin: var(--space-24); }
+  .atlassian-m-32 { margin: var(--space-32); }
+
+  /* Atlassian Gap Utilities */
+  .atlassian-gap-4 { gap: var(--space-4); }
+  .atlassian-gap-8 { gap: var(--space-8); }
+  .atlassian-gap-12 { gap: var(--space-12); }
+  .atlassian-gap-16 { gap: var(--space-16); }
+  .atlassian-gap-24 { gap: var(--space-24); }
+
+  /* Transition Aliases - Remove circular dependencies */
+  .transition-atlassian-alias-standard { 
+    transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+    transition-duration: 200ms;
+  }
+  .transition-atlassian-alias-entrance { 
+    transition-timing-function: cubic-bezier(0.15, 1, 0.3, 1);
+    transition-duration: 250ms;
+  }
+  .transition-atlassian-alias-exit { 
+    transition-timing-function: cubic-bezier(0.6, 0, 0.85, 0.15);
+    transition-duration: 200ms;
+  }
+  .transition-atlassian-alias-decelerate { 
+    transition-timing-function: cubic-bezier(0, 0, 0.3, 1);
+    transition-duration: 300ms;
+  }
+}
+
+  /* Atlassian Shadow System */
+  .elevation-100 {
+    box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25);
   }
 
-  .shadow-apple-2 {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  .elevation-200 {
+    box-shadow: 0 2px 4px rgba(9, 30, 66, 0.25);
   }
 
-  .shadow-apple-3 {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  .elevation-300 {
+    box-shadow: 0 4px 8px rgba(9, 30, 66, 0.25);
   }
 
-  .shadow-apple-4 {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  .elevation-400 {
+    box-shadow: 0 8px 16px rgba(9, 30, 66, 0.25);
   }
 
-  /* Apple标准缓动曲线 */
-  .transition-apple {
-    transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  .elevation-500 {
+    box-shadow: 0 12px 24px rgba(9, 30, 66, 0.25);
   }
 
-  .transition-apple-decelerate {
-    transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
+  .elevation-600 {
+    box-shadow: 0 20px 32px rgba(9, 30, 66, 0.25);
   }
 
-  .transition-apple-accelerate {
-    transition: all 0.2s cubic-bezier(0.4, 0, 1, 1);
+  /* Atlassian Easing Functions */
+  .transition-atlassian-entrance {
+    transition-timing-function: cubic-bezier(0.15, 1, 0.3, 1);
+    transition-duration: 250ms;
   }
 
-  .transition-apple-sharp {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.6, 1);
+  .transition-atlassian-exit {
+    transition-timing-function: cubic-bezier(0.6, 0, 0.85, 0.15);
+    transition-duration: 200ms;
   }
 
-  /* 简化的装饰性背景 - 仅桌面端 */
-  @media (min-width: 768px) {
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(
-        circle at 50% 0%,
-        hsl(var(--primary) / 0.02),
-        transparent 50%
-      );
-      pointer-events: none;
-      z-index: -1;
-    }
+  .transition-atlassian-standard {
+    transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+    transition-duration: 200ms;
   }
 
+  .transition-atlassian-decelerate {
+    transition-timing-function: cubic-bezier(0, 0, 0.3, 1);
+    transition-duration: 300ms;
+  }
+
+  /* Atlassian Interactive States */
+  .atlassian-interactive {
+    transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    cursor: pointer;
+  }
+
+  .atlassian-interactive:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(9, 30, 66, 0.25);
+  }
+
+  .atlassian-interactive:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25);
+  }
+
+  .atlassian-interactive:focus {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+
+  .atlassian-interactive:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Selection styling */
   ::selection {
     background-color: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
   }
-}
 
-/* Apple风格卡片悬浮效果 */
-.card-hover {
-  @apply transition-apple;
-  &:hover {
+  /* Atlassian Button Styles */
+  .btn-atlassian-primary {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    min-height: 40px;
+    cursor: pointer;
+    transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  .btn-atlassian-primary:hover {
+    background: hsl(var(--primary) / 0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(9, 30, 66, 0.25);
+  }
+
+  .btn-atlassian-primary:active {
+    background: hsl(var(--primary) / 0.8);
+    transform: translateY(0);
+  }
+
+  .btn-atlassian-secondary {
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    min-height: 40px;
+    transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  .btn-atlassian-secondary:hover {
+    background: hsl(var(--muted));
+    border-color: hsl(var(--border));
+  }
+
+  /* Atlassian Card Styles */
+  .card-atlassian {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25);
+    transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  .card-atlassian:hover {
+    box-shadow: 0 4px 8px rgba(9, 30, 66, 0.25);
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    .dark & {
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Focus states for accessibility */
+  .atlassian-focus:focus {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+
+  /* Remove legacy styles */
+  .card-hover {
+    transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(9, 30, 66, 0.25);
+      .dark & {
+        box-shadow: 0 2px 4px rgba(9, 30, 66, 0.4);
+      }
+    }
+    
+    &:active {
+      transform: translateY(0px);
+      transition: all 0.1s cubic-bezier(0.6, 0, 0.85, 0.15);
     }
   }
-  
-  &:active {
-    transform: translateY(0px);
-    transition: all 0.1s cubic-bezier(0.4, 0, 1, 1);
-  }
-}

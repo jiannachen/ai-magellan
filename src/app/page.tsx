@@ -25,9 +25,13 @@ export default async function Home() {
             status: true,
             visits: true,
             likes: true,
+            active: true, // 添加missing的字段
             quality_score: true,
             is_featured: true,
             is_trusted: true,
+            created_at: true,
+            pricing_model: true,
+            has_free_version: true,
           },
         }),
       { ttl: 1 } // 1天缓存

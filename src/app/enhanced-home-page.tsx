@@ -33,7 +33,7 @@ import {
   BookOpen,
   Play,
   ChevronRight,
-  Fire,
+  Flame,
   Crown,
   Bookmark
 } from "lucide-react";
@@ -126,7 +126,7 @@ export default function EnhancedHomePage({
   useEffect(() => {
     // Featured websites (marked as featured or high quality)
     const featured = websites
-      .filter(w => w.is_featured || w.quality_score > 85)
+      .filter(w => w.is_featured || (w.quality_score ?? 50) > 85)
       .slice(0, 6);
     setFeaturedWebsites(featured);
 
@@ -138,7 +138,7 @@ export default function EnhancedHomePage({
 
     // Daily picks (trusted + high quality)
     const picks = websites
-      .filter(w => w.is_trusted && w.quality_score > 80)
+      .filter(w => w.is_trusted && (w.quality_score ?? 50) > 80)
       .slice(0, 4);
     setDailyPicks(picks);
   }, [websites]);
@@ -333,7 +333,7 @@ export default function EnhancedHomePage({
                         </div>
                       </div>
                       <Badge variant="secondary" className="text-xs bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800">
-                        <Fire className="h-3 w-3 mr-1" />
+                        <Flame className="h-3 w-3 mr-1" />
                         Pick
                       </Badge>
                     </div>

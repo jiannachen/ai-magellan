@@ -67,6 +67,70 @@ export default {
         "color-orange": "hsl(var(--color-orange))",
         "color-yellow": "hsl(var(--color-yellow))",
 
+        // Atlassian品牌色彩系统
+        "atlassian-blue": {
+          50: "#E9F2FF",
+          100: "#CCE0FF", 
+          200: "#85B8FF",
+          300: "#4A90E2",
+          400: "#2684FF", // Primary Blue
+          500: "#0065FF",
+          600: "#0052CC",
+          700: "#0043A3",
+          800: "#003080",
+          900: "#002159",
+        },
+        "atlassian-green": {
+          50: "#E8F5E8",
+          100: "#D3F1D8",
+          200: "#9DD9AF", 
+          300: "#6EC071",
+          400: "#4BCE47", // Success Green
+          500: "#36B37E",
+          600: "#2B9D5F",
+          700: "#22804F",
+          800: "#1A633F",
+          900: "#13472F",
+        },
+        "atlassian-red": {
+          50: "#FFE9E6",
+          100: "#FFBDBA",
+          200: "#FF8F82",
+          300: "#FF5630", // Error Red
+          400: "#DE350B",
+          500: "#C42914",
+          600: "#AE1F0C",
+          700: "#981611",
+          800: "#7A0E0A",
+          900: "#5D0F08",
+        },
+        "atlassian-yellow": {
+          50: "#FFF7E6",
+          100: "#FFECB3",
+          200: "#FFD666",
+          300: "#FFC400", // Warning Yellow
+          400: "#FFAB00",
+          500: "#FF991F",
+          600: "#FF8B00",
+          700: "#FF7A00",
+          800: "#E65A00",
+          900: "#BF4A00",
+        },
+        "atlassian-neutral": {
+          0: "#FFFFFF",
+          50: "#FAFBFC",
+          100: "#F4F5F7",
+          200: "#EBECF0",
+          300: "#DFE1E6",
+          400: "#C1C7D0",
+          500: "#8993A4", // Body Text
+          600: "#6B778C",
+          700: "#5E6C84",
+          800: "#42526E", // Heading Text
+          900: "#172B4D", // Dark Text
+          1000: "#091E42", // Darkest
+        },
+
         // Apple标签色彩 (Label Colors)
         "label-primary": "hsl(var(--label-primary))",
         "label-secondary": "hsl(var(--label-secondary))",
@@ -137,6 +201,19 @@ export default {
         'footnote': ['13px', { lineHeight: '18px', letterSpacing: '-0.08px' }],
         'caption1': ['12px', { lineHeight: '16px', letterSpacing: '0px' }],
         'caption2': ['11px', { lineHeight: '13px', letterSpacing: '0.066px' }],
+
+        // Atlassian字体层级系统
+        'atlassian-display': ['48px', { lineHeight: '56px', letterSpacing: '-0.02em', fontWeight: '500' }],
+        'atlassian-h1': ['40px', { lineHeight: '48px', letterSpacing: '-0.02em', fontWeight: '500' }],
+        'atlassian-h2': ['32px', { lineHeight: '40px', letterSpacing: '-0.01em', fontWeight: '500' }],
+        'atlassian-h3': ['24px', { lineHeight: '32px', letterSpacing: '-0.01em', fontWeight: '500' }],
+        'atlassian-h4': ['20px', { lineHeight: '28px', letterSpacing: '-0.01em', fontWeight: '500' }],
+        'atlassian-h5': ['16px', { lineHeight: '24px', letterSpacing: '0', fontWeight: '600' }],
+        'atlassian-h6': ['14px', { lineHeight: '20px', letterSpacing: '0', fontWeight: '600' }],
+        'atlassian-body-large': ['16px', { lineHeight: '24px', letterSpacing: '0' }],
+        'atlassian-body': ['14px', { lineHeight: '20px', letterSpacing: '0' }],
+        'atlassian-body-small': ['12px', { lineHeight: '16px', letterSpacing: '0' }],
+        'atlassian-caption': ['11px', { lineHeight: '16px', letterSpacing: '0.5px' }],
       },
 
       // Apple阴影系统
@@ -151,6 +228,14 @@ export default {
         'apple-2': '0 2px 8px rgba(0, 0, 0, 0.1)',
         'apple-3': '0 4px 16px rgba(0, 0, 0, 0.1)',
         'apple-4': '0 8px 32px rgba(0, 0, 0, 0.1)',
+
+        // Atlassian阴影系统 (Elevation)
+        'atlassian-100': '0 1px 1px rgba(9, 30, 66, 0.25)',
+        'atlassian-200': '0 2px 4px rgba(9, 30, 66, 0.25)', 
+        'atlassian-300': '0 4px 8px rgba(9, 30, 66, 0.25)',
+        'atlassian-400': '0 8px 16px rgba(9, 30, 66, 0.25)',
+        'atlassian-500': '0 12px 24px rgba(9, 30, 66, 0.25)',
+        'atlassian-600': '0 20px 32px rgba(9, 30, 66, 0.25)',
       },
     },
     // 自定义断点，优化移动端体验

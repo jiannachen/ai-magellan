@@ -7,9 +7,13 @@ import { runHealthCheckProcess } from "../services/health-check";
 export const thumbnailUpdateJob = new CronJob(
   "0 3 * * *",
   async () => {
-    console.log("开始执行缩略图更新任务");
+    if (process.env.NODE_ENV === "development") {
+      console.log("开始执行缩略图更新任务");
+    }
     await updateWebsiteThumbnails();
-    console.log("缩略图更新任务完成");
+    if (process.env.NODE_ENV === "development") {
+      console.log("缩略图更新任务完成");
+    }
   },
   null,
   false,
@@ -20,9 +24,13 @@ export const thumbnailUpdateJob = new CronJob(
 export const websiteCheckJob = new CronJob(
   "0 4 * * *",
   async () => {
-    console.log("开始检查网站可访问性");
+    if (process.env.NODE_ENV === "development") {
+      console.log("开始检查网站可访问性");
+    }
     await updateWebsiteActive();
-    console.log("网站检查任务完成");
+    if (process.env.NODE_ENV === "development") {
+      console.log("网站检查任务完成");
+    }
   },
   null,
   false,
@@ -33,10 +41,14 @@ export const websiteCheckJob = new CronJob(
 export const healthCheckJob = new CronJob(
   "0 */6 * * *",
   async () => {
-    console.log("开始执行网站健康检查");
+    if (process.env.NODE_ENV === "development") {
+      console.log("开始执行网站健康检查");
+    }
     try {
       await runHealthCheckProcess(50); // 每次检查50个网站
-      console.log("网站健康检查任务完成");
+      if (process.env.NODE_ENV === "development") {
+        console.log("网站健康检查任务完成");
+      }
     } catch (error) {
       console.error("网站健康检查任务失败:", error);
     }
@@ -50,7 +62,9 @@ export const healthCheckJob = new CronJob(
 export const deadLinkCleanupJob = new CronJob(
   "0 2 * * 0", // 每周日凌晨2点
   async () => {
-    console.log("开始执行死链清理任务");
+    if (process.env.NODE_ENV === "development") {
+      console.log("开始执行死链清理任务");
+    }
     try {
       const { prisma } = await import("@/lib/db/db");
       
@@ -79,10 +93,14 @@ export const deadLinkCleanupJob = new CronJob(
           }
         });
         
-        console.log(`已降低 ${suspiciousWebsites.length} 个长期无法访问网站的质量分数`);
+        if (process.env.NODE_ENV === "development") {
+          console.log(`已降低 ${suspiciousWebsites.length} 个长期无法访问网站的质量分数`);
+        }
       }
       
-      console.log("死链清理任务完成");
+      if (process.env.NODE_ENV === "development") {
+        console.log("死链清理任务完成");
+      }
     } catch (error) {
       console.error("死链清理任务失败:", error);
     }

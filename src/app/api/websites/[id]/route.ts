@@ -5,9 +5,10 @@ import { prisma } from "@/lib/db/db";
 
 // GET /api/websites/[id]
 // 获取单个网站详细信息
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const websiteId = parseInt(params.id);
+    const { id } = await params;
+    const websiteId = parseInt(id);
     const website = await prisma.website.findUnique({
       where: { id: websiteId },
       include: { 
@@ -38,13 +39,14 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 // DELETE /api/websites/[id]
 // 删除网站
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    if (!params.id) {
+    const { id } = await params;
+    if (!id) {
       return NextResponse.json(AjaxResponse.fail("Website ID is required"), {});
     }
 
-    const websiteId = parseInt(params.id);
+    const websiteId = parseInt(id);
 
     // Check if website exists first
     const website = await prisma.website.findUnique({
@@ -83,7 +85,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 // 更新网站
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 获取当前用户信息
@@ -96,7 +98,8 @@ export async function PUT(
     }
 
     const data = await request.json();
-    const websiteId = parseInt(params.id);
+    const { id } = await params;
+    const websiteId = parseInt(id);
 
     const existingWebsite = await prisma.website.findUnique({
       where: { id: websiteId },
@@ -156,6 +159,26 @@ export async function PUT(
         description: data.description?.trim() || "",
         category_id: Number(data.category_id),
         thumbnail: data.thumbnail?.trim() || null,
+        tagline: data.tagline?.trim() || null,
+        features: data.features || [],
+        use_cases: data.use_cases || null,
+        target_audience: data.target_audience || null,
+        faq: data.faq || null,
+        pricing_model: data.pricing_model || 'free',
+        has_free_version: Boolean(data.has_free_version),
+        api_available: Boolean(data.api_available),
+        tags: data.tags?.trim() || null,
+        twitter_url: data.twitter_url?.trim() || null,
+        linkedin_url: data.linkedin_url?.trim() || null,
+        facebook_url: data.facebook_url?.trim() || null,
+        instagram_url: data.instagram_url?.trim() || null,
+        youtube_url: data.youtube_url?.trim() || null,
+        discord_url: data.discord_url?.trim() || null,
+        integrations: data.integrations || null,
+        ios_app_url: data.ios_app_url?.trim() || null,
+        android_app_url: data.android_app_url?.trim() || null,
+        web_app_url: data.web_app_url?.trim() || null,
+        desktop_platforms: data.desktop_platforms || null,
         // 保持原状态或根据需要重置为待审核
         status: existingWebsite.status,
       },

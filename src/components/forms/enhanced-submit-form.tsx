@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Input } from '@/ui/common/input'
 import { Textarea } from '@/ui/common/textarea'
 import { Label } from '@/ui/common/label'
+import { cn } from '@/lib/utils/utils'
 import {
   Select,
   SelectContent,
@@ -332,18 +333,21 @@ export default function EnhancedSubmitToolPage() {
   return (
     <ProfileLayout>
       <div className="p-6 space-y-6">
-        {/* 页面头部 */}
+        {/* 页面头部 - Atlassian风格 */}
         <div>
-          <h1 className="text-2xl font-bold mb-2">提交AI工具</h1>
-          <p className="text-muted-foreground">分享您的AI工具，与社区一起发现优质应用</p>
+          <h1 className="text-atlassian-h1 font-medium mb-2">提交AI工具</h1> {/* 使用Atlassian字体层级 */}
+          <p className="text-atlassian-body-large text-muted-foreground">分享您的AI工具，与社区一起发现优质应用</p>
         </div>
 
-        {/* 表单 */}
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* 1. 基本信息 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+        {/* 表单 - Atlassian风格 */}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5"> {/* 减少间距 */}
+          {/* 1. 基本信息 - Atlassian风格 */}
+          <Card className={cn(
+            "card-atlassian",
+            "border-border/60"
+          )}>
+            <CardHeader className="pb-4"> {/* 减少底部padding */}
+              <CardTitle className="flex items-center gap-2 text-atlassian-h4 font-medium"> {/* 使用Atlassian字体 */}
                 <Globe className="h-5 w-5" />
                 基本信息
               </CardTitle>
@@ -352,25 +356,35 @@ export default function EnhancedSubmitToolPage() {
               <div className="space-y-4">
                 {/* 工具网址 */}
                 <div>
-                  <Label htmlFor="url">工具网址 *</Label>
+                  <Label htmlFor="url" className="text-atlassian-body font-medium">工具网址 *</Label>
                   <div className="flex gap-2">
                     <Input
                       id="url"
                       placeholder="https://example.com"
                       {...form.register('url')}
-                      className="flex-1"
+                      className={cn(
+                        "flex-1",
+                        "rounded-md border-2 border-border", // Atlassian样式
+                        "focus-visible:border-primary transition-atlassian-standard",
+                        "text-atlassian-body"
+                      )}
                     />
                     <Button
                       type="button"
                       variant="outline"
                       onClick={fetchWebsiteInfo}
                       disabled={isFetching}
+                      className={cn(
+                        "btn-atlassian-secondary",
+                        "rounded-md px-4 py-2",
+                        "text-atlassian-body"
+                      )}
                     >
                       {isFetching ? '获取中...' : '自动填充'}
                     </Button>
                   </div>
                   {form.formState.errors.url && (
-                    <p className="text-sm text-destructive mt-1">
+                    <p className="text-atlassian-body-small text-destructive mt-1">
                       {form.formState.errors.url.message}
                     </p>
                   )}
@@ -378,15 +392,20 @@ export default function EnhancedSubmitToolPage() {
 
                 {/* 商业电子邮件 */}
                 <div>
-                  <Label htmlFor="email">商业电子邮件 *</Label>
+                  <Label htmlFor="email" className="text-atlassian-body font-medium">商业电子邮件 *</Label>
                   <Input
                     id="email"
                     type="email"
                     placeholder="contact@example.com"
                     {...form.register('email')}
+                    className={cn(
+                      "rounded-md border-2 border-border",
+                      "focus-visible:border-primary transition-atlassian-standard",
+                      "text-atlassian-body"
+                    )}
                   />
                   {form.formState.errors.email && (
-                    <p className="text-sm text-destructive mt-1">
+                    <p className="text-atlassian-body-small text-destructive mt-1">
                       {form.formState.errors.email.message}
                     </p>
                   )}
@@ -394,14 +413,19 @@ export default function EnhancedSubmitToolPage() {
 
                 {/* 工具名称 */}
                 <div>
-                  <Label htmlFor="title">工具名称 *</Label>
+                  <Label htmlFor="title" className="text-atlassian-body font-medium">工具名称 *</Label>
                   <Input
                     id="title"
                     placeholder="输入您的工具名称"
                     {...form.register('title')}
+                    className={cn(
+                      "rounded-md border-2 border-border",
+                      "focus-visible:border-primary transition-atlassian-standard",
+                      "text-atlassian-body"
+                    )}
                   />
                   {form.formState.errors.title && (
-                    <p className="text-sm text-destructive mt-1">
+                    <p className="text-atlassian-body-small text-destructive mt-1">
                       {form.formState.errors.title.message}
                     </p>
                   )}
@@ -410,17 +434,24 @@ export default function EnhancedSubmitToolPage() {
             </CardContent>
           </Card>
 
-          {/* 2. 类别和标签 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>类别和标签</CardTitle>
+          {/* 2. 类别和标签 - Atlassian风格 */}
+          <Card className={cn(
+            "card-atlassian",
+            "border-border/60"
+          )}>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-atlassian-h4 font-medium">类别和标签</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* 类别选择 */}
               <div>
-                <Label>类别 *</Label>
+                <Label className="text-atlassian-body font-medium">类别 *</Label>
                 <Select onValueChange={(value) => setValue('category_id', value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className={cn(
+                    "rounded-md border-2 border-border",
+                    "focus:border-primary transition-atlassian-standard",
+                    "text-atlassian-body"
+                  )}>
                     <SelectValue placeholder="搜索类别..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -432,7 +463,7 @@ export default function EnhancedSubmitToolPage() {
                   </SelectContent>
                 </Select>
                 {form.formState.errors.category_id && (
-                  <p className="text-sm text-destructive mt-1">
+                  <p className="text-atlassian-body-small text-destructive mt-1">
                     {form.formState.errors.category_id.message}
                   </p>
                 )}
@@ -440,35 +471,48 @@ export default function EnhancedSubmitToolPage() {
 
               {/* 标签 */}
               <div>
-                <Label htmlFor="tags">标签</Label>
+                <Label htmlFor="tags" className="text-atlassian-body font-medium">标签</Label>
                 <Input
                   id="tags"
                   placeholder="输入或搜索主题标签..."
                   {...form.register('tags')}
+                  className={cn(
+                    "rounded-md border-2 border-border",
+                    "focus-visible:border-primary transition-atlassian-standard",
+                    "text-atlassian-body"
+                  )}
                 />
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-atlassian-body-small text-muted-foreground mt-1">
                   用逗号分隔多个标签
                 </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* 3. 描述 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>描述</CardTitle>
+          {/* 3. 描述 - Atlassian风格 */}
+          <Card className={cn(
+            "card-atlassian",
+            "border-border/60"
+          )}>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-atlassian-h4 font-medium">描述</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* 标语 */}
               <div>
-                <Label htmlFor="tagline">标语 *</Label>
+                <Label htmlFor="tagline" className="text-atlassian-body font-medium">标语 *</Label>
                 <Input
                   id="tagline"
                   placeholder="简短、引人注目的标语"
                   {...form.register('tagline')}
+                  className={cn(
+                    "rounded-md border-2 border-border",
+                    "focus-visible:border-primary transition-atlassian-standard",
+                    "text-atlassian-body"
+                  )}
                 />
                 {form.formState.errors.tagline && (
-                  <p className="text-sm text-destructive mt-1">
+                  <p className="text-atlassian-body-small text-destructive mt-1">
                     {form.formState.errors.tagline.message}
                   </p>
                 )}
@@ -476,15 +520,20 @@ export default function EnhancedSubmitToolPage() {
 
               {/* 描述 */}
               <div>
-                <Label htmlFor="description">描述 *</Label>
+                <Label htmlFor="description" className="text-atlassian-body font-medium">描述 *</Label>
                 <Textarea
                   id="description"
                   placeholder="描述你的工具的功能以及它如何帮助用户"
                   rows={4}
                   {...form.register('description')}
+                  className={cn(
+                    "rounded-md border-2 border-border",
+                    "focus-visible:border-primary transition-atlassian-standard",
+                    "text-atlassian-body resize-none"
+                  )}
                 />
                 {form.formState.errors.description && (
-                  <p className="text-sm text-destructive mt-1">
+                  <p className="text-atlassian-body-small text-destructive mt-1">
                     {form.formState.errors.description.message}
                   </p>
                 )}
@@ -1019,15 +1068,27 @@ export default function EnhancedSubmitToolPage() {
             </CardContent>
           </Card>
 
-          {/* 提交按钮 */}
-          <Card>
-            <CardContent className="p-6">
+          {/* 提交按钮 - Atlassian风格 */}
+          <Card className={cn(
+            "card-atlassian",
+            "border-border/60"
+          )}>
+            <CardContent className="p-5"> {/* 减少内边距 */}
               <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
+                <div className="text-atlassian-body-small text-muted-foreground">
                   <p>• 审核时间：24-48小时</p>
                   <p>• 审核结果将发送到您的邮箱</p>
                 </div>
-                <Button type="submit" disabled={isSubmitting} size="lg">
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting} 
+                  size="lg"
+                  className={cn(
+                    "btn-atlassian-primary",
+                    "rounded-md px-6 py-3",
+                    "text-atlassian-body font-medium"
+                  )}
+                >
                   <Send className="h-4 w-4 mr-2" />
                   {isSubmitting ? '提交中...' : '提交工具'}
                 </Button>

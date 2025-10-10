@@ -13,6 +13,7 @@ interface FormFieldProps {
   textarea?: boolean;
 }
 
+// Atlassian Form Field Component
 export function FormField({
   label,
   name,
@@ -21,20 +22,26 @@ export function FormField({
   textarea,
 }: FormFieldProps) {
   const Component = textarea ? Textarea : Input;
+  const hasError = !!form.formState.errors[name];
 
   return (
-    <div>
-      <label className="block text-sm font-medium mb-2 text-foreground/80">
+    <div className="space-y-2">
+      <label className="block text-body-small font-medium text-foreground">
         {label}
       </label>
       <Component
         {...form.register(name)}
         placeholder={placeholder}
-        className={`w-full bg-background/50 backdrop-blur-sm border-border/40 hover:bg-background/70 hover:border-border/60 focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all duration-300 
-          ${textarea ? "min-h-[100px] resize-y" : "h-10"}`}
+        className={`w-full transition-all duration-200 ${
+          hasError 
+            ? "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20" 
+            : ""
+        } ${
+          textarea ? "min-h-[100px] resize-y" : ""
+        }`}
       />
-      {form.formState.errors[name] && (
-        <p className="text-sm text-red-500/70 mt-1">
+      {hasError && (
+        <p className="text-body-small text-destructive">
           {form.formState.errors[name]?.message}
         </p>
       )}

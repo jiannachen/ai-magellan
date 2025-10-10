@@ -27,8 +27,8 @@ export function WebsiteThumbnail({
     return (
       <div
         className={cn(
-          "relative w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center",
-          "group-hover:bg-primary/10 transition-colors duration-300",
+          "relative w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center",
+          "group-hover:bg-gray-200 dark:group-hover:bg-gray-600 transition-colors duration-300",
           className
         )}
       >
@@ -46,7 +46,7 @@ export function WebsiteThumbnail({
             e.target.nextElementSibling?.classList.remove("hidden");
           }}
         />
-        <Globe className="h-5 w-5 text-primary/50 hidden" />
+        <Globe className="h-5 w-5 text-gray-500 dark:text-gray-400 hidden" />
       </div>
     );
   }

@@ -6,7 +6,10 @@ const prisma = new PrismaClient()
 
 // GET /api/websites/[id]/reviews
 // 获取工具的评论列表
-export async function GET({ params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const websiteId = parseInt((await params).id)
     
@@ -129,7 +132,10 @@ export async function POST(
 
 // DELETE /api/websites/[id]/reviews
 // 删除评论
-export async function DELETE({ params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { userId } = await auth()
     

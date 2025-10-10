@@ -1,12 +1,9 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAtomValue, useAtom } from "jotai";
-import { isAdminModeAtom, isCompactModeAtom, websitesAtom } from "@/lib/atoms";
+import { useAtom } from "jotai";
+import { websitesAtom } from "@/lib/atoms";
 import { useToast } from "@/hooks/use-toast";
-import { WebsiteCard } from "./website-card";
 import { CompactCard } from "./compact-card";
-import { ModernWebsiteCard } from "./modern-website-card";
-import { ViewModeToggle } from "./view-mode-toggle";
 import { cn } from "@/lib/utils/utils";
 import type { Website, Category } from "@/lib/types";
 import { Globe } from "lucide-react";
@@ -23,9 +20,7 @@ export default function WebsiteGrid({
   categories,
   className,
 }: WebsiteGridProps) {
-  const isAdmin = useAtomValue(isAdminModeAtom);
   const { toast } = useToast();
-  const [isCompact, setIsCompact] = useAtom(isCompactModeAtom);
   const [, setWebsites] = useAtom(websitesAtom);
 
   const handleVisit = async (website: Website) => {
@@ -41,26 +36,6 @@ export default function WebsiteGrid({
     window.open(website.url, "_blank");
   };
 
-  const handleStatusUpdate = async (id: number, status: Website["status"]) => {
-    fetch(`/api/websites/${id}/status`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status }),
-    });
-
-    setWebsites(
-      websites.map((website) =>
-        website.id === id ? { ...website, status } : website
-      )
-    );
-    toast({
-      title: "状态已更新",
-      description: status === "approved" ? "网站已通过审核" : "网站已被拒绝",
-    });
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -68,16 +43,9 @@ export default function WebsiteGrid({
       className={cn("relative min-h-[500px]", className)}
       layout
     >
-      <ViewModeToggle isCompact={isCompact} onChange={setIsCompact} />
-
       <motion.div
         layout
-        className={cn(
-          "grid gap-3 sm:gap-4",
-          isCompact
-            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8"
-            : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4"
-        )}
+        className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8"
       >
         <AnimatePresence mode="popLayout">
           {!websites || websites.length === 0 ? (
@@ -117,19 +85,7 @@ export default function WebsiteGrid({
                   delay: index * 0.05,
                 }}
               >
-                {isCompact ? (
-                  <CompactCard website={website} onVisit={handleVisit} />
-                ) : (
-                  <ModernWebsiteCard
-                    website={website}
-                    category={categories.find(
-                      (c) => c.id === website.category_id
-                    )}
-                    isAdmin={isAdmin}
-                    onVisit={handleVisit}
-                    onStatusUpdate={handleStatusUpdate}
-                  />
-                )}
+                <CompactCard website={website} onVisit={handleVisit} />
               </motion.div>
             ))
           )}
