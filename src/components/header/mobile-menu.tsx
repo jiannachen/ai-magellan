@@ -11,18 +11,21 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/ui/common/tooltip";
+import { useTranslations } from 'next-intl';
 
 export default function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [rankingsOpen, setRankingsOpen] = useState(false);
+  const t = useTranslations();
+  const tRank = useTranslations('pages.rankings');
 
   const rankingLinks = [
-    { href: "/rankings/popular", title: "Most Popular", icon: TrendingUp },
-    { href: "/rankings/top-rated", title: "Top Rated", icon: Star },
-    { href: "/rankings/trending", title: "Trending Now", icon: Trophy },
-    { href: "/rankings/free", title: "Best Free Tools", icon: CheckCircle },
-    { href: "/rankings/new", title: "Recently Added", icon: Plus },
-    { href: "/rankings/monthly-hot", title: "Monthly Hot", icon: TrendingUp },
+    { href: "/rankings/popular", title: tRank('types.popular.title'), icon: TrendingUp },
+    { href: "/rankings/top-rated", title: tRank('types.top-rated.title'), icon: Star },
+    { href: "/rankings/trending", title: tRank('types.trending.title'), icon: Trophy },
+    { href: "/rankings/free", title: tRank('types.free.title'), icon: CheckCircle },
+    { href: "/rankings/new", title: tRank('types.new.title'), icon: Plus },
+    { href: "/rankings/monthly-hot", title: tRank('types.monthly-hot.title'), icon: TrendingUp },
   ];
 
   return (
@@ -47,7 +50,7 @@ export default function MobileMenu() {
                   >
                     <div className="flex items-center">
                       <Trophy className="h-5 w-5 mr-3 text-primary" />
-                      排行榜
+                      {t('navigation.rankings')}
                     </div>
                     <ChevronDown className={`h-4 w-4 transition-transform ${rankingsOpen ? 'rotate-180' : ''}`} />
                   </Button>
@@ -61,7 +64,7 @@ export default function MobileMenu() {
                         className="w-full justify-start hover:bg-primary/5 text-sm rounded-lg h-10"
                       >
                         <Trophy className="h-4 w-4 mr-2 text-primary" />
-                        All Rankings
+                        {tRank('view_all')}
                       </Button>
                     </Link>
                     {rankingLinks.map((link) => (

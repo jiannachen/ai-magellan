@@ -1,6 +1,7 @@
 'use client'
 
 import { useUser } from '@clerk/nextjs'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/common/avatar'
 import { Badge } from '@/ui/common/badge'
@@ -16,6 +17,10 @@ import { format } from 'date-fns'
 
 export default function ProfileInfoPage() {
   const { isLoaded, isSignedIn, user } = useUser()
+  
+  // Translation hooks
+  const t = useTranslations('common')
+  const tProfile = useTranslations('profile.info')
 
   if (!isLoaded) {
     return (
@@ -23,7 +28,7 @@ export default function ProfileInfoPage() {
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-muted-foreground">加载中...</p>
+            <p className="text-muted-foreground">{t('loading')}</p>
           </div>
         </div>
       </ProfileLayout>
@@ -36,11 +41,11 @@ export default function ProfileInfoPage() {
         <div className="p-6">
           <Card>
             <CardHeader>
-              <CardTitle>未登录</CardTitle>
+              <CardTitle>{tProfile('login_required')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                请先登录以查看个人资料。
+                {tProfile('login_description')}
               </p>
             </CardContent>
           </Card>
@@ -54,8 +59,8 @@ export default function ProfileInfoPage() {
       <div className="p-6 space-y-6">
         {/* 页面标题 */}
         <div>
-          <h1 className="text-2xl font-bold mb-2">个人信息</h1>
-          <p className="text-muted-foreground">管理您的个人资料和账户设置。</p>
+          <h1 className="text-2xl font-bold mb-2">{tProfile('title')}</h1>
+          <p className="text-muted-foreground">{tProfile('description')}</p>
         </div>
 
         {/* 基本信息卡片 */}
@@ -63,7 +68,7 @@ export default function ProfileInfoPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              基本信息
+              {tProfile('basic_info')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -77,7 +82,7 @@ export default function ProfileInfoPage() {
               </Avatar>
               <div className="space-y-2">
                 <h3 className="text-xl font-semibold">
-                  {user.fullName || user.firstName || '用户'}
+                  {user.fullName || user.firstName || tProfile('default_user')}
                 </h3>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Mail className="h-4 w-4" />
@@ -85,7 +90,7 @@ export default function ProfileInfoPage() {
                 </div>
                 <Badge variant="secondary" className="flex items-center gap-1 w-fit">
                   <Shield className="h-3 w-3" />
-                  普通用户
+                  {tProfile('general_user')}
                 </Badge>
               </div>
             </div>
@@ -96,28 +101,28 @@ export default function ProfileInfoPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">姓名</label>
-                  <p className="mt-1 text-sm">{user.fullName || user.firstName || '未设置'}</p>
+                  <label className="text-sm font-medium text-muted-foreground">{tProfile('name_label')}</label>
+                  <p className="mt-1 text-sm">{user.fullName || user.firstName || tProfile('not_set')}</p>
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">邮箱地址</label>
+                  <label className="text-sm font-medium text-muted-foreground">{tProfile('email_label')}</label>
                   <p className="mt-1 text-sm">{user.emailAddresses?.[0]?.emailAddress}</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">用户ID</label>
+                  <label className="text-sm font-medium text-muted-foreground">{tProfile('user_id_label')}</label>
                   <p className="mt-1 text-sm font-mono text-xs break-all">{user.id}</p>
                 </div>
 
                 {user.createdAt && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">注册时间</label>
+                    <label className="text-sm font-medium text-muted-foreground">{tProfile('registration_date')}</label>
                     <div className="mt-1 flex items-center gap-2 text-sm">
                       <Calendar className="h-4 w-4" />
-                      {format(new Date(user.createdAt), 'yyyy年MM月dd日')}
+                      {format(new Date(user.createdAt), 'yyyy-MM-dd')}
                     </div>
                   </div>
                 )}
@@ -128,27 +133,27 @@ export default function ProfileInfoPage() {
 
         {/* 账户设置 */}
         <Card>
-          <CardHeader>
-            <CardTitle>账户设置</CardTitle>
-          </CardHeader>
+            <CardHeader>
+              <CardTitle>{tProfile('account_settings')}</CardTitle>
+            </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
-                  <h4 className="font-medium">邮箱验证状态</h4>
-                  <p className="text-sm text-muted-foreground">您的邮箱地址验证状态</p>
+                  <h4 className="font-medium">{tProfile('email_verification')}</h4>
+                  <p className="text-sm text-muted-foreground">{tProfile('email_verification_desc')}</p>
                 </div>
                 <Badge variant={user.emailAddresses?.[0]?.verification?.status === 'verified' ? 'default' : 'secondary'}>
-                  {user.emailAddresses?.[0]?.verification?.status === 'verified' ? '已验证' : '未验证'}
+                  {user.emailAddresses?.[0]?.verification?.status === 'verified' ? tProfile('verified') : tProfile('unverified')}
                 </Badge>
               </div>
 
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
-                  <h4 className="font-medium">双重认证</h4>
-                  <p className="text-sm text-muted-foreground">增强账户安全性</p>
+                  <h4 className="font-medium">{tProfile('two_factor_auth')}</h4>
+                  <p className="text-sm text-muted-foreground">{tProfile('two_factor_desc')}</p>
                 </div>
-                <Badge variant="secondary">未启用</Badge>
+                <Badge variant="secondary">{tProfile('not_enabled')}</Badge>
               </div>
             </div>
           </CardContent>
@@ -157,13 +162,13 @@ export default function ProfileInfoPage() {
         {/* 使用提示 */}
         <Card>
           <CardHeader>
-            <CardTitle>使用提示</CardTitle>
+            <CardTitle>{tProfile('usage_tips')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-sm text-muted-foreground space-y-2">
-              <p>• 个人信息由 Clerk 安全管理，如需修改请点击右上角用户头像进入设置</p>
-              <p>• 您的邮箱地址用于接收重要通知和密码重置</p>
-              <p>• 建议启用双重认证以保护账户安全</p>
+              <p>• {tProfile('tip_1')}</p>
+              <p>• {tProfile('tip_2')}</p>
+              <p>• {tProfile('tip_3')}</p>
             </div>
           </CardContent>
         </Card>

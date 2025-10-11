@@ -2,6 +2,31 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils/utils";
 
+/**
+ * Atlassian Card Components
+ * 
+ * 完全符合 Atlassian Design System 规范的卡片组件套件
+ * 
+ * 设计规范：
+ * - 8px 圆角 (rounded-lg) - 符合Atlassian中等元素标准
+ * - 24px 内边距 (p-6) - 符合Atlassian 3倍8px网格间距
+ * - elevation-100 基础阴影，hover时提升至elevation-300
+ * - 微妙的hover动画：-1px位移 + 阴影提升
+ * 
+ * 交互状态：
+ * - 默认：elevation-100阴影
+ * - Hover：向上1px位移 + elevation-300阴影
+ * - Active：回到原位
+ * - 200ms过渡动画，符合Atlassian标准交互时长
+ * 
+ * 可访问性：
+ * - 语义化HTML结构
+ * - 适当的颜色对比度
+ * - 支持键盘导航
+ * 
+ * 参考：https://atlassian.design/components/card
+ */
+
 // Atlassian Card Component - 8px border radius, standard elevation, 24px padding
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -10,7 +35,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg bg-card text-card-foreground border border-border shadow-elevation-100 transition-all duration-200 hover:shadow-elevation-300 hover:translate-y-[-1px] active:translate-y-0",
+      "rounded-lg bg-card text-card-foreground border border-border shadow-atlassian-100 transition-all duration-200 hover:shadow-atlassian-300 hover:translate-y-[-1px] active:translate-y-0",
       className
     )}
     {...props}
@@ -39,7 +64,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-h4 font-medium leading-tight text-foreground",
+      "text-atlassian-h4 font-medium leading-tight text-foreground",
       className
     )}
     {...props}
@@ -54,7 +79,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-body text-muted-foreground", className)}
+    className={cn("text-atlassian-body text-muted-foreground", className)}
     {...props}
   />
 ));

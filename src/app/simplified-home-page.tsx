@@ -37,7 +37,10 @@ import {
   Crown,
   Calendar,
   ThumbsUp,
-  Grid3X3
+  Grid3X3,
+  Compass,
+  Map,
+  Route
 } from "lucide-react";
 import type { Website, Category } from "@/lib/types";
 import { useTranslations } from 'next-intl';
@@ -69,65 +72,65 @@ export default function SimplifiedHomePage({
   const [userFavorites, setUserFavorites] = useState<Set<number>>(new Set());
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
-  // FAQ data
+  // FAQ data - 融入 Magellan 探索精神
   const faqs = [
     {
-      question: "What types of AI tools can I find here?",
-      answer: "We curate AI tools across all major categories including chat assistants, image generators, writing tools, coding assistants, video editors, voice synthesizers, and business automation tools. All tools are tested and verified for quality."
+      question: t('home.faq.questions.what_makes_different.question'),
+      answer: t('home.faq.questions.what_makes_different.answer')
     },
     {
-      question: "Are these AI tools free to use?",
-      answer: "We list both free and paid AI tools. Each tool shows its pricing model - free, freemium, subscription, or one-time purchase. Many tools offer free tiers or trial periods so you can test them before committing."
+      question: t('home.faq.questions.quality_assurance.question'),
+      answer: t('home.faq.questions.quality_assurance.answer')
     },
     {
-      question: "How do you ensure the quality of listed tools?",
-      answer: "Every tool goes through our review process. We test functionality, check user reviews, verify company legitimacy, and assign quality scores. Featured tools meet our highest standards for reliability and user experience."
+      question: t('home.faq.questions.free_tools.question'),
+      answer: t('home.faq.questions.free_tools.answer')
     },
     {
-      question: "Can I submit my own AI tool?",
-      answer: "Yes! We welcome submissions from tool creators and users. Simply use our submission form, provide detailed information about the tool, and our team will review it. Quality tools that pass our review will be added to the directory."
+      question: t('home.faq.questions.submit_tool.question'),
+      answer: t('home.faq.questions.submit_tool.answer')
     },
     {
-      question: "How often is the directory updated?",
-      answer: "We update our directory daily with new tools, feature updates, and pricing changes. Our team continuously monitors the AI landscape to ensure you have access to the latest and most relevant tools."
+      question: t('home.faq.questions.update_frequency.question'),
+      answer: t('home.faq.questions.update_frequency.answer')
     },
     {
-      question: "Do I need to create an account?",
-      answer: "No account is needed to browse and discover tools. However, creating a free account allows you to like tools, save favorites, leave reviews, and get personalized recommendations based on your interests."
+      question: t('home.faq.questions.account_required.question'),
+      answer: t('home.faq.questions.account_required.answer')
     }
   ];
 
-  // Value propositions
+  // Value propositions - 融入 Magellan 探索主题
   const valueProps = [
     {
+      icon: Compass,
+      title: t('home.value_props.expert_navigation.title'),
+      description: t('home.value_props.expert_navigation.description')
+    },
+    {
+      icon: Map,
+      title: t('home.value_props.charted_territory.title'),
+      description: t('home.value_props.charted_territory.description')
+    },
+    {
+      icon: Route,
+      title: t('home.value_props.optimal_routes.title'),
+      description: t('home.value_props.optimal_routes.description')
+    },
+    {
       icon: Shield,
-      title: "Quality Verified",
-      description: "Every tool is tested and reviewed by our expert team before listing"
-    },
-    {
-      icon: Zap,
-      title: "Save Time",
-      description: "Skip the research. Find the perfect AI tool for your needs in minutes"
-    },
-    {
-      icon: Target,
-      title: "Perfect Match",
-      description: "Advanced filtering and search to find exactly what you're looking for"
-    },
-    {
-      icon: BarChart3,
-      title: "Data-Driven",
-      description: "Real user reviews, usage stats, and quality scores help you decide"
-    },
-    {
-      icon: Rocket,
-      title: "Stay Updated", 
-      description: "Access the latest AI tools as soon as they're released and verified"
+      title: t('home.value_props.verified_quality.title'),
+      description: t('home.value_props.verified_quality.description')
     },
     {
       icon: Globe,
-      title: "Comprehensive",
-      description: "From startups to enterprise - tools for every use case and budget"
+      title: t('home.value_props.global_discovery.title'),
+      description: t('home.value_props.global_discovery.description')
+    },
+    {
+      icon: Rocket,
+      title: t('home.value_props.pioneer_access.title'), 
+      description: t('home.value_props.pioneer_access.description')
     }
   ];
 
@@ -307,7 +310,7 @@ export default function SimplifiedHomePage({
             </div>
             <div>
               <h2 className="text-atlassian-h3 font-medium text-foreground">{title}</h2>
-       310 -                <p className="text-atlassian-body text-muted-foreground">{description}</p>
+              <p className="text-atlassian-body text-muted-foreground">{description}</p>
             </div>
           </div>
           <Link href={viewAllLink}>
@@ -319,7 +322,7 @@ export default function SimplifiedHomePage({
                 "rounded-md px-3 py-2" // Atlassian风格的按钮
               )}
             >
-              View All
+              {t('home.view_all')}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
@@ -353,7 +356,7 @@ export default function SimplifiedHomePage({
                 "hover:bg-muted transition-atlassian-standard"
               )}
             >
-              View All {title}
+              {t('home.view_all')} {title}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>
@@ -376,47 +379,53 @@ export default function SimplifiedHomePage({
             }}
             className="space-y-6" // 减少间距
           >
-            {/* Badge - Atlassian风格 */}
+            {/* Badge - Atlassian Design System */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ 
-                duration: 0.2, 
-                delay: 0.1,
-                ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+                duration: 100, // ds-motion-duration-fast
+                delay: 100,
+                ease: [0.15, 1, 0.3, 1] // ds-motion-easing-entrance
               }}
               className={cn(
                 "inline-flex items-center gap-2",
-                "px-3 py-1.5 rounded-md", // 使用4px圆角
-                "bg-primary/10 border border-primary/20",
-                "text-atlassian-body-small font-medium text-primary"
+                "px-3 py-1.5", 
+                "rounded-[4px]", // ds-border-radius-100
+                "bg-[color:var(--ds-background-brand-bold)] bg-opacity-10", 
+                "border border-[color:var(--ds-background-brand-bold)] border-opacity-20",
+                "font-medium",
+                "text-[11px] leading-4 tracking-[0.5px]", // ds-caption typography
+                "text-[color:var(--ds-background-brand-bold)]"
               )}
             >
-              <Rocket className="h-3.5 w-3.5" />
-              <span>Discover Quality AI Tools</span>
+              <Compass className="h-3.5 w-3.5" />
+              <span>{t('home.badge')}</span>
             </motion.div>
 
-            {/* Main Title - Atlassian字体层级 */}
-            <div className="space-y-3"> {/* 减少间距 */}
+            {/* Main Title - Atlassian Design System Typography */}
+            <div className="space-y-[var(--ds-space-300)]"> {/* ds-space-300: 24px */}
               <h1 className={cn(
-                "text-atlassian-display md:text-atlassian-display", // 使用Atlassian字体
-                "font-medium tracking-tight leading-tight max-w-4xl mx-auto"
+                "font-[var(--ds-font-family-sans)]",
+                "text-[48px] leading-[56px] font-medium tracking-[-0.02em]", // ds-heading-display
+                "md:text-[48px] md:leading-[56px]",
+                "max-w-4xl mx-auto"
               )}>
-                Find the Best{" "}
-                <span className="text-primary">
+                {t('home.title')}{" "}
+                <span className="text-[color:var(--ds-background-brand-bold)]">
                   AI Tools
                 </span>
                 <br />
-                <span className="text-atlassian-h3 text-muted-foreground font-normal">
-                  That Actually Work
+                <span className="text-[24px] leading-[32px] font-medium tracking-[-0.01em] text-[color:var(--ds-text-subtle)] font-normal">
+                  {t('home.subtitle')}
                 </span>
               </h1>
 
-              {/* Subtitle - Atlassian字体 */}
-              <p className="text-atlassian-body-large text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                Curated collection of AI tools to boost your productivity.
+              {/* Subtitle - Atlassian Design System */}
+              <p className="text-[16px] leading-[24px] font-normal text-[color:var(--ds-text-subtle)] max-w-2xl mx-auto">
+                {t('home.description')}
                 <br className="hidden md:block" />
-                Find, compare, and use the tools trusted by professionals.
+                {t('home.description_continued')}
               </p>
             </div>
           </motion.div>
@@ -435,7 +444,7 @@ export default function SimplifiedHomePage({
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search AI tools..."
+                placeholder={t('home.search_placeholder')}
                 className={cn(
                   "pl-10 pr-4 h-12", // 调整高度符合Atlassian
                   "text-atlassian-body rounded-md", // 使用4px圆角和Atlassian字体
@@ -448,7 +457,7 @@ export default function SimplifiedHomePage({
               />
             </div>
             <p className="text-atlassian-caption text-muted-foreground mt-2">
-              Try: "image generator", "code assistant", "writing tool"
+              {t('home.search_suggestions')}
             </p>
           </motion.div>
 
@@ -465,19 +474,19 @@ export default function SimplifiedHomePage({
           >
             <div className="text-center">
               <div className="text-atlassian-h4 font-medium text-primary mb-1">{websites.length}+</div>
-              <div className="text-atlassian-caption text-muted-foreground font-medium">AI Tools</div>
+              <div className="text-atlassian-caption text-muted-foreground font-medium">{t('home.stats.charted_tools')}</div>
             </div>
             <div className="text-center">
-              <div className="text-atlassian-h4 font-medium text-primary mb-1">50K+</div>
-              <div className="text-atlassian-caption text-muted-foreground font-medium">Users</div>
+              <div className="text-atlassian-h4 font-medium text-primary mb-1">100K+</div>
+              <div className="text-atlassian-caption text-muted-foreground font-medium">{t('home.stats.explorers')}</div>
             </div>
             <div className="text-center">
-              <div className="text-atlassian-h4 font-medium text-primary mb-1">Daily</div>
-              <div className="text-atlassian-caption text-muted-foreground font-medium">Updated</div>
+              <div className="text-atlassian-h4 font-medium text-primary mb-1">{t('home.stats.daily')}</div>
+              <div className="text-atlassian-caption text-muted-foreground font-medium">{t('home.stats.discoveries')}</div>
             </div>
             <div className="text-center">
-              <div className="text-atlassian-h4 font-medium text-primary mb-1">Quality</div>
-              <div className="text-atlassian-caption text-muted-foreground font-medium">Curated</div>
+              <div className="text-atlassian-h4 font-medium text-primary mb-1">{t('home.stats.expert')}</div>
+              <div className="text-atlassian-caption text-muted-foreground font-medium">{t('home.stats.verified')}</div>
             </div>
           </motion.div>
 
@@ -503,7 +512,7 @@ export default function SimplifiedHomePage({
                 )}
               >
                 <Grid3X3 className="h-4 w-4 mr-2" />
-                Browse Categories
+                {t('home.cta_buttons.explore_categories')}
               </Button>
             </Link>
             <Link href="/submit">
@@ -518,7 +527,7 @@ export default function SimplifiedHomePage({
                 )}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Submit Tool
+                {t('home.cta_buttons.chart_new_tool')}
               </Button>
             </Link>
           </motion.div>
@@ -527,8 +536,8 @@ export default function SimplifiedHomePage({
 
       {/* Rankings Sections */}
       <RankingSection
-        title="Top Rated AI Tools"
-        description="Highest quality tools based on our comprehensive review system"
+        title={t('home.ranking_sections.premier_discoveries.title')}
+        description={t('home.ranking_sections.premier_discoveries.description')}
         websites={topRatedWebsites}
         icon={Crown}
         viewAllLink="/rankings/top-rated"
@@ -536,8 +545,8 @@ export default function SimplifiedHomePage({
 
       <div className="bg-muted/30">
         <RankingSection
-          title="Most Popular Tools"
-          description="AI tools with the highest user engagement and visits"
+          title={t('home.ranking_sections.trending_expeditions.title')}
+          description={t('home.ranking_sections.trending_expeditions.description')}
           websites={mostPopularWebsites}
           icon={TrendingUp}
           viewAllLink="/rankings/popular"
@@ -545,8 +554,8 @@ export default function SimplifiedHomePage({
       </div>
 
       <RankingSection
-        title="Best Free AI Tools"
-        description="Top-quality AI tools that are completely free to use"
+        title={t('home.ranking_sections.free_territory.title')}
+        description={t('home.ranking_sections.free_territory.description')}
         websites={topFreeWebsites}
         icon={CheckCircle}
         viewAllLink="/rankings/free"
@@ -554,8 +563,8 @@ export default function SimplifiedHomePage({
 
       <div className="bg-muted/30">
         <RankingSection
-          title="Recently Added"
-          description="Latest AI tools added to our curated collection"
+          title={t('home.ranking_sections.new_horizons.title')}
+          description={t('home.ranking_sections.new_horizons.description')}
           websites={recentWebsites}
           icon={Clock}
           viewAllLink="/rankings/recent"
@@ -575,10 +584,10 @@ export default function SimplifiedHomePage({
               }}
             >
               <h2 className="text-atlassian-h2 font-medium mb-4"> {/* 使用Atlassian字体层级 */}
-                Why Choose Our AI Tools Directory?
+                {t('home.value_props.title')}
               </h2>
               <p className="text-atlassian-body-large text-muted-foreground max-w-3xl mx-auto">
-                We don't just list tools - we curate, test, and rank every AI tool to save you time and help you make informed decisions.
+                {t('home.value_props.description')}
               </p>
             </motion.div>
           </div>
@@ -635,10 +644,10 @@ export default function SimplifiedHomePage({
               }}
             >
               <h2 className="text-atlassian-h2 font-medium mb-4"> {/* 使用Atlassian字体层级 */}
-                Frequently Asked Questions
+                {t('home.faq.title')}
               </h2>
               <p className="text-atlassian-body-large text-muted-foreground">
-                Everything you need to know about our AI tools directory
+                {t('home.faq.description')}
               </p>
             </motion.div>
           </div>
@@ -719,9 +728,9 @@ export default function SimplifiedHomePage({
               <CardContent className="p-6"> {/* 减少内边距 */}
                 <div className="space-y-3"> {/* 减少间距 */}
                   <Lightbulb className="h-10 w-10 text-primary mx-auto" /> {/* 稍微减小图标 */}
-                  <h3 className="text-atlassian-h5 font-medium">Still have questions?</h3>
+                  <h3 className="text-atlassian-h5 font-medium">{t('home.faq.contact_cta.title')}</h3>
                   <p className="text-atlassian-body text-muted-foreground">
-                    Can't find the answer you're looking for? Our team is here to help.
+                    {t('home.faq.contact_cta.description')}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 justify-center"> {/* 减少间距 */}
                     <Button 
@@ -732,7 +741,7 @@ export default function SimplifiedHomePage({
                         "text-atlassian-body"
                       )}
                     >
-                      Contact Support
+                      {t('home.faq.contact_cta.contact_navigator')}
                     </Button>
                     <Button 
                       className={cn(
@@ -741,7 +750,7 @@ export default function SimplifiedHomePage({
                         "text-atlassian-body"
                       )}
                     >
-                      Join Community
+                      {t('home.faq.contact_cta.join_expedition')}
                     </Button>
                   </div>
                 </div>
@@ -764,10 +773,10 @@ export default function SimplifiedHomePage({
             className="space-y-4" // 减少间距
           >
             <h2 className="text-atlassian-h2 font-medium"> {/* 使用Atlassian字体层级 */}
-              Ready to discover your next AI tool?
+              {t('home.final_cta.title')}
             </h2>
             <p className="text-atlassian-body-large text-muted-foreground">
-              Join thousands of professionals who use our rankings to find the best AI tools.
+              {t('home.final_cta.description')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center"> {/* 减少间距 */}
               <Link href="/submit">
@@ -780,7 +789,7 @@ export default function SimplifiedHomePage({
                     "text-atlassian-body font-medium"
                   )}
                 >
-                  Submit Your Tool
+                  {t('home.final_cta.chart_discovery')}
                 </Button>
               </Link>
               <Link href="/categories">
@@ -794,7 +803,7 @@ export default function SimplifiedHomePage({
                     "text-atlassian-body font-medium"
                   )}
                 >
-                  Browse Categories
+                  {t('home.final_cta.explore_territories')}
                 </Button>
               </Link>
             </div>

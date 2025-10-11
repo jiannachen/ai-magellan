@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { useRouter, useParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Save, Loader2, Plus, X, Globe, Lightbulb, Target, Users, HelpCircle } from 'lucide-react'
@@ -14,24 +15,25 @@ import { Label } from '@/ui/common/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/common/select'
 import { Checkbox } from '@/ui/common/checkbox'
 import { toast } from 'sonner'
+import { ProfileLayout } from '@/components/profile/profile-layout'
 
 const PRICING_MODELS = [
-  { value: 'free', label: '免费' },
-  { value: 'freemium', label: '免费增值' },
-  { value: 'subscription', label: '订阅' },
-  { value: 'tiered', label: '分级' },
-  { value: 'custom', label: '自定义' },
-  { value: 'one_time', label: '一次性付费' },
-  { value: 'tiered_subscription', label: '分级订阅' },
-  { value: 'usage_based', label: '基于使用情况' },
-  { value: 'pay_as_you_go', label: '按需付费' },
-  { value: 'open_source', label: '开源' }
+  { value: 'free', label: 'free' },
+  { value: 'freemium', label: 'freemium' },
+  { value: 'subscription', label: 'subscription' },
+  { value: 'tiered', label: 'tiered' },
+  { value: 'custom', label: 'custom' },
+  { value: 'one_time', label: 'one_time' },
+  { value: 'tiered_subscription', label: 'tiered_subscription' },
+  { value: 'usage_based', label: 'usage_based' },
+  { value: 'pay_as_you_go', label: 'pay_as_you_go' },
+  { value: 'open_source', label: 'open_source' }
 ]
 
 const DESKTOP_PLATFORMS = [
-  { value: 'mac', label: 'macOS' },
-  { value: 'windows', label: 'Windows' },
-  { value: 'linux', label: 'Linux' }
+  { value: 'mac', label: 'macos' },
+  { value: 'windows', label: 'windows' },
+  { value: 'linux', label: 'linux' }
 ]
 
 const COMMON_INTEGRATIONS = [
@@ -82,6 +84,10 @@ export default function EditWebsitePage() {
   const router = useRouter()
   const params = useParams()
   const websiteId = params?.id as string
+  const t = useTranslations('edit')
+  const tForm = useTranslations('form')
+  const tCommon = useTranslations('common')
+  const tPricing = useTranslations('pricing_models')
 
   const [website, setWebsite] = useState<Website | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
@@ -101,6 +107,7 @@ export default function EditWebsitePage() {
     target_audience: [] as string[],
     faq: [] as Array<{question: string, answer: string}>,
     pricing_model: 'free',
+    pricing_plans: [] as Array<{name: string, billing_cycle: string, price: string, features: string[]}>,
     has_free_version: false,
     api_available: false,
     tags: '',
@@ -130,14 +137,14 @@ export default function EditWebsitePage() {
       
       if (!response.ok) {
         if (response.status === 404) {
-          setError('网站不存在')
+          setError(t('errors.website_not_found'))
           return
         }
         if (response.status === 403) {
-          setError('您没有权限编辑此网站')
+          setError(t('errors.permission_denied'))
           return
         }
-        throw new Error('获取网站信息失败')
+        throw new Error(t('errors.fetch_failed'))
       }
 
       const data = await response.json()
@@ -145,7 +152,7 @@ export default function EditWebsitePage() {
 
       // 检查是否是当前用户提交的网站
       if (websiteData.submittedBy !== user?.id) {
-        setError('您只能编辑自己提交的网站')
+        setError(t('errors.only_own_websites'))
         return
       }
 
@@ -180,6 +187,7 @@ export default function EditWebsitePage() {
         target_audience: websiteData.target_audience || [],
         faq: websiteData.faq || [],
         pricing_model: websiteData.pricing_model || 'free',
+        pricing_plans: websiteData.pricing_plans || [],
         has_free_version: websiteData.has_free_version || false,
         api_available: websiteData.api_available || false,
         tags: websiteData.tags || '',
@@ -197,7 +205,7 @@ export default function EditWebsitePage() {
       })
     } catch (error) {
       console.error('Error fetching website:', error)
-      setError('获取网站信息失败')
+      setError(t('errors.fetch_failed'))
     } finally {
       setLoading(false)
     }
@@ -219,7 +227,7 @@ export default function EditWebsitePage() {
     e.preventDefault()
     
     if (!formData.title || !formData.url || !formData.category_id) {
-      toast.error('请填写所有必填字段')
+      toast.error(t('errors.required_fields'))
       return
     }
 
@@ -236,14 +244,14 @@ export default function EditWebsitePage() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.message || '更新失败')
+        throw new Error(errorData.message || t('errors.update_failed'))
       }
 
-      toast.success('网站信息已更新')
+      toast.success(t('success.updated'))
       router.push('/profile/submissions')
     } catch (error) {
       console.error('Error updating website:', error)
-      toast.error(error instanceof Error ? error.message : '更新失败')
+      toast.error(error instanceof Error ? error.message : t('errors.update_failed'))
     } finally {
       setSaving(false)
     }
@@ -322,12 +330,62 @@ export default function EditWebsitePage() {
     })
   }
 
+  const addPricingPlan = () => {
+    if (formData.pricing_plans.length < 6) {
+      setFormData(prev => ({
+        ...prev,
+        pricing_plans: [...prev.pricing_plans, { name: '', billing_cycle: '', price: '', features: [] }]
+      }))
+    }
+  }
+
+  const removePricingPlan = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      pricing_plans: prev.pricing_plans.filter((_, i) => i !== index)
+    }))
+  }
+
+  const updatePricingPlan = (index: number, field: 'name' | 'billing_cycle' | 'price', value: string) => {
+    setFormData(prev => {
+      const plans = [...prev.pricing_plans]
+      plans[index] = { ...plans[index], [field]: value }
+      return { ...prev, pricing_plans: plans }
+    })
+  }
+
+  const addPricingPlanFeature = (planIndex: number) => {
+    if (formData.pricing_plans[planIndex].features.length < 5) {
+      setFormData(prev => {
+        const plans = [...prev.pricing_plans]
+        plans[planIndex].features.push('')
+        return { ...prev, pricing_plans: plans }
+      })
+    }
+  }
+
+  const removePricingPlanFeature = (planIndex: number, featureIndex: number) => {
+    setFormData(prev => {
+      const plans = [...prev.pricing_plans]
+      plans[planIndex].features = plans[planIndex].features.filter((_, i) => i !== featureIndex)
+      return { ...prev, pricing_plans: plans }
+    })
+  }
+
+  const updatePricingPlanFeature = (planIndex: number, featureIndex: number, value: string) => {
+    setFormData(prev => {
+      const plans = [...prev.pricing_plans]
+      plans[planIndex].features[featureIndex] = value
+      return { ...prev, pricing_plans: plans }
+    })
+  }
+
   if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">加载中...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     )
@@ -338,14 +396,14 @@ export default function EditWebsitePage() {
       <div className="container mx-auto px-4 py-8">
         <Card>
           <CardHeader>
-            <CardTitle>需要登录</CardTitle>
+            <CardTitle>{t('login_required')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4">
-              请先登录以编辑网站信息。
+              {t('login_description')}
             </p>
             <Link href="/auth/signin">
-              <Button>立即登录</Button>
+              <Button>{t('login_now')}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -376,15 +434,15 @@ export default function EditWebsitePage() {
       <div className="container mx-auto px-4 py-8">
         <Card>
           <CardHeader>
-            <CardTitle>错误</CardTitle>
+            <CardTitle>{t('error')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-destructive mb-4">{error}</p>
             <div className="flex gap-4">
               <Link href="/profile/submissions">
-                <Button variant="outline">返回我的提交</Button>
+                <Button variant="outline">{t('back_to_submissions')}</Button>
               </Link>
-              <Button onClick={() => window.location.reload()}>重试</Button>
+              <Button onClick={() => window.location.reload()}>{t('retry')}</Button>
             </div>
           </CardContent>
         </Card>
@@ -393,86 +451,87 @@ export default function EditWebsitePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* 页面头部 */}
-      <div className="flex items-center gap-4 mb-8">
-        <Link href="/profile/submissions">
-          <Button variant="outline" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            返回我的提交
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-bold">编辑网站</h1>
-      </div>
+    <ProfileLayout>
+      <div className="max-w-4xl">
+        {/* 页面头部 */}
+        <div className="flex items-center gap-4 mb-8">
+          <Link href="/profile/submissions">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {t('back_to_submissions')}
+            </Button>
+          </Link>
+          <h1 className="text-2xl md:text-3xl font-bold">{t('title')}</h1>
+        </div>
 
-      {/* 编辑表单 */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl"
-      >
+        {/* 编辑表单 */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full"
+        >
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 1. 基本信息 */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
-                基本信息
+                {tForm('basic_info')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">网站名称 *</Label>
+                <Label htmlFor="title">{tForm('website_name_required')}</Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => handleInputChange('title', e.target.value)}
-                  placeholder="请输入网站名称"
+                  placeholder={tForm('website_name_placeholder')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="url">网站链接 *</Label>
+                <Label htmlFor="url">{tForm('website_url_required')}</Label>
                 <Input
                   id="url"
                   type="url"
                   value={formData.url}
                   onChange={(e) => handleInputChange('url', e.target.value)}
-                  placeholder="https://example.com"
+                  placeholder={tForm('website_url_placeholder')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="tagline">标语</Label>
+                <Label htmlFor="tagline">{tForm('tagline')}</Label>
                 <Input
                   id="tagline"
                   value={formData.tagline}
                   onChange={(e) => handleInputChange('tagline', e.target.value)}
-                  placeholder="简短、引人注目的标语"
+                  placeholder={tForm('tagline_placeholder')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">网站描述</Label>
+                <Label htmlFor="description">{tForm('website_description')}</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="请简要描述这个网站的功能和特点"
+                  placeholder={tForm('description_placeholder')}
                   rows={4}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">分类 *</Label>
+                <Label htmlFor="category">{tForm('category_required')}</Label>
                 <Select
                   value={formData.category_id.toString()}
                   onValueChange={(value) => handleInputChange('category_id', parseInt(value))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="请选择分类" />
+                    <SelectValue placeholder={tForm('category_placeholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) => (
@@ -485,29 +544,29 @@ export default function EditWebsitePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="tags">标签</Label>
+                <Label htmlFor="tags">{tForm('tags')}</Label>
                 <Input
                   id="tags"
                   value={formData.tags}
                   onChange={(e) => handleInputChange('tags', e.target.value)}
-                  placeholder="用逗号分隔多个标签"
+                  placeholder={tForm('tags_placeholder')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="thumbnail">缩略图链接</Label>
+                <Label htmlFor="thumbnail">{tForm('thumbnail_url')}</Label>
                 <Input
                   id="thumbnail"
                   type="url"
                   value={formData.thumbnail}
                   onChange={(e) => handleInputChange('thumbnail', e.target.value)}
-                  placeholder="https://example.com/image.jpg"
+                  placeholder={tForm('thumbnail_placeholder')}
                 />
                 {formData.thumbnail && (
                   <div className="mt-2">
                     <img 
                       src={formData.thumbnail} 
-                      alt="缩略图预览" 
+                      alt={tForm('thumbnail_preview')} 
                       className="w-20 h-20 object-cover rounded border"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none'
@@ -524,14 +583,14 @@ export default function EditWebsitePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lightbulb className="h-5 w-5" />
-                主要特点
+                {tForm('main_features')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {formData.features.map((feature, index) => (
                 <div key={index} className="border rounded-lg p-4">
                   <div className="flex items-start justify-between mb-3">
-                    <h4 className="font-medium text-sm">功能 {index + 1}</h4>
+                    <h4 className="font-medium text-sm">{tForm('feature_number', {number: index + 1})}</h4>
                     <Button
                       type="button"
                       variant="ghost"
@@ -543,19 +602,19 @@ export default function EditWebsitePage() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <Label className="text-xs">特征名称</Label>
+                      <Label className="text-xs">{tForm('feature_name')}</Label>
                       <Input
                         value={feature.name}
                         onChange={(e) => updateFeature(index, 'name', e.target.value)}
-                        placeholder="例如，智能分析"
+                        placeholder={tForm('feature_name_placeholder')}
                       />
                     </div>
                     <div>
-                      <Label className="text-xs">简要描述</Label>
+                      <Label className="text-xs">{tForm('feature_description')}</Label>
                       <Input
                         value={feature.description}
                         onChange={(e) => updateFeature(index, 'description', e.target.value)}
-                        placeholder="描述这个特点的作用"
+                        placeholder={tForm('feature_description_placeholder')}
                       />
                     </div>
                   </div>
@@ -567,7 +626,7 @@ export default function EditWebsitePage() {
                 onClick={addFeature}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                添加功能
+                {tForm('add_feature')}
               </Button>
             </CardContent>
           </Card>
@@ -577,7 +636,7 @@ export default function EditWebsitePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5" />
-                用例和目标受众
+                {tForm('use_cases_and_audience')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -586,7 +645,7 @@ export default function EditWebsitePage() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Users className="h-4 w-4" />
-                    <h4 className="font-medium">用例</h4>
+                    <h4 className="font-medium">{tForm('use_cases')}</h4>
                   </div>
                   <div className="space-y-2">
                     {formData.use_cases.map((useCase, index) => (
@@ -594,7 +653,7 @@ export default function EditWebsitePage() {
                         <Input
                           value={useCase}
                           onChange={(e) => updateArrayItem('use_cases', index, e.target.value)}
-                          placeholder="用例描述"
+                          placeholder={tForm('use_case_placeholder')}
                         />
                         <Button
                           type="button"
@@ -613,7 +672,7 @@ export default function EditWebsitePage() {
                       onClick={() => addToArray('use_cases', '')}
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      添加
+                      {tForm('add_use_case')}
                     </Button>
                   </div>
                 </div>
@@ -622,7 +681,7 @@ export default function EditWebsitePage() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Users className="h-4 w-4" />
-                    <h4 className="font-medium">目标受众</h4>
+                    <h4 className="font-medium">{tForm('target_audience')}</h4>
                   </div>
                   <div className="space-y-2">
                     {formData.target_audience.map((audience, index) => (
@@ -630,7 +689,7 @@ export default function EditWebsitePage() {
                         <Input
                           value={audience}
                           onChange={(e) => updateArrayItem('target_audience', index, e.target.value)}
-                          placeholder="目标受众"
+                          placeholder={tForm('target_audience_placeholder')}
                         />
                         <Button
                           type="button"
@@ -649,7 +708,7 @@ export default function EditWebsitePage() {
                       onClick={() => addToArray('target_audience', '')}
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      添加
+                      {tForm('add_target_audience')}
                     </Button>
                   </div>
                 </div>
@@ -662,14 +721,14 @@ export default function EditWebsitePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <HelpCircle className="h-5 w-5" />
-                常见问题
+                {tForm('faq')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {formData.faq.map((item, index) => (
                 <div key={index} className="border rounded-lg p-4">
                   <div className="flex items-start justify-between mb-3">
-                    <h4 className="font-medium text-sm">常见问题 {index + 1}</h4>
+                    <h4 className="font-medium text-sm">{tForm('faq_number', {number: index + 1})}</h4>
                     <Button
                       type="button"
                       variant="ghost"
@@ -681,19 +740,19 @@ export default function EditWebsitePage() {
                   </div>
                   <div className="space-y-3">
                     <div>
-                      <Label className="text-xs">问题</Label>
+                      <Label className="text-xs">{tForm('question')}</Label>
                       <Input
                         value={item.question}
                         onChange={(e) => updateFaq(index, 'question', e.target.value)}
-                        placeholder="输入常见问题"
+                        placeholder={tForm('question_placeholder')}
                       />
                     </div>
                     <div>
-                      <Label className="text-xs">回答</Label>
+                      <Label className="text-xs">{tForm('answer')}</Label>
                       <Textarea
                         value={item.answer}
                         onChange={(e) => updateFaq(index, 'answer', e.target.value)}
-                        placeholder="输入问题的回答"
+                        placeholder={tForm('answer_placeholder')}
                         rows={2}
                       />
                     </div>
@@ -706,7 +765,7 @@ export default function EditWebsitePage() {
                 onClick={addFaq}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                添加常见问题解答
+                {tForm('add_faq')}
               </Button>
             </CardContent>
           </Card>
@@ -714,22 +773,22 @@ export default function EditWebsitePage() {
           {/* 5. 定价 */}
           <Card>
             <CardHeader>
-              <CardTitle>定价</CardTitle>
+              <CardTitle>{tForm('pricing')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <Label>定价模型</Label>
+                <Label>{tForm('pricing_model')}</Label>
                 <Select
                   value={formData.pricing_model}
                   onValueChange={(value) => handleInputChange('pricing_model', value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="选择定价模型" />
+                    <SelectValue placeholder={tForm('pricing_model_placeholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     {PRICING_MODELS.map((model) => (
                       <SelectItem key={model.value} value={model.value}>
-                        {model.label}
+                        {tPricing(model.label)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -743,7 +802,7 @@ export default function EditWebsitePage() {
                     checked={formData.has_free_version}
                     onCheckedChange={(checked) => handleInputChange('has_free_version', !!checked)}
                   />
-                  <Label htmlFor="has_free_version">有免费版本</Label>
+                  <Label htmlFor="has_free_version">{tForm('has_free_version')}</Label>
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -752,7 +811,101 @@ export default function EditWebsitePage() {
                     checked={formData.api_available}
                     onCheckedChange={(checked) => handleInputChange('api_available', !!checked)}
                   />
-                  <Label htmlFor="api_available">具有 API 访问权限</Label>
+                  <Label htmlFor="api_available">{tForm('api_available')}</Label>
+                </div>
+              </div>
+
+              {/* 定价计划 */}
+              <div>
+                <Label className="text-base font-medium mb-3 block">{tForm('pricing_plans')}</Label>
+                <div className="space-y-3">
+                  {formData.pricing_plans.map((plan, index) => (
+                    <div key={index} className="border rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <h4 className="font-medium text-sm">{tForm('plan_number', {number: index + 1})}</h4>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removePricingPlan(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                        <div>
+                          <Label className="text-xs">{tForm('plan_name')}</Label>
+                          <Input
+                            value={plan.name}
+                            onChange={(e) => updatePricingPlan(index, 'name', e.target.value)}
+                            placeholder={tForm('plan_name_placeholder')}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">{tForm('billing_cycle')}</Label>
+                          <Input
+                            value={plan.billing_cycle}
+                            onChange={(e) => updatePricingPlan(index, 'billing_cycle', e.target.value)}
+                            placeholder={tForm('billing_cycle_placeholder')}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">{tForm('price')}</Label>
+                          <Input
+                            value={plan.price}
+                            onChange={(e) => updatePricingPlan(index, 'price', e.target.value)}
+                            placeholder={tForm('price_placeholder')}
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* 功能列表 */}
+                      <div>
+                        <Label className="text-xs">{tForm('features_max_5')}</Label>
+                        <div className="space-y-2 mt-2">
+                          {plan.features.map((feature, featureIndex) => (
+                            <div key={featureIndex} className="flex gap-2">
+                              <Input
+                                value={feature}
+                                onChange={(e) => updatePricingPlanFeature(index, featureIndex, e.target.value)}
+                                placeholder={tForm('feature_placeholder')}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => removePricingPlanFeature(index, featureIndex)}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                          {plan.features.length < 5 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => addPricingPlanFeature(index)}
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              {tForm('add_feature_to_plan')}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {formData.pricing_plans.length < 6 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addPricingPlan}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      {tForm('add_pricing_plan')}
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -761,62 +914,62 @@ export default function EditWebsitePage() {
           {/* 6. 社交媒体 */}
           <Card>
             <CardHeader>
-              <CardTitle>社交媒体</CardTitle>
+              <CardTitle>{tForm('social_media')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="twitter_url">Twitter/X</Label>
+                  <Label htmlFor="twitter_url">{tForm('twitter')}</Label>
                   <Input
                     id="twitter_url"
                     value={formData.twitter_url}
                     onChange={(e) => handleInputChange('twitter_url', e.target.value)}
-                    placeholder="https://twitter.com/yourtool"
+                    placeholder={tForm('twitter_placeholder')}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="linkedin_url">LinkedIn</Label>
+                  <Label htmlFor="linkedin_url">{tForm('linkedin')}</Label>
                   <Input
                     id="linkedin_url"
                     value={formData.linkedin_url}
                     onChange={(e) => handleInputChange('linkedin_url', e.target.value)}
-                    placeholder="https://linkedin.com/company/yourtool"
+                    placeholder={tForm('linkedin_placeholder')}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="facebook_url">Facebook</Label>
+                  <Label htmlFor="facebook_url">{tForm('facebook')}</Label>
                   <Input
                     id="facebook_url"
                     value={formData.facebook_url}
                     onChange={(e) => handleInputChange('facebook_url', e.target.value)}
-                    placeholder="https://facebook.com/yourtool"
+                    placeholder={tForm('facebook_placeholder')}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="instagram_url">Instagram</Label>
+                  <Label htmlFor="instagram_url">{tForm('instagram')}</Label>
                   <Input
                     id="instagram_url"
                     value={formData.instagram_url}
                     onChange={(e) => handleInputChange('instagram_url', e.target.value)}
-                    placeholder="https://instagram.com/yourtool"
+                    placeholder={tForm('instagram_placeholder')}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="youtube_url">YouTube</Label>
+                  <Label htmlFor="youtube_url">{tForm('youtube')}</Label>
                   <Input
                     id="youtube_url"
                     value={formData.youtube_url}
                     onChange={(e) => handleInputChange('youtube_url', e.target.value)}
-                    placeholder="https://youtube.com/@yourtool"
+                    placeholder={tForm('youtube_placeholder')}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="discord_url">Discord</Label>
+                  <Label htmlFor="discord_url">{tForm('discord')}</Label>
                   <Input
                     id="discord_url"
                     value={formData.discord_url}
                     onChange={(e) => handleInputChange('discord_url', e.target.value)}
-                    placeholder="https://discord.gg/yourtool"
+                    placeholder={tForm('discord_placeholder')}
                   />
                 </div>
               </div>
@@ -826,7 +979,7 @@ export default function EditWebsitePage() {
           {/* 7. 集成 */}
           <Card>
             <CardHeader>
-              <CardTitle>集成</CardTitle>
+              <CardTitle>{tForm('integrations')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-wrap gap-2 mb-4">
@@ -861,7 +1014,7 @@ export default function EditWebsitePage() {
                     <Input
                       value={integration}
                       onChange={(e) => updateArrayItem('integrations', index, e.target.value)}
-                      placeholder="集成名称"
+                      placeholder={tForm('integration_name_placeholder')}
                     />
                     <Button
                       type="button"
@@ -879,7 +1032,7 @@ export default function EditWebsitePage() {
                   onClick={() => addToArray('integrations', '')}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  添加集成
+                  {tForm('add_integration')}
                 </Button>
               </div>
             </CardContent>
@@ -888,48 +1041,48 @@ export default function EditWebsitePage() {
           {/* 8. 平台 */}
           <Card>
             <CardHeader>
-              <CardTitle>平台</CardTitle>
+              <CardTitle>{tForm('platforms')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <h4 className="font-medium mb-3">移动应用程序</h4>
+                <h4 className="font-medium mb-3">{tForm('mobile_apps')}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="ios_app_url">iOS 应用 URL</Label>
+                    <Label htmlFor="ios_app_url">{tForm('ios_app_url')}</Label>
                     <Input
                       id="ios_app_url"
                       value={formData.ios_app_url}
                       onChange={(e) => handleInputChange('ios_app_url', e.target.value)}
-                      placeholder="https://apps.apple.com/..."
+                      placeholder={tForm('ios_placeholder')}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="android_app_url">Android 应用程序 URL</Label>
+                    <Label htmlFor="android_app_url">{tForm('android_app_url')}</Label>
                     <Input
                       id="android_app_url"
                       value={formData.android_app_url}
                       onChange={(e) => handleInputChange('android_app_url', e.target.value)}
-                      placeholder="https://play.google.com/..."
+                      placeholder={tForm('android_placeholder')}
                     />
                   </div>
                 </div>
               </div>
 
               <div>
-                <h4 className="font-medium mb-3">Web 应用程序</h4>
+                <h4 className="font-medium mb-3">{tForm('web_app')}</h4>
                 <div>
-                  <Label htmlFor="web_app_url">Web 应用程序 URL</Label>
+                  <Label htmlFor="web_app_url">{tForm('web_app_url')}</Label>
                   <Input
                     id="web_app_url"
                     value={formData.web_app_url}
                     onChange={(e) => handleInputChange('web_app_url', e.target.value)}
-                    placeholder="https://example.com"
+                    placeholder={tForm('web_app_placeholder')}
                   />
                 </div>
               </div>
 
               <div>
-                <h4 className="font-medium mb-3">桌面应用程序</h4>
+                <h4 className="font-medium mb-3">{tForm('desktop_apps')}</h4>
                 <div className="grid grid-cols-3 gap-3">
                   {DESKTOP_PLATFORMS.map((platform) => (
                     <div key={platform.value} className="flex items-center space-x-2">
@@ -951,7 +1104,7 @@ export default function EditWebsitePage() {
                         }}
                       />
                       <Label htmlFor={platform.value}>
-                        {platform.label}
+                        {tForm(platform.label)}
                       </Label>
                     </div>
                   ))}
@@ -968,18 +1121,18 @@ export default function EditWebsitePage() {
                   {saving ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      保存中...
+                      {t('saving')}
                     </>
                   ) : (
                     <>
                       <Save className="h-4 w-4 mr-2" />
-                      保存更改
+                      {t('save_changes')}
                     </>
                   )}
                 </Button>
                 <Link href="/profile/submissions">
                   <Button type="button" variant="outline">
-                    取消
+                    {tCommon('cancel')}
                   </Button>
                 </Link>
               </div>
@@ -987,6 +1140,7 @@ export default function EditWebsitePage() {
           </Card>
         </form>
       </motion.div>
-    </div>
+      </div>
+    </ProfileLayout>
   )
 }

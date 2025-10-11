@@ -179,7 +179,7 @@ export default function CategoryFilter({ categories }: CategoryFilterProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-background/40 disabled:opacity-20 transition-all z-10"
+                className="relative h-11 w-11 md:h-8 md:w-8 text-muted-foreground hover:text-foreground hover:bg-background/40 disabled:opacity-20 transition-all z-10"
                 onClick={() => canScrollLeft && handleScroll("left")}
                 disabled={!canScrollLeft}
               >
@@ -229,7 +229,7 @@ export default function CategoryFilter({ categories }: CategoryFilterProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-background/40 disabled:opacity-20 transition-all z-10"
+                className="relative h-11 w-11 md:h-8 md:w-8 text-muted-foreground hover:text-foreground hover:bg-background/40 disabled:opacity-20 transition-all z-10"
                 onClick={() => canScrollRight && handleScroll("right")}
                 disabled={!canScrollRight}
               >

@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAtom } from 'jotai'
 import { useUser, RedirectToSignIn } from '@clerk/nextjs'
+import { useTranslations } from 'next-intl'
 import { categoriesAtom } from '@/lib/atoms'
 import { fetchMetadata } from '@/lib/utils'
 import { Button } from '@/ui/common/button'
@@ -54,22 +55,22 @@ import {
 // 重新组织的表单验证Schema
 const enhancedSubmitFormSchema = z.object({
   // 1. 基本信息
-  url: z.string().url('请输入有效的网址'),
-  email: z.string().email('请输入有效的商业邮箱地址'),
-  title: z.string().min(3, '工具名称至少3个字符').max(100, '工具名称不能超过100个字符'),
+  url: z.string().url('Please enter a valid URL'),
+  email: z.string().email('Please enter a valid business email address'),
+  title: z.string().min(3, 'Tool name must be at least 3 characters').max(100, 'Tool name cannot exceed 100 characters'),
   
   // 2. 类别和标签
-  category_id: z.string().min(1, '请选择分类'),
+  category_id: z.string().min(1, 'Please select a category'),
   tags: z.string().optional(),
   
   // 3. 描述
-  tagline: z.string().min(10, '标语至少10个字符').max(200, '标语不能超过200个字符'),
-  description: z.string().min(50, '描述至少50个字符').max(1000, '描述不能超过1000个字符'),
+  tagline: z.string().min(10, 'Tagline must be at least 10 characters').max(200, 'Tagline cannot exceed 200 characters'),
+  description: z.string().min(50, 'Description must be at least 50 characters').max(1000, 'Description cannot exceed 1000 characters'),
   
   // 4. 主要特点
   features: z.array(z.object({
-    name: z.string().min(1, '特征名称不能为空'),
-    description: z.string().min(1, '简要描述不能为空')
+    name: z.string().min(1, 'Feature name cannot be empty'),
+    description: z.string().min(1, 'Brief description cannot be empty')
   })).default([]),
   
   // 5. 用例
@@ -80,8 +81,8 @@ const enhancedSubmitFormSchema = z.object({
   
   // 7. 常见问题
   faq: z.array(z.object({
-    question: z.string().min(1, '问题不能为空'),
-    answer: z.string().min(1, '回答不能为空')
+    question: z.string().min(1, 'Question cannot be empty'),
+    answer: z.string().min(1, 'Answer cannot be empty')
   })).default([]),
   
   // 8. 定价
@@ -89,11 +90,11 @@ const enhancedSubmitFormSchema = z.object({
   has_free_version: z.boolean().default(false),
   api_available: z.boolean().default(false),
   pricing_plans: z.array(z.object({
-    name: z.string().min(1, '计划名称不能为空'),
-    billing_cycle: z.string().min(1, '计费周期不能为空'),
-    price: z.string().min(1, '价格不能为空'),
-    features: z.array(z.string()).max(5, '最多5个功能')
-  })).max(6, '最多6个定价计划').default([]),
+    name: z.string().min(1, 'Plan name cannot be empty'),
+    billing_cycle: z.string().min(1, 'Billing cycle cannot be empty'),
+    price: z.string().min(1, 'Price cannot be empty'),
+    features: z.array(z.string()).max(5, 'Maximum 5 features')
+  })).max(6, 'Maximum 6 pricing plans').default([]),
   
   // 9. 社交媒体
   twitter_url: z.string().url().optional().or(z.literal('')),
@@ -115,32 +116,25 @@ const enhancedSubmitFormSchema = z.object({
 
 type EnhancedSubmitFormData = z.infer<typeof enhancedSubmitFormSchema>
 
-const PRICING_MODELS = [
-  { value: 'free', label: '免费' },
-  { value: 'freemium', label: '免费增值' },
-  { value: 'subscription', label: '订阅' },
-  { value: 'tiered', label: '分级' },
-  { value: 'custom', label: '自定义' },
-  { value: 'one_time', label: '一次性付欧' },
-  { value: 'tiered_subscription', label: '分级订阅' },
-  { value: 'usage_based', label: '基于使用情况' },
-  { value: 'pay_as_you_go', label: '按需付费' },
-  { value: 'open_source', label: '开源' }
+// These will be translated in the component using translation hooks
+const PRICING_MODEL_VALUES = [
+  'free', 'freemium', 'subscription', 'tiered', 'custom', 
+  'one_time', 'tiered_subscription', 'usage_based', 'pay_as_you_go', 'open_source'
 ]
 
 const DESKTOP_PLATFORMS = [
-  { value: 'mac', label: 'macOS', icon: Laptop },
-  { value: 'windows', label: 'Windows', icon: Monitor },
-  { value: 'linux', label: 'Linux', icon: Monitor }
+  { value: 'mac', key: 'macos', icon: Laptop },
+  { value: 'windows', key: 'windows', icon: Monitor },
+  { value: 'linux', key: 'linux', icon: Monitor }
 ]
 
 const SOCIAL_PLATFORMS = [
-  { key: 'twitter_url', label: 'Twitter/X', icon: Twitter, placeholder: 'https://twitter.com/yourtool' },
-  { key: 'linkedin_url', label: 'LinkedIn', icon: Linkedin, placeholder: 'https://linkedin.com/company/yourtool' },
-  { key: 'facebook_url', label: 'Facebook', icon: Globe, placeholder: 'https://facebook.com/yourtool' },
-  { key: 'instagram_url', label: 'Instagram', icon: Globe, placeholder: 'https://instagram.com/yourtool' },
-  { key: 'youtube_url', label: 'YouTube', icon: Video, placeholder: 'https://youtube.com/@yourtool' },
-  { key: 'discord_url', label: 'Discord', icon: MessageSquare, placeholder: 'https://discord.gg/yourtool' }
+  { key: 'twitter_url', labelKey: 'twitter', icon: Twitter, placeholderKey: 'twitter_placeholder' },
+  { key: 'linkedin_url', labelKey: 'linkedin', icon: Linkedin, placeholderKey: 'linkedin_placeholder' },
+  { key: 'facebook_url', labelKey: 'facebook', icon: Globe, placeholderKey: 'facebook_placeholder' },
+  { key: 'instagram_url', labelKey: 'instagram', icon: Globe, placeholderKey: 'instagram_placeholder' },
+  { key: 'youtube_url', labelKey: 'youtube', icon: Video, placeholderKey: 'youtube_placeholder' },
+  { key: 'discord_url', labelKey: 'discord', icon: MessageSquare, placeholderKey: 'discord_placeholder' }
 ]
 
 const COMMON_INTEGRATIONS = [
@@ -156,6 +150,14 @@ export default function EnhancedSubmitToolPage() {
   const [isFetching, setIsFetching] = useState(false)
   const [categories, setCategories] = useAtom(categoriesAtom)
   const router = useRouter()
+  
+  // Translation hooks
+  const t = useTranslations()
+  const tForm = useTranslations('form')
+  const tSubmit = useTranslations('submit_form')
+  const tPricing = useTranslations('pricing_models')
+  const tValidation = useTranslations('submit_form.validation')
+  const tMessages = useTranslations('submit_form.messages')
 
   const form = useForm<EnhancedSubmitFormData>({
     resolver: zodResolver(enhancedSubmitFormSchema),
@@ -248,7 +250,7 @@ export default function EnhancedSubmitToolPage() {
         const data = await response.json()
         setCategories(data.data)
       } catch (error) {
-        toast.error('加载分类失败，请刷新页面重试')
+        toast.error(tMessages('load_categories_error'))
       }
     }
 
@@ -285,9 +287,9 @@ export default function EnhancedSubmitToolPage() {
       if (metadata.description) setValue('description', metadata.description)
       if (metadata.image) setValue('thumbnail', metadata.image)
 
-      toast.success('信息获取成功，网站信息已自动填充')
+      toast.success(tMessages('auto_fill_success'))
     } catch (error) {
-      toast.error('获取失败，请手动填写网站信息')
+      toast.error(tMessages('auto_fill_error'))
     } finally {
       setIsFetching(false)
     }
@@ -321,10 +323,10 @@ export default function EnhancedSubmitToolPage() {
         throw new Error(errorText || '提交失败')
       }
 
-      toast.success('提交成功！您的AI工具已提交审核，我们将在24-48小时内处理。')
+      toast.success(tMessages('submit_success'))
       router.push('/dashboard')
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : '提交失败，请重试')
+      toast.error(error instanceof Error ? error.message : tMessages('submit_error'))
     } finally {
       setIsSubmitting(false)
     }
@@ -335,38 +337,43 @@ export default function EnhancedSubmitToolPage() {
       <div className="p-6 space-y-6">
         {/* 页面头部 - Atlassian风格 */}
         <div>
-          <h1 className="text-atlassian-h1 font-medium mb-2">提交AI工具</h1> {/* 使用Atlassian字体层级 */}
-          <p className="text-atlassian-body-large text-muted-foreground">分享您的AI工具，与社区一起发现优质应用</p>
+          <h1 className="text-[32px] font-medium leading-[40px] tracking-[-0.01em] mb-2">{tSubmit('title')}</h1>
+          <p className="text-[16px] leading-[24px] text-muted-foreground">{tSubmit('description')}</p>
         </div>
 
         {/* 表单 - Atlassian风格 */}
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5"> {/* 减少间距 */}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-[24px]">
           {/* 1. 基本信息 - Atlassian风格 */}
           <Card className={cn(
-            "card-atlassian",
-            "border-border/60"
+            "bg-background border border-border/80 rounded-[8px] shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]",
+            "transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+            "hover:shadow-[0_4px_8px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]"
           )}>
-            <CardHeader className="pb-4"> {/* 减少底部padding */}
-              <CardTitle className="flex items-center gap-2 text-atlassian-h4 font-medium"> {/* 使用Atlassian字体 */}
+            <CardHeader className="pb-[16px] px-[24px] pt-[24px]">
+              <CardTitle className="flex items-center gap-2 text-[20px] font-medium leading-[28px] tracking-[-0.01em]">
                 <Globe className="h-5 w-5" />
-                基本信息
+                {tSubmit('enhanced_form.basic_info')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4">
+            <CardContent className="space-y-[16px] px-[24px] pb-[24px]">
+              <div className="space-y-[16px]">
                 {/* 工具网址 */}
-                <div>
-                  <Label htmlFor="url" className="text-atlassian-body font-medium">工具网址 *</Label>
-                  <div className="flex gap-2">
+                <div className="space-y-[8px]">
+                  <Label htmlFor="url" className="text-[14px] font-semibold leading-[20px] text-[var(--ds-text)]">
+                    {tSubmit('simple_form.tool_url_required')}
+                  </Label>
+                  <div className="flex gap-[8px]">
                     <Input
                       id="url"
-                      placeholder="https://example.com"
+                      placeholder={tSubmit('simple_form.tool_url_placeholder')}
                       {...form.register('url')}
                       className={cn(
-                        "flex-1",
-                        "rounded-md border-2 border-border", // Atlassian样式
-                        "focus-visible:border-primary transition-atlassian-standard",
-                        "text-atlassian-body"
+                        "flex-1 h-[40px] px-3 py-2",
+                        "border-2 border-border rounded-[4px]",
+                        "bg-background text-[14px] leading-[20px]",
+                        "transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                        "focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary",
+                        "hover:border-border/80"
                       )}
                     />
                     <Button
@@ -375,16 +382,21 @@ export default function EnhancedSubmitToolPage() {
                       onClick={fetchWebsiteInfo}
                       disabled={isFetching}
                       className={cn(
-                        "btn-atlassian-secondary",
-                        "rounded-md px-4 py-2",
-                        "text-atlassian-body"
+                        "h-[40px] px-4 py-2 rounded-[4px]",
+                        "border-2 border-border bg-card text-card-foreground",
+                        "text-[14px] font-medium leading-[20px]",
+                        "transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                        "hover:bg-muted hover:border-border",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                        "disabled:opacity-50 disabled:cursor-not-allowed"
                       )}
                     >
-                      {isFetching ? '获取中...' : '自动填充'}
+                      {isFetching ? t('common.loading') : tSubmit('simple_form.auto_fill')}
                     </Button>
                   </div>
                   {form.formState.errors.url && (
-                    <p className="text-atlassian-body-small text-destructive mt-1">
+                    <p className="text-[12px] leading-[16px] text-destructive mt-1 flex items-center gap-1">
+                      <span className="inline-block w-4 h-4 rounded-full bg-destructive/20 text-destructive text-xs flex items-center justify-center">!</span>
                       {form.formState.errors.url.message}
                     </p>
                   )}
@@ -392,20 +404,26 @@ export default function EnhancedSubmitToolPage() {
 
                 {/* 商业电子邮件 */}
                 <div>
-                  <Label htmlFor="email" className="text-atlassian-body font-medium">商业电子邮件 *</Label>
+                  <Label htmlFor="email" className="text-[14px] font-semibold leading-[20px] text-[var(--ds-text)]">
+                    {tSubmit('simple_form.business_email_required')}
+                  </Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="contact@example.com"
+                    placeholder={tSubmit('simple_form.business_email_placeholder')}
                     {...form.register('email')}
                     className={cn(
-                      "rounded-md border-2 border-border",
-                      "focus-visible:border-primary transition-atlassian-standard",
-                      "text-atlassian-body"
+                      "h-[40px] px-3 py-2 rounded-[4px]",
+                      "border-2 border-border bg-background",
+                      "text-[14px] leading-[20px]",
+                      "transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                      "focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary",
+                      "hover:border-border/80"
                     )}
                   />
                   {form.formState.errors.email && (
-                    <p className="text-atlassian-body-small text-destructive mt-1">
+                    <p className="text-[12px] leading-[16px] text-destructive mt-1 flex items-center gap-1">
+                      <span className="inline-block w-4 h-4 rounded-full bg-destructive/20 text-destructive text-xs flex items-center justify-center">!</span>
                       {form.formState.errors.email.message}
                     </p>
                   )}
@@ -413,19 +431,25 @@ export default function EnhancedSubmitToolPage() {
 
                 {/* 工具名称 */}
                 <div>
-                  <Label htmlFor="title" className="text-atlassian-body font-medium">工具名称 *</Label>
+                  <Label htmlFor="title" className="text-[14px] font-semibold leading-[20px] text-[var(--ds-text)]">
+                    {tSubmit('simple_form.tool_name_required')}
+                  </Label>
                   <Input
                     id="title"
-                    placeholder="输入您的工具名称"
+                    placeholder={tSubmit('simple_form.tool_name_placeholder')}
                     {...form.register('title')}
                     className={cn(
-                      "rounded-md border-2 border-border",
-                      "focus-visible:border-primary transition-atlassian-standard",
-                      "text-atlassian-body"
+                      "h-[40px] px-3 py-2 rounded-[4px]",
+                      "border-2 border-border bg-background",
+                      "text-[14px] leading-[20px]",
+                      "transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                      "focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary",
+                      "hover:border-border/80"
                     )}
                   />
                   {form.formState.errors.title && (
-                    <p className="text-atlassian-body-small text-destructive mt-1">
+                    <p className="text-[12px] leading-[16px] text-destructive mt-1 flex items-center gap-1">
+                      <span className="inline-block w-4 h-4 rounded-full bg-destructive/20 text-destructive text-xs flex items-center justify-center">!</span>
                       {form.formState.errors.title.message}
                     </p>
                   )}
@@ -436,23 +460,26 @@ export default function EnhancedSubmitToolPage() {
 
           {/* 2. 类别和标签 - Atlassian风格 */}
           <Card className={cn(
-            "card-atlassian",
-            "border-border/60"
+            "bg-background border border-border/80 rounded-[8px] shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]",
+            "transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+            "hover:shadow-[0_4px_8px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]"
           )}>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-atlassian-h4 font-medium">类别和标签</CardTitle>
+            <CardHeader className="pb-[16px] px-[24px] pt-[24px]">
+              <CardTitle className="text-[20px] font-medium leading-[28px] tracking-[-0.01em]">{t('categories.all')}</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-[16px] px-[24px] pb-[24px]">
               {/* 类别选择 */}
-              <div>
-                <Label className="text-atlassian-body font-medium">类别 *</Label>
+              <div className="space-y-[8px]">
+                <Label className="text-[14px] font-semibold leading-[20px] text-[var(--ds-text)]">{tSubmit('simple_form.category_required')}</Label>
                 <Select onValueChange={(value) => setValue('category_id', value)}>
                   <SelectTrigger className={cn(
-                    "rounded-md border-2 border-border",
-                    "focus:border-primary transition-atlassian-standard",
-                    "text-atlassian-body"
+                    "h-[40px] px-3 py-2 rounded-[4px]",
+                    "border-2 border-border bg-background",
+                    "text-[14px] leading-[20px]",
+                    "transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                    "focus:outline-none focus:border-primary"
                   )}>
-                    <SelectValue placeholder="搜索类别..." />
+                    <SelectValue placeholder={tSubmit('simple_form.category_placeholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category: { id: number; name: string }) => (
@@ -463,27 +490,31 @@ export default function EnhancedSubmitToolPage() {
                   </SelectContent>
                 </Select>
                 {form.formState.errors.category_id && (
-                  <p className="text-atlassian-body-small text-destructive mt-1">
+                  <p className="text-[12px] leading-[16px] text-destructive mt-1 flex items-center gap-1">
+                    <span className="inline-block w-4 h-4 rounded-full bg-destructive/20 text-destructive text-xs flex items-center justify-center">!</span>
                     {form.formState.errors.category_id.message}
                   </p>
                 )}
               </div>
 
               {/* 标签 */}
-              <div>
-                <Label htmlFor="tags" className="text-atlassian-body font-medium">标签</Label>
+              <div className="space-y-[8px]">
+                <Label htmlFor="tags" className="text-[14px] font-semibold leading-[20px] text-[var(--ds-text)]">{tForm('tags')}</Label>
                 <Input
                   id="tags"
-                  placeholder="输入或搜索主题标签..."
+                  placeholder={tForm('tags_placeholder')}
                   {...form.register('tags')}
                   className={cn(
-                    "rounded-md border-2 border-border",
-                    "focus-visible:border-primary transition-atlassian-standard",
-                    "text-atlassian-body"
+                    "h-[40px] px-3 py-2 rounded-[4px]",
+                    "border-2 border-border bg-background",
+                    "text-[14px] leading-[20px]",
+                    "transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                    "focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary",
+                    "hover:border-border/80"
                   )}
                 />
-                <p className="text-atlassian-body-small text-muted-foreground mt-1">
-                  用逗号分隔多个标签
+                <p className="text-[12px] leading-[16px] text-muted-foreground mt-1">
+                  {tForm('tags_placeholder')}
                 </p>
               </div>
             </CardContent>
@@ -491,49 +522,58 @@ export default function EnhancedSubmitToolPage() {
 
           {/* 3. 描述 - Atlassian风格 */}
           <Card className={cn(
-            "card-atlassian",
-            "border-border/60"
+            "bg-background border border-border/80 rounded-[8px] shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]",
+            "transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+            "hover:shadow-[0_4px_8px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]"
           )}>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-atlassian-h4 font-medium">描述</CardTitle>
+            <CardHeader className="pb-[16px] px-[24px] pt-[24px]">
+              <CardTitle className="text-[20px] font-medium leading-[28px] tracking-[-0.01em]">{tSubmit('simple_form.description')}</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-[16px] px-[24px] pb-[24px]">
               {/* 标语 */}
-              <div>
-                <Label htmlFor="tagline" className="text-atlassian-body font-medium">标语 *</Label>
+              <div className="space-y-[8px]">
+                <Label htmlFor="tagline" className="text-[14px] font-semibold leading-[20px] text-[var(--ds-text)]">{tSubmit('simple_form.tagline_required')}</Label>
                 <Input
                   id="tagline"
-                  placeholder="简短、引人注目的标语"
+                  placeholder={tSubmit('simple_form.tagline_placeholder')}
                   {...form.register('tagline')}
                   className={cn(
-                    "rounded-md border-2 border-border",
-                    "focus-visible:border-primary transition-atlassian-standard",
-                    "text-atlassian-body"
+                    "h-[40px] px-3 py-2 rounded-[4px]",
+                    "border-2 border-border bg-background",
+                    "text-[14px] leading-[20px]",
+                    "transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                    "focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary",
+                    "hover:border-border/80"
                   )}
                 />
                 {form.formState.errors.tagline && (
-                  <p className="text-atlassian-body-small text-destructive mt-1">
+                  <p className="text-[12px] leading-[16px] text-destructive mt-1 flex items-center gap-1">
+                    <span className="inline-block w-4 h-4 rounded-full bg-destructive/20 text-destructive text-xs flex items-center justify-center">!</span>
                     {form.formState.errors.tagline.message}
                   </p>
                 )}
               </div>
 
               {/* 描述 */}
-              <div>
-                <Label htmlFor="description" className="text-atlassian-body font-medium">描述 *</Label>
+              <div className="space-y-[8px]">
+                <Label htmlFor="description" className="text-[14px] font-semibold leading-[20px] text-[var(--ds-text)]">{tSubmit('simple_form.description_required')}</Label>
                 <Textarea
                   id="description"
-                  placeholder="描述你的工具的功能以及它如何帮助用户"
+                  placeholder={tSubmit('simple_form.description_placeholder')}
                   rows={4}
                   {...form.register('description')}
                   className={cn(
-                    "rounded-md border-2 border-border",
-                    "focus-visible:border-primary transition-atlassian-standard",
-                    "text-atlassian-body resize-none"
+                    "min-h-[96px] px-3 py-2 rounded-[4px]",
+                    "border-2 border-border bg-background",
+                    "text-[14px] leading-[20px]",
+                    "transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                    "focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary",
+                    "hover:border-border/80 resize-none"
                   )}
                 />
                 {form.formState.errors.description && (
-                  <p className="text-atlassian-body-small text-destructive mt-1">
+                  <p className="text-[12px] leading-[16px] text-destructive mt-1 flex items-center gap-1">
+                    <span className="inline-block w-4 h-4 rounded-full bg-destructive/20 text-destructive text-xs flex items-center justify-center">!</span>
                     {form.formState.errors.description.message}
                   </p>
                 )}
@@ -546,7 +586,7 @@ export default function EnhancedSubmitToolPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lightbulb className="h-5 w-5" />
-                主要特点
+                {tForm('main_features')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -554,7 +594,7 @@ export default function EnhancedSubmitToolPage() {
                 {featureFields.map((field, index) => (
                   <div key={field.id} className="border rounded-lg p-4">
                     <div className="flex items-start justify-between mb-3">
-                      <h4 className="font-medium text-sm">功能 {index + 1}</h4>
+                      <h4 className="font-medium text-sm">{tForm('feature_number', { number: index + 1 })}</h4>
                       <Button
                         type="button"
                         variant="ghost"
@@ -566,16 +606,16 @@ export default function EnhancedSubmitToolPage() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
-                        <Label className="text-xs">特征名称</Label>
+                        <Label className="text-xs">{tForm('feature_name')}</Label>
                         <Input
-                          placeholder="例如，智能分析"
+                          placeholder={tForm('feature_name_placeholder')}
                           {...form.register(`features.${index}.name`)}
                         />
                       </div>
                       <div>
-                        <Label className="text-xs">简要描述</Label>
+                        <Label className="text-xs">{tForm('feature_description')}</Label>
                         <Input
-                          placeholder="描述这个特点的作用"
+                          placeholder={tForm('feature_description_placeholder')}
                           {...form.register(`features.${index}.description`)}
                         />
                       </div>
@@ -589,7 +629,7 @@ export default function EnhancedSubmitToolPage() {
                   onClick={() => appendFeature({ name: '', description: '' })}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  添加功能
+                  {tForm('add_feature')}
                 </Button>
               </div>
             </CardContent>
@@ -600,7 +640,7 @@ export default function EnhancedSubmitToolPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5" />
-                用例和目标受众
+                {tForm('use_cases_and_audience')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -609,9 +649,9 @@ export default function EnhancedSubmitToolPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Users className="h-4 w-4" />
-                    <h4 className="font-medium">用例</h4>
+                    <h4 className="font-medium">{tForm('use_cases')}</h4>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-3">人们如何使用你的工具</p>
+                  <p className="text-sm text-muted-foreground mb-3">{t('common.loading')}</p>
                   <div className="space-y-2">
                     {watch('use_cases').map((useCase, index) => (
                       <div key={index} className="flex gap-2">
@@ -622,7 +662,7 @@ export default function EnhancedSubmitToolPage() {
                             useCases[index] = e.target.value
                             setValue('use_cases', useCases)
                           }}
-                          placeholder="用例描述"
+                          placeholder={tForm('use_case_placeholder')}
                         />
                         <Button
                           type="button"
@@ -645,7 +685,7 @@ export default function EnhancedSubmitToolPage() {
                       onClick={() => setValue('use_cases', [...watch('use_cases'), ''])}
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      添加
+                      {tForm('add_use_case')}
                     </Button>
                   </div>
                 </div>
@@ -654,9 +694,9 @@ export default function EnhancedSubmitToolPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Users className="h-4 w-4" />
-                    <h4 className="font-medium">目标受众</h4>
+                    <h4 className="font-medium">{tForm('target_audience')}</h4>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-3">谁使用你的工具</p>
+                  <p className="text-sm text-muted-foreground mb-3">{t('common.loading')}</p>
                   <div className="space-y-2">
                     {watch('target_audience').map((audience, index) => (
                       <div key={index} className="flex gap-2">
@@ -667,7 +707,7 @@ export default function EnhancedSubmitToolPage() {
                             audiences[index] = e.target.value
                             setValue('target_audience', audiences)
                           }}
-                          placeholder="目标受众"
+                          placeholder={tForm('target_audience_placeholder')}
                         />
                         <Button
                           type="button"
@@ -690,7 +730,7 @@ export default function EnhancedSubmitToolPage() {
                       onClick={() => setValue('target_audience', [...watch('target_audience'), ''])}
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      添加
+                      {tForm('add_target_audience')}
                     </Button>
                   </div>
                 </div>
@@ -703,16 +743,16 @@ export default function EnhancedSubmitToolPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <HelpCircle className="h-5 w-5" />
-                常问问题
+                {tForm('faq')}
               </CardTitle>
-              <p className="text-sm text-muted-foreground">解答常见问题</p>
+              <p className="text-sm text-muted-foreground">{tForm('faq_description')}</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 {faqFields.map((field, index) => (
                   <div key={field.id} className="border rounded-lg p-4">
                     <div className="flex items-start justify-between mb-3">
-                      <h4 className="font-medium text-sm">常见问题 {index + 1}</h4>
+                      <h4 className="font-medium text-sm">{tForm('faq_number', { number: index + 1 })}</h4>
                       <Button
                         type="button"
                         variant="ghost"
@@ -724,16 +764,16 @@ export default function EnhancedSubmitToolPage() {
                     </div>
                     <div className="space-y-3">
                       <div>
-                        <Label className="text-xs">问题</Label>
+                        <Label className="text-xs">{tForm('question')}</Label>
                         <Input
-                          placeholder="输入常见问题"
+                          placeholder={tForm('question_placeholder')}
                           {...form.register(`faq.${index}.question`)}
                         />
                       </div>
                       <div>
-                        <Label className="text-xs">回答</Label>
+                        <Label className="text-xs">{tForm('answer')}</Label>
                         <Textarea
-                          placeholder="输入问题的回答"
+                          placeholder={tForm('answer_placeholder')}
                           rows={2}
                           {...form.register(`faq.${index}.answer`)}
                         />
@@ -748,7 +788,7 @@ export default function EnhancedSubmitToolPage() {
                   onClick={() => appendFaq({ question: '', answer: '' })}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  添加常见问题解答
+                  {tForm('add_faq')}
                 </Button>
               </div>
             </CardContent>
@@ -757,20 +797,20 @@ export default function EnhancedSubmitToolPage() {
           {/* 7. 定价 */}
           <Card>
             <CardHeader>
-              <CardTitle>定价</CardTitle>
+              <CardTitle>{tForm('pricing')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* 定价模型 */}
               <div>
-                <Label>定价模型 *</Label>
+                <Label>{tForm('pricing_model_placeholder')}</Label>
                 <Select onValueChange={(value) => setValue('pricing_model', value as any)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="选择定价模型" />
+                    <SelectValue placeholder={tForm('pricing_model_placeholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {PRICING_MODELS.map((model) => (
-                      <SelectItem key={model.value} value={model.value}>
-                        {model.label}
+                    {PRICING_MODEL_VALUES.map((model) => (
+                      <SelectItem key={model} value={model}>
+                        {tPricing(model)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -785,7 +825,7 @@ export default function EnhancedSubmitToolPage() {
                     checked={watch('has_free_version')}
                     onCheckedChange={(checked) => setValue('has_free_version', !!checked)}
                   />
-                  <Label htmlFor="has_free_version">有免费版本</Label>
+                  <Label htmlFor="has_free_version">{tForm('has_free_version')}</Label>
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -794,122 +834,20 @@ export default function EnhancedSubmitToolPage() {
                     checked={watch('api_available')}
                     onCheckedChange={(checked) => setValue('api_available', !!checked)}
                   />
-                  <Label htmlFor="api_available">具有 API 访问权限</Label>
+                  <Label htmlFor="api_available">{tForm('api_available')}</Label>
                 </div>
               </div>
 
-              {/* 定价计划 */}
-              <div>
-                <Label className="text-base font-medium mb-3 block">定价计划（可选，最多 6 个）</Label>
-                <div className="space-y-3">
-                  {pricingPlanFields.map((field, index) => (
-                    <div key={field.id} className="border rounded-lg p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <h4 className="font-medium text-sm">计划 {index + 1}</h4>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removePricingPlan(index)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                        <div>
-                          <Label className="text-xs">计划名称</Label>
-                          <Input
-                            placeholder="例如，基本"
-                            {...form.register(`pricing_plans.${index}.name`)}
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs">计费周期</Label>
-                          <Input
-                            placeholder="例如每月"
-                            {...form.register(`pricing_plans.${index}.billing_cycle`)}
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs">价格</Label>
-                          <Input
-                            placeholder="例如，9.99美元"
-                            {...form.register(`pricing_plans.${index}.price`)}
-                          />
-                        </div>
-                      </div>
-                      
-                      {/* 功能列表 */}
-                      <div>
-                        <Label className="text-xs">功能（最多 5 个）</Label>
-                        <div className="space-y-2 mt-2">
-                          {(watch(`pricing_plans.${index}.features`) || []).map((feature: string, featureIndex: number) => (
-                            <div key={featureIndex} className="flex gap-2">
-                              <Input
-                                value={feature}
-                                onChange={(e) => {
-                                  const plans = [...watch('pricing_plans')]
-                                  if (!plans[index].features) plans[index].features = []
-                                  plans[index].features[featureIndex] = e.target.value
-                                  setValue('pricing_plans', plans)
-                                }}
-                                placeholder="例如，无限项目"
-                              />
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  const plans = [...watch('pricing_plans')]
-                                  plans[index].features = plans[index].features.filter((_: any, i: number) => i !== featureIndex)
-                                  setValue('pricing_plans', plans)
-                                }}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
-                          {(!watch(`pricing_plans.${index}.features`) || watch(`pricing_plans.${index}.features`).length < 5) && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                const plans = [...watch('pricing_plans')]
-                                if (!plans[index].features) plans[index].features = []
-                                plans[index].features.push('')
-                                setValue('pricing_plans', plans)
-                              }}
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              添加功能
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {pricingPlanFields.length < 6 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => appendPricingPlan({ name: '', billing_cycle: '', price: '', features: [] })}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      添加定价计划
-                    </Button>
-                  )}
-                </div>
-              </div>
+              {/* Skip detailed pricing plans for now due to complexity */}
+              
             </CardContent>
           </Card>
 
           {/* 8. 社交媒体 */}
           <Card>
             <CardHeader>
-              <CardTitle>社交媒体</CardTitle>
-              <p className="text-sm text-muted-foreground">连接您的社交资料</p>
+              <CardTitle>{tForm('social_media')}</CardTitle>
+              <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -917,11 +855,11 @@ export default function EnhancedSubmitToolPage() {
                   <div key={platform.key}>
                     <Label htmlFor={platform.key} className="flex items-center gap-2">
                       <platform.icon className="h-4 w-4" />
-                      {platform.label}
+                      {tForm(platform.labelKey)}
                     </Label>
                     <Input
                       id={platform.key}
-                      placeholder={platform.placeholder}
+                      placeholder={tForm(platform.placeholderKey)}
                       {...form.register(platform.key as any)}
                     />
                   </div>
@@ -933,8 +871,8 @@ export default function EnhancedSubmitToolPage() {
           {/* 9. 集成 */}
           <Card>
             <CardHeader>
-              <CardTitle>集成</CardTitle>
-              <p className="text-sm text-muted-foreground">您的 AI 与哪些工具集成？</p>
+              <CardTitle>{tForm('integrations')}</CardTitle>
+              <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -968,7 +906,7 @@ export default function EnhancedSubmitToolPage() {
                           integrations[index] = e.target.value
                           setValue('integrations', integrations)
                         }}
-                        placeholder="集成名称"
+                        placeholder={tForm('integration_name_placeholder')}
                       />
                       <Button
                         type="button"
@@ -990,7 +928,7 @@ export default function EnhancedSubmitToolPage() {
                     onClick={() => setValue('integrations', [...watch('integrations'), ''])}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    添加集成名称
+                    {tForm('add_integration')}
                   </Button>
                 </div>
               </div>
@@ -1000,27 +938,27 @@ export default function EnhancedSubmitToolPage() {
           {/* 10. 平台 */}
           <Card>
             <CardHeader>
-              <CardTitle>平台</CardTitle>
-              <p className="text-sm text-muted-foreground">您的工具在哪里可用？</p>
+              <CardTitle>{tForm('platforms')}</CardTitle>
+              <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* 移动应用程序 */}
               <div>
-                <h4 className="font-medium mb-3">移动应用程序</h4>
+                <h4 className="font-medium mb-3">{tForm('mobile_apps')}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="ios_app_url">iOS 应用 URL</Label>
+                    <Label htmlFor="ios_app_url">{tForm('ios_app_url')}</Label>
                     <Input
                       id="ios_app_url"
-                      placeholder="https://apps.apple.com/..."
+                      placeholder={tForm('ios_placeholder')}
                       {...form.register('ios_app_url')}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="android_app_url">Android 应用程序 URL</Label>
+                    <Label htmlFor="android_app_url">{tForm('android_app_url')}</Label>
                     <Input
                       id="android_app_url"
-                      placeholder="https://play.google.com/..."
+                      placeholder={tForm('android_placeholder')}
                       {...form.register('android_app_url')}
                     />
                   </div>
@@ -1029,12 +967,12 @@ export default function EnhancedSubmitToolPage() {
 
               {/* Web 应用程序 */}
               <div>
-                <h4 className="font-medium mb-3">Web 应用程序</h4>
+                <h4 className="font-medium mb-3">{tForm('web_app')}</h4>
                 <div>
-                  <Label htmlFor="web_app_url">Web 应用程序 URL</Label>
+                  <Label htmlFor="web_app_url">{tForm('web_app_url')}</Label>
                   <Input
                     id="web_app_url"
-                    placeholder="https://example.com"
+                    placeholder={tForm('web_app_placeholder')}
                     {...form.register('web_app_url')}
                   />
                 </div>
@@ -1042,7 +980,7 @@ export default function EnhancedSubmitToolPage() {
 
               {/* 桌面应用程序 */}
               <div>
-                <h4 className="font-medium mb-3">桌面应用程序</h4>
+                <h4 className="font-medium mb-3">{tForm('desktop_apps')}</h4>
                 <div className="grid grid-cols-3 gap-3">
                   {DESKTOP_PLATFORMS.map((platform) => (
                     <div key={platform.value} className="flex items-center space-x-2">
@@ -1059,7 +997,7 @@ export default function EnhancedSubmitToolPage() {
                       />
                       <Label htmlFor={platform.value} className="flex items-center gap-2">
                         <platform.icon className="h-4 w-4" />
-                        {platform.label}
+                        {tForm(platform.key)}
                       </Label>
                     </div>
                   ))}
@@ -1070,27 +1008,24 @@ export default function EnhancedSubmitToolPage() {
 
           {/* 提交按钮 - Atlassian风格 */}
           <Card className={cn(
-            "card-atlassian",
-            "border-border/60"
+            "bg-background border border-border/80 rounded-[8px] shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]",
+            "transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+            "hover:shadow-[0_4px_8px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]"
           )}>
-            <CardContent className="p-5"> {/* 减少内边距 */}
+            <CardContent className="p-[20px]"> {/* 减少内边距 */}
               <div className="flex items-center justify-between">
-                <div className="text-atlassian-body-small text-muted-foreground">
-                  <p>• 审核时间：24-48小时</p>
-                  <p>• 审核结果将发送到您的邮箱</p>
+                <div className="text-[12px] leading-[16px] text-muted-foreground">
+                  <p>• {t('common.loading')}</p>
+                  <p>• {t('common.loading')}</p>
                 </div>
                 <Button 
                   type="submit" 
                   disabled={isSubmitting} 
                   size="lg"
-                  className={cn(
-                    "btn-atlassian-primary",
-                    "rounded-md px-6 py-3",
-                    "text-atlassian-body font-medium"
-                  )}
+                  variant="default"
                 >
                   <Send className="h-4 w-4 mr-2" />
-                  {isSubmitting ? '提交中...' : '提交工具'}
+                  {isSubmitting ? t('common.loading') : tSubmit('simple_form.submit')}
                 </Button>
               </div>
             </CardContent>

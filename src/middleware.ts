@@ -1,22 +1,41 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import createMiddleware from 'next-intl/middleware';
+import { locales, defaultLocale } from './i18n';
+
+// Create the next-intl middleware
+const intlMiddleware = createMiddleware({
+  locales,
+  defaultLocale,
+  localePrefix: 'as-needed' // Only show locale prefix for non-default languages
+});
 
 const isPublicRoute = createRouteMatcher([
   '/',
+  '/tw',
+  '/tw/(.*)',
+  '/(.*)', // Default language routes without prefix
   '/auth/signin(.*)',
-  '/auth/signup(.*)',
+  '/auth/signup(.*)', 
   '/auth/error',
-  '/api/websites',
-  '/rankings',
-  '/submit',
-  '/tools/(.*)',
-  '/categories',
-  '/categories/(.*)'
+  '/api/(.*)',
 ]);
 
 export default clerkMiddleware((auth, req) => {
-  if (!isPublicRoute(req)) {
-    auth.protect();
+  // Skip internationalization for API routes
+  if (req.nextUrl.pathname.startsWith('/api/')) {
+    // For protected API routes, we'll handle auth in the API route itself
+    // since middleware auth is complex with async operations
+    return;
   }
+
+  // Handle public routes without authentication
+  if (isPublicRoute(req)) {
+    return intlMiddleware(req);
+  }
+
+  // Protect private routes
+  auth.protect();
+  return intlMiddleware(req);
 });
 
 export const config = {

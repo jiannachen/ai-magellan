@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useUser, useClerk } from '@clerk/nextjs'
 import { usePathname, useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { 
@@ -24,43 +25,47 @@ interface ProfileLayoutProps {
   children: React.ReactNode
 }
 
-const navigation = [
-  {
-    name: 'Dashboard',
-    label: '概览',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-    description: '数据概览和快速操作'
-  },
-  {
-    name: '我的收藏',
-    label: '收藏',
-    href: '/profile/favorites',
-    icon: Bookmark,
-    description: '已收藏的AI工具'
-  },
-  {
-    name: '我的提交',
-    label: '提交',
-    href: '/profile/submissions',
-    icon: Upload,
-    description: '提交的工具管理'
-  },
-  {
-    name: '个人设置',
-    label: '设置',
-    href: '/profile/info',
-    icon: Settings,
-    description: '账户和个人信息'
-  }
-]
-
 export function ProfileLayout({ children }: ProfileLayoutProps) {
   const { user } = useUser()
   const { signOut } = useClerk()
   const pathname = usePathname()
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  
+  // Translation hooks
+  const t = useTranslations('common')
+  const tProfile = useTranslations('profile.navigation')
+
+  const navigation = [
+    {
+      name: 'Dashboard',
+      label: tProfile('dashboard'),
+      href: '/dashboard',
+      icon: LayoutDashboard,
+      description: tProfile('dashboard_desc')
+    },
+    {
+      name: 'Favorites',
+      label: tProfile('favorites'),
+      href: '/profile/favorites',
+      icon: Bookmark,
+      description: tProfile('favorites_desc')
+    },
+    {
+      name: 'Submissions',
+      label: tProfile('submissions'),
+      href: '/profile/submissions',
+      icon: Upload,
+      description: tProfile('submissions_desc')
+    },
+    {
+      name: 'Settings',
+      label: tProfile('settings'),
+      href: '/profile/info',
+      icon: Settings,
+      description: tProfile('settings_desc')
+    }
+  ]
 
   const handleSignOut = () => {
     signOut(() => router.push('/'))
@@ -85,7 +90,7 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
           {/* 左侧导航栏 - 在版心内的固定定位，考虑顶部Header */}
           <motion.aside
             className={cn(
-              "bg-card border border-border rounded-xl transition-apple",
+              "bg-background/95 backdrop-blur-xl border border-border/40 rounded-xl shadow-lg transition-all duration-300",
               "w-72 lg:w-64 xl:w-72",
               // 桌面端在版心内的固定定位，考虑顶部Header高度(64px) + 间距(24px) = 88px
               "lg:sticky lg:top-[5.5rem] lg:h-fit lg:self-start",
@@ -97,19 +102,19 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
           >
             <div className="flex flex-col">
               {/* 用户信息区域 */}
-              <div className="p-6 border-b border-border">
+              <div className="p-6 border-b border-border/40">
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-12 w-12 border-2 border-background">
+                  <Avatar className="h-12 w-12 border-2 border-border/20 shadow-sm">
                     <AvatarImage src={user?.imageUrl} alt={user?.fullName || ''} />
-                    <AvatarFallback className="bg-fill-quaternary text-label-primary font-semibold">
+                    <AvatarFallback className="bg-muted text-foreground font-semibold text-base">
                       {user?.firstName?.charAt(0) || user?.emailAddresses?.[0]?.emailAddress?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-subhead font-semibold truncate text-label-primary">
-                      {user?.fullName || user?.firstName || '用户'}
+                    <p className="text-base font-semibold truncate text-foreground">
+                      {user?.fullName || user?.firstName || tProfile('default_user')}
                     </p>
-                    <p className="text-caption1 text-label-secondary truncate">
+                    <p className="text-sm text-muted-foreground truncate">
                       {user?.emailAddresses?.[0]?.emailAddress}
                     </p>
                   </div>
@@ -129,13 +134,13 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
                       onClick={() => setSidebarOpen(false)}
                     >
                       <motion.div
-                        whileHover={{ x: 2 }}
+                        whileHover={{ scale: 1.02, y: -1 }}
                         whileTap={{ scale: 0.98 }}
                         className={cn(
-                          "group flex items-center px-3 py-3 text-subhead font-medium rounded-lg transition-apple relative overflow-hidden",
+                          "group flex items-center px-3 py-2.5 text-sm font-medium rounded-md transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] relative overflow-hidden cursor-pointer",
                           isActive
-                            ? "bg-primary text-primary-foreground"
-                            : "text-label-secondary hover:text-label-primary hover:bg-fill-quaternary"
+                            ? "bg-primary text-white shadow-[0px_2px_4px_rgba(9,30,66,0.25)]"
+                            : "text-muted-foreground hover:text-foreground hover:bg-accent/50 hover:shadow-[0px_1px_1px_rgba(9,30,66,0.25)]"
                         )}
                       >
                         {/* 活跃状态背景 */}
@@ -149,25 +154,25 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
                         
                         <div className="relative flex items-center w-full">
                           <item.icon className={cn(
-                            "mr-3 h-5 w-5 flex-shrink-0 transition-apple",
-                            isActive ? "text-primary-foreground" : "text-label-tertiary group-hover:text-label-primary"
+                            "mr-3 h-4 w-4 flex-shrink-0 transition-all duration-200",
+                            isActive ? "text-white" : "text-muted-foreground group-hover:text-foreground"
                           )} />
                           <div className="flex-1">
                             <div className={cn(
-                              "font-medium",
-                              isActive ? "text-primary-foreground" : "group-hover:text-label-primary"
+                              "font-medium text-sm",
+                              isActive ? "text-white" : "group-hover:text-foreground"
                             )}>
                               {item.label}
                             </div>
                             <div className={cn(
-                              "text-caption1 mt-0.5",
-                              isActive ? "text-primary-foreground/80" : "text-label-tertiary"
+                              "text-xs mt-0.5 leading-tight",
+                              isActive ? "text-white/80" : "text-muted-foreground/70 group-hover:text-muted-foreground"
                             )}>
                               {item.description}
                             </div>
                           </div>
                           {isActive && (
-                            <ChevronRight className="h-4 w-4 ml-auto text-primary-foreground" />
+                            <ChevronRight className="h-4 w-4 ml-auto text-white" />
                           )}
                         </div>
                       </motion.div>

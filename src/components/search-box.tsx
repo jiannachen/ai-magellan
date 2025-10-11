@@ -122,7 +122,7 @@ export function SearchBox({ value, onChange, className }: SearchBoxProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 gap-2 px-2.5 md:px-3 hover:bg-background/60 data-[state=open]:bg-background/60 rounded-lg transition-colors"
+              className="h-11 md:h-9 gap-2 px-2.5 md:px-3 hover:bg-background/60 data-[state=open]:bg-background/60 rounded-lg transition-colors"
             >
               {selectedEngine.icon}
               <span className="hidden sm:inline font-medium text-sm">
@@ -153,14 +153,14 @@ export function SearchBox({ value, onChange, className }: SearchBoxProps) {
             value={localValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            className="w-full h-9 pl-9 pr-3 bg-transparent border-0 ring-1 ring-border/50 hover:ring-border focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground/50 rounded-lg transition-all duration-300"
+            className="w-full h-11 md:h-9 pl-9 pr-3 bg-transparent border-0 ring-1 ring-border/50 hover:ring-border focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground/50 rounded-lg transition-all duration-300"
           />
         </div>
 
         <Button
           variant="default"
           size="sm"
-          className="h-9 px-4 rounded-lg bg-primary/90 hover:bg-primary transition-colors shadow-sm"
+          className="h-11 md:h-9 px-4 rounded-lg bg-primary/90 hover:bg-primary transition-colors shadow-sm"
           onClick={handleSearch}
         >
           搜索

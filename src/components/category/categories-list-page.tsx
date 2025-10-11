@@ -6,7 +6,7 @@ import { Badge } from '@/ui/common/badge';
 import { Button } from '@/ui/common/button';
 import { cn } from '@/lib/utils/utils';
 import {
-  Brain,
+  Compass,
   Code,
   Image,
   PenTool,
@@ -15,9 +15,13 @@ import {
   ArrowRight,
   Star,
   Users,
-  Grid3X3
+  Grid3X3,
+  Map,
+  Route,
+  Brain
 } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 interface CategoriesListPageProps {
   categories: Array<{
@@ -35,17 +39,25 @@ interface CategoriesListPageProps {
   }>;
 }
 
-// Category icons mapping
+// Category icons mapping - 融入探索主题
 const categoryIcons = {
   'ai-chat': MessageSquare,
   'ai-art': Image,
   'ai-writing': PenTool,
   'ai-coding': Code,
-  'ai-tools': Brain,
+  'ai-tools': Compass,
   'llm': Sparkles,
 };
 
 export default function CategoriesListPage({ categories }: CategoriesListPageProps) {
+  const tCat = useTranslations('pages.categories');
+  const getCategoryDisplayName = (slug: string, name: string) => {
+    try {
+      return tCat(`names.${slug}`);
+    } catch {
+      return name;
+    }
+  };
   return (
     <div className="min-h-screen bg-background">
       {/* Header - Atlassian风格 */}
@@ -64,13 +76,10 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
               "text-atlassian-display md:text-atlassian-display", // 使用Atlassian字体层级
               "font-medium tracking-tight"
             )}>
-              Browse AI Tools by{" "}
-              <span className="text-primary"> {/* 简化为单一主色调 */}
-                Category
-              </span>
+              {tCat('header_title')}
             </h1>
             <p className="text-atlassian-body-large text-muted-foreground max-w-3xl mx-auto">
-              Find the perfect AI tool for your specific needs. Explore our curated categories with top-rated tools.
+              {tCat('header_subtitle')}
             </p>
           </motion.div>
 
@@ -86,16 +95,16 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
             className="mt-8 flex justify-center gap-6 text-atlassian-body text-muted-foreground" // 减少间距，使用Atlassian字体
           >
             <div className="flex items-center gap-2">
-              <Grid3X3 className="h-4 w-4" />
-              <span>{categories.length} Categories</span>
+              <Map className="h-4 w-4" />
+              <span>{tCat('stats_territories', { count: categories.length })}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Brain className="h-4 w-4" />
-              <span>{categories.reduce((sum, cat) => sum + cat.toolCount, 0)} Tools</span>
+              <Compass className="h-4 w-4" />
+              <span>{tCat('stats_tools_charted', { count: categories.reduce((sum, cat) => sum + cat.toolCount, 0) })}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Star className="h-4 w-4" />
-              <span>Quality Curated</span>
+              <Route className="h-4 w-4" />
+              <span>{tCat('stats_expert_guided')}</span>
             </div>
           </motion.div>
         </div>
@@ -137,9 +146,9 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                             <IconComponent className="h-6 w-6 text-primary" /> {/* 稍微减小图标 */}
                           </div>
                           <div>
-                            <h2 className="text-atlassian-h4 font-medium">{category.name}</h2> {/* 使用Atlassian字体层级 */}
+                            <h2 className="text-atlassian-h4 font-medium">{getCategoryDisplayName(category.slug, category.name)}</h2> {/* 使用Atlassian字体层级 */}
                             <p className="text-atlassian-body text-muted-foreground">
-                              {category.toolCount} tools available
+                              {tCat('tools_mapped', { count: category.toolCount })}
                             </p>
                           </div>
                         </div>
@@ -158,7 +167,7 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                       {category.featuredTools.length > 0 && (
                         <div className="mb-5"> {/* 减少底部间距 */}
                           <h3 className="text-atlassian-caption font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                            Featured Tools
+                            {tCat('flagships_title')}
                           </h3>
                           <div className="space-y-2"> {/* 减少间距 */}
                             {category.featuredTools.map((tool) => (
@@ -205,7 +214,7 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                           "text-atlassian-body font-medium",
                           "group-hover:shadow-atlassian-200"
                         )}>
-                          Explore {category.name} Tools
+                          {tCat('explore_territory', { category: getCategoryDisplayName(category.slug, category.name) })}
                           <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform duration-200" />
                         </Button>
                       </Link>
@@ -230,11 +239,11 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
             }}
             className="space-y-4" // 减少间距
           >
-            <h2 className="text-atlassian-h2 font-medium"> {/* 使用Atlassian字体层级 */}
-              Can't find the right category?
+            <h2 className="text-atlassian-h2 font-medium">
+              {tCat('cta_title')}
             </h2>
             <p className="text-atlassian-body-large text-muted-foreground">
-              We're constantly adding new categories and tools. Submit your suggestion or tool!
+              {tCat('cta_subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center"> {/* 减少间距 */}
               <Link href="/submit">
@@ -247,7 +256,7 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                     "text-atlassian-body font-medium"
                   )}
                 >
-                  Submit a Tool
+                  {tCat('cta_chart_new')}
                 </Button>
               </Link>
               <Link href="/">
@@ -261,7 +270,7 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                     "text-atlassian-body font-medium"
                   )}
                 >
-                  Back to Home
+                  {tCat('cta_return')}
                 </Button>
               </Link>
             </div>

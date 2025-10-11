@@ -22,9 +22,13 @@ import {
   Heart,
   ExternalLink,
   Trophy,
-  Flame
+  Flame,
+  Compass,
+  Map,
+  Route
 } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { CompactCard } from '@/components/website/compact-card';
@@ -49,43 +53,40 @@ interface RankingsHomePageProps {
 const rankingTypes = [
   {
     key: 'popular',
-    title: 'Most Popular',
-    description: 'AI tools ranked by user visits and engagement',
     icon: TrendingUp,
     href: '/rankings/popular'
   },
   {
-    key: 'topRated', 
-    title: 'Top Rated',
-    description: 'Highest quality tools based on our review system',
+    key: 'top-rated',
     icon: Crown,
     href: '/rankings/top-rated'
   },
   {
     key: 'trending',
-    title: 'Trending',
-    description: 'AI tools gaining momentum recently',
     icon: Zap,
     href: '/rankings/trending'
   },
   {
     key: 'free',
-    title: 'Best Free',
-    description: 'Top-quality free AI tools',
     icon: CheckCircle,
     href: '/rankings/free'
   },
   {
-    key: 'newest',
-    title: 'Recently Added',
-    description: 'Latest AI tools in our directory',
+    key: 'new',
     icon: Clock,
     href: '/rankings/new'
+  }
+  ,
+  {
+    key: 'monthly-hot',
+    icon: TrendingUp,
+    href: '/rankings/monthly-hot'
   }
 ];
 
 export default function RankingsHomePage({ rankings, categories, totalTools }: RankingsHomePageProps) {
   const { user } = useUser();
+  const tRank = useTranslations('pages.rankings');
   const [userLikes, setUserLikes] = useState<Set<number>>(new Set());
 
   const handleVisit = async (website: any) => {
@@ -140,7 +141,7 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
                 "text-atlassian-body"
               )}
             >
-              View All
+              {tRank('view_all')}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
@@ -172,7 +173,7 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
               "rounded-md",
               "text-atlassian-body"
             )}>
-              View All {title}
+              {tRank('view_all_with_title', { title })}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>
@@ -196,19 +197,16 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
             className="space-y-4" // 减少间距
           >
             <div className="flex items-center justify-center gap-3 mb-4"> {/* 减少底部间距 */}
-              <Trophy className="h-10 w-10 text-primary" /> {/* 稍微减小图标 */}
+              <Compass className="h-10 w-10 text-primary" /> {/* 稍微减小图标 */}
               <h1 className={cn(
                 "text-atlassian-display md:text-atlassian-display", // 使用Atlassian字体层级
                 "font-medium tracking-tight"
               )}>
-                AI Tools{" "}
-                <span className="text-primary"> {/* 简化为单一主色调 */}
-                  Rankings
-                </span>
+                {tRank('home_header_title')}
               </h1>
             </div>
             <p className="text-atlassian-body-large text-muted-foreground max-w-3xl mx-auto">
-              Comprehensive rankings of AI tools by popularity, quality, and user engagement. Find the best tools across all categories.
+              {tRank('home_header_subtitle')}
             </p>
           </motion.div>
 
@@ -225,19 +223,19 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
           >
             <div className="text-center">
               <div className="text-atlassian-h4 font-medium text-primary">{totalTools}+</div> {/* 使用Atlassian字体 */}
-              <div className="text-atlassian-caption text-muted-foreground">Tools Ranked</div>
+              <div className="text-atlassian-caption text-muted-foreground">{tRank('stats.tools_charted')}</div>
             </div>
             <div className="text-center">
               <div className="text-atlassian-h4 font-medium text-primary">{categories.length}</div>
-              <div className="text-atlassian-caption text-muted-foreground">Categories</div>
+              <div className="text-atlassian-caption text-muted-foreground">{tRank('stats.territories')}</div>
             </div>
             <div className="text-center">
-              <div className="text-atlassian-h4 font-medium text-primary">5</div> {/* 调整数字 */}
-              <div className="text-atlassian-caption text-muted-foreground">Ranking Types</div>
+              <div className="text-atlassian-h4 font-medium text-primary">{rankingTypes.length}</div>
+              <div className="text-atlassian-caption text-muted-foreground">{tRank('stats.expedition_types')}</div>
             </div>
             <div className="text-center">
               <div className="text-atlassian-h4 font-medium text-primary">24/7</div>
-              <div className="text-atlassian-caption text-muted-foreground">Updated</div>
+              <div className="text-atlassian-caption text-muted-foreground">{tRank('stats.navigation')}</div>
             </div>
           </motion.div>
         </div>
@@ -247,9 +245,9 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
       <section className="py-12 px-4"> {/* 减少垂直间距 */}
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10"> {/* 减少底部间距 */}
-            <h2 className="text-atlassian-h2 font-medium mb-3">Explore Rankings</h2> {/* 使用Atlassian字体层级 */}
+            <h2 className="text-atlassian-h2 font-medium mb-3">{tRank('overview_title')}</h2> {/* 使用Atlassian字体层级 */}
             <p className="text-atlassian-body-large text-muted-foreground">
-              Discover AI tools through different ranking perspectives
+              {tRank('overview_subtitle')}
             </p>
           </div>
 
@@ -280,10 +278,10 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
                       )}>
                         <type.icon className="h-6 w-6 text-primary" /> {/* 稍微减小图标 */}
                       </div>
-                      <h3 className="text-atlassian-h5 font-medium mb-2">{type.title}</h3> {/* 使用Atlassian字体 */}
-                      <p className="text-atlassian-body text-muted-foreground mb-3">{type.description}</p>
+                      <h3 className="text-atlassian-h5 font-medium mb-2">{tRank(`types.${type.key}.title`)}</h3> {/* 使用Atlassian字体 */}
+                      <p className="text-atlassian-body text-muted-foreground mb-3">{tRank(`types.${type.key}.description`)}</p>
                       <div className="text-atlassian-body text-primary font-medium group-hover:underline">
-                        View Rankings →
+                        {tRank('actions.view_expedition')} →
                       </div>
                     </CardContent>
                   </Card>
@@ -298,8 +296,8 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
       <div className="bg-muted/20"> {/* 减少背景透明度 */}
         <RankingSection
           type="top-rated"
-          title="Top Rated Tools"
-          description="Highest quality AI tools based on our comprehensive review system"
+          title={tRank('types.top-rated.title')}
+          description={tRank('types.top-rated.description')}
           icon={Crown}
           data={rankings.topRated}
         />
@@ -307,8 +305,8 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
 
       <RankingSection
         type="popular"
-        title="Most Popular Tools"
-        description="AI tools with the highest user engagement and visits"
+        title={tRank('types.popular.title')}
+        description={tRank('types.popular.description')}
         icon={TrendingUp}
         data={rankings.popular}
       />
@@ -316,8 +314,8 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
       <div className="bg-muted/20"> {/* 减少背景透明度 */}
         <RankingSection
           type="trending"
-          title="Trending Tools"
-          description="AI tools gaining momentum and popularity recently"
+          title={tRank('types.trending.title')}
+          description={tRank('types.trending.description')}
           icon={Flame}
           data={rankings.trending}
         />
@@ -336,10 +334,10 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
             className="space-y-4" // 减少间距
           >
             <h2 className="text-atlassian-h2 font-medium"> {/* 使用Atlassian字体层级 */}
-              Find Your Perfect AI Tool
+              {tRank('cta_title')}
             </h2>
             <p className="text-atlassian-body-large text-muted-foreground">
-              Use our comprehensive rankings to discover AI tools that match your specific needs and budget.
+              {tRank('cta_subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center"> {/* 减少间距 */}
               <Link href="/categories">
@@ -352,7 +350,7 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
                     "text-atlassian-body font-medium"
                   )}
                 >
-                  Browse by Category
+                  {tRank('cta_navigate_by_territory')}
                 </Button>
               </Link>
               <Link href="/submit">
@@ -366,7 +364,7 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
                     "text-atlassian-body font-medium"
                   )}
                 >
-                  Submit Your Tool
+                  {tRank('cta_chart_discovery')}
                 </Button>
               </Link>
             </div>

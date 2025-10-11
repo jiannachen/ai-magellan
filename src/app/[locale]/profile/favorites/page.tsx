@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ExternalLink, Heart, Bookmark, Globe, Trash2, TrendingUp } from 'lucide-react'
@@ -54,6 +55,11 @@ export default function MyFavoritesPage() {
     total: 0,
     pages: 0
   })
+  
+  // Translation hooks
+  const t = useTranslations('common')
+  const tWebsite = useTranslations('website')
+  const tProfile = useTranslations('profile.favorites')
 
   useEffect(() => {
     if (isLoaded && isSignedIn) {
@@ -79,7 +85,7 @@ export default function MyFavoritesPage() {
       })
     } catch (error) {
       console.error('Error fetching favorites:', error)
-      setError('加载收藏失败')
+      setError(tProfile('load_error'))
     } finally {
       setLoading(false)
     }
@@ -99,10 +105,10 @@ export default function MyFavoritesPage() {
       setFavorites(prev => prev.filter(website => website.id !== websiteId))
       setPagination(prev => ({ ...prev, total: prev.total - 1 }))
       
-      toast.success('已取消收藏')
+      toast.success(tProfile('unfavorite_success'))
     } catch (error) {
       console.error('Error removing favorite:', error)
-      toast.error('取消收藏失败')
+      toast.error(tProfile('unfavorite_error'))
     }
   }
 
@@ -112,7 +118,7 @@ export default function MyFavoritesPage() {
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-muted-foreground">加载中...</p>
+            <p className="text-muted-foreground">{t('loading')}</p>
           </div>
         </div>
       </ProfileLayout>
@@ -125,14 +131,14 @@ export default function MyFavoritesPage() {
         <div className="p-6">
           <Card>
             <CardHeader>
-              <CardTitle>需要登录</CardTitle>
+              <CardTitle>{tProfile('login_required')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                请先登录以查看您的收藏。
+                {tProfile('login_description')}
               </p>
               <Link href="/auth/signin">
-                <Button>立即登录</Button>
+                <Button>{tProfile('login_now')}</Button>
               </Link>
             </CardContent>
           </Card>
@@ -148,14 +154,14 @@ export default function MyFavoritesPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-              我的收藏
+              {tProfile('title')}
             </h1>
-            <p className="text-muted-foreground text-lg">管理您收藏的AI工具，随时访问喜爱的资源</p>
+            <p className="text-muted-foreground text-lg">{tProfile('description')}</p>
           </div>
           <Link href="/">
             <Button variant="outline" className="gap-2 hover:bg-primary hover:text-primary-foreground transition-colors">
               <Globe className="h-4 w-4" />
-              发现更多工具
+              {tProfile('discover_more')}
             </Button>
           </Link>
         </div>
@@ -170,9 +176,9 @@ export default function MyFavoritesPage() {
             <CardContent className="p-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-600 mb-2">收藏工具</p>
+                  <p className="text-sm font-medium text-blue-600 mb-2">{tProfile('favorite_tools')}</p>
                   <p className="text-4xl font-bold text-blue-700 mb-1">{pagination.total}</p>
-                  <p className="text-muted-foreground">已保存到您的收藏库</p>
+                  <p className="text-muted-foreground">{tProfile('saved_to_library')}</p>
                 </div>
                 <div className="relative">
                   <div className="absolute inset-0 bg-blue-500/20 rounded-xl blur-lg" />
@@ -215,7 +221,7 @@ export default function MyFavoritesPage() {
               <CardContent className="p-8 text-center">
                 <div className="text-destructive mb-4 text-lg font-medium">{error}</div>
                 <Button onClick={() => fetchFavorites()} variant="outline">
-                  重试
+                  {tProfile('retry')}
                 </Button>
               </CardContent>
             </Card>
@@ -226,14 +232,14 @@ export default function MyFavoritesPage() {
                   <div className="absolute inset-0 bg-muted/20 rounded-full blur-3xl" />
                   <Bookmark className="relative h-20 w-20 text-muted-foreground mx-auto" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-4">还没有收藏任何工具</h3>
+                <h3 className="text-2xl font-semibold mb-4">{tProfile('no_favorites')}</h3>
                 <p className="text-muted-foreground mb-8 max-w-md mx-auto text-lg">
-                  去发现一些优质的AI工具并收藏它们吧！探索无限可能，构建您的专属工具库。
+                  {tProfile('no_favorites_desc')}
                 </p>
                 <Link href="/">
                   <Button size="lg" className="gap-2">
                     <TrendingUp className="h-5 w-5" />
-                    去发现工具
+                    {t('visit')}
                   </Button>
                 </Link>
               </CardContent>
@@ -276,7 +282,7 @@ export default function MyFavoritesPage() {
                               </h3>
                               {website.is_featured && (
                                 <Badge variant="default" className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0">
-                                  ✨ 精选
+                                  ✨ {tWebsite('featured')}
                                 </Badge>
                               )}
                             </div>
@@ -287,12 +293,12 @@ export default function MyFavoritesPage() {
                               <span className="flex items-center gap-2 text-muted-foreground">
                                 <Heart className="h-4 w-4" />
                                 <span className="font-medium">{website._count.websiteLikes}</span>
-                                <span>点赞</span>
+                                <span>{t('like')}</span>
                               </span>
                               <span className="flex items-center gap-2 text-muted-foreground">
                                 <Bookmark className="h-4 w-4" />
                                 <span className="font-medium">{website._count.websiteFavorites}</span>
-                                <span>收藏</span>
+                                <span>{t('favorite')}</span>
                               </span>
                               <Badge variant="outline" className="bg-background">
                                 {website.category.name}
@@ -314,7 +320,7 @@ export default function MyFavoritesPage() {
                               rel="noopener noreferrer"
                             >
                               <ExternalLink className="h-4 w-4" />
-                              访问
+                              {t('visit')}
                             </a>
                           </Button>
                           <Button 
@@ -324,7 +330,7 @@ export default function MyFavoritesPage() {
                             className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2"
                           >
                             <Trash2 className="h-4 w-4" />
-                            取消收藏
+                            {t('delete')}
                           </Button>
                         </div>
                       </div>
@@ -347,12 +353,11 @@ export default function MyFavoritesPage() {
                     onClick={() => fetchFavorites(pagination.page - 1)}
                     className="gap-2"
                   >
-                    上一页
+                    {t('previous')}
                   </Button>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
-                      第 <span className="font-medium text-foreground">{pagination.page}</span> 页，
-                      共 <span className="font-medium text-foreground">{pagination.pages}</span> 页
+                      {tProfile('page_info', { current: pagination.page, total: pagination.pages })}
                     </span>
                   </div>
                   <Button
@@ -361,7 +366,7 @@ export default function MyFavoritesPage() {
                     onClick={() => fetchFavorites(pagination.page + 1)}
                     className="gap-2"
                   >
-                    下一页
+                    {t('next')}
                   </Button>
                 </motion.div>
               )}

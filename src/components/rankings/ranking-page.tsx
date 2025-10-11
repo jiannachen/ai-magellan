@@ -289,7 +289,9 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
               <p className="text-muted-foreground mb-6">
                 Try adjusting your search or filters to find more tools.
               </p>
-              <Button onClick={() => {
+              <Button 
+                variant="default"
+                onClick={() => {
                 setSearchQuery('');
                 setCategoryFilter('all');
                 setPriceFilter('all');

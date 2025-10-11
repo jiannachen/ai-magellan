@@ -30,7 +30,7 @@ export function ViewModeToggle({ isCompact, onChange }: ViewModeToggleProps) {
           variant="ghost"
           size="sm"
           onClick={() => onChange(!isCompact)}
-          className="h-8 w-8 p-0 rounded-full relative text-primary"
+          className="h-11 w-11 md:h-8 md:w-8 p-0 rounded-full relative text-primary"
         >
           <motion.div
             initial={false}

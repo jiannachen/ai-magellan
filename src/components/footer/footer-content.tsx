@@ -50,7 +50,7 @@ export default function FooterContent({
     if (!newLink.title || !newLink.url) {
       toast({
         title: t('common.error'),
-        description: "请填写完整的链接信息",
+        description: t('footer.messages.complete_info_required'),
         variant: "destructive",
       });
       return;
@@ -77,12 +77,12 @@ export default function FooterContent({
 
       toast({
         title: t('common.success'),
-        description: "新的页脚链接已添加",
+        description: t('footer.messages.link_added_success'),
       });
     } catch (error) {
       toast({
         title: t('common.error'),
-        description: "添加页脚链接时出错",
+        description: t('footer.messages.link_add_error'),
         variant: "destructive",
       });
     }
@@ -103,12 +103,12 @@ export default function FooterContent({
 
       toast({
         title: t('common.success'),
-        description: "页脚链接已删除",
+        description: t('footer.messages.link_deleted_success'),
       });
     } catch (error) {
       toast({
         title: t('common.error'),
-        description: "删除页脚链接时出错",
+        description: t('footer.messages.link_delete_error'),
         variant: "destructive",
       });
     }
@@ -123,11 +123,11 @@ export default function FooterContent({
 
   // 排行榜链接数据
   const rankingLinks = [
-    { href: "/rankings", label: "All Rankings" },
-    { href: "/rankings/popular", label: "Most Popular" },
-    { href: "/rankings/top-rated", label: "Top Rated" },
-    { href: "/rankings/trending", label: "Trending" },
-    { href: "/rankings/free", label: "Best Free" },
+    { href: "/rankings", label: t('footer.rankings.all_rankings') },
+    { href: "/rankings/popular", label: t('footer.rankings.most_popular') },
+    { href: "/rankings/top-rated", label: t('footer.rankings.top_rated') },
+    { href: "/rankings/trending", label: t('footer.rankings.trending') },
+    { href: "/rankings/free", label: t('footer.rankings.best_free') },
   ];
 
   return (
@@ -155,7 +155,7 @@ export default function FooterContent({
 
           {/* 快速链接 */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">{t('footer.quick_links')}</h3>
+            <h3 className="font-semibold text-foreground">{t('footer.sections.quick_links')}</h3>
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.href}>
@@ -180,7 +180,7 @@ export default function FooterContent({
 
           {/* 排行榜链接 */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">Rankings</h3>
+            <h3 className="font-semibold text-foreground">{t('footer.sections.rankings')}</h3>
             <ul className="space-y-2">
               {rankingLinks.map((link) => (
                 <li key={link.href}>
@@ -198,7 +198,7 @@ export default function FooterContent({
           {/* 实用链接 */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-foreground">{t('footer.useful_links')}</h3>
+              <h3 className="font-semibold text-foreground">{t('footer.sections.useful_links')}</h3>
               {isAdmin && (
                 <Button
                   variant="ghost"
@@ -236,7 +236,7 @@ export default function FooterContent({
                 ))
               ) : (
                 <li className="text-sm text-muted-foreground/60 italic">
-                  {isAdmin ? "点击右侧加号添加链接" : "暂无链接"}
+                  {isAdmin ? t('footer.admin.add_link_tooltip') : t('footer.admin.no_links_message')}
                 </li>
               )}
             </ul>
@@ -244,14 +244,14 @@ export default function FooterContent({
 
           {/* 法律信息 */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">法律信息</h3>
+            <h3 className="font-semibold text-foreground">{t('footer.sections.legal_info')}</h3>
             <ul className="space-y-2">
               <li>
                 <a
                   href="#"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {t('footer.privacy')}
+                  {t('footer.legal.privacy')}
                 </a>
               </li>
               <li>
@@ -259,7 +259,7 @@ export default function FooterContent({
                   href="#"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {t('footer.terms')}
+                  {t('footer.legal.terms')}
                 </a>
               </li>
               {settings.icpBeian && (
@@ -303,35 +303,35 @@ export default function FooterContent({
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="bg-background border-border">
           <DialogHeader>
-            <DialogTitle>添加实用链接</DialogTitle>
+            <DialogTitle>{t('footer.dialog.add_link_title')}</DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              请填写链接的名称和地址
+              {t('footer.dialog.add_link_description')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
-                链接名称
+                {t('footer.dialog.link_name_label')}
               </label>
               <Input
                 value={newLink.title}
                 onChange={(e) =>
                   setNewLink((prev) => ({ ...prev, title: e.target.value }))
                 }
-                placeholder="输入链接名称"
+                placeholder={t('footer.dialog.link_name_placeholder')}
                 className="border-input"
               />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
-                链接地址
+                {t('footer.dialog.link_address_label')}
               </label>
               <Input
                 value={newLink.url}
                 onChange={(e) =>
                   setNewLink((prev) => ({ ...prev, url: e.target.value }))
                 }
-                placeholder="输入链接地址"
+                placeholder={t('footer.dialog.link_address_placeholder')}
                 className="border-input"
               />
             </div>
@@ -347,7 +347,7 @@ export default function FooterContent({
                 onClick={handleAddLink}
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                添加
+                {t('footer.dialog.add_button')}
               </Button>
             </div>
           </div>

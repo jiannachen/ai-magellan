@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link";
-import { Trophy, Plus, Brain, Grid3X3, ChevronDown, Search, Star, TrendingUp, CheckCircle } from "lucide-react";
+import { Trophy, Plus, Compass, Grid3X3, ChevronDown, Search, Star, TrendingUp, CheckCircle } from "lucide-react";
 import { Button } from "@/ui/common/button";
 import {
   DropdownMenu,
@@ -20,6 +20,8 @@ import { useEffect } from 'react';
 
 export default function Header() {
   const t = useTranslations();
+  const tRank = useTranslations('pages.rankings');
+  const tCat = useTranslations('pages.categories');
   const [categories, setCategories] = useAtom(categoriesAtom);
 
   // 加载分类数据
@@ -41,16 +43,16 @@ export default function Header() {
   }, [categories.length, setCategories]);
   
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-lg">
-      <nav className="container mx-auto px-4 h-16">
+    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur-xl">
+      <nav className="container mx-auto px-4 h-14">
         <div className="flex h-full items-center gap-6">
           {/* Logo and Title */}
           <Link
             href="/"
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            <Brain className="h-7 w-7 text-primary" />
-            <span className="font-bold text-lg lg:text-xl">AI Navigation</span>
+            <Compass className="h-7 w-7 text-primary" />
+            <span className="font-bold text-lg lg:text-xl">AI Magellan</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -64,7 +66,7 @@ export default function Header() {
                   className="flex items-center gap-2 h-10"
                 >
                   <Grid3X3 className="h-4 w-4" />
-                  <span>Categories</span>
+                  <span>{t('navigation.categories')}</span>
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -75,7 +77,7 @@ export default function Header() {
                     className="flex items-center gap-2 cursor-pointer font-semibold border-b pb-2 mb-2"
                   >
                     <Grid3X3 className="h-4 w-4" />
-                    <span>Browse All Categories</span>
+                    <span>{t('filters.all_categories')}</span>
                   </Link>
                 </DropdownMenuItem>
                 {categories.map((category: { id: number; name: string; slug: string }) => (
@@ -84,7 +86,7 @@ export default function Header() {
                       href={`/categories/${category.slug}`}
                       className="flex items-center gap-2 cursor-pointer"
                     >
-                      <span>{category.name}</span>
+                      <span>{(() => { try { return tCat(`names.${category.slug}`); } catch { return category.name; } })()}</span>
                     </Link>
                   </DropdownMenuItem>
                 ))}
@@ -112,7 +114,7 @@ export default function Header() {
                     className="flex items-center gap-2 cursor-pointer font-semibold border-b pb-2 mb-2"
                   >
                     <Trophy className="h-4 w-4" />
-                    <span>All Rankings</span>
+                    <span>{tRank('view_all')}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -121,7 +123,7 @@ export default function Header() {
                     className="flex items-center gap-2 cursor-pointer"
                   >
                     <TrendingUp className="h-4 w-4" />
-                    <span>Most Popular</span>
+                    <span>{tRank('types.popular.title')}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -130,7 +132,7 @@ export default function Header() {
                     className="flex items-center gap-2 cursor-pointer"
                   >
                     <Star className="h-4 w-4" />
-                    <span>Top Rated</span>
+                    <span>{tRank('types.top-rated.title')}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -139,7 +141,7 @@ export default function Header() {
                     className="flex items-center gap-2 cursor-pointer"
                   >
                     <Trophy className="h-4 w-4" />
-                    <span>Trending Now</span>
+                    <span>{tRank('types.trending.title')}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -148,7 +150,7 @@ export default function Header() {
                     className="flex items-center gap-2 cursor-pointer"
                   >
                     <CheckCircle className="h-4 w-4" />
-                    <span>Best Free Tools</span>
+                    <span>{tRank('types.free.title')}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -157,7 +159,7 @@ export default function Header() {
                     className="flex items-center gap-2 cursor-pointer"
                   >
                     <Plus className="h-4 w-4" />
-                    <span>Recently Added</span>
+                    <span>{tRank('types.new.title')}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -166,7 +168,7 @@ export default function Header() {
                     className="flex items-center gap-2 cursor-pointer"
                   >
                     <TrendingUp className="h-4 w-4" />
-                    <span>Monthly Hot</span>
+                    <span>{tRank('types.monthly-hot.title')}</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>

@@ -603,7 +603,7 @@ export default function EnhancedHomePage({
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/submit">
-                <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-lg">
+                <Button size="lg" variant="default">
                   <Zap className="h-5 w-5 mr-2" />
                   Submit Your Tool
                 </Button>

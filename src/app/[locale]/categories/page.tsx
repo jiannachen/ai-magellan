@@ -3,11 +3,11 @@ import { prisma } from '@/lib/db/db';
 import CategoriesListPage from '@/components/category/categories-list-page';
 
 export const metadata: Metadata = {
-  title: 'AI Tools Categories - Browse by Use Case',
-  description: 'Explore AI tools organized by categories. Find the perfect AI tool for your specific needs.',
+  title: 'AI Tool Territories - Navigate by Purpose | AI Magellan',
+  description: 'Explore AI tools mapped by territories and use cases. Chart your course through categorized AI solutions with expert guidance.',
   openGraph: {
-    title: 'AI Tools Categories',
-    description: 'Browse AI tools by category - Chat, Art, Writing, Coding and more',
+    title: 'AI Tool Territories - Navigate by Purpose',
+    description: 'Navigate through AI tool territories organized by category and purpose',
   },
 };
 

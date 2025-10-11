@@ -39,9 +39,9 @@
     "submit_website": "Submit Website"
   },
   "header": {
-    "title": "AI Navigation",
-    "subtitle": "Explore the AI World",
-    "description": "Discover Quality AI Tools & Resources"
+    "title": "AI Magellan",
+    "subtitle": "Chart Your AI Journey",
+    "description": "Navigate the AI Frontier with Expert Guidance"
   },
   "auth": {
     "signin": "Sign In",
@@ -89,24 +89,205 @@
     "ai_business": "AI Business",
     "others": "Others"
   },
-  "pages": {
-    "home": {
-      "title": "AI Navigation - Discover Quality AI Tools & Resources",
-      "hero_title": "Discover the Joy of Exploring the AI World",
-      "hero_subtitle": "Discover, share, and bookmark quality AI tools and resources to make your artificial intelligence life better",
-      "search_placeholder": "Search AI tools...",
-      "featured_section": "Featured Tools",
-      "popular_section": "Popular Tools",
-      "recent_section": "Recent Tools",
-      "all_categories": "All Categories"
+  "home": {
+    "badge": "Chart Your AI Journey",
+    "title": "Discover the Best AI Tools",
+    "subtitle": "For Your Next Adventure",
+    "description": "Like Magellan's historic voyage, we chart the AI frontier to guide your exploration.",
+    "description_continued": "Discover, compare, and navigate to the AI tools that will transform your work.",
+    "search_placeholder": "Chart your course... search AI tools",
+    "search_suggestions": "Try: 'image generator', 'code assistant', 'writing companion'",
+    "stats": {
+      "charted_tools": "Charted Tools",
+      "explorers": "Explorers",
+      "discoveries": "Discoveries",
+      "verified": "Verified",
+      "expert": "Expert",
+      "daily": "Daily"
     },
+    "cta_buttons": {
+      "explore_categories": "Explore Categories",
+      "chart_new_tool": "Chart New Tool"
+    },
+    "ranking_sections": {
+      "premier_discoveries": {
+        "title": "Premier AI Discoveries",
+        "description": "Top-quality tools charted and verified by our expert exploration team"
+      },
+      "trending_expeditions": {
+        "title": "Trending Expeditions",
+        "description": "AI tools gaining momentum in the exploration community"
+      },
+      "free_territory": {
+        "title": "Free Territory Explorer",
+        "description": "High-quality AI tools available for cost-free exploration"
+      },
+      "new_horizons": {
+        "title": "New Horizons",
+        "description": "Latest AI tools discovered and added to our exploration map"
+      }
+    },
+    "value_props": {
+      "title": "Why Choose AI Magellan as Your Guide?",
+      "description": "We don't just list tools - we chart the AI frontier, testing and mapping every solution to guide your successful exploration.",
+      "expert_navigation": {
+        "title": "Expert Navigation",
+        "description": "Like Magellan's compass, we guide you through the vast AI landscape with precision and expertise"
+      },
+      "charted_territory": {
+        "title": "Charted Territory",
+        "description": "We map the AI frontier, testing and verifying every tool to chart safe passage for your exploration"
+      },
+      "optimal_routes": {
+        "title": "Optimal Routes",
+        "description": "Advanced filtering and intelligent recommendations help you find the shortest path to your perfect AI tool"
+      },
+      "verified_quality": {
+        "title": "Verified Quality",
+        "description": "Every tool is rigorously tested and verified by our exploration team before earning a place on our platform"
+      },
+      "global_discovery": {
+        "title": "Global Discovery",
+        "description": "Discover AI innovations from around the world - from emerging startups to established enterprise solutions"
+      },
+      "pioneer_access": {
+        "title": "Pioneer Access",
+        "description": "Be among the first to discover breakthrough AI tools as they emerge on the technological horizon"
+      }
+    },
+    "faq": {
+      "title": "Navigator's Guide",
+      "description": "Everything you need to know about exploring AI tools with Magellan",
+      "questions": {
+        "what_makes_different": {
+          "question": "What makes AI Magellan different from other AI tool directories?",
+          "answer": "Like Magellan's historic voyage, we chart unknown territories in the AI landscape. Our expert team personally tests and verifies each tool, providing comprehensive reviews, real-world use cases, and quality scores. We don't just list tools - we guide your exploration of the AI frontier."
+        },
+        "quality_assurance": {
+          "question": "How do you ensure the quality of listed AI tools?",
+          "answer": "Every tool undergoes our rigorous exploration process - we test functionality, verify company credentials, analyze user feedback, and assign quality scores based on performance, reliability, and innovation. Only tools that meet our high standards earn a place on our platform."
+        },
+        "free_tools": {
+          "question": "Are the AI tools on AI Magellan free to use?",
+          "answer": "We feature both free and premium AI tools across all categories. Each listing clearly shows pricing models - free, freemium, subscription, or one-time purchase. Many tools offer free trials or basic tiers, allowing you to explore before committing to paid plans."
+        },
+        "submit_tool": {
+          "question": "Can I submit my AI tool for review?",
+          "answer": "Absolutely! We welcome tool creators and innovators to submit their AI solutions. Our review team will thoroughly evaluate your tool against our quality standards. High-quality tools that pass our exploration process will be featured in our directory."
+        },
+        "update_frequency": {
+          "question": "How often do you update the AI tool directory?",
+          "answer": "Like a navigator constantly updating charts, we refresh our directory daily. We track new releases, feature updates, pricing changes, and emerging trends in the AI space to ensure you always have access to the latest and most relevant tools."
+        },
+        "account_required": {
+          "question": "Do I need an account to explore AI tools?",
+          "answer": "No account required for basic exploration! However, creating a free account unlocks additional features like saving favorites, rating tools, leaving reviews, and receiving personalized recommendations based on your exploration history and preferences."
+        }
+      },
+      "contact_cta": {
+        "title": "Ready for your next expedition?",
+        "description": "Can't find the answer you're looking for? Our exploration team is here to guide you.",
+        "contact_navigator": "Contact Navigator",
+        "join_expedition": "Join Expedition"
+      }
+    },
+    "final_cta": {
+      "title": "Ready to chart your AI expedition?",
+      "description": "Join thousands of explorers who trust AI Magellan to discover their next breakthrough tool.",
+      "chart_discovery": "Chart Your Discovery",
+      "explore_territories": "Explore Territories"
+    },
+    "view_all": "View All"
+  },
+  "pages": {
     "rankings": {
       "title": "AI Tools Rankings",
       "description": "AI tools ranking based on visits, likes, and quality scores",
       "sort_by_visits": "Sort by Visits",
       "sort_by_likes": "Sort by Likes",
       "sort_by_quality": "Sort by Quality",
-      "top_100": "Top 100"
+      "top_100": "Top 100",
+      "back_to_rankings": "Back to Rankings",
+      "search_placeholder": "Search tools...",
+      "loading": "Loading rankings...",
+      "showing_count": "Showing {current} of {total} tools",
+      "no_results_title": "No tools found",
+      "no_results_desc": "Try adjusting your search or filters to find more tools.",
+      "clear_filters": "Clear Filters",
+      "view_all": "View All",
+      "view_all_with_title": "View All {title}",
+      "home_header_title": "AI Explorer Rankings",
+      "home_header_subtitle": "Navigate the AI frontier with our expedition rankings. Discover tools by exploration success, territory quality, and fellow navigator experiences.",
+      "overview_title": "Expedition Rankings",
+      "overview_subtitle": "Navigate through different expedition perspectives to find your ideal AI tools",
+      "stats": {
+        "tools_charted": "Tools Charted",
+        "territories": "Territories",
+        "expedition_types": "Expedition Types",
+        "navigation": "Navigation"
+      },
+      "types": {
+        "popular": {
+          "title": "Explorer Favorites",
+          "description": "Most visited AI territories by fellow navigators and explorers"
+        },
+        "top-rated": {
+          "title": "Premier Discoveries",
+          "description": "Highest quality AI tools verified by our expedition team"
+        },
+        "trending": {
+          "title": "Rising Expeditions",
+          "description": "AI tools gaining momentum in the exploration community"
+        },
+        "free": {
+          "title": "Open Territories",
+          "description": "Premium-quality AI tools accessible to all explorers"
+        },
+        "new": {
+          "title": "Fresh Discoveries",
+          "description": "Recently charted AI territories added to our exploration map"
+        },
+        "monthly-hot": {
+          "title": "Monthly Expedition Highlights",
+          "description": "This month's most successful AI tool expeditions and discoveries"
+        },
+        "category-leaders": {
+          "title": "Territory Champions",
+          "description": "Leading AI tools that dominate their respective territories"
+        }
+      },
+      "actions": {
+        "view_expedition": "View Expedition"
+      },
+      "cta_title": "Ready for Your Next Expedition?",
+      "cta_subtitle": "Use our expedition rankings to discover AI tools that perfectly match your exploration goals and budget.",
+      "cta_navigate_by_territory": "Navigate by Territory",
+      "cta_chart_discovery": "Chart Your Discovery",
+      "filters": {
+        "pricing_all": "All Pricing",
+        "pricing_free": "Free",
+        "pricing_freemium": "Freemium",
+        "pricing_paid": "Paid",
+        "category_all": "All Categories",
+        "reset": "Reset",
+        "time_range": {
+          "all_time": "All Time",
+          "today": "Today",
+          "this_week": "This Week",
+          "this_month": "This Month",
+          "this_quarter": "This Quarter",
+          "this_year": "This Year",
+          "week": "This Week",
+          "month": "This Month",
+          "quarter": "This Quarter",
+          "year": "This Year"
+        },
+        "quick_ranges": {
+          "week": "7D",
+          "month": "30D",
+          "quarter": "3M"
+        }
+      }
     },
     "submit": {
       "title": "Submit AI Tool",
@@ -136,15 +317,522 @@
           "Free and open access"
         ]
       }
+    },
+    "categories": {
+      "header_title": "Navigate AI Tool Territories",
+      "header_subtitle": "Chart your course through specialized AI tool territories. Each region mapped and verified by our exploration team.",
+      "back_to_home": "Back to Home",
+      "page_title": "{category} AI Tools",
+      "page_subtitle": "Discover the best {category} AI tools. Curated and ranked to help you find exactly what you need.",
+      "stats_territories": "{count} Territories",
+      "stats_tools_charted": "{count} Tools Charted",
+      "stats_expert_guided": "Expert Guided",
+      "names": {
+        "ai-chat": "AI Chat",
+        "ai-art": "AI Art",
+        "ai-writing": "AI Writing",
+        "ai-coding": "AI Coding",
+        "ai-tools": "AI Tools",
+        "llm": "Large Language Models"
+      },
+      "search_placeholder": "Search {category} tools...",
+      "filters": {
+        "pricing_all": "All Tools",
+        "pricing_free": "Free",
+        "pricing_freemium": "Freemium",
+        "pricing_paid": "Paid"
+      },
+      "sort": {
+        "featured_first": "Featured First",
+        "most_popular": "Most Popular",
+        "highest_rated": "Highest Rated",
+        "newest": "Newest",
+        "name_az": "Name A-Z"
+      },
+      "showing_count": "Showing {current} of {total} {category} tools",
+      "sidebar_title": "Categories",
+      "browse_all": "Browse All",
+      "no_results_title": "No tools found",
+      "no_results_desc": "Try adjusting your search or filters to find more {category} tools.",
+      "clear_filters": "Clear Filters",
+      "tools_mapped": "{count} tools mapped",
+      "flagships_title": "Flagship Tools",
+      "explore_territory": "Explore {category} Territory",
+      "cta_title": "Uncharted territory?",
+      "cta_subtitle": "Help us map new AI frontiers. Submit your discovery or suggest new territories to explore!",
+      "cta_chart_new": "Chart New Discovery",
+      "cta_return": "Return to Base"
+    }
+  },
+  "form": {
+    "website_name": "Website Name",
+    "website_name_required": "Website Name *",
+    "website_name_placeholder": "Please enter website name",
+    "website_url": "Website URL",
+    "website_url_required": "Website URL *", 
+    "website_url_placeholder": "https://example.com",
+    "tagline": "Tagline",
+    "tagline_placeholder": "Short, catchy tagline",
+    "website_description": "Website Description",
+    "description_placeholder": "Please briefly describe the website's features and characteristics",
+    "category_required": "Category *",
+    "category_placeholder": "Please select category",
+    "tags": "Tags",
+    "tags_placeholder": "Separate multiple tags with commas",
+    "thumbnail_url": "Thumbnail URL",
+    "thumbnail_placeholder": "https://example.com/image.jpg",
+    "thumbnail_preview": "Thumbnail Preview",
+    "basic_info": "Basic Information",
+    "main_features": "Main Features",
+    "feature_number": "Feature {number}",
+    "add_feature": "Add Feature",
+    "feature_name": "Feature Name",
+    "feature_name_placeholder": "e.g., Smart Analysis",
+    "feature_description": "Brief Description",
+    "feature_description_placeholder": "Describe what this feature does",
+    "use_cases_and_audience": "Use Cases and Target Audience",
+    "use_cases": "Use Cases",
+    "use_case_placeholder": "Use case description",
+    "add_use_case": "Add",
+    "target_audience": "Target Audience",
+    "target_audience_placeholder": "Target audience",
+    "add_target_audience": "Add",
+    "faq": "Frequently Asked Questions",
+    "faq_description": "Answer common questions",
+    "faq_number": "FAQ {number}",
+    "question": "Question",
+    "question_placeholder": "Enter common question",
+    "answer": "Answer",
+    "answer_placeholder": "Enter answer to the question",
+    "add_faq": "Add FAQ",
+    "pricing": "Pricing",
+    "pricing_model": "Pricing Model",
+    "pricing_model_placeholder": "Select pricing model",
+    "has_free_version": "Has free version",
+    "api_available": "API access available",
+    "pricing_plans": "Pricing Plans (optional, max 6)",
+    "plan_number": "Plan {number}",
+    "plan_name": "Plan Name",
+    "plan_name_placeholder": "e.g., Basic",
+    "billing_cycle": "Billing Cycle",
+    "billing_cycle_placeholder": "e.g., Monthly",
+    "price": "Price",
+    "price_placeholder": "e.g., $9.99",
+    "features_max_5": "Features (max 5)",
+    "feature_placeholder": "e.g., Unlimited projects",
+    "add_feature_to_plan": "Add Feature",
+    "add_pricing_plan": "Add Pricing Plan",
+    "social_media": "Social Media",
+    "twitter": "Twitter/X",
+    "twitter_placeholder": "https://twitter.com/yourtool",
+    "linkedin": "LinkedIn", 
+    "linkedin_placeholder": "https://linkedin.com/company/yourtool",
+    "facebook": "Facebook",
+    "facebook_placeholder": "https://facebook.com/yourtool",
+    "instagram": "Instagram",
+    "instagram_placeholder": "https://instagram.com/yourtool",
+    "youtube": "YouTube",
+    "youtube_placeholder": "https://youtube.com/@yourtool",
+    "discord": "Discord",
+    "discord_placeholder": "https://discord.gg/yourtool",
+    "integrations": "Integrations",
+    "integration_name_placeholder": "Integration name",
+    "add_integration": "Add Integration",
+    "platforms": "Platforms",
+    "mobile_apps": "Mobile Applications",
+    "ios_app_url": "iOS App URL",
+    "ios_placeholder": "https://apps.apple.com/...",
+    "android_app_url": "Android App URL",
+    "android_placeholder": "https://play.google.com/...",
+    "web_app": "Web Application",
+    "web_app_url": "Web App URL",
+    "web_app_placeholder": "https://example.com",
+    "desktop_apps": "Desktop Applications",
+    "macos": "macOS",
+    "windows": "Windows",
+    "linux": "Linux"
+  },
+  "edit": {
+    "title": "Edit Website",
+    "back_to_submissions": "Back to My Submissions",
+    "saving": "Saving...",
+    "save_changes": "Save Changes",
+    "errors": {
+      "required_fields": "Please fill in all required fields",
+      "update_failed": "Update failed",
+      "fetch_failed": "Failed to fetch website information",
+      "website_not_found": "Website does not exist",
+      "permission_denied": "You do not have permission to edit this website",
+      "only_own_websites": "You can only edit websites you submitted"
+    },
+    "success": {
+      "updated": "Website information updated"
+    },
+    "loading": "Loading...",
+    "error": "Error",
+    "login_required": "Login Required",
+    "login_description": "Please login first to edit website information.",
+    "login_now": "Login Now",
+    "retry": "Retry"
+  },
+  "profile": {
+    "dashboard": {
+      "title": "Dashboard",
+      "welcome": "Hello, {name}!",
+      "welcome_back": "Welcome back to your AI tools center",
+      "favorites_tools": "Favorite Tools", 
+      "saved_tools": "Saved tools",
+      "my_submissions": "My Submissions",
+      "submitted_tools": "Submitted tools",
+      "quick_actions": "Quick Actions",
+      "submit_new_tool": "Submit New Tool",
+      "manage_submissions": "Manage Submissions", 
+      "discover_tools": "Discover Tools",
+      "recent_favorites": "Recent Favorites",
+      "view_all": "View All",
+      "no_favorites": "No favorite tools yet",
+      "no_favorites_desc": "Go discover some quality AI tools and favorite them!",
+      "go_discover": "Go Discover Tools",
+      "unfavorite_success": "Unfavorited",
+      "unfavorite_error": "Failed to unfavorite",
+      "loading_favorites": "Loading favorites..."
+    },
+    "favorites": {
+      "title": "My Favorites",
+      "description": "Manage your favorite AI tools, access your favorite resources anytime",
+      "discover_more": "Discover More Tools",
+      "favorite_tools": "Favorite Tools",
+      "saved_to_library": "Saved to your favorites library",
+      "retry": "Retry",
+      "no_favorites": "No favorite tools yet",
+      "no_favorites_desc": "Go discover some quality AI tools and favorite them! Explore unlimited possibilities and build your exclusive tool library.",
+      "load_error": "Failed to load favorites",
+      "login_required": "Login Required",
+      "login_description": "Please login first to view your favorites.",
+      "login_now": "Login Now"
+    },
+    "info": {
+      "title": "Personal Information",
+      "description": "Manage your personal profile and account settings",
+      "basic_info": "Basic Information",
+      "general_user": "General User",
+      "regular_user": "General User",
+      "name_label": "Name",
+      "name": "Name",
+      "email_label": "Email Address", 
+      "email_address": "Email Address",
+      "user_id_label": "User ID",
+      "user_id": "User ID",
+      "registration_date": "Registration Date",
+      "not_set": "Not set",
+      "account_settings": "Account Settings",
+      "email_verification": "Email Verification Status",
+      "email_verification_status": "Email Verification Status",
+      "email_verification_desc": "Your email address verification status",
+      "verified": "Verified",
+      "unverified": "Unverified",
+      "two_factor_auth": "Two-Factor Authentication",
+      "two_factor_desc": "Enhance account security",
+      "not_enabled": "Not enabled",
+      "disabled": "Not enabled",
+      "usage_tips": "Usage Tips",
+      "usage_tips_content": [
+        "You can favorite tools on the tool detail page for easy access later",
+        "Submitted tools will be reviewed within 24-48 hours",
+        "Check your account settings regularly to ensure account security"
+      ],
+      "tip_1": "You can favorite tools on the tool detail page for easy access later",
+      "tip_2": "Submitted tools will be reviewed within 24-48 hours",
+      "tip_3": "Check your account settings regularly to ensure account security",
+      "not_logged_in": "Not logged in",
+      "login_to_view": "Please login first to view personal profile.",
+      "login_required": "Login Required",
+      "login_description": "Please login first to view personal profile.",
+      "login_now": "Login Now",
+      "default_user": "General User"
+    },
+    "submissions": {
+      "title": "My Submissions",
+      "description": "Manage your submitted AI tools",
+      "submit_new": "Submit New Tool",
+      "submit_new_tool": "Submit New Tool",
+      "total_submissions": "Total Submissions",
+      "approved": "Approved",
+      "pending": "Pending Review",
+      "pending_review": "Pending Review",
+      "status_pending": "Pending Review",
+      "status_approved": "Approved",
+      "status_rejected": "Rejected",
+      "retry": "Retry",
+      "no_submissions": "No tools submitted yet",
+      "no_submissions_desc": "Start sharing the quality AI tools you discovered!",
+      "submit_first": "Submit First Tool",
+      "submit_first_tool": "Submit First Tool",
+      "featured": "Featured",
+      "page_info": "Page {current} of {total}",
+      "load_error": "Failed to load submission records",
+      "login_required": "Login Required",
+      "login_description": "Please login first to view your submission records.",
+      "login_now": "Login Now"
+    },
+    "navigation": {
+      "overview": "Overview",
+      "overview_desc": "Data overview and quick actions",
+      "dashboard": "Dashboard", 
+      "dashboard_desc": "Data overview and quick actions",
+      "favorites": "Favorites", 
+      "favorites_desc": "Favorited AI tools",
+      "submissions": "Submissions",
+      "submissions_desc": "Submitted tools management",
+      "settings": "Settings",
+      "settings_desc": "Account and personal information",
+      "user": "User",
+      "default_user": "General User"
+    }
+  },
+  "submit_form": {
+    "title": "Submit AI Tool",
+    "description": "Share your AI tools, discover quality applications with the community",
+    "simple_form": {
+      "tool_url": "Tool URL",
+      "tool_url_required": "Tool URL *",
+      "tool_url_placeholder": "https://example.com",
+      "tool_name": "Tool Name",
+      "tool_name_required": "Tool Name *", 
+      "tool_name_placeholder": "Enter your tool name",
+      "business_email": "Business Email",
+      "business_email_required": "Business Email *",
+      "business_email_placeholder": "contact@example.com",
+      "tagline": "Tagline",
+      "tagline_required": "Tagline *",
+      "tagline_placeholder": "Short, catchy tagline",
+      "category": "Category",
+      "category_required": "Category *",
+      "category_placeholder": "Select a category",
+      "description": "Description",
+      "description_required": "Description *",
+      "description_placeholder": "Briefly describe your tool's features and characteristics",
+      "auto_fill": "Auto Fill",
+      "submit": "Submit Tool"
+    },
+    "enhanced_form": {
+      "basic_info": "Basic Information",
+      "advanced_info": "Advanced Information"
+    },
+    "validation": {
+      "valid_url": "Please enter a valid URL",
+      "valid_email": "Please enter a valid business email address", 
+      "name_min_length": "Tool name must be at least 3 characters",
+      "name_max_length": "Tool name cannot exceed 100 characters",
+      "select_category": "Please select a category",
+      "tagline_min_length": "Tagline must be at least 10 characters",
+      "tagline_max_length": "Tagline cannot exceed 200 characters",
+      "description_min_length": "Description must be at least 50 characters",
+      "description_max_length": "Description cannot exceed 1000 characters"
+    },
+    "messages": {
+      "load_categories_error": "Failed to load categories, please refresh the page and try again",
+      "auto_fill_success": "Information retrieved successfully, website information has been auto-filled",
+      "auto_fill_error": "Retrieval failed, please manually fill in website information",
+      "submit_success": "Submitted successfully! Your AI tool has been submitted for review, we will process it within 24-48 hours.",
+      "submit_error": "Submission failed, please try again"
     }
   },
   "search": {
-    "placeholder": "Search AI tools...",
-    "no_results": "No results found",
-    "results_count": "Found {count} results",
-    "suggestions": "Search suggestions",
-    "recent_searches": "Recent searches",
-    "clear_history": "Clear search history"
+    "advanced": {
+      "title": "Advanced Search",
+      "search_placeholder": "Search AI tools... (e.g.: AI writing, image generation)",
+      "advanced_filters": "Advanced Filters",
+      "clear_filters": "Clear Filters", 
+      "pricing_model": "Pricing Model",
+      "pricing_options": {
+        "free": "Free",
+        "freemium": "Freemium", 
+        "paid": "Paid",
+        "enterprise": "Enterprise"
+      },
+      "min_quality_score": "Minimum Quality Score: {score}",
+      "trusted_tools": "Trusted Tools",
+      "featured_tools": "Featured Tools", 
+      "free_version": "Has Free Version",
+      "sort_by": "Sort By",
+      "sort_options": {
+        "relevance": "Relevance",
+        "newest": "Newest Added",
+        "visits": "Visits",
+        "likes": "Likes", 
+        "quality": "Quality Score",
+        "name": "Name"
+      },
+      "sort_direction": "Sort Direction",
+      "suggestions": [
+        "AI writing assistant",
+        "image generation tool", 
+        "code assistant"
+      ]
+    },
+    "search_box": {
+      "placeholder": "Search AI tools, tutorials, resources...",
+      "search_types": {
+        "internal": "Internal",
+        "baidu": "Baidu"
+      }
+    }
+  },
+  "tools": {
+    "detail": {
+      "load_error": "Failed to load tool details",
+      "login_required": "Please login first",
+      "like_success": "Liked successfully",
+      "unlike_success": "Unliked",
+      "favorite_success": "Added to favorites", 
+      "unfavorite_success": "Removed from favorites",
+      "operation_failed": "Operation failed",
+      "link_copied": "Link copied to clipboard",
+      "featured": "Featured",
+      "likes": "likes",
+      "favorites": "favorites", 
+      "visits": "visits",
+      "visit_tool": "Visit Tool",
+      "liked": "Liked",
+      "like": "Like",
+      "favorited": "Favorited",
+      "favorite": "Favorite",
+      "share": "Share",
+      "tool_preview": "Tool Preview",
+      "no_preview": "No preview available",
+      "navigation": {
+        "overview": "Overview",
+        "features": "Features",
+        "use_cases": "Use Cases", 
+        "target_audience": "Target Audience",
+        "faq": "FAQ",
+        "pricing": "Pricing Plans",
+        "more_info": "More Info",
+        "analytics": "Analytics",
+        "reviews": "Reviews",
+        "alternatives": "Alternatives"
+      },
+      "sections": {
+        "pricing": {
+          "model": "Model",
+          "free": "Free",
+          "free_trial": "Free trial • {price}",
+          "paid": "Paid",
+          "contact_sales": "Contact sales",
+          "has_free_version": "Has free version",
+          "api_available": "API available",
+          "plan_details": "Plan Details",
+          "included_features": "Included features:"
+        },
+        "more_info": {
+          "basic_info": "Basic Information",
+          "category": "Category",
+          "quality_score": "Quality Score",
+          "security": "Security",
+          "ssl_secure": "SSL secure",
+          "added_time": "Added",
+          "contact_email": "Contact Email",
+          "platform_support": "Platform Support",
+          "ios_app": "iOS App",
+          "android_app": "Android App",
+          "web_app": "Web App",
+          "integration_platforms": "Integration Platforms",
+          "social_media": "Social Media"
+        },
+        "analytics": {
+          "total_visits": "Total Visits",
+          "likes_count": "Likes",
+          "favorites_count": "Favorites", 
+          "quality_score": "Quality Score",
+          "response_time": "Response Time",
+          "domain_authority": "Domain Authority",
+          "added_date": "Added Date"
+        },
+        "alternatives": {
+          "featured": "Featured"
+        }
+      }
+    }
+  },
+  "reviews": {
+    "load_error": "Failed to load reviews",
+    "login_required": "Please login first",
+    "content_required": "Please enter review content",
+    "submit_success": "Review submitted",
+    "update_success": "Review updated",
+    "submit_error": "Submission failed, please try again",
+    "delete_success": "Review deleted",
+    "delete_error": "Delete failed",
+    "placeholder": "Share your experience using this tool...",
+    "no_reviews": "No reviews yet, be the first to review!"
+  },
+  "theme": {
+    "loading": "Loading",
+    "switch_to_dark": "Switch to dark mode",
+    "switch_to_light": "Switch to light mode"
+  },
+  "fallback": {
+    "loading": "Loading..."
+  },
+  "admin": {
+    "status": {
+      "pending": "Pending Review",
+      "approved": "Approved", 
+      "rejected": "Rejected"
+    },
+    "categories": {
+      "select_placeholder": "Select category",
+      "all_categories": "All Categories"
+    },
+    "settings": {
+      "save_failed": "Failed to save settings",
+      "save_success": "Settings saved",
+      "save_success_desc": "Website settings have been saved successfully",
+      "save_error": "Failed to save settings",
+      "save_error_desc": "Please try again"
+    },
+    "websites": {
+      "status_updated": "Status updated",
+      "approved_desc": "Website has been approved",
+      "rejected_desc": "Website has been rejected", 
+      "delete_success": "Deleted successfully",
+      "delete_success_desc": "Website has been deleted"
+    },
+    "management": {
+      "websites": "Website Management",
+      "categories": "Category Management",
+      "users": "User Management",
+      "settings": "System Settings",
+      "statistics": "Statistics",
+      "pending_review": "Pending Review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "bulk_actions": "Bulk Actions",
+      "approve_selected": "Approve Selected",
+      "reject_selected": "Reject Selected",
+      "delete_selected": "Delete Selected"
+    }
+  },
+  "api_errors": {
+    "url_required": "URL must be provided",
+    "validation_failed": "Page link validation failed",
+    "fetch_recommendations_failed": "Failed to get recommendations",
+    "record_failed": "Recording failed",
+    "fetch_categories_failed": "Failed to get categories data",
+    "create_category_failed": "Failed to create category"
+  },
+  "pricing_models": {
+    "free": "Free",
+    "freemium": "Freemium", 
+    "subscription": "Subscription",
+    "tiered": "Tiered",
+    "custom": "Custom",
+    "one_time": "One-time Payment",
+    "tiered_subscription": "Tiered Subscription",
+    "usage_based": "Usage-based",
+    "pay_as_you_go": "Pay as You Go",
+    "open_source": "Open Source"
   },
   "filters": {
     "all_categories": "All Categories",
@@ -153,17 +841,51 @@
     "sort_popular": "Most Popular",
     "sort_rating": "Highest Rated",
     "sort_visits": "Most Visited",
+    "sort_trending": "Trending",
+    "monthly_hot": "Monthly Hot",
     "filter_featured": "Featured Only",
     "filter_free": "Free Tools",
     "filter_paid": "Paid Tools"
   },
   "footer": {
     "description": "The best platform to discover quality AI tools and resources",
-    "quick_links": "Quick Links",
-    "useful_links": "Useful Links",
-    "contact": "Contact Us",
-    "privacy": "Privacy Policy",
-    "terms": "Terms of Service",
+    "sections": {
+      "quick_links": "Quick Links",
+      "rankings": "Rankings",
+      "useful_links": "Useful Links",
+      "legal_info": "Legal Information"
+    },
+    "rankings": {
+      "all_rankings": "All Rankings",
+      "most_popular": "Most Popular",
+      "top_rated": "Top Rated",
+      "trending": "Trending",
+      "best_free": "Best Free"
+    },
+    "legal": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "admin": {
+      "add_link_tooltip": "Click the plus sign to add links",
+      "no_links_message": "No links available"
+    },
+    "dialog": {
+      "add_link_title": "Add Useful Link",
+      "add_link_description": "Please fill in the link name and address",
+      "link_name_label": "Link Name",
+      "link_name_placeholder": "Enter link name",
+      "link_address_label": "Link Address",
+      "link_address_placeholder": "Enter link address",
+      "add_button": "Add"
+    },
+    "messages": {
+      "complete_info_required": "Please fill in complete link information",
+      "link_added_success": "New footer link has been added",
+      "link_add_error": "Error occurred while adding footer link",
+      "link_deleted_success": "Footer link has been deleted",
+      "link_delete_error": "Error occurred while deleting footer link"
+    },
     "copyright": "All rights reserved.",
     "site_info": "Professional AI tools navigation platform"
   },
@@ -188,18 +910,23 @@
     "ai_tools_list": "AI Tools Recommendation List",
     "curated_list_description": "Curated list of AI tools and resources"
   },
-  "admin": {
-    "websites": "Website Management",
-    "categories": "Category Management",
-    "users": "User Management",
-    "settings": "System Settings",
-    "statistics": "Statistics",
-    "pending_review": "Pending Review",
-    "approved": "Approved",
-    "rejected": "Rejected",
-    "bulk_actions": "Bulk Actions",
-    "approve_selected": "Approve Selected",
-    "reject_selected": "Reject Selected",
-    "delete_selected": "Delete Selected"
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Welcome back! View your favorites and activity overview.",
+    "favorite_tools": "Favorite Tools",
+    "saved_tools": "Saved tools",
+    "my_submissions": "My Submissions", 
+    "submitted_tools": "Submitted tools",
+    "quick_actions": "Quick Actions",
+    "submit_new_tool": "Submit New Tool",
+    "manage_submissions": "Manage Submissions",
+    "discover_tools": "Discover Tools",
+    "recent_favorites": "Recent Favorites",
+    "view_all": "View All",
+    "no_favorites": "No favorite tools yet",
+    "no_favorites_desc": "Go discover some quality AI tools and favorite them!",
+    "go_discover": "Go Discover Tools",
+    "unfavorite_success": "Unfavorited",
+    "unfavorite_error": "Failed to unfavorite"
   }
 }

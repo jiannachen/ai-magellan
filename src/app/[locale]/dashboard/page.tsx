@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { 
@@ -11,7 +12,6 @@ import {
   TrendingUp, 
   Plus,
   ExternalLink,
-  Calendar,
   Trash2
 } from 'lucide-react'
 import { Button } from '@/ui/common/button'
@@ -50,6 +50,10 @@ export default function DashboardPage() {
     totalLikes: 0
   })
   const [loading, setLoading] = useState(true)
+  
+  // Translation hooks
+  const t = useTranslations('common')
+  const tDashboard = useTranslations('dashboard')
 
   useEffect(() => {
     if (isLoaded && isSignedIn) {
@@ -84,11 +88,11 @@ export default function DashboardPage() {
       if (response.ok) {
         setFavorites(prev => prev.filter(website => website.id !== websiteId))
         setStats(prev => ({ ...prev, totalFavorites: prev.totalFavorites - 1 }))
-        toast.success('已取消收藏')
+        toast.success(tDashboard('unfavorite_success'))
       }
     } catch (error) {
       console.error('Error removing favorite:', error)
-      toast.error('取消收藏失败')
+      toast.error(tDashboard('unfavorite_error'))
     }
   }
 
@@ -98,7 +102,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-muted-foreground">加载中...</p>
+            <p className="text-muted-foreground">{t('loading')}</p>
           </div>
         </div>
       </ProfileLayout>
@@ -107,108 +111,106 @@ export default function DashboardPage() {
 
   return (
     <ProfileLayout>
-      <div className="p-6 space-y-6">
-        {/* 页面标题 */}
+      <div className="space-y-[24px]">
+        {/* 页面标题 - Atlassian风格 */}
         <div>
-          <h1 className="text-2xl font-bold mb-2">Dashboard</h1>
-          <p className="text-muted-foreground">欢迎回来！查看您的收藏和活动概览。</p>
+          <h1 className="text-[32px] font-medium leading-[40px] tracking-[-0.01em] mb-2">
+            {tDashboard('title')}
+          </h1>
+          <p className="text-[16px] leading-[24px] text-muted-foreground">
+            {tDashboard('description')}
+          </p>
         </div>
 
-        {/* 统计卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
+        {/* 统计卡片 - Atlassian风格 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card className="transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] hover:shadow-[0_4px_8px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">收藏工具</p>
-                  <p className="text-2xl font-bold text-blue-600">{stats.totalFavorites}</p>
+                  <p className="text-[14px] font-semibold text-primary mb-2">{tDashboard('favorite_tools')}</p>
+                  <p className="text-[32px] font-medium leading-[40px] text-[var(--ds-text)]">{stats.totalFavorites}</p>
+                  <p className="text-[12px] text-muted-foreground mt-1">{tDashboard('saved_tools')}</p>
                 </div>
-                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Bookmark className="h-5 w-5 text-blue-600" />
+                <div className="w-12 h-12 bg-primary/10 rounded-[8px] flex items-center justify-center">
+                  <Bookmark className="h-6 w-6 text-primary" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] hover:shadow-[0_4px_8px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">快速操作</p>
-                  <p className="text-sm font-medium text-muted-foreground">提交和管理工具</p>
+                  <p className="text-[14px] font-semibold text-muted-foreground mb-2">{tDashboard('my_submissions')}</p>
+                  <p className="text-[32px] font-medium leading-[40px] text-[var(--ds-text)]">{stats.totalSubmissions}</p>
+                  <p className="text-[12px] text-muted-foreground mt-1">{tDashboard('submitted_tools')}</p>
                 </div>
-                <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Upload className="h-5 w-5 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">发现工具</p>
-                  <p className="text-sm font-medium text-muted-foreground">探索更多AI工具</p>
-                </div>
-                <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-purple-600" />
+                <div className="w-12 h-12 bg-muted rounded-[8px] flex items-center justify-center">
+                  <Upload className="h-6 w-6 text-muted-foreground" />
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* 快速操作 */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              快速操作
+        {/* 快速操作 - Atlassian风格 */}
+        <Card className="transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] hover:shadow-[0_4px_8px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]">
+          <CardHeader className="pb-[16px] px-[24px] pt-[24px]">
+            <CardTitle className="flex items-center gap-2 text-[20px] font-medium leading-[28px] tracking-[-0.01em]">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              {tDashboard('quick_actions')}
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <CardContent className="px-[24px] pb-[24px]">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Link href="/submit">
-                <Button className="w-full h-20 flex-col gap-2" variant="outline">
-                  <Plus className="h-5 w-5" />
-                  <span>提交新工具</span>
-                </Button>
+                <Card className="h-20 border-2 border-[#0052CC] bg-white hover:bg-[#E9F2FF] hover:border-[#0747A6] transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] cursor-pointer">
+                  <CardContent className="h-full flex flex-col items-center justify-center gap-2">
+                    <Plus className="h-5 w-5 text-[#0052CC]" />
+                    <span className="text-[14px] font-medium text-[#172B4D]">{tDashboard('submit_new_tool')}</span>
+                  </CardContent>
+                </Card>
               </Link>
               <Link href="/profile/submissions">
-                <Button className="w-full h-20 flex-col gap-2" variant="outline">
-                  <Upload className="h-5 w-5" />
-                  <span>我的提交</span>
-                </Button>
+                <Card className="h-20 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] cursor-pointer">
+                  <CardContent className="h-full flex flex-col items-center justify-center gap-2">
+                    <Upload className="h-5 w-5 text-primary" />
+                    <span className="text-[14px] font-medium text-[var(--ds-text)]">{tDashboard('manage_submissions')}</span>
+                  </CardContent>
+                </Card>
               </Link>
               <Link href="/">
-                <Button className="w-full h-20 flex-col gap-2" variant="outline">
-                  <TrendingUp className="h-5 w-5" />
-                  <span>发现工具</span>
-                </Button>
+                <Card className="h-20 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] cursor-pointer">
+                  <CardContent className="h-full flex flex-col items-center justify-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-primary" />
+                    <span className="text-[14px] font-medium text-[var(--ds-text)]">{tDashboard('discover_tools')}</span>
+                  </CardContent>
+                </Card>
               </Link>
             </div>
           </CardContent>
         </Card>
 
-        {/* 已保存的工具 */}
-        <Card>
-          <CardHeader>
+        {/* 已保存的工具 - Atlassian风格 */}
+        <Card className="transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] hover:shadow-[0_4px_8px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]">
+          <CardHeader className="pb-[16px] px-[24px] pt-[24px]">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Bookmark className="h-5 w-5" />
-                已保存的工具
+              <CardTitle className="flex items-center gap-2 text-[20px] font-medium leading-[28px] tracking-[-0.01em]">
+                <Bookmark className="h-5 w-5 text-primary" />
+                {tDashboard('recent_favorites')}
               </CardTitle>
               {favorites.length > 0 && (
                 <Link href="/profile/favorites">
-                  <Button variant="ghost" size="sm">
-                    查看全部
+                  <Button variant="ghost" size="sm" className="text-[14px] text-primary hover:bg-primary/5">
+                    {tDashboard('view_all')}
                   </Button>
                 </Link>
               )}
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-[24px] pb-[24px]">
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[...Array(4)].map((_, i) => (
@@ -221,14 +223,16 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : favorites.length === 0 ? (
-              <div className="text-center py-12">
-                <Bookmark className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">还没有保存任何工具</h3>
-                <p className="text-muted-foreground mb-4">
-                  去发现一些优质的AI工具并收藏它们吧！
+              <div className="text-center py-16">
+                <Bookmark className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-[20px] font-medium leading-[28px] mb-2 text-[var(--ds-text)]">{tDashboard('no_favorites')}</h3>
+                <p className="text-[14px] leading-[20px] text-muted-foreground mb-6">
+                  {tDashboard('no_favorites_desc')}
                 </p>
                 <Link href="/">
-                  <Button>去发现工具</Button>
+                  <Button className="h-[40px] px-4 py-2 rounded-[4px] text-[14px] font-medium">
+                    {tDashboard('go_discover')}
+                  </Button>
                 </Link>
               </div>
             ) : (
@@ -282,7 +286,7 @@ export default function DashboardPage() {
                               className="flex items-center gap-1"
                             >
                               <ExternalLink className="h-3 w-3" />
-                              访问
+                              {t('visit')}
                             </a>
                           </Button>
                           <Button 

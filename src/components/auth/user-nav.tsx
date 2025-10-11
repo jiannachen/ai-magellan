@@ -1,6 +1,7 @@
 'use client'
 
 import { useUser, useClerk } from '@clerk/nextjs'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/ui/common/button'
 import { 
   DropdownMenu,
@@ -16,10 +17,11 @@ import Link from 'next/link'
 export function UserNav() {
   const { isLoaded, isSignedIn, user } = useUser()
   const { signOut } = useClerk()
+  const t = useTranslations('auth')
 
   if (!isLoaded) {
     return (
-      <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+      <div className="h-11 w-11 md:h-8 md:w-8 rounded-full bg-muted animate-pulse" />
     )
   }
 
@@ -32,7 +34,7 @@ export function UserNav() {
           className="flex items-center gap-2"
         >
           <LogIn className="h-4 w-4" />
-          登录
+          {t('signin')}
         </Button>
       </Link>
     )
@@ -41,8 +43,8 @@ export function UserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
+        <Button variant="ghost" className="relative h-11 w-11 md:h-8 md:w-8 rounded-full">
+          <Avatar className="h-11 w-11 md:h-8 md:w-8">
             <AvatarImage src={user?.imageUrl || ''} alt={user?.fullName || ''} />
             <AvatarFallback>
               {user?.firstName?.charAt(0) || user?.emailAddresses?.[0]?.emailAddress?.charAt(0) || 'U'}
@@ -67,13 +69,13 @@ export function UserNav() {
         <DropdownMenuItem asChild>
           <Link href="/dashboard" className="flex items-center">
             <User className="mr-2 h-4 w-4" />
-            <span>Dashboard</span>
+            <span>{t('profile')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/profile/info" className="flex items-center">
             <Settings className="mr-2 h-4 w-4" />
-            <span>个人信息</span>
+            <span>{t('settings')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -85,7 +87,7 @@ export function UserNav() {
           }}
         >
           <LogOut className="mr-2 h-4 w-4" />
-          <span>退出登录</span>
+          <span>{t('signout')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

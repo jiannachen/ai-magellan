@@ -298,7 +298,9 @@ export default function CategoryPage({ category, websites: initialWebsites, allC
                   <p className="text-muted-foreground mb-6">
                     Try adjusting your search or filters to find more {category.name} tools.
                   </p>
-                  <Button onClick={() => {
+                  <Button 
+                    variant="default"
+                    onClick={() => {
                     setSearchQuery('');
                     setPriceFilter('all');
                     setSortBy('featured');

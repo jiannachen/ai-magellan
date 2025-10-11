@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import RankingPage from '@/components/rankings/ranking-page';
 import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 interface PageProps {
   params: {
@@ -13,52 +14,38 @@ interface PageProps {
   };
 }
 
-// Valid ranking types
+// Valid ranking types - 融入 Magellan 探索主题
 const RANKING_TYPES = {
   'popular': {
-    title: 'Most Popular AI Tools',
-    description: 'AI tools ranked by user visits and engagement',
     sortField: 'visits',
     sortOrder: 'desc' as const
   },
   'top-rated': {
-    title: 'Top Rated AI Tools',
-    description: 'Highest quality AI tools based on our comprehensive review system',
     sortField: 'quality_score',
     sortOrder: 'desc' as const
   },
   'trending': {
-    title: 'Trending AI Tools',
-    description: 'AI tools gaining momentum and popularity recently',
     sortField: 'likes',
     sortOrder: 'desc' as const
   },
   'free': {
-    title: 'Best Free AI Tools',
-    description: 'Top-quality AI tools that are completely free to use',
     sortField: 'quality_score',
     sortOrder: 'desc' as const,
-    filter: 'free'
+    filter: 'free' as const
   },
   'new': {
-    title: 'Newest AI Tools',
-    description: 'Recently added AI tools to our curated collection',
     sortField: 'created_at',
     sortOrder: 'desc' as const
   },
   'monthly-hot': {
-    title: 'Monthly Hot AI Tools',
-    description: 'Trending AI tools this month based on visits and engagement',
     sortField: 'visits',
     sortOrder: 'desc' as const
   },
   'category-leaders': {
-    title: 'Category Leaders',
-    description: 'Top performing AI tools in each category',
     sortField: 'quality_score',
     sortOrder: 'desc' as const
   }
-};
+} as const;
 
 export async function generateStaticParams() {
   return Object.keys(RANKING_TYPES).map((type) => ({
@@ -68,17 +55,21 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { type } = await params;
-  const rankingType = RANKING_TYPES[type as keyof typeof RANKING_TYPES];
+  const base = RANKING_TYPES[type as keyof typeof RANKING_TYPES];
+  const tRank = await getTranslations('pages.rankings');
   
-  if (!rankingType) {
+  if (!base) {
     return {
       title: 'Rankings Not Found',
     };
   }
 
+  const title = tRank(`types.${type}.title`);
+  const description = tRank(`types.${type}.description`);
+
   return {
-    title: `${rankingType.title} | AI Navigation`,
-    description: rankingType.description,
+    title: `${title} | AI Magellan`,
+    description
   };
 }
 
@@ -158,11 +149,18 @@ export default async function RankingTypePage({ params, searchParams }: PageProp
     notFound();
   }
 
+  const tRank = await getTranslations('pages.rankings');
+
+  const rankingTypeInfo = {
+    title: tRank(`types.${type}.title`),
+    description: tRank(`types.${type}.description`)
+  };
+
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>{tRank('loading')}</div>}>
       <RankingPage
         type={type}
-        rankingType={rankingType}
+        rankingType={rankingTypeInfo}
         websites={websites}
         categories={categories}
         selectedCategory={category}

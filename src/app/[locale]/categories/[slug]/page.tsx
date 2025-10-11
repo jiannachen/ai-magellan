@@ -32,11 +32,11 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${category.name} AI Tools - Best ${category.name} Tools Ranked`,
-    description: `Discover the best ${category.name} AI tools. Curated and ranked ${category.name} tools to boost your productivity.`,
+    title: `${category.name} AI Territory - Explore ${category.name} Tools | AI Magellan`,
+    description: `Navigate the ${category.name} AI territory. Discover and chart the best ${category.name} tools verified by our exploration team.`,
     openGraph: {
-      title: `${category.name} AI Tools`,
-      description: `Best ${category.name} AI tools ranked and reviewed`,
+      title: `${category.name} AI Territory - AI Magellan`,
+      description: `Best ${category.name} AI tools charted and verified by expert navigators`,
     },
   };
 }

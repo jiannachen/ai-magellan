@@ -2,10 +2,11 @@ import { Suspense } from 'react';
 import { prisma } from '@/lib/prisma';
 import RankingsHomePage from '@/components/rankings/rankings-home-page';
 import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 export const metadata: Metadata = {
-  title: 'AI Tools Rankings | AI Navigation',
-  description: 'Comprehensive rankings of AI tools by popularity, quality, and user engagement. Find the best AI tools ranked across different categories.',
+  title: 'AI Tools Expedition Rankings | AI Magellan',
+  description: 'Comprehensive expedition rankings of AI tools by discovery success, quality, and explorer engagement. Navigate to the best-charted AI territories.',
 };
 
 async function getRankingsData() {
@@ -73,9 +74,10 @@ async function getRankingsData() {
 
 export default async function RankingsPage() {
   const data = await getRankingsData();
+  const tRank = await getTranslations('pages.rankings');
 
   return (
-    <Suspense fallback={<div>Loading rankings...</div>}>
+    <Suspense fallback={<div>{tRank('loading')}</div>}>
       <RankingsHomePage {...data} />
     </Suspense>
   );

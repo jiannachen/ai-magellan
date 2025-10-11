@@ -1,42 +1,40 @@
 import "./globals.css";
 import { Metadata, Viewport } from "next";
-import { NextIntlClientProvider } from 'next-intl';
 import { ClerkProvider } from '@clerk/nextjs';
 import ThemeProvider from "@/components/providers/theme-provider";
 import { StoreProvider } from "@/components/providers/store-provider";
 import { Toaster } from "@/ui/common/sonner";
-import Header from "@/components/header/header";
-import Footer from "@/components/footer/index";
 import SWRProvider from "@/components/providers/swr-provider";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { Analytics as OtherAnalytics } from "@/components/analytics";
+import { getLocale } from 'next-intl/server';
 
 // 全局SEO配置
 export const metadata: Metadata = {
   title: {
-    default: "AI导航 - 发现优质AI工具与资源",
-    template: "%s | AI导航"
+    default: "AI Magellan - 探索发现优质AI工具的导航专家",
+    template: "%s | AI Magellan"
   },
-  description: "AI导航是一个专业的AI工具导航站，精选优质的人工智能工具和资源，帮助用户发现、分享和收藏最新最好用的AI产品。包含ChatGPT、MidJourney、Stable Diffusion等热门AI工具。",
-  keywords: ["AI导航", "人工智能工具", "AI工具", "ChatGPT", "AI资源", "机器学习", "深度学习", "AI产品"],
-  authors: [{ name: "AI导航团队" }],
-  creator: "AI导航",
-  publisher: "AI导航",
+  description: "AI Magellan 是您的AI工具探索伙伴，如同麦哲伦开启环球航海一样，我们为您开启AI工具的发现之旅。精选验证优质的人工智能工具和资源，帮助专业人士发现、评估和使用最适合的AI产品。",
+  keywords: ["AI Magellan", "AI工具导航", "人工智能工具", "AI工具发现", "AI资源探索", "专业AI工具", "ChatGPT", "AI产品评测"],
+  authors: [{ name: "AI Magellan 团队" }],
+  creator: "AI Magellan",
+  publisher: "AI Magellan",
   
   // Open Graph
   openGraph: {
     type: "website",
     locale: "zh",
-    url: process.env.NEXT_PUBLIC_BASE_URL || "https://yoursite.com",
-    siteName: "AI导航",
-    title: "AI导航 - 发现优质AI工具与资源",
-    description: "专业的AI工具导航站，精选优质的人工智能工具和资源",
+    url: process.env.NEXT_PUBLIC_BASE_URL || "https://aimagellan.com",
+    siteName: "AI Magellan",
+    title: "AI Magellan - 探索发现优质AI工具的导航专家",
+    description: "AI Magellan 是您的AI工具探索伙伴，精选验证优质的人工智能工具和资源",
     images: [
       {
         url: "/images/og-image.png",
         width: 1200,
         height: 630,
-        alt: "AI导航 - 发现优质AI工具与资源"
+        alt: "AI Magellan - 探索发现优质AI工具的导航专家"
       }
     ]
   },
@@ -44,10 +42,10 @@ export const metadata: Metadata = {
   // Twitter Card
   twitter: {
     card: "summary_large_image",
-    title: "AI导航 - 发现优质AI工具与资源",
-    description: "专业的AI工具导航站，精选优质的人工智能工具和资源",
+    title: "AI Magellan - 探索发现优质AI工具的导航专家",
+    description: "AI Magellan 是您的AI工具探索伙伴，精选验证优质的人工智能工具和资源",
     images: ["/images/twitter-image.png"],
-    creator: "@ai_nav"
+    creator: "@aimagellan"
   },
   
   // 验证标签
@@ -73,7 +71,7 @@ export const metadata: Metadata = {
   },
   
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_BASE_URL || "https://yoursite.com",
+    canonical: process.env.NEXT_PUBLIC_BASE_URL || "https://aimagellan.com",
   },
   
   category: "Technology",
@@ -95,9 +93,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // 使用默认语言作为回退
-  const locale = 'en';
-  const messages = (await import(`@/i18n/messages/${locale}.json`)).default;
+  const locale = await getLocale();
   
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -106,7 +102,7 @@ export default async function RootLayout({
         <meta name="format-detection" content="telephone=no" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="AI导航" />
+        <meta name="apple-mobile-web-app-title" content="AI Magellan" />
         
         {/* 网站图标 */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -123,23 +119,21 @@ export default async function RootLayout({
         suppressHydrationWarning
         className="min-h-screen flex flex-col bg-background"
       >
-        <NextIntlClientProvider messages={messages} locale={locale}>
-          <ClerkProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <StoreProvider>
-                <Header />
-                <main className="flex-1">{children}</main>
-                <Footer />
+        <ClerkProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <StoreProvider>
+              <SWRProvider>
+                {children}
                 <Toaster />
-              </StoreProvider>
-            </ThemeProvider>
-          </ClerkProvider>
-        </NextIntlClientProvider>
+              </SWRProvider>
+            </StoreProvider>
+          </ThemeProvider>
+        </ClerkProvider>
         <VercelAnalytics />
         <OtherAnalytics googleAnalyticsId="G-9MNGY82H1J" />
       </body>

@@ -2,39 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes float {
+/* Atlassian-compliant keyframe animations */
+@keyframes atlassian-float {
   0% {
-    transform: translateY(0px) scale(1);
+    transform: translateY(0px);
   }
   50% {
-    transform: translateY(-20px) scale(1.05);
+    transform: translateY(-8px);
   }
   100% {
-    transform: translateY(0px) scale(1);
+    transform: translateY(0px);
   }
 }
 
-@keyframes pulse {
+@keyframes atlassian-pulse {
   0% {
-    opacity: 0.4;
-  }
-  50% {
     opacity: 0.6;
   }
+  50% {
+    opacity: 0.8;
+  }
   100% {
-    opacity: 0.4;
+    opacity: 0.6;
   }
 }
 
-@keyframes grain {
+@keyframes atlassian-fade-in {
   0% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(10%, 10%);
+    opacity: 0;
+    transform: translateY(8px);
   }
   100% {
-    transform: translate(0, 0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes atlassian-fade-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes atlassian-scale-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -110,32 +132,32 @@
     --atlassian-neutral-900: 221 43% 20%;/* #172B4D Dark Text */
     --atlassian-neutral-1000: 224 71% 14%;/* #091E42 Darkest */
     
-    /* Primary Brand Color */
-    --primary: var(--atlassian-blue-400);
-    --primary-foreground: var(--atlassian-neutral-0);
+    /* Primary Brand Color - Atlassian Official Blue */
+    --primary: 216 87% 50%; /* #0052CC - Atlassian官方主品牌色 */
+    --primary-foreground: 0 0% 100%; /* White */
     
     /* System Semantic Colors */
-    --foreground: var(--atlassian-neutral-1000);
-    --muted-foreground: var(--atlassian-neutral-500);
-    --card: var(--atlassian-neutral-0);
-    --card-foreground: var(--atlassian-neutral-1000);
-    --popover: var(--atlassian-neutral-0);
-    --popover-foreground: var(--atlassian-neutral-1000);
-    --secondary: var(--atlassian-neutral-100);
-    --secondary-foreground: var(--atlassian-neutral-800);
-    --muted: var(--atlassian-neutral-100);
-    --accent: var(--atlassian-neutral-100);
-    --accent-foreground: var(--atlassian-neutral-800);
-    --border: var(--atlassian-neutral-300);
-    --input: var(--atlassian-neutral-300);
-    --ring: var(--primary);
-    --background: var(--atlassian-neutral-0);
-    --destructive: var(--atlassian-error-300);
-    --destructive-foreground: var(--atlassian-neutral-0);
-    --success: var(--atlassian-success-500);
-    --success-foreground: var(--atlassian-neutral-0);
-    --warning: var(--atlassian-warning-300);
-    --warning-foreground: var(--atlassian-neutral-1000);
+    --foreground: 224 71% 14%; /* #091E42 - Darkest */
+    --muted-foreground: 221 13% 63%; /* #8993A4 - Body Text */
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 224 71% 14%; /* #091E42 */
+    --popover: 0 0% 100%; /* #FFFFFF */
+    --popover-foreground: 224 71% 14%; /* #091E42 */
+    --secondary: 216 12% 96%; /* #F4F5F7 */
+    --secondary-foreground: 221 39% 35%; /* #42526E */
+    --muted: 216 12% 96%; /* #F4F5F7 */
+    --accent: 216 12% 96%; /* #F4F5F7 */
+    --accent-foreground: 221 39% 35%; /* #42526E */
+    --border: 219 12% 89%; /* #DFE1E6 */
+    --input: 219 12% 89%; /* #DFE1E6 */
+    --ring: 216 87% 50%; /* Primary */
+    --background: 0 0% 100%; /* #FFFFFF */
+    --destructive: 11 82% 59%; /* #FF5630 */
+    --destructive-foreground: 0 0% 100%; /* White */
+    --success: 148 58% 45%; /* #36B37E */
+    --success-foreground: 0 0% 100%; /* White */
+    --warning: 48 100% 50%; /* #FFC400 */
+    --warning-foreground: 224 71% 14%; /* Dark text */
     
     /* Atlassian Border Radius System */
     --radius-2: 2px;
@@ -145,6 +167,19 @@
     --radius-16: 16px;    /* Extra large */
     --radius-full: 50%;   /* Circular */
     --radius: var(--radius-4);
+    
+    /* Atlassian Motion System - Duration Variables */
+    --duration-micro: 100ms;        /* Micro interactions */
+    --duration-short: 200ms;        /* Standard interactions */
+    --duration-medium: 300ms;       /* Page elements */
+    --duration-long: 500ms;         /* Page transitions */
+    
+    /* Atlassian Easing Variables */
+    --ease-entrance: cubic-bezier(0.15, 1, 0.3, 1);      /* Elements entering */
+    --ease-exit: cubic-bezier(0.6, 0, 0.85, 0.15);       /* Elements exiting */
+    --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);   /* Standard interactions */
+    --ease-decelerate: cubic-bezier(0, 0, 0.3, 1);       /* Slow ending */
+    --ease-accelerate: cubic-bezier(0.7, 0, 1, 0.5);     /* Fast ending */
     
     /* Atlassian Spacing System - 8px Grid */
     --space-0: 0;
@@ -186,32 +221,32 @@
     --atlassian-warning-300: 48 100% 55%; /* Brighter for dark */
     --atlassian-error-300: 11 82% 65%;   /* Brighter for dark */
     
-    /* Primary Color */
-    --primary: var(--atlassian-blue-400);
-    --primary-foreground: var(--atlassian-neutral-50);
+    /* Primary Color - Dark Mode - Atlassian Official Blue */
+    --primary: 216 87% 65%; /* Brighter for dark mode */
+    --primary-foreground: 0 0% 100%; /* White */
     
     /* System Semantic Colors for Dark Mode */
-    --foreground: var(--atlassian-neutral-1000);
-    --muted-foreground: var(--atlassian-neutral-700);
-    --card: var(--atlassian-neutral-50);
-    --card-foreground: var(--atlassian-neutral-1000);
-    --popover: var(--atlassian-neutral-0);
-    --popover-foreground: var(--atlassian-neutral-1000);
-    --secondary: var(--atlassian-neutral-100);
-    --secondary-foreground: var(--atlassian-neutral-1000);
-    --muted: var(--atlassian-neutral-100);
-    --accent: var(--atlassian-neutral-100);
-    --accent-foreground: var(--atlassian-neutral-1000);
-    --border: var(--atlassian-neutral-300);
-    --input: var(--atlassian-neutral-300);
-    --ring: var(--primary);
-    --background: var(--atlassian-neutral-0);
-    --destructive: var(--atlassian-error-300);
-    --destructive-foreground: var(--atlassian-neutral-1000);
-    --success: var(--atlassian-success-500);
-    --success-foreground: var(--atlassian-neutral-1000);
-    --warning: var(--atlassian-warning-300);
-    --warning-foreground: var(--atlassian-neutral-1000);
+    --foreground: 0 0% 100%; /* #FFFFFF */
+    --muted-foreground: 218 10% 79%; /* #C9D1D9 */
+    --card: 220 13% 9%; /* #161B22 */
+    --card-foreground: 0 0% 100%; /* #FFFFFF */
+    --popover: 224 71% 4%; /* #0D1117 */
+    --popover-foreground: 0 0% 100%; /* #FFFFFF */
+    --secondary: 219 11% 15%; /* #21262D */
+    --secondary-foreground: 0 0% 100%; /* #FFFFFF */
+    --muted: 219 11% 15%; /* #21262D */
+    --accent: 219 11% 15%; /* #21262D */
+    --accent-foreground: 0 0% 100%; /* #FFFFFF */
+    --border: 221 12% 31%; /* #484F58 */
+    --input: 221 12% 31%; /* #484F58 */
+    --ring: 216 87% 65%; /* Primary */
+    --background: 224 71% 4%; /* #0D1117 */
+    --destructive: 11 82% 65%; /* Brighter for dark */
+    --destructive-foreground: 0 0% 100%; /* #FFFFFF */
+    --success: 148 58% 58%; /* Brighter for dark */
+    --success-foreground: 0 0% 100%; /* #FFFFFF */
+    --warning: 48 100% 55%; /* Brighter for dark */
+    --warning-foreground: 0 0% 100%; /* #FFFFFF */
   }
 }
 
@@ -364,22 +399,43 @@
   .atlassian-gap-16 { gap: var(--space-16); }
   .atlassian-gap-24 { gap: var(--space-24); }
 
+  /* Atlassian Animation Utility Classes */
+  .atlassian-float {
+    animation: atlassian-float 3s var(--ease-decelerate) infinite;
+  }
+  
+  .atlassian-pulse {
+    animation: atlassian-pulse 2s var(--ease-standard) infinite;
+  }
+  
+  .atlassian-fade-in {
+    animation: atlassian-fade-in var(--duration-medium) var(--ease-entrance) forwards;
+  }
+  
+  .atlassian-fade-out {
+    animation: atlassian-fade-out var(--duration-short) var(--ease-exit) forwards;
+  }
+  
+  .atlassian-scale-in {
+    animation: atlassian-scale-in var(--duration-medium) var(--ease-entrance) forwards;
+  }
+
   /* Transition Aliases - Remove circular dependencies */
   .transition-atlassian-alias-standard { 
-    transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
-    transition-duration: 200ms;
+    transition-timing-function: var(--ease-standard);
+    transition-duration: var(--duration-short);
   }
   .transition-atlassian-alias-entrance { 
-    transition-timing-function: cubic-bezier(0.15, 1, 0.3, 1);
-    transition-duration: 250ms;
+    transition-timing-function: var(--ease-entrance);
+    transition-duration: var(--duration-medium);
   }
   .transition-atlassian-alias-exit { 
-    transition-timing-function: cubic-bezier(0.6, 0, 0.85, 0.15);
-    transition-duration: 200ms;
+    transition-timing-function: var(--ease-exit);
+    transition-duration: var(--duration-short);
   }
   .transition-atlassian-alias-decelerate { 
-    transition-timing-function: cubic-bezier(0, 0, 0.3, 1);
-    transition-duration: 300ms;
+    transition-timing-function: var(--ease-decelerate);
+    transition-duration: var(--duration-medium);
   }
 }
 
@@ -410,28 +466,28 @@
 
   /* Atlassian Easing Functions */
   .transition-atlassian-entrance {
-    transition-timing-function: cubic-bezier(0.15, 1, 0.3, 1);
-    transition-duration: 250ms;
+    transition-timing-function: var(--ease-entrance);
+    transition-duration: var(--duration-medium);
   }
 
   .transition-atlassian-exit {
-    transition-timing-function: cubic-bezier(0.6, 0, 0.85, 0.15);
-    transition-duration: 200ms;
+    transition-timing-function: var(--ease-exit);
+    transition-duration: var(--duration-short);
   }
 
   .transition-atlassian-standard {
-    transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
-    transition-duration: 200ms;
+    transition-timing-function: var(--ease-standard);
+    transition-duration: var(--duration-short);
   }
 
   .transition-atlassian-decelerate {
-    transition-timing-function: cubic-bezier(0, 0, 0.3, 1);
-    transition-duration: 300ms;
+    transition-timing-function: var(--ease-decelerate);
+    transition-duration: var(--duration-medium);
   }
 
   /* Atlassian Interactive States */
   .atlassian-interactive {
-    transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    transition: all var(--duration-short) var(--ease-standard);
     cursor: pointer;
   }
 
@@ -443,6 +499,7 @@
   .atlassian-interactive:active {
     transform: translateY(0);
     box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25);
+    transition: all var(--duration-micro) var(--ease-exit);
   }
 
   .atlassian-interactive:focus {
@@ -474,7 +531,7 @@
     font-weight: 500;
     min-height: 40px;
     cursor: pointer;
-    transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    transition: all var(--duration-short) var(--ease-standard);
   }
 
   .btn-atlassian-primary:hover {
@@ -486,6 +543,7 @@
   .btn-atlassian-primary:active {
     background: hsl(var(--primary) / 0.8);
     transform: translateY(0);
+    transition: all var(--duration-micro) var(--ease-exit);
   }
 
   .btn-atlassian-secondary {
@@ -497,7 +555,7 @@
     font-size: 14px;
     font-weight: 500;
     min-height: 40px;
-    transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    transition: all var(--duration-short) var(--ease-standard);
   }
 
   .btn-atlassian-secondary:hover {
@@ -512,7 +570,7 @@
     border-radius: 8px;
     padding: 24px;
     box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25);
-    transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    transition: all var(--duration-short) var(--ease-standard);
   }
 
   .card-atlassian:hover {
@@ -528,7 +586,7 @@
 
   /* Remove legacy styles */
   .card-hover {
-    transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    transition: all var(--duration-short) var(--ease-standard);
     &:hover {
       transform: translateY(-1px);
       box-shadow: 0 2px 4px rgba(9, 30, 66, 0.25);
@@ -539,6 +597,6 @@
     
     &:active {
       transform: translateY(0px);
-      transition: all 0.1s cubic-bezier(0.6, 0, 0.85, 0.15);
+      transition: all var(--duration-micro) var(--ease-exit);
     }
   }

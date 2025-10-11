@@ -3,19 +3,20 @@ import { Card, CardContent } from "@/ui/common/card";
 import {
   Brain,
   Globe,
-  Download,
   Plus,
   Trophy,
   Search,
-  ExternalLink,
-  Sparkles,
+  Users,
+  Zap,
+  Shield,
+  Star,
 } from "lucide-react";
 import { Button } from "@/ui/common/button";
 import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "关于 AI 导航",
-  description: "AI导航是一个帮助用户发现、分享和收藏优质AI工具与资源的平台。",
+  description: "发现、评估和使用最佳 AI 工具的统一平台。简化 AI 工具选择，提升工作效率。",
 };
 
 export default function AboutPage() {
@@ -43,24 +44,7 @@ export default function AboutPage() {
   ];
 
   const steps = [
-    {
-      icon: <Download className="h-5 w-5" />,
-      title: "安装助手",
-      description: "安装浏览器扩展和AI导航助手脚本，一键采集AI工具信息",
-      action: (
-        <Link href="/scripts/ai-nav-collector.user.js">
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-2 group relative overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-shine animate-background-shine" />
-            <Download className="h-4 w-4 mr-2 transition-transform group-hover:scale-110" />
-            安装脚本
-          </Button>
-        </Link>
-      ),
-    },
+    
     {
       icon: <Plus className="h-5 w-5" />,
       title: "提交工具",
@@ -200,17 +184,7 @@ export default function AboutPage() {
           <p className="text-base text-muted-foreground/90 mb-8 sm:mb-10 px-4">
             我们欢迎各种形式的贡献，无论是提交新的AI工具、改进网站功能，还是提供建议和反馈。
           </p>
-          <a
-            href="https://github.com/liyown/ai-navigation"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary/10 hover:bg-primary/15 text-primary transition-colors duration-500 group"
-          >
-            <span className="text-sm sm:text-base font-medium">
-              访问 GitHub 仓库
-            </span>
-            <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-1 duration-500" />
-          </a>
+    
         </div>
       </section>
     </div>

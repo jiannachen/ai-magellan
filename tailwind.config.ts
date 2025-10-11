@@ -60,22 +60,36 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
 
-        // Apple标准色彩系统
-        "color-blue": "hsl(var(--color-blue))",
-        "color-green": "hsl(var(--color-green))",
-        "color-red": "hsl(var(--color-red))",
-        "color-orange": "hsl(var(--color-orange))",
-        "color-yellow": "hsl(var(--color-yellow))",
+        // Atlassian 2024 Design System Tokens
+        "ds-background-brand-bold": "#0052CC",
+        "ds-background-brand-bold-hovered": "#0747A6", 
+        "ds-background-brand-bold-pressed": "#092E5C",
+        "ds-background-neutral": "#FFFFFF",
+        "ds-background-neutral-subtle": "#F7F8F9",
+        "ds-background-neutral-subtle-hovered": "#F1F2F4",
+        "ds-background-neutral-subtle-pressed": "#DCDFE4",
+        "ds-text": "#172B4D",
+        "ds-text-subtle": "#626F86",
+        "ds-text-subtlest": "#758195",
+        "ds-text-disabled": "#091E424F",
+        "ds-link": "#0052CC",
+        "ds-link-pressed": "#0747A6",
+        "ds-background-success": "#1F845A",
+        "ds-background-success-bold": "#22A06B",
+        "ds-background-warning": "#974F0C",
+        "ds-background-warning-bold": "#E56910",
+        "ds-background-danger": "#C9372C",
+        "ds-background-danger-bold": "#E34935",
 
-        // Atlassian品牌色彩系统
+        // Atlassian品牌色彩系统（保持向后兼容）
         "atlassian-blue": {
           50: "#E9F2FF",
           100: "#CCE0FF", 
           200: "#85B8FF",
           300: "#4A90E2",
-          400: "#2684FF", // Primary Blue
+          400: "#2684FF",
           500: "#0065FF",
-          600: "#0052CC",
+          600: "#0052CC", // Atlassian Official Primary Blue
           700: "#0043A3",
           800: "#003080",
           900: "#002159",
@@ -130,56 +144,61 @@ export default {
           900: "#172B4D", // Dark Text
           1000: "#091E42", // Darkest
         },
-
-        // Apple标签色彩 (Label Colors)
-        "label-primary": "hsl(var(--label-primary))",
-        "label-secondary": "hsl(var(--label-secondary))",
-        "label-tertiary": "hsl(var(--label-tertiary))",
-        "label-quaternary": "hsl(var(--label-quaternary))",
-
-        // Apple填充色彩 (Fill Colors)
-        "fill-primary": "hsl(var(--fill-primary))",
-        "fill-secondary": "hsl(var(--fill-secondary))",
-        "fill-tertiary": "hsl(var(--fill-tertiary))",
-        "fill-quaternary": "hsl(var(--fill-quaternary))",
-
-        // Apple背景色彩 (Background Colors)
-        "background-secondary": "hsl(var(--background-secondary))",
-        "background-tertiary": "hsl(var(--background-tertiary))",
-
-        // Apple分组背景 (Grouped Background)
-        "grouped-background-primary": "hsl(var(--grouped-background-primary))",
-        "grouped-background-secondary": "hsl(var(--grouped-background-secondary))",
-        "grouped-background-tertiary": "hsl(var(--grouped-background-tertiary))",
-
-        // Apple灰度系统
-        "gray-1": "hsl(var(--gray-1))",
-        "gray-2": "hsl(var(--gray-2))",
-        "gray-3": "hsl(var(--gray-3))",
-        "gray-4": "hsl(var(--gray-4))",
-        "gray-5": "hsl(var(--gray-5))",
-        "gray-6": "hsl(var(--gray-6))",
-
-        // 保留原有颜色变量
-        surface: "hsl(var(--surface))",
-        "surface-variant": "hsl(var(--surface-variant))",
-        hover: "hsl(var(--hover))",
-        pressed: "hsl(var(--pressed))",
       },
 
-      // 扩展圆角半径系统
-      // 使用 CSS 变量实现一致的圆角样式
+      // Atlassian Design System Spacing Tokens
+      spacing: {
+        // 原有间距
+        '18': '4.5rem',   // 72px
+        '22': '5.5rem',   // 88px
+        '88': '22rem',    // 352px
+        
+        // Atlassian Design System Spacing
+        'ds-space-025': '2px',
+        'ds-space-050': '4px', 
+        'ds-space-075': '6px',
+        'ds-space-100': '8px',
+        'ds-space-150': '12px',
+        'ds-space-200': '16px',
+        'ds-space-250': '20px',
+        'ds-space-300': '24px',
+        'ds-space-400': '32px',
+        'ds-space-500': '40px',
+        'ds-space-600': '48px',
+        'ds-space-800': '64px',
+        'ds-space-1000': '80px',
+      },
+
+      // Atlassian Border Radius Tokens
       borderRadius: {
         lg: "var(--radius)", // 大圆角
         md: "calc(var(--radius) - 2px)", // 中等圆角
         sm: "calc(var(--radius) - 4px)", // 小圆角
+        
+        // Atlassian Design System Border Radius
+        'ds-050': '2px',
+        'ds-100': '4px',
+        'ds-200': '8px', 
+        'ds-300': '12px',
+        'ds-400': '16px',
+        'ds-round': '50%',
       },
 
-      // 优化间距系统
-      spacing: {
-        '18': '4.5rem',   // 72px
-        '22': '5.5rem',   // 88px
-        '88': '22rem',    // 352px
+      // Atlassian Motion Tokens
+      transitionDuration: {
+        'ds-instant': '0ms',
+        'ds-fast': '100ms',
+        'ds-medium': '200ms', 
+        'ds-slow': '300ms',
+        'ds-slower': '500ms',
+      },
+
+      transitionTimingFunction: {
+        'ds-entrance': 'cubic-bezier(0.15, 1, 0.3, 1)',
+        'ds-exit': 'cubic-bezier(0.6, 0, 0.85, 0.15)',
+        'ds-standard': 'cubic-bezier(0.25, 0.1, 0.25, 1)',
+        'ds-decelerate': 'cubic-bezier(0, 0, 0.3, 1)',
+        'ds-accelerate': 'cubic-bezier(0.7, 0, 1, 0.5)',
       },
 
       // Apple字体系统
@@ -189,18 +208,6 @@ export default {
         'xs': ['0.75rem', { lineHeight: '1.125rem' }], // 12px
         'sm': ['0.875rem', { lineHeight: '1.375rem' }], // 14px
         
-        // Apple字体层级系统
-        'largeTitle': ['34px', { lineHeight: '41px', letterSpacing: '0.374px' }],
-        'title1': ['28px', { lineHeight: '34px', letterSpacing: '0.364px' }],
-        'title2': ['22px', { lineHeight: '28px', letterSpacing: '0.352px' }],
-        'title3': ['20px', { lineHeight: '25px', letterSpacing: '0.38px' }],
-        'headline': ['17px', { lineHeight: '22px', letterSpacing: '-0.43px', fontWeight: '600' }],
-        'body': ['17px', { lineHeight: '22px', letterSpacing: '-0.43px' }],
-        'callout': ['16px', { lineHeight: '21px', letterSpacing: '-0.32px' }],
-        'subhead': ['15px', { lineHeight: '20px', letterSpacing: '-0.24px' }],
-        'footnote': ['13px', { lineHeight: '18px', letterSpacing: '-0.08px' }],
-        'caption1': ['12px', { lineHeight: '16px', letterSpacing: '0px' }],
-        'caption2': ['11px', { lineHeight: '13px', letterSpacing: '0.066px' }],
 
         // Atlassian字体层级系统
         'atlassian-display': ['48px', { lineHeight: '56px', letterSpacing: '-0.02em', fontWeight: '500' }],
@@ -216,19 +223,13 @@ export default {
         'atlassian-caption': ['11px', { lineHeight: '16px', letterSpacing: '0.5px' }],
       },
 
-      // Apple阴影系统
+      // Atlassian阴影系统
       boxShadow: {
         // 保留原有阴影
         'sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
         'md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
         'lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
         
-        // Apple标准阴影
-        'apple-1': '0 1px 3px rgba(0, 0, 0, 0.1)',
-        'apple-2': '0 2px 8px rgba(0, 0, 0, 0.1)',
-        'apple-3': '0 4px 16px rgba(0, 0, 0, 0.1)',
-        'apple-4': '0 8px 32px rgba(0, 0, 0, 0.1)',
-
         // Atlassian阴影系统 (Elevation)
         'atlassian-100': '0 1px 1px rgba(9, 30, 66, 0.25)',
         'atlassian-200': '0 2px 4px rgba(9, 30, 66, 0.25)', 
@@ -236,6 +237,12 @@ export default {
         'atlassian-400': '0 8px 16px rgba(9, 30, 66, 0.25)',
         'atlassian-500': '0 12px 24px rgba(9, 30, 66, 0.25)',
         'atlassian-600': '0 20px 32px rgba(9, 30, 66, 0.25)',
+        
+        // Atlassian Design System Elevation Tokens
+        'ds-raised': '0px 1px 1px rgba(9, 30, 66, 0.25), 0px 0px 1px rgba(9, 30, 66, 0.31)',
+        'ds-overlay': '0px 4px 8px rgba(9, 30, 66, 0.25), 0px 0px 1px rgba(9, 30, 66, 0.31)',
+        'ds-popup': '0px 8px 12px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.31)',
+        'ds-modal': '0px 20px 32px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.31)',
       },
     },
     // 自定义断点，优化移动端体验
@@ -261,6 +268,35 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Atlassian Design System Plugin for Reduced Motion
+    function({ addUtilities, theme, addBase }) {
+      addBase({
+        '@media (prefers-reduced-motion: reduce)': {
+          '*, *::before, *::after': {
+            'animation-duration': '0.01ms !important',
+            'animation-iteration-count': '1 !important',
+            'transition-duration': '0.01ms !important',
+            'scroll-behavior': 'auto !important',
+          },
+        },
+      });
+      
+      addUtilities({
+        '.ds-motion-safe': {
+          '@media (prefers-reduced-motion: no-preference)': {
+            'transition-duration': theme('transitionDuration.ds-medium'),
+            'transition-timing-function': theme('transitionTimingFunction.ds-standard'),
+          },
+        },
+        '.ds-motion-reduce': {
+          '@media (prefers-reduced-motion: reduce)': {
+            'transition-duration': '0.01ms',
+            'animation-duration': '0.01ms',
+          },
+        },
+      });
+    }
+  ],
   darkMode: "class", // 使用 class 策略来控制暗色模式
 } satisfies Config;

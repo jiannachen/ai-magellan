@@ -37,6 +37,7 @@ import { toast } from 'sonner'
 import { useUser } from '@clerk/nextjs'
 import { Reviews } from '@/components/reviews/reviews'
 import { cn } from '@/lib/utils/utils'
+import { useTranslations } from 'next-intl'
 
 interface Website {
   id: number
@@ -104,6 +105,7 @@ interface RelatedTool {
 export default function ToolDetailPage() {
   const params = useParams()
   const { isSignedIn, user } = useUser()
+  const t = useTranslations()
   const [website, setWebsite] = useState<Website | null>(null)
   const [relatedTools, setRelatedTools] = useState<RelatedTool[]>([])
   const [loading, setLoading] = useState(true)
@@ -149,7 +151,7 @@ export default function ToolDetailPage() {
       await fetch(`/api/websites/${params.id}/visit`, { method: 'POST' })
     } catch (error) {
       console.error('Error fetching tool details:', error)
-      toast.error('加载工具详情失败')
+      toast.error(t('tools.detail.load_error'))
     } finally {
       setLoading(false)
     }
@@ -191,7 +193,7 @@ export default function ToolDetailPage() {
 
   const handleLike = async () => {
     if (!isSignedIn) {
-      toast.error('请先登录')
+      toast.error(t('tools.detail.login_required'))
       return
     }
 
@@ -202,17 +204,17 @@ export default function ToolDetailPage() {
       if (response.ok) {
         setIsLiked(!isLiked)
         setLikesCount(prev => isLiked ? prev - 1 : prev + 1)
-        toast.success(isLiked ? '已取消点赞' : '点赞成功')
+        toast.success(isLiked ? t('tools.detail.unlike_success') : t('tools.detail.like_success'))
       }
     } catch (error) {
       console.error('Error toggling like:', error)
-      toast.error('操作失败')
+      toast.error(t('tools.detail.operation_failed'))
     }
   }
 
   const handleFavorite = async () => {
     if (!isSignedIn) {
-      toast.error('请先登录')
+      toast.error(t('tools.detail.login_required'))
       return
     }
 
@@ -232,11 +234,11 @@ export default function ToolDetailPage() {
 
       if (response.ok) {
         setIsFavorited(!isFavorited)
-        toast.success(isFavorited ? '已取消收藏' : '已添加收藏')
+        toast.success(isFavorited ? t('tools.detail.unfavorite_success') : t('tools.detail.favorite_success'))
       }
     } catch (error) {
       console.error('Error toggling favorite:', error)
-      toast.error('操作失败')
+      toast.error(t('tools.detail.operation_failed'))
     }
   }
 
@@ -259,14 +261,14 @@ export default function ToolDetailPage() {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(window.location.href)
-    toast.success('链接已复制到剪贴板')
+    toast.success(t('tools.detail.link_copied'))
   }
 
   const getPricingDisplay = (pricingModel: string, hasFreePlan: boolean, basePrice: string | null) => {
-    if (pricingModel === 'free') return '免费'
-    if (hasFreePlan && basePrice) return `免费试用 • ${basePrice}`
+    if (pricingModel === 'free') return t('tools.detail.sections.pricing.free')
+    if (hasFreePlan && basePrice) return t('tools.detail.sections.pricing.free_trial', { price: basePrice })
     if (basePrice) return basePrice
-    return pricingModel === 'paid' ? '付费' : '联系销售'
+    return pricingModel === 'paid' ? t('tools.detail.sections.pricing.paid') : t('tools.detail.sections.pricing.contact_sales')
   }
 
   if (loading) {
@@ -329,7 +331,7 @@ export default function ToolDetailPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
-          {/* 头部整块介绍区域 - Apple风格 */}
+          {/* 头部整块介绍区域 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -338,48 +340,49 @@ export default function ToolDetailPage() {
               duration: 0.4,
               ease: [0.25, 0.46, 0.45, 0.94]
             }}
-            className="bg-background-secondary rounded-2xl p-8 mb-8 shadow-2"
           >
+            <Card className="p-8 mb-8">
+              <CardContent className="p-0">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* 左侧：工具信息 */}
               <div className="flex flex-col justify-between">
                 <div className="flex items-start gap-6 mb-6">
-                  {/* 工具图标 - Apple风格 */}
+                  {/* 工具图标 */}
                   <div className="relative flex-shrink-0">
                     {website.thumbnail ? (
                       <img 
                         src={website.thumbnail}
                         alt={website.title}
-                        className="w-20 h-20 rounded-2xl object-cover shadow-3"
+                        className="w-20 h-20 rounded-xl object-cover shadow-md"
                       />
                     ) : (
-                      <div className="w-20 h-20 rounded-2xl bg-fill-quaternary flex items-center justify-center shadow-3">
-                        <Globe className="h-10 w-10 text-label-tertiary" />
+                      <div className="w-20 h-20 rounded-xl bg-muted flex items-center justify-center shadow-md">
+                        <Globe className="h-10 w-10 text-muted-foreground" />
                       </div>
                     )}
                     {website.is_featured && (
                       <div className="absolute -top-2 -right-2">
-                        <Badge className="bg-color-blue text-white border-0 rounded-full px-2 py-1 text-caption2">
-                          精选
+                        <Badge className="bg-blue-500 text-white border-0 rounded-full px-2 py-1 text-xs">
+                          {t('tools.detail.featured')}
                         </Badge>
                       </div>
                     )}
                   </div>
 
-                  {/* 工具基本信息 - Apple字体系统 */}
+                  {/* 工具基本信息 */}
                   <div className="flex-1 min-w-0">
-                    <h1 className="text-largeTitle font-normal text-label-primary mb-2 leading-[41px] tracking-[0.37px]">{website.title}</h1>
+                    <h1 className="text-4xl font-semibold text-foreground mb-2">{website.title}</h1>
                     {website.tagline && (
-                      <p className="text-title3 text-label-secondary mb-4 leading-[25px] tracking-[0.38px]">{website.tagline}</p>
+                      <p className="text-xl text-muted-foreground mb-4">{website.tagline}</p>
                     )}
                     
-                    {/* 分类和标签 - Apple风格标签 */}
+                    {/* 分类和标签 */}
                     <div className="flex items-center gap-3 mb-4">
-                      <Badge className="bg-fill-quaternary text-label-primary border-0 rounded-full text-caption1">
+                      <Badge variant="secondary">
                         {website.category.name}
                       </Badge>
                       {tags.length > 0 && tags.slice(0, 3).map((tag, index) => (
-                        <Badge key={index} className="bg-fill-tertiary text-label-secondary border-0 rounded-full text-caption1">
+                        <Badge key={index} variant="outline">
                           {tag.trim()}
                         </Badge>
                       ))}
@@ -387,32 +390,32 @@ export default function ToolDetailPage() {
                   </div>
                 </div>
                 
-                {/* 统计信息 - Apple风格数据 */}
-                <div className="flex items-center gap-6 text-subhead text-label-tertiary mb-6 leading-[20px] tracking-[-0.24px]">
+                {/* 统计信息 */}
+                <div className="flex items-center gap-6 text-sm text-muted-foreground mb-6">
                   <div className="flex items-center gap-2">
-                    <Heart className="h-4 w-4 text-color-red" />
-                    <span>{likesCount} 点赞</span>
+                    <Heart className="h-4 w-4 text-red-500" />
+                    <span>{likesCount} {t('tools.detail.likes')}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Bookmark className="h-4 w-4 text-color-blue" />
-                    <span>{website._count?.websiteFavorites || 0} 收藏</span>
+                    <Bookmark className="h-4 w-4 text-blue-500" />
+                    <span>{website._count?.websiteFavorites || 0} {t('tools.detail.favorites')}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-color-green" />
-                    <span>{website.visits} 访问</span>
+                    <TrendingUp className="h-4 w-4 text-green-500" />
+                    <span>{website.visits} {t('tools.detail.visits')}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-color-yellow" />
+                    <Star className="h-4 w-4 text-yellow-500" />
                     <span>{website.quality_score}/100</span>
                   </div>
                 </div>
 
-                {/* 操作按钮 - Apple风格按钮 */}
+                {/* 操作按钮 */}
                 <div className="flex items-center gap-3 flex-wrap">
                   <Button 
                     size="lg" 
                     asChild
-                    className="bg-color-blue hover:bg-color-blue/80 rounded-xl px-6 h-11 text-body font-semibold transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:opacity-80 hover:-translate-y-px active:opacity-60 active:translate-y-0"
+                    className="bg-primary hover:bg-primary/90"
                   >
                     <a 
                       href={website.url} 
@@ -421,7 +424,7 @@ export default function ToolDetailPage() {
                       className="gap-2"
                     >
                       <ExternalLink className="h-4 w-4" />
-                      访问工具
+                      {t('tools.detail.visit_tool')}
                     </a>
                   </Button>
                   
@@ -430,12 +433,12 @@ export default function ToolDetailPage() {
                     size="lg"
                     onClick={handleLike}
                     className={cn(
-                      "gap-2 rounded-xl px-4 h-11 text-body transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:opacity-80 hover:-translate-y-px active:opacity-60 active:translate-y-0",
-                      isLiked && "border-color-red/30 bg-color-red/5 text-color-red"
+                      "gap-2",
+                      isLiked && "border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
                     )}
                   >
                     <Heart className={cn("h-4 w-4", isLiked && "fill-current")} />
-                    {isLiked ? '已点赞' : '点赞'}
+                    {isLiked ? t('tools.detail.liked') : t('tools.detail.like')}
                   </Button>
 
                   <Button
@@ -443,186 +446,181 @@ export default function ToolDetailPage() {
                     size="lg"
                     onClick={handleFavorite}
                     className={cn(
-                      "gap-2 rounded-xl px-4 h-11 text-body transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:opacity-80 hover:-translate-y-px active:opacity-60 active:translate-y-0",
-                      isFavorited && "border-color-blue/30 bg-color-blue/5 text-color-blue"
+                      "gap-2",
+                      isFavorited && "border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100"
                     )}
                   >
                     <Bookmark className={cn("h-4 w-4", isFavorited && "fill-current")} />
-                    {isFavorited ? '已收藏' : '收藏'}
+                    {isFavorited ? t('tools.detail.favorited') : t('tools.detail.favorite')}
                   </Button>
 
                   <Button
                     variant="outline"
                     size="lg"
                     onClick={handleShare}
-                    className="gap-2 rounded-xl px-4 h-11 text-body transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:opacity-80 hover:-translate-y-px active:opacity-60 active:translate-y-0"
+                    className="gap-2"
                   >
                     <Share2 className="h-4 w-4" />
-                    分享
+                    {t('tools.detail.share')}
                   </Button>
                 </div>
               </div>
 
-              {/* 右侧：动态缓存缩略图/预览 - Apple风格卡片 */}
+              {/* 右侧：缩略图/预览 */}
               <div className="flex items-center justify-center">
-                <div className="bg-fill-quaternary rounded-2xl p-6 w-full h-full min-h-[380px] flex items-center justify-center shadow-1">
+                <div className="bg-muted rounded-lg p-6 w-full h-full min-h-[380px] flex items-center justify-center">
                   {website.thumbnail ? (
                     <div className="w-full h-full flex flex-col items-center justify-center">
                       <img 
                         src={website.thumbnail}
                         alt={`${website.title} 预览`}
-                        className="w-full h-auto rounded-xl object-cover max-h-[320px] shadow-2"
+                        className="w-full h-auto rounded-lg object-cover max-h-[320px] shadow-md"
                       />
-                      <p className="text-caption1 text-label-tertiary mt-3 text-center leading-[16px]">工具预览图</p>
+                      <p className="text-sm text-muted-foreground mt-3 text-center">{t('tools.detail.tool_preview')}</p>
                     </div>
                   ) : (
                     <div className="text-center">
-                      <Monitor className="h-20 w-20 text-label-tertiary mx-auto mb-4" />
-                      <p className="text-subhead text-label-tertiary leading-[20px] tracking-[-0.24px]">暂无预览图</p>
+                      <Monitor className="h-20 w-20 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">{t('tools.detail.no_preview')}</p>
                     </div>
                   )}
                 </div>
               </div>
             </div>
+              </CardContent>
+            </Card>
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* 左侧固定导航栏 - Apple风格 */}
+            {/* 左侧固定导航栏 */}
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-6">
                 {/* 导航菜单 */}
-                <div className="bg-background-secondary rounded-2xl overflow-hidden shadow-2">
-                  <div className="p-4">
+                <Card>
+                  <CardContent className="p-4">
                     <nav className="space-y-1">
                       <a 
                         href="#overview" 
-                        className="flex items-center gap-3 px-3 py-3 rounded-xl text-body font-medium text-label-primary bg-fill-quaternary transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-foreground bg-secondary hover:bg-secondary/80 transition-colors"
                       >
                         <Globe className="h-4 w-4" />
-                        Overview
+                        {t('tools.detail.navigation.overview')}
                       </a>
                       {features && features.length > 0 && (
                         <a 
                           href="#features" 
-                          className="flex items-center gap-3 px-3 py-3 rounded-xl text-body font-normal text-label-secondary hover:bg-fill-quaternary hover:text-label-primary transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                          className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-normal text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                         >
                           <Zap className="h-4 w-4" />
-                          Features
+                          {t('tools.detail.navigation.features')}
                         </a>
                       )}
                       {website.use_cases && website.use_cases.length > 0 && (
                         <a 
                           href="#use-cases" 
-                          className="flex items-center gap-3 px-3 py-3 rounded-xl text-body font-normal text-label-secondary hover:bg-fill-quaternary hover:text-label-primary transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                          className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-normal text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                         >
                           <Target className="h-4 w-4" />
-                          Use Cases
+                          {t('tools.detail.navigation.use_cases')}
                         </a>
                       )}
                       {website.target_audience && Array.isArray(website.target_audience) && website.target_audience.length > 0 && (
                         <a 
                           href="#target-audience" 
-                          className="flex items-center gap-3 px-3 py-3 rounded-xl text-body font-normal text-label-secondary hover:bg-fill-quaternary hover:text-label-primary transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                          className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-normal text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                         >
                           <Users className="h-4 w-4" />
-                          Target Audience
+                          {t('tools.detail.navigation.target_audience')}
                         </a>
                       )}
-                      <a 
-                        href="#pros-cons" 
-                        className="flex items-center gap-3 px-3 py-3 rounded-xl text-body font-normal text-label-secondary hover:bg-fill-quaternary hover:text-label-primary transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
-                      >
-                        <CheckCircle className="h-4 w-4" />
-                        Pros & Cons
-                      </a>
                       {website.faq && website.faq.length > 0 && (
                         <a 
                           href="#faq" 
-                          className="flex items-center gap-3 px-3 py-3 rounded-xl text-body font-normal text-label-secondary hover:bg-fill-quaternary hover:text-label-primary transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                          className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-normal text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                         >
                           <HelpCircle className="h-4 w-4" />
-                          FAQ
+                          {t('tools.detail.navigation.faq')}
                         </a>
                       )}
                       <a 
                         href="#pricing" 
-                        className="flex items-center gap-3 px-3 py-3 rounded-xl text-body font-normal text-label-secondary hover:bg-fill-quaternary hover:text-label-primary transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-normal text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                       >
                         <DollarSign className="h-4 w-4" />
-                        Pricing Plans
+                        {t('tools.detail.navigation.pricing')}
                       </a>
                       <a 
                         href="#more-info" 
-                        className="flex items-center gap-3 px-3 py-3 rounded-xl text-body font-normal text-label-secondary hover:bg-fill-quaternary hover:text-label-primary transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-normal text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                       >
                         <Globe className="h-4 w-4" />
-                        More Info
+                        {t('tools.detail.navigation.more_info')}
                       </a>
                       <a 
                         href="#analytics" 
-                        className="flex items-center gap-3 px-3 py-3 rounded-xl text-body font-normal text-label-secondary hover:bg-fill-quaternary hover:text-label-primary transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-normal text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                       >
                         <TrendingUp className="h-4 w-4" />
-                        Analytics
+                        {t('tools.detail.navigation.analytics')}
                       </a>
                       <a 
                         href="#reviews" 
-                        className="flex items-center gap-3 px-3 py-3 rounded-xl text-body font-normal text-label-secondary hover:bg-fill-quaternary hover:text-label-primary transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-normal text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                       >
                         <Star className="h-4 w-4" />
-                        Reviews
+                        {t('tools.detail.navigation.reviews')}
                       </a>
                       <a 
                         href="#alternatives" 
-                        className="flex items-center gap-3 px-3 py-3 rounded-xl text-body font-normal text-label-secondary hover:bg-fill-quaternary hover:text-label-primary transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-normal text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                       >
                         <Target className="h-4 w-4" />
-                        Alternatives
+                        {t('tools.detail.navigation.alternatives')}
                       </a>
                     </nav>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
 
-                {/* Featured 相关产品推荐 - Apple风格 */}
+                {/* Featured 相关产品推荐 */}
                 {relatedTools.length > 0 && (
-                  <div className="bg-background-secondary rounded-2xl shadow-2">
-                    <div className="p-4">
-                      <h3 className="text-headline font-semibold text-label-primary mb-4 flex items-center gap-2 leading-[22px] tracking-[-0.43px]">
+                  <Card>
+                    <CardContent className="p-4">
+                      <h3 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
                         <Award className="h-4 w-4" />
-                        Featured
+                        {t('tools.detail.featured')}
                       </h3>
                       <div className="space-y-3">
                         {relatedTools.slice(0, 3).map((tool) => (
                           <Link key={tool.id} href={`/tools/${tool.id}`}>
-                            <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-fill-quaternary transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer">
+                            <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-secondary transition-colors cursor-pointer">
                               {tool.thumbnail ? (
                                 <img 
                                   src={tool.thumbnail}
                                   alt={tool.title}
-                                  className="w-8 h-8 rounded-lg object-cover shadow-1"
+                                  className="w-8 h-8 rounded-md object-cover"
                                 />
                               ) : (
-                                <div className="w-8 h-8 rounded-lg bg-fill-quaternary flex items-center justify-center">
-                                  <Globe className="h-4 w-4 text-label-tertiary" />
+                                <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center">
+                                  <Globe className="h-4 w-4 text-muted-foreground" />
                                 </div>
                               )}
                               <div className="flex-1 min-w-0">
-                                <p className="text-footnote font-medium text-label-primary truncate leading-[18px] tracking-[-0.08px]">{tool.title}</p>
-                                <p className="text-caption1 text-label-tertiary truncate leading-[16px]">{tool.category.name}</p>
+                                <p className="text-sm font-medium text-foreground truncate">{tool.title}</p>
+                                <p className="text-xs text-muted-foreground truncate">{tool.category.name}</p>
                               </div>
                             </div>
                           </Link>
                         ))}
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 )}
               </div>
             </div>
 
             {/* 右侧主要内容区域 */}
             <div className="lg:col-span-3 space-y-8">
-              {/* Overview 模块 - Apple风格 */}
+              {/* Overview 模块 */}
               <motion.section
                 id="overview"
                 initial={{ opacity: 0, y: 20 }}
@@ -634,20 +632,22 @@ export default function ToolDetailPage() {
                 }}
                 className="scroll-mt-24"
               >
-                <div className="bg-background-secondary rounded-2xl overflow-hidden shadow-2">
-                  <div className="p-6">
-                    <h3 className="text-title3 font-normal text-label-primary mb-4 flex items-center gap-3 leading-[25px] tracking-[0.38px]">
-                      <Globe className="h-5 w-5 text-color-blue" />
-                      Overview
-                    </h3>
-                    <p className="text-body text-label-secondary leading-[22px] tracking-[-0.43px] leading-relaxed">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3">
+                      <Globe className="h-5 w-5 text-primary" />
+                      {t('tools.detail.navigation.overview')}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed">
                       {website.description}
                     </p>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               </motion.section>
 
-              {/* Features 模块 - Apple风格 */}
+              {/* Features 模块 */}
               {features && features.length > 0 && (
                 <motion.section
                   id="features"
@@ -660,35 +660,37 @@ export default function ToolDetailPage() {
                   }}
                   className="scroll-mt-24"
                 >
-                  <div className="bg-background-secondary rounded-2xl overflow-hidden shadow-2">
-                    <div className="p-6">
-                      <h3 className="text-title3 font-normal text-label-primary mb-6 flex items-center gap-3 leading-[25px] tracking-[0.38px]">
-                        <Zap className="h-5 w-5 text-color-blue" />
-                        Features
-                      </h3>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-3">
+                        <Zap className="h-5 w-5 text-primary" />
+                        {t('tools.detail.navigation.features')}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
                       <div className="space-y-4">
                         {features.map((feature: any, index: number) => (
-                          <div key={index} className="flex items-start gap-4 p-4 rounded-xl bg-fill-quaternary hover:bg-fill-tertiary transition-all duration-200 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]">
-                            <CheckCircle className="h-5 w-5 text-color-green mt-0.5 flex-shrink-0" />
+                          <div key={index} className="flex items-start gap-4 p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                            <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
                             <div className="flex-1">
                               {typeof feature === 'object' && feature.name ? (
                                 <>
-                                  <h4 className="text-callout font-medium text-label-primary mb-1 leading-[21px] tracking-[-0.32px]">{feature.name}</h4>
-                                  <p className="text-subhead text-label-secondary leading-[20px] tracking-[-0.24px]">{feature.description}</p>
+                                  <h4 className="font-medium text-foreground mb-1">{feature.name}</h4>
+                                  <p className="text-muted-foreground">{feature.description}</p>
                                 </>
                               ) : (
-                                <span className="text-callout text-label-primary leading-[21px] tracking-[-0.32px]">{feature}</span>
+                                <span className="text-foreground">{feature}</span>
                               )}
                             </div>
                           </div>
                         ))}
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 </motion.section>
               )}
 
-              {/* Use Cases 模块 - Apple风格 */}
+              {/* Use Cases 模块 */}
               {website.use_cases && Array.isArray(website.use_cases) && website.use_cases.length > 0 && (
                 <motion.section
                   id="use-cases"
@@ -701,26 +703,28 @@ export default function ToolDetailPage() {
                   }}
                   className="scroll-mt-24"
                 >
-                  <div className="bg-background-secondary rounded-2xl overflow-hidden shadow-2">
-                    <div className="p-6">
-                      <h3 className="text-title3 font-normal text-label-primary mb-6 flex items-center gap-3 leading-[25px] tracking-[0.38px]">
-                        <Target className="h-5 w-5 text-color-blue" />
-                        Use Cases
-                      </h3>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-3">
+                        <Target className="h-5 w-5 text-primary" />
+                        {t('tools.detail.navigation.use_cases')}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
                       <div className="space-y-4">
                         {website.use_cases.map((useCase: string, index: number) => (
                           <div key={index} className="flex items-start gap-4">
-                            <div className="w-2 h-2 rounded-full bg-color-blue mt-2 flex-shrink-0 shadow-1"></div>
-                            <p className="text-callout text-label-secondary leading-[21px] tracking-[-0.32px]">{useCase}</p>
+                            <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                            <p className="text-muted-foreground">{useCase}</p>
                           </div>
                         ))}
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 </motion.section>
               )}
 
-              {/* Target Audience 模块 - Apple风格 */}
+              {/* Target Audience 模块 */}
               {website.target_audience && Array.isArray(website.target_audience) && website.target_audience.length > 0 && (
                 <motion.section
                   id="target-audience"
@@ -733,144 +737,27 @@ export default function ToolDetailPage() {
                   }}
                   className="scroll-mt-24"
                 >
-                  <div className="bg-background-secondary rounded-2xl overflow-hidden shadow-2">
-                    <div className="p-6">
-                      <h3 className="text-title3 font-normal text-label-primary mb-6 flex items-center gap-3 leading-[25px] tracking-[0.38px]">
-                        <Users className="h-5 w-5 text-color-blue" />
-                        Target Audience
-                      </h3>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-3">
+                        <Users className="h-5 w-5 text-primary" />
+                        {t('tools.detail.navigation.target_audience')}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
                       <div className="flex flex-wrap gap-3">
                         {website.target_audience.map((audience: string, index: number) => (
-                          <div key={index} className="bg-fill-quaternary text-label-primary rounded-full px-4 py-2 text-subhead font-medium leading-[20px] tracking-[-0.24px] shadow-1">
+                          <Badge key={index} variant="secondary" className="px-4 py-2">
                             {audience}
-                          </div>
+                          </Badge>
                         ))}
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 </motion.section>
               )}
 
-              {/* Pros & Cons 模块 - Apple风格 */}
-              <motion.section
-                id="pros-cons"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ 
-                  delay: 0.42,
-                  duration: 0.4,
-                  ease: [0.25, 0.46, 0.45, 0.94]
-                }}
-                className="scroll-mt-24"
-              >
-                <div className="bg-background-secondary rounded-2xl overflow-hidden shadow-2">
-                  <div className="p-6">
-                    <h3 className="text-title3 font-normal text-label-primary mb-6 flex items-center gap-3 leading-[25px] tracking-[0.38px]">
-                      <CheckCircle className="h-5 w-5 text-color-blue" />
-                      Pros & Cons
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      {/* Pros */}
-                      <div className="space-y-4">
-                        <h4 className="text-headline font-semibold text-color-green flex items-center gap-2 leading-[22px] tracking-[-0.43px]">
-                          <CheckCircle className="h-4 w-4" />
-                          优点
-                        </h4>
-                        <div className="space-y-3">
-                          {/* 基于现有数据生成的优点 */}
-                          {website.has_free_version && (
-                            <div className="flex items-start gap-3">
-                              <div className="w-2 h-2 rounded-full bg-color-green mt-2 flex-shrink-0 shadow-1"></div>
-                              <span className="text-callout text-label-secondary leading-[21px] tracking-[-0.32px]">提供免费版本</span>
-                            </div>
-                          )}
-                          {website.api_available && (
-                            <div className="flex items-start gap-3">
-                              <div className="w-2 h-2 rounded-full bg-color-green mt-2 flex-shrink-0 shadow-1"></div>
-                              <span className="text-callout text-label-secondary leading-[21px] tracking-[-0.32px]">提供API接口</span>
-                            </div>
-                          )}
-                          {website.ssl_enabled && (
-                            <div className="flex items-start gap-3">
-                              <div className="w-2 h-2 rounded-full bg-color-green mt-2 flex-shrink-0 shadow-1"></div>
-                              <span className="text-callout text-label-secondary leading-[21px] tracking-[-0.32px]">安全可靠（SSL加密）</span>
-                            </div>
-                          )}
-                          {website.integrations && Array.isArray(website.integrations) && website.integrations.length > 0 && (
-                            <div className="flex items-start gap-3">
-                              <div className="w-2 h-2 rounded-full bg-color-green mt-2 flex-shrink-0 shadow-1"></div>
-                              <span className="text-callout text-label-secondary leading-[21px] tracking-[-0.32px]">支持多种集成平台</span>
-                            </div>
-                          )}
-                          {website.quality_score && website.quality_score >= 80 && (
-                            <div className="flex items-start gap-3">
-                              <div className="w-2 h-2 rounded-full bg-color-green mt-2 flex-shrink-0 shadow-1"></div>
-                              <span className="text-callout text-label-secondary leading-[21px] tracking-[-0.32px]">高质量评分 ({website.quality_score}/100)</span>
-                            </div>
-                          )}
-                          {((website.ios_app_url || website.android_app_url) || 
-                            (website.desktop_platforms && Array.isArray(website.desktop_platforms) && website.desktop_platforms.length > 0)) && (
-                            <div className="flex items-start gap-3">
-                              <div className="w-2 h-2 rounded-full bg-color-green mt-2 flex-shrink-0 shadow-1"></div>
-                              <span className="text-callout text-label-secondary leading-[21px] tracking-[-0.32px]">支持多平台使用</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Cons */}
-                      <div className="space-y-4">
-                        <h4 className="text-headline font-semibold text-color-red flex items-center gap-2 leading-[22px] tracking-[-0.43px]">
-                          <X className="h-4 w-4" />
-                          缺点
-                        </h4>
-                        <div className="space-y-3">
-                          {/* 基于现有数据生成的缺点 */}
-                          {!website.has_free_version && website.pricing_model !== 'free' && (
-                            <div className="flex items-start gap-3">
-                              <div className="w-2 h-2 rounded-full bg-color-red mt-2 flex-shrink-0 shadow-1"></div>
-                              <span className="text-callout text-label-secondary leading-[21px] tracking-[-0.32px]">无免费版本</span>
-                            </div>
-                          )}
-                          {!website.api_available && (
-                            <div className="flex items-start gap-3">
-                              <div className="w-2 h-2 rounded-full bg-color-red mt-2 flex-shrink-0 shadow-1"></div>
-                              <span className="text-callout text-label-secondary leading-[21px] tracking-[-0.32px]">不提供API接口</span>
-                            </div>
-                          )}
-                          {website.quality_score && website.quality_score < 60 && (
-                            <div className="flex items-start gap-3">
-                              <div className="w-2 h-2 rounded-full bg-color-red mt-2 flex-shrink-0 shadow-1"></div>
-                              <span className="text-callout text-label-secondary leading-[21px] tracking-[-0.32px]">质量评分较低 ({website.quality_score}/100)</span>
-                            </div>
-                          )}
-                          {website.response_time && website.response_time > 2000 && (
-                            <div className="flex items-start gap-3">
-                              <div className="w-2 h-2 rounded-full bg-color-red mt-2 flex-shrink-0 shadow-1"></div>
-                              <span className="text-callout text-label-secondary leading-[21px] tracking-[-0.32px]">响应速度较慢 ({website.response_time}ms)</span>
-                            </div>
-                          )}
-                          {(!website.integrations || !Array.isArray(website.integrations) || website.integrations.length === 0) && (
-                            <div className="flex items-start gap-3">
-                              <div className="w-2 h-2 rounded-full bg-color-red mt-2 flex-shrink-0 shadow-1"></div>
-                              <span className="text-callout text-label-secondary leading-[21px] tracking-[-0.32px]">集成支持有限</span>
-                            </div>
-                          )}
-                          {/* 如果没有明显缺点，显示中性评价 */}
-                          {website.has_free_version && website.api_available && website.quality_score >= 60 && (
-                            <div className="flex items-start gap-3">
-                              <div className="w-2 h-2 rounded-full bg-color-yellow mt-2 flex-shrink-0 shadow-1"></div>
-                              <span className="text-callout text-label-tertiary leading-[21px] tracking-[-0.32px]">需要更多用户反馈评价</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.section>
-
-              {/* FAQ 模块 - Apple风格 */}
+              {/* FAQ 模块 */}
               {website.faq && Array.isArray(website.faq) && website.faq.length > 0 && (
                 <motion.section
                   id="faq"
@@ -883,22 +770,24 @@ export default function ToolDetailPage() {
                   }}
                   className="scroll-mt-24"
                 >
-                  <div className="bg-background-secondary rounded-2xl overflow-hidden shadow-2">
-                    <div className="p-6">
-                      <h3 className="text-title3 font-normal text-label-primary mb-6 flex items-center gap-3 leading-[25px] tracking-[0.38px]">
-                        <HelpCircle className="h-5 w-5 text-color-blue" />
-                        FAQ
-                      </h3>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-3">
+                        <HelpCircle className="h-5 w-5 text-primary" />
+                        {t('tools.detail.navigation.faq')}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
                       <div className="space-y-6">
                         {website.faq.map((item: any, index: number) => (
-                          <div key={index} className="border-b border-fill-quaternary last:border-0 pb-6 last:pb-0">
-                            <h4 className="text-callout font-medium text-label-primary mb-3 leading-[21px] tracking-[-0.32px]">{item.question}</h4>
-                            <p className="text-subhead text-label-secondary leading-[20px] tracking-[-0.24px]">{item.answer}</p>
+                          <div key={index} className="border-b border-border last:border-0 pb-6 last:pb-0">
+                            <h4 className="font-medium text-foreground mb-3">{item.question}</h4>
+                            <p className="text-muted-foreground">{item.answer}</p>
                           </div>
                         ))}
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 </motion.section>
               )}
 
@@ -914,7 +803,7 @@ export default function ToolDetailPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <DollarSign className="h-5 w-5 text-primary" />
-                      Pricing Plans
+                      {t('tools.detail.navigation.pricing')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -922,7 +811,7 @@ export default function ToolDetailPage() {
                       {/* 基本定价信息 */}
                       <div className="flex items-center gap-4 text-sm flex-wrap">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">模型:</span>
+                          <span className="font-medium">{t('tools.detail.sections.pricing.model')}:</span>
                           <Badge variant="outline" className="capitalize">
                             {getPricingDisplay(website.pricing_model, website.has_free_version, website.base_price)}
                           </Badge>
@@ -930,13 +819,13 @@ export default function ToolDetailPage() {
                         {website.has_free_version && (
                           <div className="flex items-center gap-1">
                             <CheckCircle className="h-4 w-4 text-green-500" />
-                            <span className="text-green-600">有免费版本</span>
+                            <span className="text-green-600">{t('tools.detail.sections.pricing.has_free_version')}</span>
                           </div>
                         )}
                         {website.api_available && (
                           <div className="flex items-center gap-1">
                             <CheckCircle className="h-4 w-4 text-blue-500" />
-                            <span className="text-blue-600">API 可用</span>
+                            <span className="text-blue-600">{t('tools.detail.sections.pricing.api_available')}</span>
                           </div>
                         )}
                       </div>
@@ -944,7 +833,7 @@ export default function ToolDetailPage() {
                       {/* 详细定价计划 */}
                       {website.pricing_plans && Array.isArray(website.pricing_plans) && website.pricing_plans.length > 0 && (
                         <div className="space-y-4">
-                          <h4 className="font-medium">定价计划详情</h4>
+                          <h4 className="font-medium">{t('tools.detail.sections.pricing.plan_details')}</h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {website.pricing_plans.map((plan: any, index: number) => (
                               <div key={index} className="border rounded-lg p-4">
@@ -957,7 +846,7 @@ export default function ToolDetailPage() {
                                 </div>
                                 {plan.features && Array.isArray(plan.features) && plan.features.length > 0 && (
                                   <div className="space-y-2">
-                                    <p className="text-sm font-medium text-muted-foreground">包含功能:</p>
+                                    <p className="text-sm font-medium text-muted-foreground">{t('tools.detail.sections.pricing.included_features')}</p>
                                     <ul className="space-y-1">
                                       {plan.features.map((feature: string, featureIndex: number) => (
                                         <li key={featureIndex} className="flex items-start gap-2 text-sm">
@@ -990,21 +879,21 @@ export default function ToolDetailPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Globe className="h-5 w-5 text-primary" />
-                      More Info
+                      {t('tools.detail.navigation.more_info')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* 基本信息 */}
                       <div className="space-y-4">
-                        <h4 className="font-medium">基本信息</h4>
+                        <h4 className="font-medium">{t('tools.detail.sections.more_info.basic_info')}</h4>
                         <div className="space-y-3 text-sm">
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">分类</span>
+                            <span className="text-muted-foreground">{t('tools.detail.sections.more_info.category')}</span>
                             <Badge variant="secondary">{website.category.name}</Badge>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">质量评分</span>
+                            <span className="text-muted-foreground">{t('tools.detail.sections.more_info.quality_score')}</span>
                             <div className="flex items-center gap-1">
                               <Star className="h-4 w-4 text-yellow-500" />
                               <span>{website.quality_score}/100</span>
@@ -1012,20 +901,20 @@ export default function ToolDetailPage() {
                           </div>
                           {website.ssl_enabled && (
                             <div className="flex justify-between">
-                              <span className="text-muted-foreground">安全性</span>
+                              <span className="text-muted-foreground">{t('tools.detail.sections.more_info.security')}</span>
                               <div className="flex items-center gap-1">
                                 <Shield className="h-4 w-4 text-green-500" />
-                                <span>SSL安全</span>
+                                <span>{t('tools.detail.sections.more_info.ssl_secure')}</span>
                               </div>
                             </div>
                           )}
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">添加时间</span>
+                            <span className="text-muted-foreground">{t('tools.detail.sections.more_info.added_time')}</span>
                             <span>{new Date(website.created_at).toLocaleDateString('zh-CN')}</span>
                           </div>
                           {website.email && (
                             <div className="flex justify-between">
-                              <span className="text-muted-foreground">联系邮箱</span>
+                              <span className="text-muted-foreground">{t('tools.detail.sections.more_info.contact_email')}</span>
                               <a href={`mailto:${website.email}`} className="text-blue-600 hover:text-blue-800 text-sm">
                                 {website.email}
                               </a>
@@ -1038,24 +927,24 @@ export default function ToolDetailPage() {
                       {((website.ios_app_url || website.android_app_url || website.web_app_url) || 
                         (website.desktop_platforms && Array.isArray(website.desktop_platforms) && website.desktop_platforms.length > 0)) && (
                         <div className="space-y-4">
-                          <h4 className="font-medium">平台支持</h4>
+                          <h4 className="font-medium">{t('tools.detail.sections.more_info.platform_support')}</h4>
                           <div className="space-y-3">
                             {website.ios_app_url && (
                               <a href={website.ios_app_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-blue-600 hover:text-blue-800 transition-colors">
                                 <Smartphone className="h-4 w-4" />
-                                <span className="text-sm">iOS 应用</span>
+                                <span className="text-sm">{t('tools.detail.sections.more_info.ios_app')}</span>
                               </a>
                             )}
                             {website.android_app_url && (
                               <a href={website.android_app_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-blue-600 hover:text-blue-800 transition-colors">
                                 <Smartphone className="h-4 w-4" />
-                                <span className="text-sm">Android 应用</span>
+                                <span className="text-sm">{t('tools.detail.sections.more_info.android_app')}</span>
                               </a>
                             )}
                             {website.web_app_url && (
                               <a href={website.web_app_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-blue-600 hover:text-blue-800 transition-colors">
                                 <Globe className="h-4 w-4" />
-                                <span className="text-sm">Web 应用</span>
+                                <span className="text-sm">{t('tools.detail.sections.more_info.web_app')}</span>
                               </a>
                             )}
                             {website.desktop_platforms && Array.isArray(website.desktop_platforms) && website.desktop_platforms.length > 0 && (
@@ -1077,7 +966,7 @@ export default function ToolDetailPage() {
                       {/* 集成 */}
                       {website.integrations && Array.isArray(website.integrations) && website.integrations.length > 0 && (
                         <div className="space-y-4">
-                          <h4 className="font-medium">集成平台</h4>
+                          <h4 className="font-medium">{t('tools.detail.sections.more_info.integration_platforms')}</h4>
                           <div className="flex flex-wrap gap-2">
                             {website.integrations.map((integration: string, index: number) => (
                               <Badge key={index} variant="outline" className="text-xs">
@@ -1091,7 +980,7 @@ export default function ToolDetailPage() {
                       {/* 社交媒体 */}
                       {(website.twitter_url || website.linkedin_url || website.facebook_url || website.instagram_url || website.youtube_url || website.discord_url) && (
                         <div className="space-y-4">
-                          <h4 className="font-medium">社交媒体</h4>
+                          <h4 className="font-medium">{t('tools.detail.sections.more_info.social_media')}</h4>
                           <div className="space-y-3">
                             {website.twitter_url && (
                               <a href={website.twitter_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-blue-600 hover:text-blue-800 transition-colors">
@@ -1137,26 +1026,26 @@ export default function ToolDetailPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <TrendingUp className="h-5 w-5 text-primary" />
-                      Analytics
+                      {t('tools.detail.navigation.analytics')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                       <div className="text-center">
                         <div className="text-2xl font-bold text-primary">{website.visits}</div>
-                        <div className="text-sm text-muted-foreground">总访问量</div>
+                        <div className="text-sm text-muted-foreground">{t('tools.detail.sections.analytics.total_visits')}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-red-500">{likesCount}</div>
-                        <div className="text-sm text-muted-foreground">点赞数</div>
+                        <div className="text-sm text-muted-foreground">{t('tools.detail.sections.analytics.likes_count')}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-blue-500">{website._count?.websiteFavorites || 0}</div>
-                        <div className="text-sm text-muted-foreground">收藏数</div>
+                        <div className="text-sm text-muted-foreground">{t('tools.detail.sections.analytics.favorites_count')}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-yellow-500">{website.quality_score}</div>
-                        <div className="text-sm text-muted-foreground">质量评分</div>
+                        <div className="text-sm text-muted-foreground">{t('tools.detail.sections.analytics.quality_score')}</div>
                       </div>
                     </div>
                     
@@ -1168,7 +1057,7 @@ export default function ToolDetailPage() {
                             <div className="text-center">
                               <div className="flex items-center justify-center gap-2 mb-2">
                                 <Clock className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-sm font-medium">响应时间</span>
+                                <span className="text-sm font-medium">{t('tools.detail.sections.analytics.response_time')}</span>
                               </div>
                               <div className={cn(
                                 "text-lg font-semibold",
@@ -1183,7 +1072,7 @@ export default function ToolDetailPage() {
                             <div className="text-center">
                               <div className="flex items-center justify-center gap-2 mb-2">
                                 <Shield className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-sm font-medium">域名权威度</span>
+                                <span className="text-sm font-medium">{t('tools.detail.sections.analytics.domain_authority')}</span>
                               </div>
                               <div className="text-lg font-semibold text-blue-500">
                                 {website.domain_authority}/100
@@ -1198,7 +1087,7 @@ export default function ToolDetailPage() {
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-2 mb-2">
                         <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">收录时间</span>
+                        <span className="text-sm font-medium">{t('tools.detail.sections.analytics.added_date')}</span>
                       </div>
                       <div className="text-sm text-muted-foreground">
                         {new Date(website.created_at).toLocaleDateString('zh-CN', {
@@ -1236,7 +1125,7 @@ export default function ToolDetailPage() {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Target className="h-5 w-5 text-primary" />
-                        Alternatives
+                        {t('tools.detail.navigation.alternatives')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -1261,7 +1150,7 @@ export default function ToolDetailPage() {
                                     <div className="flex items-center gap-2 mb-1">
                                       <h4 className="font-medium truncate">{tool.title}</h4>
                                       {tool.is_featured && (
-                                        <Badge variant="outline" className="text-xs">精选</Badge>
+                                        <Badge variant="outline" className="text-xs">{t('tools.detail.sections.alternatives.featured')}</Badge>
                                       )}
                                     </div>
                                     <p className="text-xs text-muted-foreground line-clamp-2 mb-2">

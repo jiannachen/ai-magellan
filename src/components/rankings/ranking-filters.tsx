@@ -3,6 +3,7 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/common/select';
 import { Button } from '@/ui/common/button';
 import { Calendar, Clock, TrendingUp } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface RankingFiltersProps {
   timeRange: string;
@@ -18,12 +19,12 @@ interface RankingFiltersProps {
 }
 
 const timeRangeOptions = [
-  { value: 'all', label: 'All Time', icon: Clock },
-  { value: 'today', label: 'Today', icon: Clock },
-  { value: 'week', label: 'This Week', icon: Calendar },
-  { value: 'month', label: 'This Month', icon: Calendar },
-  { value: 'quarter', label: 'This Quarter', icon: TrendingUp },
-  { value: 'year', label: 'This Year', icon: TrendingUp }
+  { value: 'all', labelKey: 'filters.time_range.all_time', icon: Clock },
+  { value: 'today', labelKey: 'filters.time_range.today', icon: Clock },
+  { value: 'week', labelKey: 'filters.time_range.this_week', icon: Calendar },
+  { value: 'month', labelKey: 'filters.time_range.this_month', icon: Calendar },
+  { value: 'quarter', labelKey: 'filters.time_range.this_quarter', icon: TrendingUp },
+  { value: 'year', labelKey: 'filters.time_range.this_year', icon: TrendingUp }
 ];
 
 export default function RankingFilters({
@@ -34,6 +35,7 @@ export default function RankingFilters({
   categories,
   currentType
 }: RankingFiltersProps) {
+  const tRank = useTranslations('pages.rankings');
   const currentTimeRange = timeRangeOptions.find(option => option.value === timeRange);
 
   return (
@@ -42,16 +44,14 @@ export default function RankingFilters({
       <div className="flex items-center gap-2">
         <Calendar className="h-4 w-4 text-muted-foreground" />
         <Select value={timeRange} onValueChange={onTimeRangeChange}>
-          <SelectTrigger className="w-36">
+          <SelectTrigger className="w-auto min-w-[8rem] max-w-[12rem]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {timeRangeOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
-                <div className="flex items-center gap-2">
-                  <option.icon className="h-4 w-4" />
-                  {option.label}
-                </div>
+                <option.icon className="h-4 w-4" />
+                {tRank(option.labelKey)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -62,11 +62,11 @@ export default function RankingFilters({
       <div className="flex items-center gap-2">
         <TrendingUp className="h-4 w-4 text-muted-foreground" />
         <Select value={categoryFilter} onValueChange={onCategoryChange}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-auto min-w-[8rem] max-w-[12rem]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="all">{tRank('filters.category_all')}</SelectItem>
             {categories.map((category) => (
               <SelectItem key={category.id} value={category.slug}>
                 {category.name}
@@ -78,7 +78,7 @@ export default function RankingFilters({
 
       {/* Quick Time Range Buttons */}
       <div className="flex gap-2">
-        {['week', 'month', 'quarter'].map((range) => (
+        {(['week', 'month', 'quarter'] as const).map((range) => (
           <Button
             key={range}
             variant={timeRange === range ? 'default' : 'outline'}
@@ -86,7 +86,7 @@ export default function RankingFilters({
             onClick={() => onTimeRangeChange(range)}
             className="text-xs"
           >
-            {range === 'week' ? '7D' : range === 'month' ? '30D' : '3M'}
+            {tRank(`filters.quick_ranges.${range}`)}
           </Button>
         ))}
       </div>
@@ -102,7 +102,7 @@ export default function RankingFilters({
           }}
           className="text-xs"
         >
-          Reset
+          {tRank('filters.reset')}
         </Button>
       )}
     </div>

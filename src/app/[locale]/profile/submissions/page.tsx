@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Edit, ExternalLink, Heart, Bookmark, Calendar, Globe, ArrowLeft, CheckCircle, Clock, Upload } from 'lucide-react'
@@ -53,6 +54,11 @@ export default function MySubmissionsPage() {
     total: 0,
     pages: 0
   })
+  
+  // Translation hooks
+  const t = useTranslations('common')
+  const tProfile = useTranslations('profile.submissions')
+  const tWebsite = useTranslations('website')
 
   useEffect(() => {
     if (isLoaded && isSignedIn) {
@@ -78,7 +84,7 @@ export default function MySubmissionsPage() {
       })
     } catch (error) {
       console.error('Error fetching submissions:', error)
-      setError('加载提交记录失败')
+      setError(tProfile('load_error'))
     } finally {
       setLoading(false)
     }
@@ -86,9 +92,9 @@ export default function MySubmissionsPage() {
 
   const getStatusBadge = (status: string) => {
     const statusMap = {
-      pending: { label: '待审核', variant: 'secondary' as const },
-      approved: { label: '已通过', variant: 'default' as const },
-      rejected: { label: '已拒绝', variant: 'destructive' as const }
+      pending: { label: tProfile('status_pending'), variant: 'secondary' as const },
+      approved: { label: tProfile('status_approved'), variant: 'default' as const },
+      rejected: { label: tProfile('status_rejected'), variant: 'destructive' as const }
     }
     
     return statusMap[status as keyof typeof statusMap] || { label: status, variant: 'secondary' as const }
@@ -100,7 +106,7 @@ export default function MySubmissionsPage() {
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-muted-foreground">加载中...</p>
+            <p className="text-muted-foreground">{t('loading')}</p>
           </div>
         </div>
       </ProfileLayout>
@@ -113,14 +119,14 @@ export default function MySubmissionsPage() {
         <div className="p-6">
           <Card>
             <CardHeader>
-              <CardTitle>需要登录</CardTitle>
+              <CardTitle>{tProfile('login_required')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                请先登录以查看您的提交记录。
+                {tProfile('login_description')}
               </p>
               <Link href="/auth/signin">
-                <Button>立即登录</Button>
+                <Button>{tProfile('login_now')}</Button>
               </Link>
             </CardContent>
           </Card>
@@ -135,13 +141,13 @@ export default function MySubmissionsPage() {
         {/* 页面头部 */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold mb-2">我的提交</h1>
-            <p className="text-muted-foreground">管理您提交的AI工具</p>
+            <h1 className="text-2xl font-bold mb-2">{tProfile('title')}</h1>
+            <p className="text-muted-foreground">{tProfile('description')}</p>
           </div>
           <Link href="/submit">
             <Button>
               <Globe className="h-4 w-4 mr-2" />
-              提交新工具
+              {tProfile('submit_new_tool')}
             </Button>
           </Link>
         </div>
@@ -152,7 +158,7 @@ export default function MySubmissionsPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">总提交数</p>
+                  <p className="text-sm text-muted-foreground">{tProfile('total_submissions')}</p>
                   <p className="text-2xl font-bold text-primary">{pagination.total}</p>
                 </div>
                 <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -165,7 +171,7 @@ export default function MySubmissionsPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">已通过</p>
+                  <p className="text-sm text-muted-foreground">{tProfile('approved')}</p>
                   <p className="text-2xl font-bold text-green-600">
                     {submissions.filter(w => w.status === 'approved').length}
                   </p>
@@ -180,7 +186,7 @@ export default function MySubmissionsPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">待审核</p>
+                  <p className="text-sm text-muted-foreground">{tProfile('pending_review')}</p>
                   <p className="text-2xl font-bold text-yellow-600">
                     {submissions.filter(w => w.status === 'pending').length}
                   </p>
@@ -209,19 +215,19 @@ export default function MySubmissionsPage() {
           <Card>
             <CardContent className="p-6 text-center">
               <p className="text-destructive mb-4">{error}</p>
-              <Button onClick={() => fetchSubmissions()}>重试</Button>
+              <Button onClick={() => fetchSubmissions()}>{tProfile('retry')}</Button>
             </CardContent>
           </Card>
         ) : submissions.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center">
               <Globe className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">还没有提交任何工具</h3>
+              <h3 className="text-lg font-medium mb-2">{tProfile('no_submissions')}</h3>
               <p className="text-muted-foreground mb-4">
-                开始分享您发现的优质AI工具吧！
+                {tProfile('no_submissions_desc')}
               </p>
               <Link href="/submit">
-                <Button>提交第一个工具</Button>
+                <Button>{tProfile('submit_first_tool')}</Button>
               </Link>
             </CardContent>
           </Card>
@@ -243,7 +249,7 @@ export default function MySubmissionsPage() {
                             {website.title}
                           </h3>
                           {website.is_featured && (
-                            <Badge variant="default">精选</Badge>
+                            <Badge variant="default">{tWebsite('featured')}</Badge>
                           )}
                           <Badge {...getStatusBadge(website.status)}>
                             {getStatusBadge(website.status).label}
@@ -299,17 +305,17 @@ export default function MySubmissionsPage() {
                   disabled={pagination.page === 1}
                   onClick={() => fetchSubmissions(pagination.page - 1)}
                 >
-                  上一页
+                  {t('previous')}
                 </Button>
                 <span className="flex items-center px-4">
-                  第 {pagination.page} / {pagination.pages} 页
+                  {tProfile('page_info', { current: pagination.page, total: pagination.pages })}
                 </span>
                 <Button
                   variant="outline"
                   disabled={pagination.page === pagination.pages}
                   onClick={() => fetchSubmissions(pagination.page + 1)}
                 >
-                  下一页
+                  {t('next')}
                 </Button>
               </div>
             )}
