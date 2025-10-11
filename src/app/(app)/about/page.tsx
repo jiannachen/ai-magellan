@@ -57,7 +57,7 @@ export default function AboutPage() {
             className="mt-2 group relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-shine animate-background-shine" />
-            <Plus className="h-4 w-4 mr-2 transition-transform group-hover:scale-110" />
+            <Plus className="h-4 w-4 mr-2 subtle-scale" />
             提交网站
           </Button>
         </Link>
@@ -75,7 +75,7 @@ export default function AboutPage() {
             className="mt-2 group relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-shine animate-background-shine" />
-            <Search className="h-4 w-4 mr-2 transition-transform group-hover:scale-110" />
+            <Search className="h-4 w-4 mr-2 subtle-scale" />
             开始探索
           </Button>
         </Link>

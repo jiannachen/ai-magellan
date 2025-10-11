@@ -25,7 +25,11 @@ import {
   Flame,
   Compass,
   Map,
-  Route
+  Route,
+  Anchor,
+  Telescope,
+  Ship,
+  Navigation
 } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -50,37 +54,43 @@ interface RankingsHomePageProps {
   totalTools: number;
 }
 
+// 探险排行榜类型 - 航海主题图标
 const rankingTypes = [
   {
     key: 'popular',
-    icon: TrendingUp,
-    href: '/rankings/popular'
+    icon: Ship, // 热门航线
+    href: '/rankings/popular',
+    color: 'magellan-teal'
   },
   {
     key: 'top-rated',
-    icon: Crown,
-    href: '/rankings/top-rated'
+    icon: Crown, // 传奇宝藏
+    href: '/rankings/top-rated',
+    color: 'magellan-gold'
   },
   {
     key: 'trending',
-    icon: Zap,
-    href: '/rankings/trending'
+    icon: Flame, // 新兴信标 
+    href: '/rankings/trending',
+    color: 'magellan-coral'
   },
   {
     key: 'free',
-    icon: CheckCircle,
-    href: '/rankings/free'
+    icon: Anchor, // 免费港湾
+    href: '/rankings/free',
+    color: 'magellan-mint'
   },
   {
     key: 'new',
-    icon: Clock,
-    href: '/rankings/new'
-  }
-  ,
+    icon: Telescope, // 新发现
+    href: '/rankings/new',
+    color: 'primary'
+  },
   {
     key: 'monthly-hot',
-    icon: TrendingUp,
-    href: '/rankings/monthly-hot'
+    icon: Flame, // 月度热潮
+    href: '/rankings/monthly-hot',
+    color: 'magellan-coral'
   }
 ];
 
@@ -99,191 +109,321 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
   };
 
   const WebsiteCard = ({ website, rank }: { website: any; rank: number }) => (
-    <div className="relative">
-      {/* 排名标识 - Atlassian风格 */}
+    <div className="relative group">
+      {/* 排名宝藏标识 - 航海主题 */}
       <div className={cn(
-        "absolute -top-2 -left-2 z-10 w-6 h-6 rounded-full flex items-center justify-center",
-        "text-atlassian-caption font-medium",
-        rank === 1 ? 'bg-primary text-primary-foreground' :
-        rank === 2 ? 'bg-muted-foreground text-background' :
-        rank === 3 ? 'bg-orange-500 text-white' :
-        'bg-muted text-muted-foreground'
+        "absolute -top-2 -left-2 z-10 w-8 h-8 rounded-xl flex items-center justify-center",
+        "text-xs font-bold shadow-lg border transition-all duration-300",
+        "subtle-scale",
+        rank === 1 ? 'bg-gradient-to-br from-magellan-gold to-magellan-coral text-white border-magellan-gold/30 professional-glow' :
+        rank === 2 ? 'bg-gradient-to-br from-primary to-magellan-teal text-white border-primary/30' :
+        rank === 3 ? 'bg-gradient-to-br from-magellan-coral to-magellan-gold text-white border-magellan-coral/30' :
+        'bg-gradient-to-br from-muted to-background text-muted-foreground border-border'
       )}>
-        {rank}
+        {rank <= 3 ? (
+          <Crown className="h-3 w-3" />
+        ) : (
+          rank
+        )}
       </div>
+      
+      {/* 发现标记 - 宝藏效果 */}
+      {rank <= 3 && (
+        <div className={cn(
+          "absolute -top-1 -right-1 z-10 w-4 h-4 rounded-full",
+          "bg-gradient-to-br from-magellan-gold to-magellan-coral",
+          "animate-pulse shadow-lg",
+          rank === 1 ? 'professional-glow' : ''
+        )}>
+          <Star className="h-2 w-2 text-white m-1" />
+        </div>
+      )}
+      
       <CompactCard website={website} onVisit={handleVisit} />
     </div>
   );
 
-  const RankingSection = ({ type, title, description, icon: Icon, data }: any) => (
-    <section className="py-10 px-4"> {/* 减少垂直间距 */}
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6"> {/* 减少底部间距 */}
-          <div className="flex items-center gap-3"> {/* 减少gap */}
+  const RankingSection = ({ type, title, description, icon: Icon, data, color = 'primary' }: any) => (
+    <section className="py-16 px-4 relative">
+      {/* 海域背景装饰 */}
+      <div className="absolute inset-0 opacity-6 pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-primary/3 to-transparent rounded-full blur-3xl professional-float"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-magellan-teal/3 to-transparent rounded-full blur-2xl professional-decoration" style={{animationDelay: '2s'}}></div>
+      </div>
+      
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            {/* 探险图标 - 罗盘风格 */}
             <div className={cn(
-              "p-2.5 rounded-lg", // 使用8px圆角，减少padding
-              "bg-primary/10 border border-primary/20"
+              "w-14 h-14 rounded-2xl flex items-center justify-center relative group",
+              `bg-gradient-to-br from-${color}/15 to-${color}/5`,
+              `border border-${color}/20 shadow-lg`,
+              "subtle-scale"
             )}>
-              <Icon className="h-5 w-5 text-primary" />
+              <Icon className={cn(
+                "h-7 w-7 transition-colors duration-300",
+                `text-${color} group-hover:text-${color}`
+              )} />
+              {/* 发光环效果 */}
+              <div className={cn(
+                "absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500",
+                `bg-gradient-to-br from-${color}/20 to-transparent`
+              )}></div>
             </div>
-            <div>
-              <h2 className="text-atlassian-h3 font-medium">{title}</h2> {/* 使用Atlassian字体层级 */}
-              <p className="text-atlassian-body text-muted-foreground">{description}</p>
+            <div className="space-y-1">
+              <h2 className={cn(
+                "text-atlassian-h3 font-semibold text-foreground",
+                "flex items-center gap-2"
+              )}>
+                🏆 {title}
+              </h2>
+              <p className="text-atlassian-body text-muted-foreground flex items-center gap-2">
+                <Compass className="h-4 w-4 text-magellan-teal professional-compass" />
+                {description}
+              </p>
             </div>
           </div>
+          
+          {/* 探索更多按钮 - 航海风格 */}
           <Link href={`/rankings/${type}`}>
             <Button 
               variant="outline" 
               className={cn(
-                "hidden md:flex items-center gap-2",
-                "btn-atlassian-secondary",
-                "rounded-md px-4 py-2",
-                "text-atlassian-body"
+                "hidden md:flex items-center gap-2 group",
+                "px-4 py-2 rounded-xl",
+                "bg-gradient-to-r from-transparent to-primary/5",
+                "border border-primary/20 hover:border-primary/40",
+                "text-primary hover:bg-primary/10",
+                "subtle-hover",
+                "shadow-md hover:shadow-lg"
               )}
             >
+              <Route className="h-4 w-4 subtle-rotate" />
               {tRank('view_all')}
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {data.slice(0, 8).map((website: any, index: number) => (
+        {/* 宝藏发现网格 - 海洋主题 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {data.slice(0, 12).map((website: any, index: number) => (
             <motion.div
               key={website.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ 
-                duration: 0.3, 
-                delay: index * 0.05, // 减少延迟间隔
-                ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+                duration: 0.4, 
+                delay: index * 0.08,
+                ease: [0.15, 1, 0.3, 1] // 海洋波浪效果
               }}
+              className="group"
             >
               <WebsiteCard website={website} rank={index + 1} />
             </motion.div>
           ))}
         </div>
 
-        {/* Mobile View All Button - Atlassian风格 */}
-        <div className="mt-5 text-center md:hidden"> {/* 减少上边距 */}
+        {/* 移动端探索按钮 - 航海CTA */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.6 }}
+          className="mt-10 text-center md:hidden"
+        >
           <Link href={`/rankings/${type}`}>
-            <Button className={cn(
-              "w-full",
-              "btn-atlassian-primary",
-              "rounded-md",
-              "text-atlassian-body"
-            )}>
-              {tRank('view_all_with_title', { title })}
-              <ArrowRight className="h-4 w-4 ml-2" />
+            <Button 
+              size="lg"
+              className={cn(
+                "w-full max-w-sm",
+                `bg-gradient-to-r from-${color} to-${color}/80`,
+                `hover:from-${color}/90 hover:to-${color}/70`,
+                "text-white rounded-xl px-6 py-4",
+                "shadow-lg hover:shadow-xl",
+                "subtle-hover",
+                "border border-primary/20"
+              )}
+            >
+              <Ship className="h-5 w-5 mr-2 professional-float" />
+              ⚓ {tRank('view_all_with_title', { title })}
+              <ExternalLink className="h-4 w-4 ml-2" />
             </Button>
           </Link>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section - Atlassian风格 */}
-      <section className="py-12 px-4 bg-primary/5"> {/* 减少垂直间距，使用简洁背景 */}
-        <div className="max-w-6xl mx-auto text-center">
+      {/* Hero Section - AI Magellan 探险排行榜 */}
+      <section className="relative py-24 px-4 bg-gradient-to-br from-primary/5 via-background to-magellan-coral/3 overflow-hidden">
+        {/* 海洋装饰背景元素 */}
+        <div className="absolute inset-0 opacity-8 pointer-events-none">
+          <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-br from-primary/4 to-transparent rounded-full blur-3xl professional-float"></div>
+          <div className="absolute bottom-10 left-10 w-96 h-96 bg-gradient-to-tr from-magellan-gold/3 to-transparent rounded-full blur-3xl professional-decoration" style={{animationDelay: '2s'}}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-magellan-coral/2 to-magellan-teal/2 rounded-full blur-2xl professional-decoration active" style={{animationDelay: '4s'}}></div>
+        </div>
+        
+        <div className="max-w-6xl mx-auto text-center relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
-              duration: 0.3,
-              ease: [0.15, 1, 0.3, 1] // Atlassian entrance缓动
+              duration: 0.6,
+              ease: [0.15, 1, 0.3, 1]
             }}
-            className="space-y-4" // 减少间距
+            className="space-y-8"
           >
-            <div className="flex items-center justify-center gap-3 mb-4"> {/* 减少底部间距 */}
-              <Compass className="h-10 w-10 text-primary" /> {/* 稍微减小图标 */}
-              <h1 className={cn(
-                "text-atlassian-display md:text-atlassian-display", // 使用Atlassian字体层级
-                "font-medium tracking-tight"
-              )}>
-                {tRank('home_header_title')}
-              </h1>
+            {/* 探险徽章 */}
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 rounded-full bg-gradient-to-r from-primary/10 to-magellan-gold/10 border border-primary/20 shadow-lg">
+              <Trophy className="h-5 w-5 text-primary professional-glow" />
+              <span className="text-sm font-semibold text-primary">🏆 {tRank('hero.badge')}</span>
+              <div className="w-2 h-2 rounded-full bg-magellan-coral professional-glow"></div>
             </div>
-            <p className="text-atlassian-body-large text-muted-foreground max-w-3xl mx-auto">
-              {tRank('home_header_subtitle')}
+            
+            <h1 className={cn(
+              "text-5xl md:text-6xl lg:text-7xl font-bold leading-tight",
+              "bg-gradient-to-r from-primary via-magellan-gold to-magellan-coral bg-clip-text text-transparent"
+            )}>
+              🗺️ {tRank('home_header_title')}
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+              ⚓ {tRank('home_header_subtitle')}
             </p>
           </motion.div>
 
-          {/* Quick Stats - Atlassian风格 */}
+          {/* 探险统计 - 航海数据 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
-              duration: 0.3, 
-              delay: 0.1,
-              ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+              duration: 0.5, 
+              delay: 0.3
             }}
-            className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto" // 减少间距
+            className="mt-16 flex justify-center gap-8 text-sm text-muted-foreground flex-wrap"
           >
-            <div className="text-center">
-              <div className="text-atlassian-h4 font-medium text-primary">{totalTools}+</div> {/* 使用Atlassian字体 */}
-              <div className="text-atlassian-caption text-muted-foreground">{tRank('stats.tools_charted')}</div>
+            <div className="flex items-center gap-2 group">
+              <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <Compass className="h-4 w-4 text-primary professional-compass" />
+              </div>
+              <span className="font-medium">{totalTools}+ {tRank('stats.tools_charted')}</span>
             </div>
-            <div className="text-center">
-              <div className="text-atlassian-h4 font-medium text-primary">{categories.length}</div>
-              <div className="text-atlassian-caption text-muted-foreground">{tRank('stats.territories')}</div>
+            <div className="flex items-center gap-2 group">
+              <div className="p-2 rounded-full bg-magellan-teal/10 group-hover:bg-magellan-teal/20 transition-colors">
+                <Map className="h-4 w-4 text-magellan-teal professional-float" />
+              </div>
+              <span className="font-medium">{categories.length} {tRank('stats.territories')}</span>
             </div>
-            <div className="text-center">
-              <div className="text-atlassian-h4 font-medium text-primary">{rankingTypes.length}</div>
-              <div className="text-atlassian-caption text-muted-foreground">{tRank('stats.expedition_types')}</div>
+            <div className="flex items-center gap-2 group">
+              <div className="p-2 rounded-full bg-magellan-gold/10 group-hover:bg-magellan-gold/20 transition-colors">
+                <Trophy className="h-4 w-4 text-magellan-gold professional-glow" />
+              </div>
+              <span className="font-medium">{rankingTypes.length} {tRank('stats.expedition_types')}</span>
             </div>
-            <div className="text-center">
-              <div className="text-atlassian-h4 font-medium text-primary">24/7</div>
-              <div className="text-atlassian-caption text-muted-foreground">{tRank('stats.navigation')}</div>
+            <div className="flex items-center gap-2 group">
+              <div className="p-2 rounded-full bg-magellan-mint/10 group-hover:bg-magellan-mint/20 transition-colors">
+                <Navigation className="h-4 w-4 text-magellan-mint professional-compass" />
+              </div>
+              <span className="font-medium">24/7 {tRank('stats.navigation')}</span>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Ranking Types Overview - Atlassian风格 */}
-      <section className="py-12 px-4"> {/* 减少垂直间距 */}
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10"> {/* 减少底部间距 */}
-            <h2 className="text-atlassian-h2 font-medium mb-3">{tRank('overview_title')}</h2> {/* 使用Atlassian字体层级 */}
-            <p className="text-atlassian-body-large text-muted-foreground">
+      {/* 探险类型概览 - 航海地图 */}
+      <section className="py-20 px-4 relative">
+        {/* 海域背景装饰 */}
+        <div className="absolute inset-0 opacity-6 pointer-events-none">
+          <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-magellan-teal/4 to-transparent rounded-full blur-3xl professional-decoration"></div>
+          <div className="absolute bottom-20 left-20 w-80 h-80 bg-gradient-to-tr from-primary/3 to-transparent rounded-full blur-2xl professional-decoration active"></div>
+        </div>
+        
+        <div className="max-w-6xl mx-auto relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl font-bold mb-4 flex items-center justify-center gap-3">
+              🗺️ {tRank('overview_title')}
+            </h2>
+            <p className="text-lg text-muted-foreground">
               {tRank('overview_subtitle')}
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"> {/* 减少间距 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {rankingTypes.map((type, index) => (
               <motion.div
                 key={type.key}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 40, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ 
-                  duration: 0.3, 
-                  delay: index * 0.05, // 减少延迟间隔
-                  ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+                  duration: 0.5, 
+                  delay: index * 0.1,
+                  ease: [0.15, 1, 0.3, 1]
                 }}
               >
                 <Link href={type.href}>
                   <Card className={cn(
-                    "h-full group cursor-pointer",
-                    "card-atlassian", // 使用Atlassian卡片样式
-                    "border-border/60 hover:border-primary/30",
-                    "transition-atlassian-standard"
+                    "group h-full relative overflow-hidden cursor-pointer",
+                    "bg-card/95 backdrop-blur-sm border border-primary/10",
+                    "rounded-2xl shadow-lg hover:shadow-2xl",
+                    "transition-all duration-500 ease-out",
+                    "subtle-hover",
+                    "hover:border-primary/30"
                   )}>
-                    <CardContent className="p-5 text-center"> {/* 减少内边距 */}
-                      <div className={cn(
-                        "mx-auto w-12 h-12 rounded-lg flex items-center justify-center mb-4", // 使用8px圆角，减小尺寸
-                        "bg-primary/10 border border-primary/20",
-                        "group-hover:bg-primary/15 transition-atlassian-standard"
-                      )}>
-                        <type.icon className="h-6 w-6 text-primary" /> {/* 稍微减小图标 */}
+                    {/* 背景效果 */}
+                    <div className={cn(
+                      "absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500",
+                      `bg-gradient-to-br from-${type.color}/3 via-transparent to-${type.color}/5`
+                    )}></div>
+                    
+                    <CardContent className="p-8 relative z-10 text-center">
+                      {/* 探险图标 */}
+                      <div className="mb-6 flex justify-center">
+                        <div className={cn(
+                          "relative p-4 rounded-2xl",
+                          `bg-${type.color}/15 border border-${type.color}/20`,
+                          "subtle-scale",
+                          "transition-all duration-500"
+                        )}>
+                          <type.icon className={cn(
+                            "h-8 w-8 transition-colors duration-300",
+                            `text-${type.color} group-hover:text-${type.color}`
+                          )} />
+                          {/* 发光环效果 */}
+                          <div className={cn(
+                            "absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500",
+                            `bg-gradient-to-br from-${type.color}/20 to-transparent`
+                          )}></div>
+                        </div>
                       </div>
-                      <h3 className="text-atlassian-h5 font-medium mb-2">{tRank(`types.${type.key}.title`)}</h3> {/* 使用Atlassian字体 */}
-                      <p className="text-atlassian-body text-muted-foreground mb-3">{tRank(`types.${type.key}.description`)}</p>
-                      <div className="text-atlassian-body text-primary font-medium group-hover:underline">
-                        {tRank('actions.view_expedition')} →
+                      
+                      <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors duration-300">
+                        {tRank(`types.${type.key}.title`)}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                        {tRank(`types.${type.key}.description`)}
+                      </p>
+                      <div className={cn(
+                        "text-sm font-medium flex items-center justify-center gap-2",
+                        `text-${type.color} group-hover:underline transition-colors duration-300`
+                      )}>
+                        <Compass className="h-4 w-4" />
+                        {tRank('actions.view_expedition')}
+                        <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform duration-300" />
                       </div>
                     </CardContent>
+                    
+                    {/* 底部装饰线 */}
+                    <div className={cn(
+                      "absolute bottom-0 left-0 right-0 h-1 scale-x-0 group-hover:scale-x-100 transition-transform duration-500",
+                      `bg-gradient-to-r from-transparent via-${type.color}/60 to-transparent`
+                    )}></div>
                   </Card>
                 </Link>
               </motion.div>
@@ -292,14 +432,15 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
         </div>
       </section>
 
-      {/* Top Rankings Preview */}
-      <div className="bg-muted/20"> {/* 减少背景透明度 */}
+      {/* 顶级探险预览 */}
+      <div className="bg-muted/30">
         <RankingSection
           type="top-rated"
           title={tRank('types.top-rated.title')}
           description={tRank('types.top-rated.description')}
           icon={Crown}
           data={rankings.topRated}
+          color="magellan-gold"
         />
       </div>
 
@@ -307,64 +448,83 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
         type="popular"
         title={tRank('types.popular.title')}
         description={tRank('types.popular.description')}
-        icon={TrendingUp}
+        icon={Ship}
         data={rankings.popular}
+        color="magellan-teal"
       />
 
-      <div className="bg-muted/20"> {/* 减少背景透明度 */}
+      <div className="bg-muted/30">
         <RankingSection
           type="trending"
           title={tRank('types.trending.title')}
           description={tRank('types.trending.description')}
           icon={Flame}
           data={rankings.trending}
+          color="magellan-coral"
         />
       </div>
 
-      {/* CTA Section - Atlassian风格 */}
-      <section className="py-16 px-4 bg-primary/5"> {/* 减少垂直间距，使用简洁背景 */}
-        <div className="max-w-4xl mx-auto text-center">
+      {/* 最终CTA Section - 启程探险 */}
+      <section className="py-20 px-4 relative bg-gradient-to-br from-primary/5 via-background to-magellan-coral/3">
+        {/* 背景装饰 */}
+        <div className="absolute inset-0 opacity-25">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-primary/3 to-transparent"></div>
+        </div>
+        
+        <div className="max-w-5xl mx-auto text-center relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
-              duration: 0.3,
-              ease: [0.15, 1, 0.3, 1] // Atlassian entrance缓动
+              duration: 0.6,
+              ease: [0.15, 1, 0.3, 1]
             }}
-            className="space-y-4" // 减少间距
+            className="space-y-8"
           >
-            <h2 className="text-atlassian-h2 font-medium"> {/* 使用Atlassian字体层级 */}
-              {tRank('cta_title')}
+            <h2 className="text-4xl font-bold flex items-center justify-center gap-3">
+              ⚓ {tRank('cta_title')}
             </h2>
-            <p className="text-atlassian-body-large text-muted-foreground">
-              {tRank('cta_subtitle')}
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              🌊 {tRank('cta_subtitle')}
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center"> {/* 减少间距 */}
+            
+            <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Link href="/categories">
                 <Button 
                   size="lg" 
                   className={cn(
-                    "w-full sm:w-auto",
-                    "btn-atlassian-primary",
-                    "rounded-md px-6 py-3",
-                    "text-atlassian-body font-medium"
+                    "group relative overflow-hidden",
+                    "bg-gradient-to-r from-primary to-magellan-teal",
+                    "hover:from-primary/90 hover:to-magellan-teal/90",
+                    "text-white rounded-xl px-8 py-4 text-lg font-semibold",
+                    "shadow-lg hover:shadow-xl",
+                    "subtle-hover"
                   )}
                 >
-                  {tRank('cta_navigate_by_territory')}
+                  <div className="relative flex items-center gap-3">
+                    <Map className="h-5 w-5 subtle-rotate" />
+                    🗺️ {tRank('cta_navigate_by_territory')}
+                  </div>
                 </Button>
               </Link>
+              
               <Link href="/submit">
                 <Button 
                   size="lg" 
                   variant="outline" 
                   className={cn(
-                    "w-full sm:w-auto",
-                    "btn-atlassian-secondary",
-                    "rounded-md px-6 py-3",
-                    "text-atlassian-body font-medium"
+                    "group",
+                    "border-2 border-primary/30 hover:border-primary/60",
+                    "bg-background/80 hover:bg-primary/5 backdrop-blur-sm",
+                    "rounded-xl px-8 py-4 text-lg font-semibold",
+                    "shadow-lg hover:shadow-xl",
+                    "subtle-hover"
                   )}
                 >
-                  {tRank('cta_chart_discovery')}
+                  <div className="flex items-center gap-3">
+                    <Anchor className="h-5 w-5 text-primary subtle-rotate" />
+                    ⚓ {tRank('cta_chart_discovery')}
+                  </div>
                 </Button>
               </Link>
             </div>

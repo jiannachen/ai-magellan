@@ -1,0 +1,510 @@
+[
+  {
+    "id": "1",
+    "name": "ChatGPT",
+    "tagline": "OpenAI's conversational AI assistant",
+    "description": "ChatGPT is an AI-powered chatbot that can have natural conversations, answer questions, help with writing, coding, and more.",
+    "slug": "chatgpt",
+    "url": "https://chatgpt.com",
+    "website": "https://chatgpt.com",
+    "featuredAt": "2023-01-01T00:00:00Z",
+    "createdAt": "2023-01-01T00:00:00Z",
+    "votesCount": 5000,
+    "commentsCount": 1200,
+    "reviewsRating": 4.8,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/chatgpt-logo.png"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/chatgpt-screenshot.png",
+        "type": "image"
+      }
+    ],
+    "makers": [
+      {
+        "name": "OpenAI Team",
+        "username": "openai",
+        "profileImage": "https://ph-avatars.imgix.net/openai.jpg"
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "AI",
+            "slug": "ai"
+          }
+        },
+        {
+          "node": {
+            "name": "Productivity",
+            "slug": "productivity"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "2",
+    "name": "Claude",
+    "tagline": "Anthropic's helpful AI assistant",
+    "description": "Claude is an AI assistant created by Anthropic that can help with analysis, writing, math, coding, creative tasks, and more.",
+    "slug": "claude",
+    "url": "https://claude.ai",
+    "website": "https://claude.ai",
+    "featuredAt": "2023-03-01T00:00:00Z",
+    "createdAt": "2023-03-01T00:00:00Z",
+    "votesCount": 4200,
+    "commentsCount": 980,
+    "reviewsRating": 4.7,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/claude-logo.png"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/claude-screenshot.png",
+        "type": "image"
+      }
+    ],
+    "makers": [
+      {
+        "name": "Anthropic Team",
+        "username": "anthropic",
+        "profileImage": "https://ph-avatars.imgix.net/anthropic.jpg"
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "AI",
+            "slug": "ai"
+          }
+        },
+        {
+          "node": {
+            "name": "Assistant",
+            "slug": "ai-assistant"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "3",
+    "name": "Midjourney",
+    "tagline": "AI-powered image generation",
+    "description": "Midjourney is an AI art generator that creates stunning images from text descriptions using advanced machine learning.",
+    "slug": "midjourney",
+    "url": "https://midjourney.com",
+    "website": "https://midjourney.com",
+    "featuredAt": "2022-08-01T00:00:00Z",
+    "createdAt": "2022-08-01T00:00:00Z",
+    "votesCount": 6500,
+    "commentsCount": 2100,
+    "reviewsRating": 4.6,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/midjourney-logo.png"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/midjourney-art.png",
+        "type": "image"
+      }
+    ],
+    "makers": [
+      {
+        "name": "David Holz",
+        "username": "david",
+        "profileImage": "https://ph-avatars.imgix.net/david.jpg"
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "AI",
+            "slug": "ai"
+          }
+        },
+        {
+          "node": {
+            "name": "Design",
+            "slug": "design"
+          }
+        },
+        {
+          "node": {
+            "name": "Art",
+            "slug": "art"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "4",
+    "name": "Notion AI",
+    "tagline": "AI writing assistant in Notion",
+    "description": "Notion AI helps you write better and think bigger by providing AI-powered writing assistance directly in your Notion workspace.",
+    "slug": "notion-ai",
+    "url": "https://notion.so/ai",
+    "website": "https://notion.so/ai",
+    "featuredAt": "2023-02-01T00:00:00Z",
+    "createdAt": "2023-02-01T00:00:00Z",
+    "votesCount": 3800,
+    "commentsCount": 750,
+    "reviewsRating": 4.5,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/notion-logo.png"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/notion-ai-demo.png",
+        "type": "image"
+      }
+    ],
+    "makers": [
+      {
+        "name": "Notion Team",
+        "username": "notion",
+        "profileImage": "https://ph-avatars.imgix.net/notion.jpg"
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "AI",
+            "slug": "ai"
+          }
+        },
+        {
+          "node": {
+            "name": "Productivity",
+            "slug": "productivity"
+          }
+        },
+        {
+          "node": {
+            "name": "Writing",
+            "slug": "writing"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "5",
+    "name": "GitHub Copilot",
+    "tagline": "Your AI pair programmer",
+    "description": "GitHub Copilot is an AI coding assistant that helps developers write code faster with AI-powered code completions.",
+    "slug": "github-copilot",
+    "url": "https://github.com/features/copilot",
+    "website": "https://github.com/features/copilot",
+    "featuredAt": "2021-10-01T00:00:00Z",
+    "createdAt": "2021-10-01T00:00:00Z",
+    "votesCount": 4500,
+    "commentsCount": 1100,
+    "reviewsRating": 4.4,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/copilot-logo.png"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/copilot-coding.png",
+        "type": "image"
+      }
+    ],
+    "makers": [
+      {
+        "name": "GitHub Team",
+        "username": "github",
+        "profileImage": "https://ph-avatars.imgix.net/github.jpg"
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "AI",
+            "slug": "ai"
+          }
+        },
+        {
+          "node": {
+            "name": "Developer Tools",
+            "slug": "developer-tools"
+          }
+        },
+        {
+          "node": {
+            "name": "Coding",
+            "slug": "coding"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "6",
+    "name": "Canva AI",
+    "tagline": "AI-powered design made simple",
+    "description": "Canva's AI features help you create stunning designs with text-to-image generation, background removal, and smart design suggestions.",
+    "slug": "canva-ai",
+    "url": "https://canva.com/ai",
+    "website": "https://canva.com/ai",
+    "featuredAt": "2023-04-01T00:00:00Z",
+    "createdAt": "2023-04-01T00:00:00Z",
+    "votesCount": 3200,
+    "commentsCount": 680,
+    "reviewsRating": 4.3,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/canva-logo.png"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/canva-ai-design.png",
+        "type": "image"
+      }
+    ],
+    "makers": [
+      {
+        "name": "Canva Team",
+        "username": "canva",
+        "profileImage": "https://ph-avatars.imgix.net/canva.jpg"
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "AI",
+            "slug": "ai"
+          }
+        },
+        {
+          "node": {
+            "name": "Design",
+            "slug": "design"
+          }
+        },
+        {
+          "node": {
+            "name": "Graphics",
+            "slug": "graphics"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "7",
+    "name": "Perplexity",
+    "tagline": "AI-powered search engine",
+    "description": "Perplexity is an AI search engine that provides accurate, real-time answers with citations from reliable sources.",
+    "slug": "perplexity",
+    "url": "https://perplexity.ai",
+    "website": "https://perplexity.ai",
+    "featuredAt": "2023-05-01T00:00:00Z",
+    "createdAt": "2023-05-01T00:00:00Z",
+    "votesCount": 2800,
+    "commentsCount": 520,
+    "reviewsRating": 4.2,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/perplexity-logo.png"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/perplexity-search.png",
+        "type": "image"
+      }
+    ],
+    "makers": [
+      {
+        "name": "Perplexity Team",
+        "username": "perplexity",
+        "profileImage": "https://ph-avatars.imgix.net/perplexity.jpg"
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "AI",
+            "slug": "ai"
+          }
+        },
+        {
+          "node": {
+            "name": "Search",
+            "slug": "search"
+          }
+        },
+        {
+          "node": {
+            "name": "Research",
+            "slug": "research"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "8",
+    "name": "Loom AI",
+    "tagline": "AI-powered video messaging",
+    "description": "Loom AI helps you create better video messages with AI-generated titles, summaries, and chapters for your recordings.",
+    "slug": "loom-ai",
+    "url": "https://loom.com/ai",
+    "website": "https://loom.com/ai",
+    "featuredAt": "2023-06-01T00:00:00Z",
+    "createdAt": "2023-06-01T00:00:00Z",
+    "votesCount": 2400,
+    "commentsCount": 450,
+    "reviewsRating": 4.1,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/loom-logo.png"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/loom-video.png",
+        "type": "image"
+      }
+    ],
+    "makers": [
+      {
+        "name": "Loom Team",
+        "username": "loom",
+        "profileImage": "https://ph-avatars.imgix.net/loom.jpg"
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "AI",
+            "slug": "ai"
+          }
+        },
+        {
+          "node": {
+            "name": "Video",
+            "slug": "video"
+          }
+        },
+        {
+          "node": {
+            "name": "Communication",
+            "slug": "communication"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "9",
+    "name": "Jasper AI",
+    "tagline": "AI content creation platform",
+    "description": "Jasper AI helps marketing teams create high-quality content faster with AI-powered writing tools and templates.",
+    "slug": "jasper-ai",
+    "url": "https://jasper.ai",
+    "website": "https://jasper.ai",
+    "featuredAt": "2022-12-01T00:00:00Z",
+    "createdAt": "2022-12-01T00:00:00Z",
+    "votesCount": 3600,
+    "commentsCount": 820,
+    "reviewsRating": 4,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/jasper-logo.png"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/jasper-writing.png",
+        "type": "image"
+      }
+    ],
+    "makers": [
+      {
+        "name": "Jasper Team",
+        "username": "jasper",
+        "profileImage": "https://ph-avatars.imgix.net/jasper.jpg"
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "AI",
+            "slug": "ai"
+          }
+        },
+        {
+          "node": {
+            "name": "Marketing",
+            "slug": "marketing"
+          }
+        },
+        {
+          "node": {
+            "name": "Content",
+            "slug": "content"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "10",
+    "name": "Runway ML",
+    "tagline": "AI video creation and editing",
+    "description": "Runway ML provides AI-powered video editing tools including text-to-video generation, background removal, and creative effects.",
+    "slug": "runway-ml",
+    "url": "https://runwayml.com",
+    "website": "https://runwayml.com",
+    "featuredAt": "2023-07-01T00:00:00Z",
+    "createdAt": "2023-07-01T00:00:00Z",
+    "votesCount": 2200,
+    "commentsCount": 380,
+    "reviewsRating": 4.2,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/runway-logo.png"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/runway-video.png",
+        "type": "image"
+      }
+    ],
+    "makers": [
+      {
+        "name": "Runway Team",
+        "username": "runway",
+        "profileImage": "https://ph-avatars.imgix.net/runway.jpg"
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "AI",
+            "slug": "ai"
+          }
+        },
+        {
+          "node": {
+            "name": "Video",
+            "slug": "video"
+          }
+        },
+        {
+          "node": {
+            "name": "Creative",
+            "slug": "creative"
+          }
+        }
+      ]
+    }
+  }
+]

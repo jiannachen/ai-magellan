@@ -2,6 +2,114 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== AI MAGELLAN 专业级海洋主题动画 ===== */
+/* 核心原则：微妙、专业、有意义的动画效果 */
+/* 更新：进一步优化hover效果，避免视觉过载 */
+
+/* 基础浮动动画 - 减少幅度，增加专业感 */
+@keyframes gentle-float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-1px); }  /* 从-2px进一步减少到-1px */
+  100% { transform: translateY(0px); }
+}
+
+/* 微妙的渐变效果 */
+@keyframes subtle-gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 专业级罗盘旋转 - 慢速、稳定 */
+@keyframes professional-compass-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 质感波纹效果 - 低调专业 */
+@keyframes professional-ripple {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  50% { transform: scale(1); opacity: 0.3; }
+  100% { transform: scale(1.2); opacity: 0; }
+}
+
+/* 微妙的高光效果 - 仅在交互时显示 */
+@keyframes subtle-glow {
+  0% { box-shadow: 0 0 3px rgba(59, 130, 246, 0.1); }  /* 进一步减弱 */
+  50% { box-shadow: 0 0 8px rgba(59, 130, 246, 0.15); }
+  100% { box-shadow: 0 0 3px rgba(59, 130, 246, 0.1); }
+}
+
+/* 专业级淡入动画 */
+@keyframes professional-fade-in {
+  0% { 
+    opacity: 0;
+    transform: translateY(4px);  /* 从8px减少到4px */
+  }
+  100% { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 品质感的缩放效果 - 极其微妙 */
+@keyframes quality-scale {
+  0% { 
+    opacity: 0;
+    transform: scale(0.99);  /* 从0.98改为0.99 */
+  }
+  100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 专业级海洋背景效果 - 降低强度 */
+@keyframes professional-ocean-wave {
+  0% { 
+    transform: translateY(0) scale(1);
+    border-radius: 50% 48% 52% 46%;
+  }
+  50% { 
+    transform: translateY(-1px) scale(1.005);  /* 进一步减小 */
+    border-radius: 48% 52% 50% 48%;
+  }
+  100% { 
+    transform: translateY(0) scale(1);
+    border-radius: 50% 48% 52% 46%;
+  }
+}
+
+/* 专业微妙流动效果 */
+@keyframes professional-current {
+  0% { 
+    transform: translateX(0) rotate(0deg) scale(1);
+    opacity: 0.15;  /* 进一步降低 */
+  }
+  50% { 
+    transform: translateX(5px) rotate(1deg) scale(1.01);  /* 减小移动和旋转 */
+    opacity: 0.2;
+  }
+  100% { 
+    transform: translateX(0) rotate(0deg) scale(1);
+    opacity: 0.15;
+  }
+}
+
+/* 质感发现动画 - 专业级 */
+@keyframes professional-discovery {
+  0% { 
+    transform: scale(0.98) translateY(5px);  /* 减小初始偏移 */
+    opacity: 0;
+    filter: blur(1px);  /* 减少模糊 */
+  }
+  100% { 
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
 /* Atlassian-compliant keyframe animations */
 @keyframes atlassian-float {
   0% {
@@ -70,6 +178,45 @@
 */
 @layer base {
   :root {
+    /* ===== AI MAGELLAN 海洋主题色彩系统 ===== */
+    /* 主品牌色 - 深海蓝 */
+    --magellan-primary: 214 79% 30%; /* #0B4F8C - 深海主蓝 */
+    --magellan-primary-hover: 214 79% 26%; /* #083A6B - 深海蓝悬停 */
+    --magellan-primary-light: 213 62% 58%; /* #4A90E2 - 浅海蓝 */
+    --magellan-primary-subtle: 214 79% 30% / 0.08; /* 主蓝透明版 */
+
+    /* 辅助色 - 海洋光谱 */
+    --magellan-navy: 229 80% 32%; /* #1E3A8A - 海军蓝 */
+    --magellan-teal: 170 97% 27%; /* #0F766E - 青绿 */
+    --magellan-coral: 27 94% 54%; /* #F97316 - 珊瑚橙 */
+    --magellan-gold: 32 91% 43%; /* #D97706 - 金色 */
+    --magellan-mint: 161 84% 39%; /* #10B981 - 薄荷绿 */
+
+    /* 中性色 - 海洋深度 */
+    --magellan-depth-900: 218 54% 11%; /* #0C1B2A - 深海黑 */
+    --magellan-depth-800: 220 14% 22%; /* #1F2937 - 深水灰 */
+    --magellan-depth-700: 219 12% 30%; /* #374151 - 中水灰 */
+    --magellan-depth-600: 219 10% 40%; /* #4B5563 - 浅水灰 */
+    --magellan-depth-100: 216 33% 97%; /* #F1F5F9 - 浅海泡沫 */
+    --magellan-depth-50: 210 20% 98%; /* #F8FAFC - 海面白 */
+
+    /* 语义化色彩 - 航海信号 */
+    --magellan-success: var(--magellan-mint); /* 安全到港 */
+    --magellan-warning: var(--magellan-coral); /* 注意信号 */
+    --magellan-danger: 0 84% 60%; /* #DC2626 - 危险信号 */
+    --magellan-info: var(--magellan-teal); /* 信息浮标 */
+
+    /* 交互色 - 探索状态 */
+    --magellan-discovered: var(--magellan-gold); /* 已发现 */
+    --magellan-bookmarked: var(--magellan-coral); /* 已标记 */
+    --magellan-trending: var(--magellan-mint); /* 热门航线 */
+
+    /* 渐变系统 */
+    --ocean-surface: linear-gradient(135deg, hsl(var(--magellan-primary)) 0%, hsl(var(--magellan-primary-light)) 100%);
+    --deep-sea: linear-gradient(180deg, hsl(var(--magellan-navy)) 0%, hsl(var(--magellan-primary)) 100%);
+    --treasure-glow: radial-gradient(circle, hsl(var(--magellan-coral)) 0%, transparent 70%);
+    --safe-harbor: linear-gradient(45deg, hsl(var(--magellan-mint)) 0%, hsl(var(--magellan-teal)) 100%);
+
     /* Atlassian Brand Colors */
     --atlassian-blue-50: 233 242 255;    /* #E9F2FF */
     --atlassian-blue-100: 204 224 255;   /* #CCE0FF */
@@ -132,8 +279,8 @@
     --atlassian-neutral-900: 221 43% 20%;/* #172B4D Dark Text */
     --atlassian-neutral-1000: 224 71% 14%;/* #091E42 Darkest */
     
-    /* Primary Brand Color - Atlassian Official Blue */
-    --primary: 216 87% 50%; /* #0052CC - Atlassian官方主品牌色 */
+    /* 融合主色调 - 采用海洋主题但保持专业性 */
+    --primary: var(--magellan-primary); /* 使用海洋深蓝作为主色 */
     --primary-foreground: 0 0% 100%; /* White */
     
     /* System Semantic Colors */
@@ -150,13 +297,13 @@
     --accent-foreground: 221 39% 35%; /* #42526E */
     --border: 219 12% 89%; /* #DFE1E6 */
     --input: 219 12% 89%; /* #DFE1E6 */
-    --ring: 216 87% 50%; /* Primary */
+    --ring: var(--primary); /* Primary */
     --background: 0 0% 100%; /* #FFFFFF */
     --destructive: 11 82% 59%; /* #FF5630 */
     --destructive-foreground: 0 0% 100%; /* White */
-    --success: 148 58% 45%; /* #36B37E */
+    --success: var(--magellan-success); /* 使用海洋薄荷绿 */
     --success-foreground: 0 0% 100%; /* White */
-    --warning: 48 100% 50%; /* #FFC400 */
+    --warning: var(--magellan-warning); /* 使用海洋珊瑚橙 */
     --warning-foreground: 224 71% 14%; /* Dark text */
     
     /* Atlassian Border Radius System */
@@ -364,6 +511,144 @@
   .shadow-atlassian-300 { @apply elevation-300; }
 }
 @layer utilities {
+  /* ===== 最终版本：极其克制的专业动画 ===== */
+  
+  /* 替代所有过度hover效果的统一类 */
+  .subtle-hover {
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .subtle-hover:hover {
+    transform: translateY(-0.5px);  /* 极微小的上移 */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);  /* 微妙阴影 */
+  }
+  
+  /* 替代所有过度缩放的统一类 */
+  .subtle-scale {
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .subtle-scale:hover {
+    transform: scale(1.005);  /* 几乎不可见的缩放 */
+  }
+  
+  /* 替代所有过度旋转的统一类 */
+  .subtle-rotate {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .subtle-rotate:hover {
+    transform: rotate(1deg);  /* 微小旋转 */
+  }
+  
+  /* 替代所有过度发光的统一类 */
+  .subtle-glow {
+    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .subtle-glow:hover {
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.1);  /* 微妙边框发光 */
+  }
+  
+  /* 海洋主题文字颜色 */
+  .text-magellan-primary {
+    color: hsl(var(--magellan-primary));
+  }
+  
+  .text-magellan-coral {
+    color: hsl(var(--magellan-coral));
+  }
+  
+  .text-magellan-gold {
+    color: hsl(var(--magellan-gold));
+  }
+  
+  .text-magellan-teal {
+    color: hsl(var(--magellan-teal));
+  }
+  
+  .text-magellan-mint {
+    color: hsl(var(--magellan-mint));
+  }
+  
+  /* 海洋主题边框 */
+  .border-magellan-primary {
+    border-color: hsl(var(--magellan-primary));
+  }
+  
+  .border-magellan-coral {
+    border-color: hsl(var(--magellan-coral));
+  }
+  
+  .border-magellan-gold {
+    border-color: hsl(var(--magellan-gold));
+  }
+  
+  /* 海洋主题背景色 */
+  .bg-magellan-primary {
+    background-color: hsl(var(--magellan-primary));
+  }
+  
+  .bg-magellan-coral {
+    background-color: hsl(var(--magellan-coral));
+  }
+  
+  .bg-magellan-gold {
+    background-color: hsl(var(--magellan-gold));
+  }
+  
+  .bg-magellan-mint {
+    background-color: hsl(var(--magellan-mint));
+  }
+  
+  /* 岛屿卡片效果 */
+  .island-card {
+    @apply transition-all duration-300 ease-out hover:scale-[1.02] hover:-translate-y-1;
+    @apply bg-card/95 backdrop-blur-sm border border-primary/10;
+    @apply hover:border-primary/30 hover:shadow-xl;
+    @apply relative overflow-hidden;
+  }
+  
+  .island-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, 
+      hsl(var(--magellan-primary) / 0.03) 0%, 
+      transparent 50%, 
+      hsl(var(--magellan-coral) / 0.03) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .island-card:hover::before {
+    opacity: 1;
+  }
+  
+  /* 专业级罗盘搜索框效果 */
+  .professional-compass-search {
+    position: relative;
+  }
+  
+  .professional-compass-search::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(90deg, 
+      transparent 0deg, 
+      hsl(var(--primary) / 0.08) 90deg, 
+      transparent 180deg);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .professional-compass-search:focus-within::before {
+    opacity: 1;
+  }
+
   /* Atlassian 8px Grid Spacing System */
   .atlassian-space-0 { @apply p-0; }                /* 0px */
   .atlassian-space-2 { padding: var(--space-2); }   /* 2px */

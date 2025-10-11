@@ -10,26 +10,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import RankingFilters from './ranking-filters';
 import { CompactCard } from '@/components/website/compact-card';
 import {
-  Search,
-  Filter,
-  Grid3X3,
-  List,
-  Star,
-  Heart,
-  Eye,
-  ExternalLink,
-  Award,
-  Bookmark,
   ArrowLeft,
   Trophy,
-  TrendingUp,
   Crown,
-  CheckCircle,
-  Clock,
-  Zap
+  Zap,
+  Compass,
+  Anchor,
+  Ship,
+  Telescope,
+  Navigation
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
+import { cn } from '@/lib/utils/utils';
 
 interface RankingPageProps {
   type: string;
@@ -45,11 +38,11 @@ interface RankingPageProps {
 type FilterOption = 'all' | 'free' | 'paid' | 'freemium';
 
 const rankingIcons = {
-  popular: TrendingUp,
+  popular: Ship,
   'top-rated': Crown,
   trending: Zap,
-  free: CheckCircle,
-  new: Clock
+  free: Anchor,
+  new: Telescope
 };
 
 export default function RankingPage({ type, rankingType, websites: initialWebsites, categories, selectedCategory }: RankingPageProps) {
@@ -171,78 +164,130 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <section className="py-12 px-4 bg-gradient-to-b from-primary/5 to-background border-b">
-        <div className="max-w-7xl mx-auto">
-          {/* Navigation */}
-          <div className="mb-6">
-            <Link href="/rankings" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Rankings
+      {/* Header - 探险排行榜主页 */}
+      <section className="relative py-20 px-4 bg-gradient-to-br from-primary/5 via-background to-magellan-coral/3 border-b border-primary/20 overflow-hidden">
+        {/* 海洋背景装饰 */}
+        <div className="absolute inset-0 opacity-8 pointer-events-none">
+          <div className="absolute top-10 right-10 w-96 h-96 bg-gradient-to-br from-primary/4 to-transparent rounded-full blur-3xl professional-float"></div>
+          <div className="absolute bottom-10 left-10 w-80 h-80 bg-gradient-to-tr from-magellan-teal/3 to-transparent rounded-full blur-2xl professional-decoration"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* 导航面包屑 - 航海路径 */}
+          <div className="mb-8">
+            <Link href="/rankings" className={cn(
+              "inline-flex items-center gap-3 group",
+              "text-muted-foreground hover:text-primary transition-all duration-300",
+              "p-3 rounded-xl bg-background/80 backdrop-blur-sm border border-primary/10",
+              "hover:border-primary/30 hover:bg-primary/5"
+            )}>
+              <div className="p-1 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
+                <ArrowLeft className="h-4 w-4" />
+              </div>
+              <Compass className="h-4 w-4 subtle-rotate" />
+              🧭 Back to Expedition Hub
             </Link>
           </div>
 
-          {/* Title */}
-          <div className="mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="flex items-center gap-4 mb-6"
-            >
-              <div className="p-3 rounded-xl bg-gradient-to-r from-primary to-purple-500">
-                <IconComponent className="h-8 w-8 text-white" />
+          {/* 探险标题区域 */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.6,
+              ease: [0.15, 1, 0.3, 1]
+            }}
+            className="mb-10"
+          >
+            <div className="flex items-center gap-6 mb-8">
+              {/* 探险徽章 */}
+              <div className={cn(
+                "p-4 rounded-2xl relative group",
+                "bg-gradient-to-br from-primary/15 to-magellan-teal/10",
+                "border border-primary/20 shadow-xl",
+                "subtle-scale"
+              )}>
+                <IconComponent className="h-10 w-10 text-primary group-hover:text-magellan-teal transition-colors duration-300" />
+                {/* 发光环效果 */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold">
-                  {rankingType.title}
+              
+              <div className="space-y-2">
+                <h1 className={cn(
+                  "text-4xl md:text-5xl lg:text-6xl font-bold leading-tight",
+                  "bg-gradient-to-r from-primary via-magellan-teal to-magellan-coral bg-clip-text text-transparent"
+                )}>
+                  🏆 {rankingType.title}
                 </h1>
-                <p className="text-lg text-muted-foreground">
-                  {rankingType.description}
+                <p className="text-xl text-muted-foreground max-w-3xl">
+                  ⚓ {rankingType.description}
                 </p>
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
 
-          {/* Filters and Controls */}
+          {/* 探险控制台 - 航海仪表盘 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-background/80 backdrop-blur rounded-xl border p-6"
+            className={cn(
+              "bg-background/95 backdrop-blur-xl rounded-2xl border border-primary/20",
+              "p-8 shadow-xl relative overflow-hidden"
+            )}
           >
-            <div className="flex flex-col gap-6">
-              {/* Search and Basic Filters */}
-              <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-                {/* Search */}
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            {/* 背景装饰 */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/2 via-transparent to-magellan-teal/2 pointer-events-none"></div>
+            
+            <div className="relative z-10 space-y-6">
+              {/* 搜索和基础过滤器 */}
+              <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
+                {/* 罗盘搜索框 */}
+                <div className="relative flex-1 max-w-md group compass-search">
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+                    <Compass className="h-5 w-5 text-primary professional-compass" />
+                  </div>
                   <Input
-                    placeholder="Search tools..."
-                    className="pl-10"
+                    placeholder="🔍 Search expedition tools..."
+                    className={cn(
+                      "pl-12 h-12 text-base rounded-xl",
+                      "border-2 border-primary/20 focus:border-primary",
+                      "bg-background/80 backdrop-blur-sm",
+                      "shadow-lg hover:shadow-xl transition-all duration-300"
+                    )}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
 
-                {/* Basic Filters */}
+                {/* 航海过滤器 */}
                 <div className="flex items-center gap-4">
-                  <Select value={priceFilter} onValueChange={(value: FilterOption) => setPriceFilter(value)}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Pricing</SelectItem>
-                      <SelectItem value="free">Free</SelectItem>
-                      <SelectItem value="freemium">Freemium</SelectItem>
-                      <SelectItem value="paid">Paid</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-2">
+                    <Anchor className="h-4 w-4 text-magellan-coral professional-float" />
+                    <Select value={priceFilter} onValueChange={(value: FilterOption) => setPriceFilter(value)}>
+                      <SelectTrigger className={cn(
+                        "w-40 h-12 rounded-xl border-primary/20",
+                        "focus:border-primary bg-background/80"
+                      )}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">🌊 All Pricing</SelectItem>
+                        <SelectItem value="free">⚓ Free Harbor</SelectItem>
+                        <SelectItem value="freemium">🏝️ Freemium Isle</SelectItem>
+                        <SelectItem value="paid">💎 Premium Treasure</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
 
-              {/* Advanced Filters */}
-              <div className="border-t pt-4">
+              {/* 高级探险过滤器 */}
+              <div className="border-t border-primary/20 pt-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Navigation className="h-5 w-5 text-magellan-teal professional-compass" />
+                  <span className="text-sm font-semibold text-foreground">🗺️ Advanced Navigation Filters</span>
+                </div>
                 <RankingFilters
                   timeRange={timeRange}
                   onTimeRangeChange={setTimeRange}
@@ -253,19 +298,25 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                 />
               </div>
 
-              {/* Results count and loading */}
-              <div className="text-center">
+              {/* 发现统计和加载状态 */}
+              <div className="text-center p-4 rounded-xl bg-gradient-to-r from-primary/5 to-magellan-teal/5 border border-primary/10">
                 {loading ? (
-                  <p className="text-muted-foreground">Loading rankings...</p>
+                  <div className="flex items-center justify-center gap-3 text-muted-foreground">
+                    <Compass className="h-4 w-4 professional-compass" />
+                    <span>🧭 Charting expedition routes...</span>
+                  </div>
                 ) : (
-                  <p className="text-muted-foreground">
-                    Showing {filteredWebsites.length} of {websites.length} tools
-                    {timeRange !== 'all' && (
-                      <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                        {timeRange}
-                      </span>
-                    )}
-                  </p>
+                  <div className="flex items-center justify-center gap-3 text-muted-foreground">
+                    <Trophy className="h-4 w-4 text-magellan-gold professional-glow" />
+                    <span>
+                      🏆 Discovered {filteredWebsites.length} of {websites.length} expedition tools
+                      {timeRange !== 'all' && (
+                        <span className="ml-2 text-xs bg-primary/15 text-primary px-3 py-1 rounded-full border border-primary/20">
+                          ⏰ {timeRange}
+                        </span>
+                      )}
+                    </span>
+                  </div>
                 )}
               </div>
             </div>
@@ -273,30 +324,90 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
         </div>
       </section>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* 探险发现主内容区 */}
+      <div className="max-w-7xl mx-auto px-4 py-12 relative">
+        {/* 海域背景装饰 */}
+        <div className="absolute inset-0 opacity-6 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-72 h-72 bg-gradient-to-br from-primary/3 to-transparent rounded-full blur-2xl professional-decoration"></div>
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-tl from-magellan-coral/3 to-transparent rounded-full blur-3xl professional-decoration active"></div>
+        </div>
+        
         {filteredWebsites.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredWebsites.map((website, index) => (
-              <CompactCard key={website.id} website={website} onVisit={handleVisit} />
-            ))}
+          <div className="relative z-10">
+            {/* 发现网格 - 岛屿探险 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredWebsites.map((website, index) => (
+                <motion.div
+                  key={website.id}
+                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ 
+                    duration: 0.4, 
+                    delay: index * 0.05,
+                    ease: [0.15, 1, 0.3, 1]
+                  }}
+                  className="group"
+                >
+                  <div className="relative">
+                    {/* 排名宝藏标识 */}
+                    {index < 10 && (
+                      <div className={cn(
+                        "absolute -top-2 -left-2 z-10 w-8 h-8 rounded-xl flex items-center justify-center",
+                        "text-xs font-bold shadow-lg border transition-all duration-300",
+                        "subtle-scale",
+                        index === 0 ? 'bg-gradient-to-br from-magellan-gold to-magellan-coral text-white border-magellan-gold/30 professional-glow' :
+                        index === 1 ? 'bg-gradient-to-br from-primary to-magellan-teal text-white border-primary/30' :
+                        index === 2 ? 'bg-gradient-to-br from-magellan-coral to-magellan-gold text-white border-magellan-coral/30' :
+                        'bg-gradient-to-br from-muted to-background text-muted-foreground border-border'
+                      )}>
+                        {index < 3 ? (
+                          <Crown className="h-3 w-3" />
+                        ) : (
+                          index + 1
+                        )}
+                      </div>
+                    )}
+                    
+                    <CompactCard website={website} onVisit={handleVisit} />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         ) : (
-          <div className="text-center py-16">
+          <div className="text-center py-20 relative z-10">
             <div className="max-w-md mx-auto">
-              <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No tools found</h3>
-              <p className="text-muted-foreground mb-6">
-                Try adjusting your search or filters to find more tools.
+              <div className="mb-8 flex justify-center">
+                <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-magellan-teal/5 border border-primary/20">
+                  <Telescope className="h-16 w-16 text-muted-foreground" />
+                </div>
+              </div>
+              
+              <h3 className="text-2xl font-bold mb-4 flex items-center justify-center gap-2">
+                🔍 No treasures discovered
+              </h3>
+              <p className="text-muted-foreground mb-8 leading-relaxed">
+                🌊 Adjust your navigation compass or exploration filters to chart new territories and discover more AI treasures.
               </p>
+              
               <Button 
                 variant="default"
+                className={cn(
+                  "bg-gradient-to-r from-primary to-magellan-teal",
+                  "hover:from-primary/90 hover:to-magellan-teal/90",
+                  "text-white rounded-xl px-6 py-3",
+                  "shadow-lg hover:shadow-xl",
+                  "subtle-hover",
+                  "professional-card"
+                )}
                 onClick={() => {
-                setSearchQuery('');
-                setCategoryFilter('all');
-                setPriceFilter('all');
-              }}>
-                Clear Filters
+                  setSearchQuery('');
+                  setCategoryFilter('all');
+                  setPriceFilter('all');
+                }}
+              >
+                <Compass className="h-4 w-4 mr-2 professional-compass" />
+                ⚓ Reset Navigation
               </Button>
             </div>
           </div>

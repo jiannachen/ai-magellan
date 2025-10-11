@@ -7,7 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "init-data": "ts-node --project tsconfig.script.json src/lib/utils/init-data.ts"
+    "init-data": "ts-node --project tsconfig.script.json src/lib/utils/init-data.ts",
+    "scrape-producthunt": "ts-node --project tsconfig.script.json scripts/scrape-producthunt.ts",
+    "import-mock-data": "ts-node --project tsconfig.script.json scripts/import-mock-data.ts",
+    "enhance-website-data": "ts-node --project tsconfig.script.json scripts/enhance-website-data.ts",
+    "enhance-data": "ts-node --project tsconfig.script.json scripts/enhance-data-interactive.ts",
+    "auto-enhance": "ts-node --project tsconfig.script.json scripts/auto-enhance-data.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.33.3",
@@ -44,6 +49,7 @@
     "@tanstack/react-query": "^5.62.8",
     "@tanstack/react-virtual": "^3.11.2",
     "@types/cron": "^2.0.1",
+    "@types/node-fetch": "^2.6.13",
     "@vercel/analytics": "^1.4.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -57,6 +63,7 @@
     "next": "15.1.2",
     "next-intl": "^4.3.11",
     "next-themes": "^0.4.4",
+    "node-fetch": "^3.3.2",
     "prisma": "^6.1.0",
     "react": "^18.2.0",
     "react-day-picker": "^9.4.4",

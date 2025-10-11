@@ -298,236 +298,334 @@ export default function SimplifiedHomePage({
     icon: any; 
     viewAllLink: string; 
   }) => (
-    <section className="py-12 px-4"> {/* 减少padding，更精简 */}
-      <div className="container mx-auto">
-        <div className="flex items-center justify-between mb-6"> {/* 减少margin-bottom */}
-          <div className="flex items-center gap-3">
+    <section className="py-16 px-4 relative"> {/* 海洋章节分隔 */}
+      {/* 海域背景装饰 */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-magellan-teal/5 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-primary/5 to-transparent rounded-full blur-2xl"></div>
+      </div>
+      
+      <div className="container mx-auto relative z-10">
+        {/* 海域标题区 - 航海日志风格 */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.15, 1, 0.3, 1] }}
+          className="flex items-center justify-between mb-8"
+        >
+          <div className="flex items-center gap-4">
+            {/* 海域图标 - 罗盘风格 */}
             <div className={cn(
-              "w-10 h-10 rounded-lg flex items-center justify-center", // 使用8px圆角
-              "bg-primary/10 border border-primary/20"
+              "w-12 h-12 rounded-xl flex items-center justify-center",
+              "bg-gradient-to-br from-primary/15 to-magellan-teal/10",
+              "border border-primary/20 shadow-lg",
+              "relative group"
             )}>
-              <Icon className="h-5 w-5 text-primary" />
+              <Icon className="h-6 w-6 text-primary subtle-scale" />
+              {/* 发光效果 */}
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
-            <div>
-              <h2 className="text-atlassian-h3 font-medium text-foreground">{title}</h2>
-              <p className="text-atlassian-body text-muted-foreground">{description}</p>
+            <div className="space-y-1">
+              <h2 className={cn(
+                "text-atlassian-h3 font-semibold text-foreground",
+                "flex items-center gap-2"
+              )}>
+                🗺️ {title}
+              </h2>
+              <p className="text-atlassian-body text-muted-foreground flex items-center gap-2">
+                <Compass className="h-4 w-4 text-magellan-teal" />
+                {description}
+              </p>
             </div>
           </div>
+          
+          {/* 探索更多按钮 - 航海风格 */}
           <Link href={viewAllLink}>
             <Button 
               variant="ghost" 
               className={cn(
-                "hidden md:flex items-center gap-2 text-primary",
-                "hover:bg-primary/5 transition-atlassian-standard",
-                "rounded-md px-3 py-2" // Atlassian风格的按钮
+                "hidden md:flex items-center gap-2 group",
+                "px-4 py-2 rounded-xl",
+                "bg-gradient-to-r from-transparent to-primary/5",
+                "border border-primary/20 hover:border-primary/40",
+                "text-primary hover:bg-primary/10",
+                "subtle-hover",
+                "shadow-md hover:shadow-lg"
               )}
             >
+              <Map className="h-4 w-4 group-hover:rotate-6 transition-transform duration-300 professional-rotate" />
               {t('home.view_all')}
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
           </Link>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"> {/* 调整为3-4列布局 */}
+        {/* 岛屿网格 - 探索发现 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {websites.slice(0, 12).map((website, index) => (
             <motion.div
               key={website.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ 
-                duration: 0.3, // 缩短动画时间
-                delay: index * 0.03, // 减少延迟间隔
-                ease: [0.25, 0.1, 0.25, 1] // 使用Atlassian缓动曲线
+                duration: 0.4, 
+                delay: index * 0.08, // 增加延迟创造波浪效果
+                ease: [0.15, 1, 0.3, 1] // Atlassian entrance缓动
               }}
+              className="group"
             >
               <WebsiteCard website={website} rank={index + 1} />
             </motion.div>
           ))}
         </div>
 
-        {/* Mobile View All Button - Atlassian风格 */}
-        <div className="mt-6 text-center md:hidden">
+        {/* 移动端探索按钮 - 航海CTA */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.6 }}
+          className="mt-10 text-center md:hidden"
+        >
           <Link href={viewAllLink}>
             <Button 
-              variant="secondary" 
+              size="lg"
               className={cn(
                 "w-full max-w-sm",
-                "rounded-md border border-border",
-                "hover:bg-muted transition-atlassian-standard"
+                "bg-gradient-to-r from-primary to-magellan-teal",
+                "hover:from-primary/90 hover:to-magellan-teal/90",
+                "text-white rounded-xl px-6 py-4",
+                "shadow-lg hover:shadow-xl",
+                "subtle-hover",
+                "border border-primary/20"
               )}
             >
-              {t('home.view_all')} {title}
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <Route className="h-5 w-5 mr-2" />
+              {t('home.explore_more')} {title}
+              <ExternalLink className="h-4 w-4 ml-2" />
             </Button>
           </Link>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section - Atlassian风格 */}
-      <section className="relative py-20 px-4 bg-background"> {/* 减少垂直间距 */}
-        <div className="container mx-auto text-center">
+      {/* Hero Section - AI Magellan 海洋探险主题 */}
+      <section className="relative py-24 px-4 bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
+        {/* 海洋装饰背景元素 - 专业级低调版本 */}
+        <div className="absolute inset-0 opacity-8 pointer-events-none">
+          <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-br from-primary/4 to-transparent rounded-full blur-3xl professional-float"></div>
+          <div className="absolute bottom-10 left-10 w-96 h-96 bg-gradient-to-tr from-magellan-teal/3 to-transparent rounded-full blur-3xl professional-decoration"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-magellan-coral/2 to-magellan-gold/2 rounded-full blur-2xl professional-decoration active"></div>
+        </div>
+        
+        <div className="container mx-auto text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
-              duration: 0.3, 
+              duration: 0.6, 
               ease: [0.15, 1, 0.3, 1] // Atlassian entrance缓动
             }}
-            className="space-y-6" // 减少间距
+            className="space-y-8"
           >
-            {/* Badge - Atlassian Design System */}
+            {/* 探险徽章 - AI Magellan 主题 */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ 
-                duration: 100, // ds-motion-duration-fast
-                delay: 100,
-                ease: [0.15, 1, 0.3, 1] // ds-motion-easing-entrance
+                duration: 0.3,
+                delay: 0.2,
+                ease: [0.15, 1, 0.3, 1]
               }}
               className={cn(
-                "inline-flex items-center gap-2",
-                "px-3 py-1.5", 
-                "rounded-[4px]", // ds-border-radius-100
-                "bg-[color:var(--ds-background-brand-bold)] bg-opacity-10", 
-                "border border-[color:var(--ds-background-brand-bold)] border-opacity-20",
-                "font-medium",
-                "text-[11px] leading-4 tracking-[0.5px]", // ds-caption typography
-                "text-[color:var(--ds-background-brand-bold)]"
+                "inline-flex items-center gap-3",
+                "px-4 py-2", 
+                "rounded-full",
+                "bg-gradient-to-r from-primary/10 to-magellan-teal/10",
+                "border border-primary/20",
+                "font-medium text-sm",
+                "text-primary",
+                "backdrop-blur-sm"
               )}
             >
-              <Compass className="h-3.5 w-3.5" />
-              <span>{t('home.badge')}</span>
+              <Compass className="h-4 w-4 professional-compass" />
+              <span>🚀 {t('hero.badge')}</span>
+              <div className="w-2 h-2 rounded-full bg-magellan-mint professional-glow"></div>
             </motion.div>
 
-            {/* Main Title - Atlassian Design System Typography */}
-            <div className="space-y-[var(--ds-space-300)]"> {/* ds-space-300: 24px */}
-              <h1 className={cn(
-                "font-[var(--ds-font-family-sans)]",
-                "text-[48px] leading-[56px] font-medium tracking-[-0.02em]", // ds-heading-display
-                "md:text-[48px] md:leading-[56px]",
-                "max-w-4xl mx-auto"
-              )}>
-                {t('home.title')}{" "}
-                <span className="text-[color:var(--ds-background-brand-bold)]">
-                  AI Tools
-                </span>
-                <br />
-                <span className="text-[24px] leading-[32px] font-medium tracking-[-0.01em] text-[color:var(--ds-text-subtle)] font-normal">
-                  {t('home.subtitle')}
-                </span>
-              </h1>
-
-              {/* Subtitle - Atlassian Design System */}
-              <p className="text-[16px] leading-[24px] font-normal text-[color:var(--ds-text-subtle)] max-w-2xl mx-auto">
-                {t('home.description')}
-                <br className="hidden md:block" />
-                {t('home.description_continued')}
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Search - Atlassian风格 */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: 0.3, 
-              delay: 0.2,
-              ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
-            }}
-            className="mt-8 max-w-xl mx-auto" // 减少上边距
-          >
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder={t('home.search_placeholder')}
+            {/* 主标题 - 探险家精神 */}
+            <div className="space-y-6">
+              <motion.h1 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  duration: 0.8, 
+                  delay: 0.3,
+                  ease: [0.15, 1, 0.3, 1]
+                }}
                 className={cn(
-                  "pl-10 pr-4 h-12", // 调整高度符合Atlassian
-                  "text-atlassian-body rounded-md", // 使用4px圆角和Atlassian字体
-                  "border-2 border-border focus-visible:border-primary",
-                  "bg-background shadow-atlassian-100 focus-visible:shadow-atlassian-200",
-                  "transition-atlassian-standard"
+                  "font-bold text-5xl md:text-6xl lg:text-7xl leading-tight",
+                  "max-w-5xl mx-auto"
                 )}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+              >
+                {t('hero.title_start')}
+                <br />
+                <span className="bg-gradient-to-r from-primary via-magellan-teal to-magellan-coral bg-clip-text text-transparent">
+                  {t('hero.title_highlight')}
+                </span>
+              </motion.h1>
+
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  duration: 0.6, 
+                  delay: 0.5 
+                }}
+                className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+              >
+                🌊 {t('hero.description')}
+                <br />
+                <span className="text-primary font-medium">{t('hero.description_highlight')}</span>
+              </motion.p>
             </div>
-            <p className="text-atlassian-caption text-muted-foreground mt-2">
-              {t('home.search_suggestions')}
-            </p>
           </motion.div>
 
-          {/* Quick Stats - Atlassian风格 */}
+          {/* 罗盘搜索框 - 海洋主题 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
-              duration: 0.3, 
-              delay: 0.3,
-              ease: [0.25, 0.1, 0.25, 1]
-            }}
-            className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto" // 减少gap
-          >
-            <div className="text-center">
-              <div className="text-atlassian-h4 font-medium text-primary mb-1">{websites.length}+</div>
-              <div className="text-atlassian-caption text-muted-foreground font-medium">{t('home.stats.charted_tools')}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-atlassian-h4 font-medium text-primary mb-1">100K+</div>
-              <div className="text-atlassian-caption text-muted-foreground font-medium">{t('home.stats.explorers')}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-atlassian-h4 font-medium text-primary mb-1">{t('home.stats.daily')}</div>
-              <div className="text-atlassian-caption text-muted-foreground font-medium">{t('home.stats.discoveries')}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-atlassian-h4 font-medium text-primary mb-1">{t('home.stats.expert')}</div>
-              <div className="text-atlassian-caption text-muted-foreground font-medium">{t('home.stats.verified')}</div>
-            </div>
-          </motion.div>
-
-          {/* CTA Buttons - Atlassian风格 */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: 0.3, 
+              duration: 0.6, 
               delay: 0.4,
               ease: [0.25, 0.1, 0.25, 1]
             }}
-            className="mt-10 flex flex-col sm:flex-row gap-3 justify-center" // 减少间距
+            className="mt-12 max-w-2xl mx-auto"
+          >
+            <div className="relative group professional-compass-search">
+              {/* 专业级罗盘外环装饰 */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary/8 via-magellan-coral/8 to-magellan-teal/8 rounded-2xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all duration-500"></div>
+              
+              <div className="relative">
+                <div className="absolute left-5 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+                  <Compass className="h-5 w-5 text-primary professional-compass" />
+                </div>
+                <Input
+                  placeholder={t('hero.search_placeholder')}
+                  className={cn(
+                    "pl-14 pr-6 h-14 text-lg",
+                    "rounded-xl border border-primary/15",
+                    "bg-background/90 backdrop-blur-sm",
+                    "focus:border-primary focus:bg-background",
+                    "shadow-sm hover:shadow-md transition-all duration-300",
+                    "placeholder:text-muted-foreground/70"
+                  )}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                
+                {/* 搜索按钮 */}
+                <Button 
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 px-4 bg-primary hover:bg-primary/90 text-white rounded-lg"
+                  onClick={() => {/* 触发搜索 */}}
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <p className="text-sm text-muted-foreground mt-3 flex items-center justify-center gap-2">
+              <span>💡 {t('hero.popular_searches')}:</span>
+              {['ChatGPT', 'Midjourney', t('hero.search_tags.coding_assistant'), t('hero.search_tags.ai_writing')].map((tag, index) => (
+                <Badge 
+                  key={tag}
+                  variant="secondary" 
+                  className="cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors"
+                  onClick={() => setSearchQuery(tag)}
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </p>
+          </motion.div>
+
+          {/* 探索统计 - 航海数据 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.6, 
+              delay: 0.6
+            }}
+            className="mt-16 flex justify-center gap-8 text-sm text-muted-foreground flex-wrap"
+          >
+            <div className="flex items-center gap-2 group">
+              <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <Map className="h-4 w-4 text-primary" />
+              </div>
+              <span className="font-medium">{websites.length}+ {t('hero.stats.islands')}</span>
+            </div>
+            <div className="flex items-center gap-2 group">
+              <div className="p-2 rounded-full bg-magellan-teal/10 group-hover:bg-magellan-teal/20 transition-colors">
+                <Compass className="h-4 w-4 text-magellan-teal" />
+              </div>
+              <span className="font-medium">{categories.length} {t('hero.stats.territories')}</span>
+            </div>
+            <div className="flex items-center gap-2 group">
+              <div className="p-2 rounded-full bg-magellan-gold/10 group-hover:bg-magellan-gold/20 transition-colors">
+                <Crown className="h-4 w-4 text-magellan-gold" />
+              </div>
+              <span className="font-medium">{t('hero.stats.curated_treasures')}</span>
+            </div>
+            <div className="flex items-center gap-2 group">
+              <div className="p-2 rounded-full bg-magellan-mint/10 group-hover:bg-magellan-mint/20 transition-colors">
+                <Users className="h-4 w-4 text-magellan-mint" />
+              </div>
+              <span className="font-medium">{t('hero.stats.explorers')}</span>
+            </div>
+          </motion.div>
+
+          {/* 探索行动按钮 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.3, 
+              delay: 0.7,
+              ease: [0.25, 0.1, 0.25, 1]
+            }}
+            className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
           >
             <Link href="/categories">
               <Button 
                 size="lg" 
                 className={cn(
                   "w-full sm:w-auto",
-                  "btn-atlassian-primary",
-                  "rounded-md px-6 py-3", // Atlassian按钮尺寸
-                  "text-atlassian-body font-medium"
+                  "bg-primary hover:bg-primary/90 text-white",
+                  "rounded-xl px-8 py-4 text-base font-semibold",
+                  "shadow-lg hover:shadow-xl transition-shadow duration-200",
+                  "subtle-scale"
                 )}
               >
-                <Grid3X3 className="h-4 w-4 mr-2" />
-                {t('home.cta_buttons.explore_categories')}
+                <Map className="h-5 w-5 mr-2" />
+                🗺️ {t('hero.buttons.explore_territories')}
               </Button>
             </Link>
             <Link href="/submit">
               <Button 
                 size="lg" 
-                variant="secondary" 
+                variant="outline"
                 className={cn(
                   "w-full sm:w-auto",
-                  "btn-atlassian-secondary",
-                  "rounded-md px-6 py-3",
-                  "text-atlassian-body font-medium"
+                  "border-primary/30 hover:border-primary hover:bg-primary/5",
+                  "rounded-xl px-8 py-4 text-base font-semibold",
+                  "transition-colors duration-200 subtle-hover"
                 )}
               >
-                <Plus className="h-4 w-4 mr-2" />
-                {t('home.cta_buttons.chart_new_tool')}
+                <Compass className="h-5 w-5 mr-2" />
+                ⚓ {t('hero.buttons.mark_discovery')}
               </Button>
             </Link>
           </motion.div>
@@ -571,58 +669,87 @@ export default function SimplifiedHomePage({
         />
       </div>
 
-      {/* Value Proposition Section - Atlassian风格 */}
-      <section className="py-16 px-4 bg-primary/5"> {/* 减少垂直间距，使用更简洁的背景 */}
-        <div className="container mx-auto">
-          <div className="text-center mb-12"> {/* 减少底部间距 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ 
-                duration: 0.3,
-                ease: [0.15, 1, 0.3, 1] // Atlassian entrance缓动
-              }}
-            >
-              <h2 className="text-atlassian-h2 font-medium mb-4"> {/* 使用Atlassian字体层级 */}
-                {t('home.value_props.title')}
-              </h2>
-              <p className="text-atlassian-body-large text-muted-foreground max-w-3xl mx-auto">
-                {t('home.value_props.description')}
-              </p>
-            </motion.div>
-          </div>
+      {/* Value Proposition Section - 探索价值主张 */}
+      <section className="py-20 px-4 relative bg-gradient-to-br from-primary/3 via-background to-magellan-teal/2">
+        {/* 海域背景效果 */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-magellan-coral/4 to-transparent rounded-full blur-3xl ocean-float"></div>
+          <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-tl from-magellan-mint/4 to-transparent rounded-full blur-2xl" style={{animationDelay: '2s'}}></div>
+        </div>
+        
+        <div className="container mx-auto relative z-10">
+          {/* 章节标题 - 航海日志风格 */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.6,
+              ease: [0.15, 1, 0.3, 1]
+            }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center gap-3 mb-6 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-magellan-teal/10 border border-primary/20">
+              <Map className="h-5 w-5 text-primary" />
+              <span className="text-sm font-medium text-primary">{t('home.value_props.badge')}</span>
+              <div className="w-2 h-2 rounded-full bg-magellan-coral animate-pulse"></div>
+            </div>
+            <h2 className="text-atlassian-h2 font-semibold mb-4 flex items-center justify-center gap-3">
+              ⚓ {t('home.value_props.title')}
+            </h2>
+            <p className="text-atlassian-body-large text-muted-foreground max-w-4xl mx-auto">
+              🌊 {t('home.value_props.description')}
+            </p>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> {/* 减少间距 */}
+          {/* 价值主张网格 - 探索能力 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {valueProps.map((prop, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 40, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ 
-                  duration: 0.3, 
-                  delay: index * 0.05, // 减少延迟间隔
-                  ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+                  duration: 0.5, 
+                  delay: index * 0.1,
+                  ease: [0.15, 1, 0.3, 1]
                 }}
               >
                 <Card className={cn(
-                  "h-full text-center",
-                  "card-atlassian", // 使用Atlassian卡片样式
-                  "border-border/60 hover:border-primary/30",
-                  "transition-atlassian-standard"
+                  "group h-full text-center relative overflow-hidden",
+                  "bg-card/95 backdrop-blur-sm border border-primary/10",
+                  "rounded-2xl shadow-lg hover:shadow-2xl",
+                  "transition-all duration-500 ease-out",
+                  "subtle-hover",
+                  "hover:border-primary/30"
                 )}>
-                  <CardContent className="p-6"> {/* 减少内边距 */}
-                    <div className="mb-4 flex justify-center"> {/* 减少底部间距 */}
+                  {/* 背景海洋效果 */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-magellan-coral/3 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                  
+                  <CardContent className="p-8 relative z-10">
+                    {/* 图标容器 - 罗盘风格 */}
+                    <div className="mb-6 flex justify-center">
                       <div className={cn(
-                        "p-3 rounded-lg", // 使用8px圆角
-                        "bg-primary/10 border border-primary/20"
+                        "relative p-4 rounded-2xl",
+                        "bg-gradient-to-br from-primary/15 to-magellan-teal/10",
+                        "border border-primary/20 shadow-lg",
+                        "subtle-scale",
+                        "transition-all duration-500"
                       )}>
-                        <prop.icon className="h-6 w-6 text-primary" /> {/* 稍微减小图标 */}
+                        <prop.icon className="h-8 w-8 text-primary group-hover:text-magellan-teal transition-colors duration-300" />
+                        {/* 发光环效果 */}
+                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       </div>
                     </div>
-                    <h3 className="text-atlassian-h5 font-medium mb-3">{prop.title}</h3> {/* 使用Atlassian字体 */}
+                    
+                    <h3 className="text-atlassian-h5 font-semibold mb-4 text-foreground group-hover:text-primary transition-colors duration-300">
+                      {prop.title}
+                    </h3>
                     <p className="text-atlassian-body text-muted-foreground leading-relaxed">
                       {prop.description}
                     </p>
+                    
+                    {/* 底部装饰线 */}
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -631,61 +758,91 @@ export default function SimplifiedHomePage({
         </div>
       </section>
 
-      {/* FAQ Section - Atlassian风格 */}
-      <section className="py-16 px-4"> {/* 减少垂直间距 */}
-        <div className="container mx-auto">
-          <div className="text-center mb-12"> {/* 减少底部间距 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ 
-                duration: 0.3,
-                ease: [0.15, 1, 0.3, 1] // Atlassian entrance缓动
-              }}
-            >
-              <h2 className="text-atlassian-h2 font-medium mb-4"> {/* 使用Atlassian字体层级 */}
-                {t('home.faq.title')}
-              </h2>
-              <p className="text-atlassian-body-large text-muted-foreground">
-                {t('home.faq.description')}
-              </p>
-            </motion.div>
-          </div>
+      {/* FAQ Section - 航海指南 */}
+      <section className="py-20 px-4 relative">
+        {/* 背景装饰 */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 left-1/4 w-72 h-72 bg-gradient-to-br from-magellan-teal/5 to-transparent rounded-full blur-2xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-tl from-primary/5 to-transparent rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="container mx-auto relative z-10">
+          {/* 标题区域 - 导航员指南 */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.6,
+              ease: [0.15, 1, 0.3, 1]
+            }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center gap-3 mb-6 px-4 py-2 rounded-full bg-gradient-to-r from-magellan-gold/10 to-magellan-coral/10 border border-magellan-gold/20">
+              <Compass className="h-5 w-5 text-magellan-gold professional-compass" />
+              <span className="text-sm font-medium text-magellan-gold">{t('home.faq.badge')}</span>
+              <div className="w-2 h-2 rounded-full bg-magellan-mint professional-glow"></div>
+            </div>
+            <h2 className="text-atlassian-h2 font-semibold mb-4 flex items-center justify-center gap-3">
+              🧭 {t('home.faq.title')}
+            </h2>
+            <p className="text-atlassian-body-large text-muted-foreground max-w-3xl mx-auto">
+              {t('home.faq.description')}
+            </p>
+          </motion.div>
 
-          <div className="space-y-3"> {/* 减少间距 */}
+          {/* FAQ列表 - 航海问答 */}
+          <div className="max-w-4xl mx-auto space-y-4">
             {faqs.map((faq, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ 
-                  duration: 0.3, 
-                  delay: index * 0.05, // 减少延迟间隔
-                  ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+                  duration: 0.4, 
+                  delay: index * 0.1,
+                  ease: [0.15, 1, 0.3, 1]
                 }}
               >
                 <Card className={cn(
-                  "overflow-hidden",
-                  "card-atlassian", // 使用Atlassian卡片样式
-                  "border-border/60"
+                  "group overflow-hidden relative",
+                  "bg-card/95 backdrop-blur-sm border border-primary/10",
+                  "rounded-2xl shadow-lg hover:shadow-xl",
+                  "transition-all duration-300",
+                  "hover:border-primary/30"
                 )}>
-                  <CardContent className="p-0">
+                  {/* 背景波纹效果 */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/2 via-transparent to-magellan-teal/2 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                  
+                  <CardContent className="p-0 relative z-10">
                     <button
                       onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
                       className={cn(
-                        "w-full text-left p-5 transition-atlassian-standard", // 减少内边距，使用Atlassian缓动
-                        "hover:bg-muted/30 flex items-center justify-between"
+                        "w-full text-left p-6 transition-all duration-300",
+                        "hover:bg-primary/5 flex items-center justify-between group/btn"
                       )}
                     >
-                      <h3 className="text-atlassian-h6 font-medium pr-4">{faq.question}</h3>
-                      <div className="flex-shrink-0">
-                        {openFaqIndex === index ? (
-                          <Minus className="h-4 w-4 text-primary" />
-                        ) : (
-                          <Plus className="h-4 w-4 text-primary" />
-                        )}
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className={cn(
+                          "p-2 rounded-xl transition-all duration-300",
+                          "bg-gradient-to-br from-primary/15 to-magellan-teal/10",
+                          "border border-primary/20",
+                          "group-hover/btn:scale-105 group-hover/btn:rotate-3 professional-scale"
+                        )}>
+                          <Map className="h-4 w-4 text-primary" />
+                        </div>
+                        <h3 className="text-atlassian-h6 font-semibold text-foreground group-hover/btn:text-primary transition-colors duration-300">
+                          {faq.question}
+                        </h3>
+                      </div>
+                      <div className={cn(
+                        "flex-shrink-0 p-2 rounded-lg transition-all duration-300",
+                        "bg-primary/10 group-hover/btn:bg-primary/20",
+                        openFaqIndex === index ? "rotate-180" : "rotate-0"
+                      )}>
+                        <ChevronDown className="h-4 w-4 text-primary" />
                       </div>
                     </button>
+                    
                     <AnimatePresence>
                       {openFaqIndex === index && (
                         <motion.div
@@ -693,13 +850,19 @@ export default function SimplifiedHomePage({
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
                           transition={{ 
-                            duration: 0.2, // 缩短动画时间
-                            ease: [0.25, 0.1, 0.25, 1] // Atlassian缓动
+                            duration: 0.3,
+                            ease: [0.25, 0.1, 0.25, 1]
                           }}
                           className="overflow-hidden"
                         >
-                          <div className="px-5 pb-5 text-atlassian-body text-muted-foreground leading-relaxed">
-                            {faq.answer}
+                          <div className="px-6 pb-6">
+                            <div className="pl-12">
+                              <div className="border-l-2 border-primary/20 pl-4">
+                                <p className="text-atlassian-body text-muted-foreground leading-relaxed">
+                                  {faq.answer}
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         </motion.div>
                       )}
@@ -710,46 +873,65 @@ export default function SimplifiedHomePage({
             ))}
           </div>
 
-          {/* Contact CTA - Atlassian风格 */}
+          {/* 联系CTA - 航海支援 */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
-              duration: 0.3, 
-              delay: 0.4,
-              ease: [0.25, 0.1, 0.25, 1] // Atlassian standard缓动
+              duration: 0.4, 
+              delay: 0.6,
+              ease: [0.25, 0.1, 0.25, 1]
             }}
-            className="mt-10 text-center" // 减少上边距
+            className="mt-16 text-center"
           >
             <Card className={cn(
-              "bg-primary/5 border-primary/20",
-              "card-atlassian"
+              "max-w-2xl mx-auto relative overflow-hidden",
+              "bg-gradient-to-br from-primary/5 via-background to-magellan-teal/5",
+              "border border-primary/20 rounded-2xl shadow-xl"
             )}>
-              <CardContent className="p-6"> {/* 减少内边距 */}
-                <div className="space-y-3"> {/* 减少间距 */}
-                  <Lightbulb className="h-10 w-10 text-primary mx-auto" /> {/* 稍微减小图标 */}
-                  <h3 className="text-atlassian-h5 font-medium">{t('home.faq.contact_cta.title')}</h3>
-                  <p className="text-atlassian-body text-muted-foreground">
-                    {t('home.faq.contact_cta.description')}
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-2 justify-center"> {/* 减少间距 */}
+              {/* 背景光效 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-magellan-coral/5 via-transparent to-magellan-gold/5"></div>
+              
+              <CardContent className="p-8 relative z-10">
+                <div className="space-y-6">
+                  {/* 图标 */}
+                  <div className="flex justify-center">
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-magellan-gold/20 to-magellan-coral/15 border border-magellan-gold/30">
+                      <Lightbulb className="h-8 w-8 text-magellan-gold" />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h3 className="text-atlassian-h4 font-semibold text-foreground">
+                      {t('home.faq.contact_cta.title')}
+                    </h3>
+                    <p className="text-atlassian-body text-muted-foreground">
+                      {t('home.faq.contact_cta.description')}
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button 
                       variant="outline"
                       className={cn(
-                        "btn-atlassian-secondary",
-                        "rounded-md px-4 py-2",
-                        "text-atlassian-body"
+                        "rounded-xl px-6 py-3 border-primary/30",
+                        "hover:bg-primary/10 hover:border-primary/50",
+                        "subtle-hover"
                       )}
                     >
+                      <Compass className="h-4 w-4 mr-2" />
                       {t('home.faq.contact_cta.contact_navigator')}
                     </Button>
                     <Button 
                       className={cn(
-                        "btn-atlassian-primary",
-                        "rounded-md px-4 py-2",
-                        "text-atlassian-body"
+                        "bg-gradient-to-r from-primary to-magellan-teal",
+                        "hover:from-primary/90 hover:to-magellan-teal/90",
+                        "rounded-xl px-6 py-3 text-white",
+                        "shadow-lg hover:shadow-xl",
+                        "subtle-hover"
                       )}
                     >
+                      <Route className="h-4 w-4 mr-2" />
                       {t('home.faq.contact_cta.join_expedition')}
                     </Button>
                   </div>
@@ -760,53 +942,131 @@ export default function SimplifiedHomePage({
         </div>
       </section>
 
-      {/* CTA Section - Atlassian风格 */}
-      <section className="py-16 px-4"> {/* 减少垂直间距 */}
-        <div className="max-w-4xl mx-auto text-center">
+      {/* Final CTA Section - 启程远航 */}
+      <section className="py-24 px-4 relative bg-gradient-to-br from-primary/5 via-background to-magellan-coral/3">
+        {/* 最终航海背景 */}
+        <div className="absolute inset-0 opacity-25">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-primary/3 to-transparent"></div>
+          <div className="absolute top-10 right-10 w-96 h-96 bg-gradient-to-bl from-magellan-teal/5 to-transparent rounded-full blur-3xl ocean-float"></div>
+          <div className="absolute bottom-10 left-10 w-80 h-80 bg-gradient-to-tr from-magellan-coral/5 to-transparent rounded-full blur-2xl" style={{animationDelay: '3s'}}></div>
+        </div>
+        
+        <div className="max-w-5xl mx-auto text-center relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
-              duration: 0.3,
-              ease: [0.15, 1, 0.3, 1] // Atlassian entrance缓动
+              duration: 0.8,
+              ease: [0.15, 1, 0.3, 1]
             }}
-            className="space-y-4" // 减少间距
+            className="space-y-8"
           >
-            <h2 className="text-atlassian-h2 font-medium"> {/* 使用Atlassian字体层级 */}
-              {t('home.final_cta.title')}
-            </h2>
-            <p className="text-atlassian-body-large text-muted-foreground">
-              {t('home.final_cta.description')}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center"> {/* 减少间距 */}
+            {/* 最终徽章 */}
+            <div className="inline-flex items-center gap-3 mb-8 px-6 py-3 rounded-full bg-gradient-to-r from-primary/15 to-magellan-coral/10 border border-primary/30 shadow-lg">
+              <Rocket className="h-5 w-5 text-primary" />
+              <span className="text-sm font-semibold text-primary">{t('home.final_cta.badge')}</span>
+              <div className="w-2 h-2 rounded-full bg-magellan-mint animate-pulse"></div>
+            </div>
+            
+            {/* 启程标题 */}
+            <div className="space-y-6">
+              <h2 className="text-atlassian-h1 font-bold leading-tight flex items-center justify-center gap-4 flex-wrap">
+                <span>⚓</span>
+                {t('home.final_cta.title')}
+                <span>🗺️</span>
+              </h2>
+              <p className="text-atlassian-body-large text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                🌊 {t('home.final_cta.description')}
+              </p>
+            </div>
+            
+            {/* 航海统计 */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex justify-center gap-12 text-sm text-muted-foreground flex-wrap my-8"
+            >
+              <div className="flex items-center gap-2 group">
+                <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <Users className="h-4 w-4 text-primary" />
+                </div>
+                <span className="font-medium">{t('home.final_cta.stats.active_explorers')}</span>
+              </div>
+              <div className="flex items-center gap-2 group">
+                <div className="p-2 rounded-full bg-magellan-teal/10 group-hover:bg-magellan-teal/20 transition-colors">
+                  <Star className="h-4 w-4 text-magellan-teal" />
+                </div>
+                <span className="font-medium">{t('home.final_cta.stats.discoveries_made')}</span>
+              </div>
+              <div className="flex items-center gap-2 group">
+                <div className="p-2 rounded-full bg-magellan-gold/10 group-hover:bg-magellan-gold/20 transition-colors">
+                  <Crown className="h-4 w-4 text-magellan-gold" />
+                </div>
+                <span className="font-medium">{t('home.final_cta.stats.verified_treasures')}</span>
+              </div>
+            </motion.div>
+            
+            {/* 行动按钮 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.6, 
+                delay: 0.4,
+                ease: [0.25, 0.1, 0.25, 1]
+              }}
+              className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+            >
               <Link href="/submit">
                 <Button 
                   size="lg" 
                   className={cn(
-                    "w-full sm:w-auto",
-                    "btn-atlassian-primary",
-                    "rounded-md px-6 py-3",
-                    "text-atlassian-body font-medium"
+                    "group relative overflow-hidden",
+                    "bg-gradient-to-r from-primary via-magellan-teal to-primary",
+                    "hover:from-primary/90 hover:via-magellan-teal/90 hover:to-primary/90",
+                    "text-white rounded-2xl px-8 py-4 text-lg font-semibold",
+                    "shadow-2xl hover:shadow-3xl",
+                    "transition-all duration-500 professional-scale",
+                    "border border-primary/20"
                   )}
+                  style={{
+                    backgroundSize: '200% 100%',
+                    animation: 'gradient-shift 3s ease infinite'
+                  }}
                 >
-                  {t('home.final_cta.chart_discovery')}
+                  {/* 按钮背景效果 */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-magellan-coral/20 via-transparent to-magellan-gold/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  
+                  <div className="relative flex items-center gap-3">
+                    <Map className="h-6 w-6 group-hover:rotate-6 transition-transform duration-300 professional-rotate" />
+                    ⚓ {t('home.final_cta.chart_discovery')}
+                    <ExternalLink className="h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+                  </div>
                 </Button>
               </Link>
+              
               <Link href="/categories">
                 <Button 
                   size="lg" 
                   variant="outline" 
                   className={cn(
-                    "w-full sm:w-auto",
-                    "btn-atlassian-secondary",
-                    "rounded-md px-6 py-3",
-                    "text-atlassian-body font-medium"
+                    "group",
+                    "border-2 border-primary/30 hover:border-primary/60",
+                    "bg-background/80 hover:bg-primary/5 backdrop-blur-sm",
+                    "rounded-2xl px-8 py-4 text-lg font-semibold",
+                    "shadow-lg hover:shadow-xl",
+                    "subtle-hover"
                   )}
                 >
-                  {t('home.final_cta.explore_territories')}
+                  <div className="flex items-center gap-3">
+                    <Compass className="h-6 w-6 text-primary group-hover:rotate-12 transition-transform duration-500 professional-rotate" />
+                    🗺️ {t('home.final_cta.explore_territories')}
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                  </div>
                 </Button>
               </Link>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>

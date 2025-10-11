@@ -199,7 +199,7 @@ export default function DashboardPage() {
                   >
                     <Card className="h-20 border-2 border-dashed border-border/60 hover:border-primary hover:bg-primary/5 transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] cursor-pointer">
                       <CardContent className="h-full flex flex-col items-center justify-center gap-2">
-                        <Plus className="h-5 w-5 text-primary transition-all duration-200 group-hover:scale-110" />
+                        <Plus className="h-5 w-5 text-primary subtle-scale" />
                         <span className="text-[14px] font-medium text-[var(--ds-text)]">{tProfile('submit_new_tool')}</span>
                       </CardContent>
                     </Card>
@@ -214,7 +214,7 @@ export default function DashboardPage() {
                   >
                     <Card className="h-20 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] cursor-pointer">
                       <CardContent className="h-full flex flex-col items-center justify-center gap-2">
-                        <Upload className="h-5 w-5 text-primary transition-all duration-200 group-hover:scale-110" />
+                        <Upload className="h-5 w-5 text-primary subtle-scale" />
                         <span className="text-[14px] font-medium text-[var(--ds-text)]">{tProfile('manage_submissions')}</span>
                       </CardContent>
                     </Card>
@@ -229,7 +229,7 @@ export default function DashboardPage() {
                   >
                     <Card className="h-20 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] cursor-pointer">
                       <CardContent className="h-full flex flex-col items-center justify-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-primary transition-all duration-200 group-hover:scale-110" />
+                        <TrendingUp className="h-5 w-5 text-primary subtle-scale" />
                         <span className="text-[14px] font-medium text-[var(--ds-text)]">{tProfile('discover_tools')}</span>
                       </CardContent>
                     </Card>

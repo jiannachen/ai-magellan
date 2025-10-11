@@ -169,7 +169,7 @@ export function Reviews({ websiteId, websiteTitle }: ReviewsProps) {
             onMouseLeave={() => interactive && setHoveredStar(0)}
             className={cn(
               "transition-colors duration-200",
-              interactive && "hover:scale-110 cursor-pointer"
+              interactive && "subtle-scale cursor-pointer"
             )}
           >
             <Star

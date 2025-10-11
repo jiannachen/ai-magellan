@@ -1,0 +1,852 @@
+[
+  {
+    "id": "1024524",
+    "name": "Google AI Studio",
+    "tagline": "Now you can vibe code with your voice",
+    "description": "Google AI Studio now lets you vibe code with your voice. Hit the mic, describe what you need, and watch it build. The AI strips out filler words and false starts, turning your natural speech into clean prompts. No typing, no friction—just talk and build.",
+    "slug": "google-ai-studio-2",
+    "url": "https://www.producthunt.com/products/google-ai-studio-2?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "website": "https://www.producthunt.com/r/S4JBSCN4MK7OOG?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "featuredAt": "2025-10-11T07:01:00Z",
+    "createdAt": "2025-10-11T07:01:00Z",
+    "votesCount": 203,
+    "commentsCount": 3,
+    "reviewsRating": 0,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/2ad69c66-4c75-44d6-8f4f-a8795d08260e.png?auto=format"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/16811973-45b4-480f-85c1-cd90ac826255.jpeg?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/55710afe-ff50-4b2f-a511-e57400820331.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/856e010d-f6b8-48ee-9e7a-ed89cfbc222d.jpeg?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/96210310-dfb8-4196-94a5-6289c0b888cc.jpeg?auto=format",
+        "type": "video"
+      }
+    ],
+    "makers": [
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "Artificial Intelligence",
+            "slug": "artificial-intelligence"
+          }
+        },
+        {
+          "node": {
+            "name": "Audio",
+            "slug": "audio"
+          }
+        },
+        {
+          "node": {
+            "name": "Vibe coding",
+            "slug": "vibe-coding"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "1011704",
+    "name": "JustPaid",
+    "tagline": "Autonomous AI for billing, contracts, and collections.",
+    "description": "AI-powered revenue operations platform that automates invoice follow-ups, tracks customer payments, and manages all communications. Streamline your financial processes with intelligent automation.",
+    "slug": "justpaid",
+    "url": "https://www.producthunt.com/products/justpaid?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "website": "https://www.producthunt.com/r/V5DYVSXPRXILK7?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "featuredAt": "2025-10-11T07:01:00Z",
+    "createdAt": "2025-10-11T07:01:00Z",
+    "votesCount": 152,
+    "commentsCount": 1,
+    "reviewsRating": 0,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/05b63008-74fa-4b5d-b843-9516a1bc8627.jpeg?auto=format"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/9c37f940-e35d-43c9-96f0-7fc9275165ff.jpeg?auto=format",
+        "type": "video"
+      },
+      {
+        "url": "https://ph-files.imgix.net/1d233000-363e-45ea-951a-9ad976f16a8e.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/674f5704-b5d2-4035-bef8-7f7d8d11a2c5.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/be5e399c-fbbb-4410-a3d6-e9a63fe249b8.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/9a4f4f45-c897-4458-b35a-55a248e3cd4b.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/ab72467e-c4ae-4f17-bf10-2a0f341adec1.png?auto=format",
+        "type": "image"
+      }
+    ],
+    "makers": [
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "Fintech",
+            "slug": "fintech"
+          }
+        },
+        {
+          "node": {
+            "name": "Payments",
+            "slug": "payments"
+          }
+        },
+        {
+          "node": {
+            "name": "Artificial Intelligence",
+            "slug": "artificial-intelligence"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "1024990",
+    "name": "Buildrrr",
+    "tagline": "The Easiest Way To Create Custom Branded DMG Files",
+    "description": "Buildrrr is a macOS app for creating professional DMG installers. Design layouts, save templates, and add branding with ease. One-click signing, notarization, and stapling ensure Apple-compliant DMGs ready to ship with confidence.",
+    "slug": "buildrrr",
+    "url": "https://www.producthunt.com/products/buildrrr?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "website": "https://www.producthunt.com/r/DNT5FJI5TS6FEF?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "featuredAt": "2025-10-11T07:01:00Z",
+    "createdAt": "2025-10-11T07:01:00Z",
+    "votesCount": 148,
+    "commentsCount": 2,
+    "reviewsRating": 0,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/27328d1c-1159-4a91-8984-39a14011b75a.png?auto=format"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/fa20b864-0c95-4580-a7b6-8d9f86125bc0.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/46b09622-b61e-4cbb-93cf-1dfb502e8376.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/f03dd675-c3a2-4052-a017-cb9063da064e.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/4e9caaed-88f8-4de9-9911-6f36c17bc0c1.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/9dd75e54-99ef-465c-a388-250ba921aeb2.png?auto=format",
+        "type": "image"
+      }
+    ],
+    "makers": [
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "Design Tools",
+            "slug": "design-tools"
+          }
+        },
+        {
+          "node": {
+            "name": "Productivity",
+            "slug": "productivity"
+          }
+        },
+        {
+          "node": {
+            "name": "Developer Tools",
+            "slug": "developer-tools"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "1025200",
+    "name": "Mittalmar YouTube Software",
+    "tagline": "Track growing YouTube niches in real time",
+    "description": "Mittalmar is the most intelligent YouTube Software Ecosystem. Save hours, create with purpose, and grow your YouTube skills and passion to new heights.",
+    "slug": "mittalmar-youtube-software",
+    "url": "https://www.producthunt.com/products/mittalmar-youtube-software?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "website": "https://www.producthunt.com/r/R3SUZNNFQJTNNG?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "featuredAt": "2025-10-11T07:01:00Z",
+    "createdAt": "2025-10-11T07:01:00Z",
+    "votesCount": 114,
+    "commentsCount": 7,
+    "reviewsRating": 0,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/dc946273-2c6f-4b11-a11d-b27535f3dd77.png?auto=format"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/0a3023db-0f02-46ad-86f6-7a41f4c73361.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/5315983c-923c-4915-ba5e-8697b5532a2e.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/8ca79a0c-2c43-4d77-b412-b658711786c9.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/72e60dd2-1e65-4464-b837-07c9a4e4f027.jpeg?auto=format",
+        "type": "video"
+      }
+    ],
+    "makers": [
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "Productivity",
+            "slug": "productivity"
+          }
+        },
+        {
+          "node": {
+            "name": "YouTube",
+            "slug": "youtube"
+          }
+        },
+        {
+          "node": {
+            "name": "Data & Analytics",
+            "slug": "data-analytics"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "1025301",
+    "name": "GensparkAI to Obsidian",
+    "tagline": "Batch export & download genspark conversations to markdown",
+    "description": "Effortlessly export, download, and sync all your Genspark conversations to Markdown files in bulk with just one click! Perfect for Obsidian, Notion, Logseq, and other knowledge management tools.",
+    "slug": "gensparkai-to-obsidian",
+    "url": "https://www.producthunt.com/products/gensparkai-to-obsidian?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "website": "https://www.producthunt.com/r/VV23EMW3VRRRBK?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "featuredAt": "2025-10-11T07:01:00Z",
+    "createdAt": "2025-10-11T07:01:00Z",
+    "votesCount": 104,
+    "commentsCount": 1,
+    "reviewsRating": 0,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/89553c1e-9f8d-447d-beaa-4ff8c7e23259.vnd.microsoft.icon?auto=format"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/83794114-4356-4696-8334-c3e21cd9e4d8.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/b668cff1-51d1-4102-b4d1-d6669c2802e9.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/3d06a07e-445b-4473-a17d-2472474efb4f.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/77c4d4b7-ec8b-4b67-af02-7a7603f744db.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/8f7f06da-15db-4a10-af10-a97f9e58c341.jpeg?auto=format",
+        "type": "video"
+      }
+    ],
+    "makers": [
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "Chrome Extensions",
+            "slug": "chrome-extensions"
+          }
+        },
+        {
+          "node": {
+            "name": "Productivity",
+            "slug": "productivity"
+          }
+        },
+        {
+          "node": {
+            "name": "Data",
+            "slug": "data"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "1021883",
+    "name": "Intryc",
+    "tagline": "AI scores tickets to your SOPs with 90% precision",
+    "description": "Intryc scores and gives feedback on real support conversations. Now with AI simulations, agents can role play real past tickets and get scored instantly, cutting onboarding time by 50 percent and saving CX leads 12 to 15 hours of manual training each week.",
+    "slug": "intryc",
+    "url": "https://www.producthunt.com/products/intryc?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "website": "https://www.producthunt.com/r/PRPL22S22YFASN?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "featuredAt": "2025-10-10T07:01:00Z",
+    "createdAt": "2025-10-10T07:01:00Z",
+    "votesCount": 466,
+    "commentsCount": 18,
+    "reviewsRating": 0,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/cb9e7ea7-648f-4cbd-99cb-2f9dfd5f83d1.jpeg?auto=format"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/69c81ca4-7922-4280-b2c9-03bc6e65494c.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/a289b4c0-16cc-46de-a478-2641c28d49ce.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/dc1938b1-2f05-434f-a5d2-c553a8860443.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/70e61271-ed5a-45e0-a3fe-30f05afe14a1.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/bc58395f-94d3-4e90-9f11-4433716c33ed.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/adfa54b7-a01b-4475-af47-4729d2a9b672.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/15459f25-b93f-4bad-bc85-70a92c799213.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/1a9adaab-01ab-4a41-a764-4e885fce421a.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/6620110f-2f69-4857-93b0-f2ca309c6b43.gif?auto=format",
+        "type": "video"
+      }
+    ],
+    "makers": [
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "Customer Success",
+            "slug": "customer-success"
+          }
+        },
+        {
+          "node": {
+            "name": "Analytics",
+            "slug": "analytics"
+          }
+        },
+        {
+          "node": {
+            "name": "Artificial Intelligence",
+            "slug": "artificial-intelligence"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "1017736",
+    "name": "Lyra",
+    "tagline": "Record, transcribe + auto‑create action items for every call",
+    "description": "Lyra is the final meeting platform. Work with AI and your team to create follow-ups, drafts, and tasks live, no more screenshare. Meetings finish with actions, not just notes, and shared context carries across every call without an AI notetaker.",
+    "slug": "lyra-7",
+    "url": "https://www.producthunt.com/products/lyra-7?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "website": "https://www.producthunt.com/r/RNKBPN65GQZXAU?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "featuredAt": "2025-10-10T07:01:00Z",
+    "createdAt": "2025-10-10T07:01:00Z",
+    "votesCount": 460,
+    "commentsCount": 83,
+    "reviewsRating": 0,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/acae4262-d1de-43e3-904c-0d38733f4ca5.png?auto=format"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/510dfa30-a5c7-445e-9288-213ab846f8da.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/bede86ca-378d-4177-b321-0e6b6e158676.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/1e994a1e-1fd4-4a8a-b5b2-8f007e1a0a04.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/d11768fa-d7db-487e-87f3-1966330de4dd.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/0649e1eb-2a23-4bf3-b845-0cbbcbbcd251.jpeg?auto=format",
+        "type": "video"
+      }
+    ],
+    "makers": [
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "Productivity",
+            "slug": "productivity"
+          }
+        },
+        {
+          "node": {
+            "name": "Meetings",
+            "slug": "meetings"
+          }
+        },
+        {
+          "node": {
+            "name": "Artificial Intelligence",
+            "slug": "artificial-intelligence"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "993684",
+    "name": "Layercode CLI",
+    "tagline": "Build voice AI agents with one command",
+    "description": "Build a voice AI agent in minutes, straight from your terminal. One command scaffolds your project with built-in tunneling, sample backends, and global edge deployment. Connect via webhook, use existing agent logic, pay only for speech (silence is free).",
+    "slug": "layercode-cli",
+    "url": "https://www.producthunt.com/products/layercode?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "website": "https://www.producthunt.com/r/BDKIK5KJ63CGR6?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "featuredAt": "2025-10-10T07:01:00Z",
+    "createdAt": "2025-10-10T07:01:00Z",
+    "votesCount": 250,
+    "commentsCount": 39,
+    "reviewsRating": 0,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/c11bde87-0221-4b92-9f0f-52b7d78353d6.gif?auto=format"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/75ba1661-97fd-4fe0-9f32-866785399abe.jpeg?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/13c78c9c-8ed4-4efe-a5c2-ce61556c4e57.jpeg?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/224c1e7d-7f65-4a6a-adf0-a386deb8d422.jpeg?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/de096881-43b9-4b0a-9de8-e1b7f374071d.jpeg?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/7fcdee9a-0170-49de-b7d0-77ccf19c4e5e.jpeg?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/1368fde1-baaa-475e-a48c-c9a3a2e2a92e.jpeg?auto=format",
+        "type": "video"
+      }
+    ],
+    "makers": [
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "Developer Tools",
+            "slug": "developer-tools"
+          }
+        },
+        {
+          "node": {
+            "name": "Artificial Intelligence",
+            "slug": "artificial-intelligence"
+          }
+        },
+        {
+          "node": {
+            "name": "Audio",
+            "slug": "audio"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "1024599",
+    "name": "blai",
+    "tagline": "AI crypto advisor that trades for you",
+    "description": "Your AI Crypto advisor. The first AI investing app that trades for you, live today. Blai is “Chat to trade” for Gen Z: prompt to research, build a portfolio, and buy/sell; the AI executes.",
+    "slug": "blai",
+    "url": "https://www.producthunt.com/products/blai?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "website": "https://www.producthunt.com/r/WBUCIUA2LDCJQP?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "featuredAt": "2025-10-10T07:01:00Z",
+    "createdAt": "2025-10-10T07:01:00Z",
+    "votesCount": 288,
+    "commentsCount": 24,
+    "reviewsRating": 0,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/6de75bb3-9575-4fdc-87f6-8a9eb334f606.png?auto=format"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/009598b3-d333-4441-ae41-fd0fbca73777.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/b696dfe8-cc3a-414e-b48d-6c3c0d6791a1.jpeg?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/c1cecc77-bc1d-4b4c-85dd-a9345c2008c5.jpeg?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/3de2978d-c607-4d63-9718-da4e33316226.jpeg?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/d944c78f-6a92-4287-b343-edef4d35125f.jpeg?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/957302b2-566a-4808-b6e0-52551c008e1a.jpeg?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/ecf0bf0d-7e39-480c-8238-f81a46f7bd00.jpeg?auto=format",
+        "type": "video"
+      }
+    ],
+    "makers": [
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      },
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "Fintech",
+            "slug": "fintech"
+          }
+        },
+        {
+          "node": {
+            "name": "Investing",
+            "slug": "investing"
+          }
+        },
+        {
+          "node": {
+            "name": "Crypto",
+            "slug": "crypto"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "1024388",
+    "name": "Dad Reply v1.5",
+    "tagline": "Compose, reply, and send a 👍 in a single click",
+    "description": "Reply in one click.* No typing. No thinking. Just send it. * \"Outlook already does this\" — you're using Outlook, sit down.",
+    "slug": "dad-reply-v1-5",
+    "url": "https://www.producthunt.com/products/dad-reply?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "website": "https://www.producthunt.com/r/PSXFKYUYJAL2Q2?utm_campaign=producthunt-api&utm_medium=api-v2&utm_source=Application%3A+aimagellan+%28ID%3A+233052%29",
+    "featuredAt": "2025-10-10T07:01:00Z",
+    "createdAt": "2025-10-10T07:01:00Z",
+    "votesCount": 221,
+    "commentsCount": 26,
+    "reviewsRating": 0,
+    "thumbnail": {
+      "url": "https://ph-files.imgix.net/571899bb-78fe-4e6a-b556-b24a4b814368.png?auto=format"
+    },
+    "media": [
+      {
+        "url": "https://ph-files.imgix.net/07cd65ca-8407-4fba-be3d-e6cb3a839129.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/37d80e60-e7fe-44b2-81d0-a3dd8d2c222c.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/92f7a99e-fa41-4ab2-ba7f-2d9130d26860.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/2dfc319f-f570-4825-a8bf-4ad07b0d207b.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/dbcc7533-4722-44d3-847f-48971b5ee7f6.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/db43d65c-d9f0-4135-9420-b5e53f88741f.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/40f3b51c-9d33-4dc3-9057-120b233fcb6e.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/97463aa2-4872-4eb8-81ac-526f47f4da53.png?auto=format",
+        "type": "image"
+      },
+      {
+        "url": "https://ph-files.imgix.net/bee377bd-4e29-4ab0-a7ba-218d38c72200.png?auto=format",
+        "type": "image"
+      }
+    ],
+    "makers": [
+      {
+        "name": "[REDACTED]",
+        "username": "[REDACTED]",
+        "profileImage": null
+      }
+    ],
+    "topics": {
+      "edges": [
+        {
+          "node": {
+            "name": "Chrome Extensions",
+            "slug": "chrome-extensions"
+          }
+        },
+        {
+          "node": {
+            "name": "Email",
+            "slug": "email"
+          }
+        },
+        {
+          "node": {
+            "name": "Productivity",
+            "slug": "productivity"
+          }
+        }
+      ]
+    }
+  }
+]
