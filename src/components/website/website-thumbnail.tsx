@@ -35,9 +35,9 @@ export function WebsiteThumbnail({
         <Image
           src={faviconUrl}
           alt={title}
-          width={20}
-          height={20}
-          className="w-5 h-5"
+          width={32}
+          height={32}
+          className="w-8 h-8"
           unoptimized
           onError={(e) => {
             // @ts-ignore - nextjs Image 组件的 error 事件类型定义问题
@@ -46,7 +46,7 @@ export function WebsiteThumbnail({
             e.target.nextElementSibling?.classList.remove("hidden");
           }}
         />
-        <Globe className="h-5 w-5 text-gray-500 dark:text-gray-400 hidden" />
+        <Globe className="h-8 w-8 text-gray-500 dark:text-gray-400 hidden" />
       </div>
     );
   }
@@ -63,8 +63,8 @@ export function WebsiteThumbnail({
         src={thumbnailSrc}
         alt={title}
         fill
-        sizes="40px"
-        className="object-cover"
+        sizes="56px"
+        className="object-contain"
         unoptimized
         onError={() => setImageError(true)}
       />

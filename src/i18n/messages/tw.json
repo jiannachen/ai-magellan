@@ -89,116 +89,6 @@
     "ai_business": "AI商業",
     "others": "其他"
   },
-  "home": {
-    "badge": "開啟AI探索之旅",
-    "title": "發現最佳AI工具",
-    "subtitle": "為您的下一次冒險",
-    "description": "如同麥哲倫的歷史航行，我們為您開拓AI前沿，指引您的探索之路。",
-    "description_continued": "發現、比較並導航到將改變您工作的AI工具。",
-    "search_placeholder": "規劃您的航線... 搜尋AI工具",
-    "search_suggestions": "試試：'圖像生成器'、'程式碼助手'、'寫作夥伴'",
-    "stats": {
-      "charted_tools": "已繪製工具",
-      "explorers": "探索者",
-      "discoveries": "發現",
-      "verified": "已驗證",
-      "expert": "專家",
-      "daily": "每日"
-    },
-    "cta_buttons": {
-      "explore_categories": "探索分類",
-      "chart_new_tool": "繪製新工具"
-    },
-    "ranking_sections": {
-      "premier_discoveries": {
-        "title": "頂級AI發現",
-        "description": "由我們專業探索團隊驗證的頂級工具"
-      },
-      "trending_expeditions": {
-        "title": "熱門探險",
-        "description": "在探索社群中備受關注的AI工具"
-      },
-      "free_territory": {
-        "title": "免費領域探索",
-        "description": "所有探索者都可免費使用的高品質AI工具"
-      },
-      "new_horizons": {
-        "title": "新地平線",
-        "description": "最新發現並添加到我們探索地圖的AI工具"
-      }
-    },
-    "value_props": {
-      "title": "為何選擇AI Magellan作為您的嚮導？",
-      "description": "我們不只是列出工具 - 我們繪製AI前沿，測試並映射每個解決方案，指引您成功的探索。",
-      "expert_navigation": {
-        "title": "專家導航",
-        "description": "如同麥哲倫的指南針，我們以精確性和專業知識引導您穿越廣闊的AI領域"
-      },
-      "charted_territory": {
-        "title": "已繪製領域",
-        "description": "我們映射AI前沿，測試並驗證每個工具，為您的探索繪製安全通道"
-      },
-      "optimal_routes": {
-        "title": "最佳路線",
-        "description": "進階篩選和智慧推薦幫助您找到通往完美AI工具的最短路徑"
-      },
-      "verified_quality": {
-        "title": "品質驗證",
-        "description": "每個工具都經過我們探索團隊的嚴格測試和驗證才能在我們平台上佔有一席之地"
-      },
-      "global_discovery": {
-        "title": "全球發現",
-        "description": "發現來自世界各地的AI創新 - 從新興初創公司到成熟的企業解決方案"
-      },
-      "pioneer_access": {
-        "title": "先驅存取",
-        "description": "成為首批發現突破性AI工具的人，當它們在技術地平線上出現時"
-      }
-    },
-    "faq": {
-      "title": "導航指南",
-      "description": "關於使用Magellan探索AI工具您需要知道的一切",
-      "questions": {
-        "what_makes_different": {
-          "question": "AI Magellan與其他AI工具目錄有何不同？",
-          "answer": "如同麥哲倫的歷史航行，我們在AI領域開拓未知的領域。我們的專家團隊親自測試和驗證每個工具，提供全面的評論、真實世界的使用案例和品質評分。我們不只是列出工具 - 我們引導您探索AI前沿。"
-        },
-        "quality_assurance": {
-          "question": "您如何確保所列AI工具的品質？",
-          "answer": "每個工具都經過我們嚴格的探索過程 - 我們測試功能性，驗證公司資格，分析用戶反饋，並根據性能、可靠性和創新性分配品質評分。只有符合我們高標準的工具才能在我們的平台上佔有一席之地。"
-        },
-        "free_tools": {
-          "question": "AI Magellan上的AI工具是免費使用的嗎？",
-          "answer": "我們在所有類別中都有免費和付費AI工具。每個列表都清楚顯示定價模式 - 免費、免費增值、訂閱或一次性購買。許多工具提供免費試用或基本版本，讓您在承諾付費計劃之前可以探索。"
-        },
-        "submit_tool": {
-          "question": "我可以提交我的AI工具進行審查嗎？",
-          "answer": "當然可以！我們歡迎工具創作者和創新者提交他們的AI解決方案。我們的審查團隊會徹底評估您的工具是否符合我們的品質標準。通過我們探索過程的高品質工具將在我們的目錄中特色展示。"
-        },
-        "update_frequency": {
-          "question": "您多久更新一次AI工具目錄？",
-          "answer": "如同導航員不斷更新圖表，我們每天都會更新我們的目錄。我們追蹤新發布、功能更新、價格變化和AI領域的新興趨勢，確保您始終能獲得最新和最相關的工具。"
-        },
-        "account_required": {
-          "question": "我需要帳戶來探索AI工具嗎？",
-          "answer": "基本探索不需要帳戶！但是，創建免費帳戶可以解鎖額外功能，如保存收藏、評分工具、留下評論，以及根據您的探索歷史和偏好獲得個性化推薦。"
-        }
-      },
-      "contact_cta": {
-        "title": "準備好進行下一次探險了嗎？",
-        "description": "找不到您要尋找的答案？我們的探索團隊在這裡為您指引。",
-        "contact_navigator": "聯繫導航員",
-        "join_expedition": "加入探險"
-      }
-    },
-    "final_cta": {
-      "title": "準備好繪製您的AI探險了嗎？",
-      "description": "加入成千上萬信任AI Magellan發現下一個突破工具的探索者。",
-      "chart_discovery": "繪製您的發現",
-      "explore_territories": "探索領域"
-    },
-    "view_all": "檢視全部"
-  },
   "pages": {
     "rankings": {
       "title": "AI工具排行榜",
@@ -288,20 +178,6 @@
       "cta_subtitle": "使用我們的探險排行榜，發現最符合你探索目標與預算的 AI 工具。",
       "cta_navigate_by_territory": "按領域導航",
       "cta_chart_discovery": "繪製你的發現"
-    },
-    "submit": {
-      "title": "提交AI工具",
-      "description": "分享你發現的優質AI工具",
-      "form": {
-        "website_title": "網站標題",
-        "website_url": "網站URL",
-        "website_description": "網站描述",
-        "category": "選擇分類",
-        "tags": "標籤（用逗號分隔）",
-        "submit_button": "提交網站",
-        "success_message": "提交成功！我們會盡快審核您的提交。",
-        "error_message": "提交失敗，請稍後重試。"
-      }
     },
     "about": {
       "title": "關於AI導航",
@@ -411,6 +287,7 @@
     "has_free_version": "有免費版本",
     "api_available": "具有 API 存取權限",
     "pricing_plans": "定價方案（可選，最多 6 個）",
+    "pricing_plan": "定價方案",
     "plan_number": "方案 {number}",
     "plan_name": "方案名稱",
     "plan_name_placeholder": "例如，基本",
@@ -418,10 +295,16 @@
     "billing_cycle_placeholder": "例如每月",
     "price": "價格",
     "price_placeholder": "例如，9.99美元",
+    "plan_features": "方案功能",
     "features_max_5": "功能（最多 5 個）",
     "feature_placeholder": "例如，無限專案",
+    "plan_feature_placeholder": "例如，無限專案",
     "add_feature_to_plan": "新增功能",
     "add_pricing_plan": "新增定價方案",
+    "monthly": "每月",
+    "yearly": "每年",
+    "one_time": "一次性",
+    "usage_based": "按使用量",
     "social_media": "社群媒體",
     "twitter": "Twitter/X",
     "twitter_placeholder": "https://twitter.com/yourtool",
@@ -451,309 +334,6 @@
     "macos": "macOS",
     "windows": "Windows",
     "linux": "Linux"
-  },
-  "edit": {
-    "title": "編輯網站",
-    "back_to_submissions": "返回我的提交",
-    "saving": "儲存中...",
-    "save_changes": "儲存變更",
-    "errors": {
-      "required_fields": "請填寫所有必填欄位",
-      "update_failed": "更新失敗",
-      "fetch_failed": "取得網站資訊失敗",
-      "website_not_found": "網站不存在",
-      "permission_denied": "您沒有權限編輯此網站",
-      "only_own_websites": "您只能編輯自己提交的網站"
-    },
-    "success": {
-      "updated": "網站資訊已更新"
-    },
-    "loading": "載入中...",
-    "error": "錯誤",
-    "login_required": "需要登入",
-    "login_description": "請先登入以編輯網站資訊。",
-    "login_now": "立即登入",
-    "retry": "重試"
-  },
-  "profile": {
-    "dashboard": {
-      "title": "儀表板",
-      "welcome": "你好，{name}！",
-      "welcome_back": "歡迎回到你的AI工具中心",
-      "favorites_tools": "收藏工具",
-      "saved_tools": "已保存的工具",
-      "my_submissions": "我的提交",
-      "submitted_tools": "已提交工具",
-      "quick_actions": "快速操作",
-      "submit_new_tool": "提交新工具",
-      "manage_submissions": "管理提交",
-      "discover_tools": "發現工具",
-      "recent_favorites": "最近收藏",
-      "view_all": "查看全部",
-      "no_favorites": "還沒有收藏任何工具",
-      "no_favorites_desc": "去發現一些優質的AI工具並收藏它們吧！",
-      "go_discover": "去發現工具",
-      "unfavorite_success": "已取消收藏",
-      "unfavorite_error": "取消收藏失敗",
-      "loading_favorites": "載入收藏中..."
-    },
-    "favorites": {
-      "title": "我的收藏",
-      "description": "管理您收藏的AI工具，隨時存取喜愛的資源",
-      "discover_more": "發現更多工具",
-      "favorite_tools": "收藏工具",
-      "saved_to_library": "已保存到您的收藏庫",
-      "retry": "重試",
-      "no_favorites": "還沒有收藏任何工具",
-      "no_favorites_desc": "去發現一些優質的AI工具並收藏它們吧！探索無限可能，構建您的專屬工具庫。",
-      "load_error": "載入收藏失敗",
-      "login_required": "需要登入",
-      "login_description": "請先登入以查看您的收藏。",
-      "login_now": "立即登入"
-    },
-    "info": {
-      "title": "個人資訊",
-      "description": "管理您的個人資料和帳戶設定",
-      "basic_info": "基本資訊",
-      "general_user": "普通用戶",
-      "regular_user": "普通用戶",
-      "name_label": "姓名",
-      "name": "姓名",
-      "email_label": "信箱地址",
-      "email_address": "信箱地址",
-      "user_id_label": "用戶ID",
-      "user_id": "用戶ID",
-      "registration_date": "註冊時間",
-      "not_set": "未設定",
-      "account_settings": "帳戶設定",
-      "email_verification": "信箱驗證狀態",
-      "email_verification_status": "信箱驗證狀態",
-      "email_verification_desc": "您的信箱地址驗證狀態",
-      "verified": "已驗證",
-      "unverified": "未驗證",
-      "two_factor_auth": "雙重認證",
-      "two_factor_desc": "增強帳戶安全性",
-      "not_enabled": "未啟用",
-      "disabled": "未啟用",
-      "usage_tips": "使用提示",
-      "usage_tips_content": [
-        "您可以在工具詳情頁收藏工具，方便日後查看",
-        "提交的工具將在24-48小時內審核",
-        "定期檢查您的帳戶設定，確保帳戶安全"
-      ],
-      "tip_1": "您可以在工具詳情頁收藏工具，方便日後查看",
-      "tip_2": "提交的工具將在24-48小時內審核",
-      "tip_3": "定期檢查您的帳戶設定，確保帳戶安全",
-      "not_logged_in": "未登入",
-      "login_to_view": "請先登入以查看個人資料。",
-      "login_required": "需要登入",
-      "login_description": "請先登入以查看個人資料。",
-      "login_now": "立即登入",
-      "default_user": "普通用戶"
-    },
-    "submissions": {
-      "title": "我的提交",
-      "description": "管理您提交的AI工具",
-      "submit_new": "提交新工具",
-      "submit_new_tool": "提交新工具",
-      "total_submissions": "總提交數",
-      "approved": "已通過",
-      "pending": "待審核",
-      "pending_review": "待審核",
-      "status_pending": "待審核",
-      "status_approved": "已通過",
-      "status_rejected": "已拒絕",
-      "retry": "重試",
-      "no_submissions": "還沒有提交任何工具",
-      "no_submissions_desc": "開始分享您發現的優質AI工具吧！",
-      "submit_first": "提交第一個工具",
-      "submit_first_tool": "提交第一個工具",
-      "featured": "精選",
-      "page_info": "第 {current} / {total} 頁",
-      "load_error": "載入提交記錄失敗",
-      "login_required": "需要登入",
-      "login_description": "請先登入以查看您的提交記錄。",
-      "login_now": "立即登入"
-    },
-    "navigation": {
-      "overview": "概覽",
-      "overview_desc": "數據概覽和快速操作",
-      "dashboard": "儀表板",
-      "dashboard_desc": "數據概覽和快速操作",
-      "favorites": "收藏",
-      "favorites_desc": "已收藏的AI工具",
-      "submissions": "提交",
-      "submissions_desc": "提交的工具管理",
-      "settings": "設定",
-      "settings_desc": "帳戶和個人資訊",
-      "user": "用戶",
-      "default_user": "普通用戶"
-    }
-  },
-  "submit_form": {
-    "title": "提交AI工具",
-    "description": "分享您的AI工具，與社群一起發現優質應用",
-    "simple_form": {
-      "tool_url": "工具網址",
-      "tool_url_required": "工具網址 *",
-      "tool_url_placeholder": "https://example.com",
-      "tool_name": "工具名稱",
-      "tool_name_required": "工具名稱 *",
-      "tool_name_placeholder": "輸入您的工具名稱",
-      "business_email": "商業信箱",
-      "business_email_required": "商業信箱 *",
-      "business_email_placeholder": "contact@example.com",
-      "tagline": "標語",
-      "tagline_required": "標語 *",
-      "tagline_placeholder": "簡短、引人注目的標語",
-      "category": "分類",
-      "category_required": "分類 *",
-      "category_placeholder": "選擇分類",
-      "description": "描述",
-      "description_required": "描述 *",
-      "description_placeholder": "簡要描述您工具的功能和特色",
-      "auto_fill": "自動填入",
-      "submit": "提交工具"
-    },
-    "enhanced_form": {
-      "basic_info": "基本資訊",
-      "advanced_info": "進階資訊"
-    },
-    "validation": {
-      "valid_url": "請輸入有效的網址",
-      "valid_email": "請輸入有效的商業信箱地址",
-      "name_min_length": "工具名稱至少3個字符",
-      "name_max_length": "工具名稱不能超過100個字符",
-      "select_category": "請選擇分類",
-      "tagline_min_length": "標語至少10個字符",
-      "tagline_max_length": "標語不能超過200個字符",
-      "description_min_length": "描述至少50個字符",
-      "description_max_length": "描述不能超過1000個字符"
-    },
-    "messages": {
-      "load_categories_error": "載入分類失敗，請刷新頁面重試",
-      "auto_fill_success": "資訊獲取成功，網站資訊已自動填充",
-      "auto_fill_error": "獲取失敗，請手動填寫網站資訊",
-      "submit_success": "提交成功！您的AI工具已提交審核，我們將在24-48小時內處理。",
-      "submit_error": "提交失敗，請重試"
-    }
-  },
-  "search": {
-    "advanced": {
-      "title": "進階搜尋",
-      "search_placeholder": "搜尋AI工具...（例如：AI寫作、圖像生成）",
-      "advanced_filters": "進階篩選",
-      "clear_filters": "清除篩選",
-      "pricing_model": "定價模式",
-      "pricing_options": {
-        "free": "免費",
-        "freemium": "免費增值",
-        "paid": "付費",
-        "enterprise": "企業版"
-      },
-      "min_quality_score": "最低品質評分：{score}",
-      "trusted_tools": "可信工具",
-      "featured_tools": "精選工具",
-      "free_version": "有免費版本",
-      "sort_by": "排序方式",
-      "sort_options": {
-        "relevance": "相關度",
-        "newest": "最新添加",
-        "visits": "存取量",
-        "likes": "點讚數",
-        "quality": "品質評分",
-        "name": "名稱"
-      },
-      "sort_direction": "排序方向",
-      "suggestions": [
-        "AI寫作助手",
-        "圖像生成工具",
-        "程式碼助手"
-      ]
-    },
-    "search_box": {
-      "placeholder": "搜尋AI工具、教學、資源...",
-      "search_types": {
-        "internal": "站內",
-        "baidu": "百度"
-      }
-    }
-  },
-  "tools": {
-    "detail": {
-      "load_error": "載入工具詳情失敗",
-      "login_required": "請先登入",
-      "like_success": "按讚成功",
-      "unlike_success": "已取消按讚",
-      "favorite_success": "已加入收藏",
-      "unfavorite_success": "已移除收藏",
-      "operation_failed": "操作失敗",
-      "link_copied": "連結已複製到剪貼簿",
-      "featured": "精選",
-      "likes": "讚",
-      "favorites": "收藏",
-      "visits": "造訪",
-      "visit_tool": "造訪工具",
-      "liked": "已按讚",
-      "like": "按讚",
-      "favorited": "已收藏",
-      "favorite": "收藏",
-      "share": "分享",
-      "tool_preview": "工具預覽",
-      "no_preview": "暫無預覽圖",
-      "navigation": {
-        "overview": "概覽",
-        "features": "功能特色",
-        "use_cases": "使用場景",
-        "target_audience": "目標使用者",
-        "faq": "常見問題",
-        "pricing": "定價方案",
-        "more_info": "更多資訊",
-        "analytics": "數據分析",
-        "reviews": "評價",
-        "alternatives": "替代方案"
-      },
-      "sections": {
-        "pricing": {
-          "model": "模式",
-          "free": "免費",
-          "free_trial": "免費試用 • {price}",
-          "paid": "付費",
-          "contact_sales": "聯絡銷售",
-          "has_free_version": "有免費版本",
-          "api_available": "API 可用",
-          "plan_details": "定價方案詳情",
-          "included_features": "包含功能："
-        },
-        "more_info": {
-          "basic_info": "基本資訊",
-          "category": "分類",
-          "quality_score": "品質評分",
-          "security": "安全性",
-          "ssl_secure": "SSL 安全",
-          "added_time": "加入時間",
-          "contact_email": "聯絡信箱",
-          "platform_support": "平台支援",
-          "ios_app": "iOS 應用程式",
-          "android_app": "Android 應用程式",
-          "web_app": "網頁應用程式",
-          "integration_platforms": "整合平台",
-          "social_media": "社群媒體"
-        },
-        "analytics": {
-          "total_visits": "總造訪量",
-          "likes_count": "按讚數",
-          "favorites_count": "收藏數",
-          "quality_score": "品質評分",
-          "response_time": "回應時間",
-          "domain_authority": "網域權威度",
-          "added_date": "收錄時間"
-        },
-        "alternatives": {
-          "featured": "精選"
-        }
-      }
-    }
   },
   "reviews": {
     "load_error": "載入評論失敗",
@@ -910,24 +490,5 @@
     "site_description": "專業的AI工具導航站，精選優質的人工智能工具和資源",
     "ai_tools_list": "AI工具推薦清單",
     "curated_list_description": "精選的AI工具和資源清單"
-  },
-  "dashboard": {
-    "title": "儀表板",
-    "description": "歡迎回來！查看您的收藏和活動概覽。",
-    "favorite_tools": "收藏工具",
-    "saved_tools": "已保存的工具",
-    "my_submissions": "我的提交",
-    "submitted_tools": "已提交工具",
-    "quick_actions": "快速操作",
-    "submit_new_tool": "提交新工具",
-    "manage_submissions": "管理提交",
-    "discover_tools": "發現工具",
-    "recent_favorites": "最近收藏",
-    "view_all": "查看全部",
-    "no_favorites": "還沒有收藏任何工具",
-    "no_favorites_desc": "去發現一些優質的AI工具並收藏它們吧！",
-    "go_discover": "去發現工具",
-    "unfavorite_success": "已取消收藏",
-    "unfavorite_error": "取消收藏失敗"
   }
 }

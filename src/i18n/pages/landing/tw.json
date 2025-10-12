@@ -1,0 +1,133 @@
+{
+  "hero": {
+    "badge": "開啟AI探索之旅",
+    "title_start": "發現最佳",
+    "title_highlight": "AI導航工具",
+    "description": "如同麥哲倫的歷史航行，我們為您開拓AI前沿，指引您的探索之路。",
+    "description_highlight": "發現、比較並導航到將改變您工作的AI工具。",
+    "search_placeholder": "規劃您的航線... 搜尋AI工具",
+    "popular_searches": "熱門探險",
+    "search_tags": {
+      "coding_assistant": "程式碼助手",
+      "ai_writing": "寫作夥伴"
+    },
+    "stats": {
+      "islands": "已繪製島嶼",
+      "territories": "領域",
+      "curated_treasures": "精選寶藏",
+      "explorers": "活躍探險者"
+    },
+    "buttons": {
+      "explore_territories": "探索領域",
+      "mark_discovery": "標記發現"
+    }
+  },
+  "sections": {
+    "view_all": "查看所有寶藏",
+    "explore_more": "在以下領域探索更多",
+    "ranking_sections": {
+      "premier_discoveries": {
+        "title": "頂級AI發現",
+        "description": "由我們專業探索團隊驗證的頂級工具"
+      },
+      "trending_expeditions": {
+        "title": "熱門探險",
+        "description": "在探索社群中備受關注的AI工具"
+      },
+      "free_territory": {
+        "title": "免費領域探索",
+        "description": "所有探索者都可免費使用的高品質AI工具"
+      },
+      "new_horizons": {
+        "title": "新地平線",
+        "description": "最新發現並添加到我們探索地圖的AI工具"
+      }
+    },
+    "value_props": {
+      "badge": "為何選擇AI Magellan？",
+      "title": "AI探險者的專業導航",
+      "description": "我們不只是列出工具 - 我們繪製AI前沿，測試並映射每個解決方案。",
+      "expert_navigation": {
+        "title": "專家導航",
+        "description": "如同麥哲倫的指南針，我們以精確性和專業知識引導您穿越廣闊的AI領域"
+      },
+      "charted_territory": {
+        "title": "已繪製領域",
+        "description": "我們映射AI前沿，測試並驗證每個工具，為您的探索繪製安全通道"
+      },
+      "optimal_routes": {
+        "title": "最佳路線",
+        "description": "進階篩選和智慧推薦幫助您找到通往完美AI工具的最短路徑"
+      },
+      "verified_quality": {
+        "title": "品質驗證",
+        "description": "每個工具都經過我們探索團隊的嚴格測試和驗證才能在我們平台上佔有一席之地"
+      },
+      "global_discovery": {
+        "title": "全球發現",
+        "description": "發現來自世界各地的AI創新 - 從新興初創公司到成熟的企業解決方案"
+      },
+      "pioneer_access": {
+        "title": "先驅存取",
+        "description": "成為首批發現突破性AI工具的人，當它們在技術地平線上出現時"
+      }
+    },
+    "faq": {
+      "badge": "導航指南",
+      "title": "探險者常見問題",
+      "description": "關於使用Magellan探索AI工具您需要知道的一切",
+      "questions": {
+        "what_makes_different": {
+          "question": "AI Magellan與其他AI工具目錄有何不同？",
+          "answer": "如同麥哲倫的歷史航行，我們在AI領域開拓未知的領域。我們的專家團隊親自測試和驗證每個工具，提供全面的評論、真實世界的使用案例和品質評分。"
+        },
+        "quality_assurance": {
+          "question": "您如何確保所列AI工具的品質？",
+          "answer": "每個工具都經過我們嚴格的探索過程 - 我們測試功能性，驗證公司資格，分析用戶反饋，並根據性能、可靠性和創新性分配品質評分。"
+        },
+        "free_tools": {
+          "question": "AI Magellan上的AI工具是免費使用的嗎？",
+          "answer": "我們在所有類別中都有免費和付費AI工具。每個列表都清楚顯示定價模式 - 免費、免費增值、訂閱或一次性購買。"
+        },
+        "submit_tool": {
+          "question": "我可以提交我的AI工具進行審查嗎？",
+          "answer": "當然可以！我們歡迎工具創作者和創新者提交他們的AI解決方案。我們的審查團隊會徹底評估您的工具是否符合我們的品質標準。"
+        },
+        "update_frequency": {
+          "question": "您多久更新一次AI工具目錄？",
+          "answer": "如同導航員不斷更新圖表，我們每天都會更新我們的目錄。我們追蹤新發布、功能更新、價格變化和AI領域的新興趨勢。"
+        },
+        "account_required": {
+          "question": "我需要帳戶來探索AI工具嗎？",
+          "answer": "基本探索不需要帳戶！但是，創建免費帳戶可以解鎖額外功能，如保存收藏、評分工具和獲得個性化推薦。"
+        }
+      },
+      "contact_cta": {
+        "title": "準備好進行下一次探險了嗎？",
+        "description": "找不到您要尋找的答案？我們的探索團隊在這裡為您指引。",
+        "contact_navigator": "聯絡導航員",
+        "join_expedition": "加入探險"
+      }
+    },
+    "final_cta": {
+      "badge": "開始您的旅程",
+      "title": "準備好繪製您的AI探險了嗎？",
+      "description": "加入成千上萬信任AI Magellan發現下一個突破工具的探索者。",
+      "stats": {
+        "active_explorers": "12,000+ 活躍探險者",
+        "discoveries_made": "每週 500+ 發現",
+        "verified_treasures": "1,200+ 驗證寶藏"
+      },
+      "chart_discovery": "繪製您的發現",
+      "explore_territories": "探索所有領域"
+    }
+  },
+  "island": {
+    "treasure_mark": "精選",
+    "explore_island": "詳細探索這個AI島嶼",
+    "unnamed_island": "無名島嶼",
+    "mysterious_island": "一個等待探索的神秘島嶼",
+    "free_territory": "免費領域",
+    "set_sail": "啟航"
+  }
+}

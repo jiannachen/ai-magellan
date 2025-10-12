@@ -6,7 +6,33 @@ import { useRouter, useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Save, Loader2, Plus, X, Globe, Lightbulb, Target, Users, HelpCircle } from 'lucide-react'
+import { websiteEditSchema, type WebsiteEditData } from '@/lib/validations/website'
+import { 
+  Save, 
+  Loader2, 
+  Plus, 
+  X, 
+  Map, 
+  Compass, 
+  Anchor, 
+  Ship, 
+  Telescope, 
+  Flag, 
+  Star, 
+  Zap, 
+  Users, 
+  Target, 
+  Lightbulb, 
+  HelpCircle, 
+  Coins, 
+  Waves, 
+  Globe,
+  MessageSquare,
+  Code,
+  Monitor,
+  Smartphone,
+  Laptop
+} from 'lucide-react'
 import { Button } from '@/ui/common/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Input } from '@/ui/common/input'
@@ -15,7 +41,9 @@ import { Label } from '@/ui/common/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/common/select'
 import { Checkbox } from '@/ui/common/checkbox'
 import { toast } from 'sonner'
-import { ProfileLayout } from '@/components/profile/profile-layout'
+import { PageHeader } from '@/components/ui/page-header'
+import { ActionCard } from '@/components/ui/action-card'
+import { cn } from '@/lib/utils/utils'
 
 const PRICING_MODELS = [
   { value: 'free', label: 'free' },
@@ -84,7 +112,7 @@ export default function EditWebsitePage() {
   const router = useRouter()
   const params = useParams()
   const websiteId = params?.id as string
-  const t = useTranslations('edit')
+  const t = useTranslations('profile.edit')
   const tForm = useTranslations('form')
   const tCommon = useTranslations('common')
   const tPricing = useTranslations('pricing_models')
@@ -382,10 +410,18 @@ export default function EditWebsitePage() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">{t('loading')}</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="relative">
+            <Compass className="h-12 w-12 text-primary mx-auto animate-spin" />
+            <div className="absolute inset-0 animate-pulse">
+              <Waves className="h-12 w-12 text-magellan-teal mx-auto opacity-50" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-foreground">⚙️ Loading Tool Information</h3>
+            <p className="text-sm text-muted-foreground">Preparing your discovery for editing...</p>
+          </div>
         </div>
       </div>
     )
@@ -393,37 +429,54 @@ export default function EditWebsitePage() {
 
   if (!isSignedIn) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('login_required')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              {t('login_description')}
-            </p>
-            <Link href="/auth/signin">
-              <Button>{t('login_now')}</Button>
-            </Link>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="container mx-auto px-4 py-8 max-w-md">
+          <ActionCard
+            title="🔐 Sign In Required"
+            description="You need to sign in to edit your tool submissions"
+            icon={Anchor}
+            className="p-8 text-center"
+          >
+            <div className="mt-6">
+              <Link href="/auth/signin">
+                <Button className="bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90">
+                  <Compass className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
+              </Link>
+            </div>
+          </ActionCard>
+        </div>
       </div>
     )
   }
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-muted rounded w-1/4"></div>
-          <Card>
-            <CardContent className="p-6 space-y-4">
-              <div className="h-4 bg-muted rounded w-1/3"></div>
-              <div className="h-10 bg-muted rounded"></div>
-              <div className="h-4 bg-muted rounded w-1/3"></div>
-              <div className="h-10 bg-muted rounded"></div>
-            </CardContent>
-          </Card>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          <div className="animate-pulse space-y-8">
+            {/* Header skeleton */}
+            <div className="space-y-4">
+              <div className="h-8 bg-gradient-to-r from-primary/20 to-magellan-teal/20 rounded w-1/3"></div>
+              <div className="h-4 bg-muted rounded w-2/3"></div>
+            </div>
+            
+            {/* Form sections skeleton */}
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-gradient-to-br from-card to-card/95 border border-primary/10 rounded-2xl p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-5 w-5 bg-primary/30 rounded"></div>
+                  <div className="h-6 bg-primary/30 rounded w-1/4"></div>
+                </div>
+                <div className="h-4 bg-muted rounded w-3/4"></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="h-10 bg-muted rounded"></div>
+                  <div className="h-10 bg-muted rounded"></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     )
@@ -431,716 +484,888 @@ export default function EditWebsitePage() {
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('error')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-destructive mb-4">{error}</p>
-            <div className="flex gap-4">
-              <Link href="/profile/submissions">
-                <Button variant="outline">{t('back_to_submissions')}</Button>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="container mx-auto px-4 py-8 max-w-md">
+          <ActionCard
+            title="⚠️ Navigation Error"
+            description={error}
+            icon={Compass}
+            variant="default"
+            className="p-8 text-center border-destructive/20"
+          >
+            <div className="mt-6 flex flex-col sm:flex-row gap-4">
+              <Link href="/profile/submissions" className="flex-1">
+                <Button variant="outline" className="w-full subtle-hover">
+                  <Anchor className="h-4 w-4 mr-2" />
+                  Return to Home
+                </Button>
               </Link>
-              <Button onClick={() => window.location.reload()}>{t('retry')}</Button>
+              <Button 
+                onClick={() => window.location.reload()}
+                className="flex-1 bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90 text-white"
+              >
+                <Compass className="h-4 w-4 mr-2" />
+                Retry Navigation
+              </Button>
             </div>
-          </CardContent>
-        </Card>
+          </ActionCard>
+        </div>
       </div>
     )
   }
 
   return (
-    <ProfileLayout>
-      <div className="max-w-4xl">
-        {/* 页面头部 */}
-        <div className="flex items-center gap-4 mb-8">
-          <Link href="/profile/submissions">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {t('back_to_submissions')}
-            </Button>
-          </Link>
-          <h1 className="text-2xl md:text-3xl font-bold">{t('title')}</h1>
-        </div>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <PageHeader
+          title="Update Tool Submission"
+          description="🌊 Enhance your AI tool submission with new information and improvements"
+          icon={<Map className="h-8 w-8 text-primary" />}
+          backHref="/profile/submissions"
+          backLabel="🧭 Back to My Submissions"
+          badge={
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-magellan-teal/10 border border-primary/20">
+              <Anchor className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium text-primary">🔧 Tool Enhancement</span>
+            </div>
+          }
+        />
 
-        {/* 编辑表单 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full"
+          className="mt-12"
         >
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* 1. 基本信息 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5" />
-                {tForm('basic_info')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">{tForm('website_name_required')}</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
-                  placeholder={tForm('website_name_placeholder')}
-                  required
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* 1. Island Coordinates & Basic Info */}
+            <ActionCard
+              title="📝 Basic Information"
+              description="Update the essential details of your AI tool"
+              icon={Map}
+              className="p-6"
+            >
+              <div className="space-y-6">
+                {/* Island Name */}
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-sm font-medium flex items-center gap-2">
+                    <Flag className="h-4 w-4 text-primary" />
+                    Tool Name *
+                  </Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => handleInputChange('title', e.target.value)}
+                    placeholder="Enter your AI tool's name"
+                    required
+                    className="subtle-hover"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="url">{tForm('website_url_required')}</Label>
-                <Input
-                  id="url"
-                  type="url"
-                  value={formData.url}
-                  onChange={(e) => handleInputChange('url', e.target.value)}
-                  placeholder={tForm('website_url_placeholder')}
-                  required
-                />
-              </div>
+                {/* Island URL */}
+                <div className="space-y-2">
+                  <Label htmlFor="url" className="text-sm font-medium flex items-center gap-2">
+                    <Anchor className="h-4 w-4 text-primary" />
+                    Website URL *
+                  </Label>
+                  <Input
+                    id="url"
+                    type="url"
+                    value={formData.url}
+                    onChange={(e) => handleInputChange('url', e.target.value)}
+                    placeholder="https://your-ai-tool.com"
+                    required
+                    className="subtle-hover"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="tagline">{tForm('tagline')}</Label>
-                <Input
-                  id="tagline"
-                  value={formData.tagline}
-                  onChange={(e) => handleInputChange('tagline', e.target.value)}
-                  placeholder={tForm('tagline_placeholder')}
-                />
-              </div>
+                {/* Island Motto */}
+                <div className="space-y-2">
+                  <Label htmlFor="tagline" className="text-sm font-medium flex items-center gap-2">
+                    <Star className="h-4 w-4 text-primary" />
+                    Tagline
+                  </Label>
+                  <Input
+                    id="tagline"
+                    value={formData.tagline}
+                    onChange={(e) => handleInputChange('tagline', e.target.value)}
+                    placeholder="A compelling one-line description"
+                    className="subtle-hover"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">{tForm('website_description')}</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder={tForm('description_placeholder')}
-                  rows={4}
-                />
-              </div>
+                {/* Island Chronicle */}
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-sm font-medium flex items-center gap-2">
+                    <Telescope className="h-4 w-4 text-primary" />
+                    Description *
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    placeholder="Tell the full story of your AI tool - what it does, how it helps, and why users should try it"
+                    rows={4}
+                    className="subtle-hover resize-none"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="category">{tForm('category_required')}</Label>
-                <Select
-                  value={formData.category_id.toString()}
-                  onValueChange={(value) => handleInputChange('category_id', parseInt(value))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={tForm('category_placeholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id.toString()}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Territory Classification */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium flex items-center gap-2">
+                      <Compass className="h-4 w-4 text-primary" />
+                      Territory Classification *
+                    </Label>
+                    <Select
+                      value={formData.category_id.toString()}
+                      onValueChange={(value) => handleInputChange('category_id', parseInt(value))}
+                    >
+                      <SelectTrigger className="subtle-hover">
+                        <SelectValue placeholder="Select the category this tool belongs to" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id.toString()}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="tags">{tForm('tags')}</Label>
-                <Input
-                  id="tags"
-                  value={formData.tags}
-                  onChange={(e) => handleInputChange('tags', e.target.value)}
-                  placeholder={tForm('tags_placeholder')}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="thumbnail">{tForm('thumbnail_url')}</Label>
-                <Input
-                  id="thumbnail"
-                  type="url"
-                  value={formData.thumbnail}
-                  onChange={(e) => handleInputChange('thumbnail', e.target.value)}
-                  placeholder={tForm('thumbnail_placeholder')}
-                />
-                {formData.thumbnail && (
-                  <div className="mt-2">
-                    <img 
-                      src={formData.thumbnail} 
-                      alt={tForm('thumbnail_preview')} 
-                      className="w-20 h-20 object-cover rounded border"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none'
-                      }}
+                  {/* Navigation Tags */}
+                  <div className="space-y-2">
+                    <Label htmlFor="tags" className="text-sm font-medium flex items-center gap-2">
+                      <Star className="h-4 w-4 text-primary" />
+                      Navigation Tags
+                    </Label>
+                    <Input
+                      id="tags"
+                      value={formData.tags}
+                      onChange={(e) => handleInputChange('tags', e.target.value)}
+                      placeholder="AI, automation, productivity (comma separated)"
+                      className="subtle-hover"
                     />
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* 2. 主要特点 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="h-5 w-5" />
-                {tForm('main_features')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {formData.features.map((feature, index) => (
-                <div key={index} className="border rounded-lg p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <h4 className="font-medium text-sm">{tForm('feature_number', {number: index + 1})}</h4>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeFeature(index)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-xs">{tForm('feature_name')}</Label>
-                      <Input
-                        value={feature.name}
-                        onChange={(e) => updateFeature(index, 'name', e.target.value)}
-                        placeholder={tForm('feature_name_placeholder')}
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs">{tForm('feature_description')}</Label>
-                      <Input
-                        value={feature.description}
-                        onChange={(e) => updateFeature(index, 'description', e.target.value)}
-                        placeholder={tForm('feature_description_placeholder')}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addFeature}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                {tForm('add_feature')}
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* 3. 用例和目标受众 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5" />
-                {tForm('use_cases_and_audience')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* 用例 */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Users className="h-4 w-4" />
-                    <h4 className="font-medium">{tForm('use_cases')}</h4>
-                  </div>
-                  <div className="space-y-2">
-                    {formData.use_cases.map((useCase, index) => (
-                      <div key={index} className="flex gap-2">
-                        <Input
-                          value={useCase}
-                          onChange={(e) => updateArrayItem('use_cases', index, e.target.value)}
-                          placeholder={tForm('use_case_placeholder')}
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => removeFromArray('use_cases', index)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => addToArray('use_cases', '')}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      {tForm('add_use_case')}
-                    </Button>
-                  </div>
                 </div>
 
-                {/* 目标受众 */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Users className="h-4 w-4" />
-                    <h4 className="font-medium">{tForm('target_audience')}</h4>
-                  </div>
-                  <div className="space-y-2">
-                    {formData.target_audience.map((audience, index) => (
-                      <div key={index} className="flex gap-2">
-                        <Input
-                          value={audience}
-                          onChange={(e) => updateArrayItem('target_audience', index, e.target.value)}
-                          placeholder={tForm('target_audience_placeholder')}
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => removeFromArray('target_audience', index)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => addToArray('target_audience', '')}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      {tForm('add_target_audience')}
-                    </Button>
-                  </div>
+                {/* Island Visual Map */}
+                <div className="space-y-2">
+                  <Label htmlFor="thumbnail" className="text-sm font-medium flex items-center gap-2">
+                    <Map className="h-4 w-4 text-primary" />
+                    Thumbnail URL
+                  </Label>
+                  <Input
+                    id="thumbnail"
+                    type="url"
+                    value={formData.thumbnail}
+                    onChange={(e) => handleInputChange('thumbnail', e.target.value)}
+                    placeholder="https://example.com/your-tool-screenshot.png"
+                    className="subtle-hover"
+                  />
+                  {formData.thumbnail && (
+                    <div className="mt-3 p-3 bg-gradient-to-br from-primary/5 to-magellan-teal/5 border border-primary/10 rounded-lg">
+                      <img 
+                        src={formData.thumbnail} 
+                        alt="Tool preview" 
+                        className="w-20 h-20 object-cover rounded border border-primary/20"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                        }}
+                      />
+                      <p className="text-xs text-muted-foreground mt-2">🖼️ Tool Preview Image</p>
+                    </div>
+                  )}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </ActionCard>
 
-          {/* 4. 常见问题 */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <HelpCircle className="h-5 w-5" />
-                {tForm('faq')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {formData.faq.map((item, index) => (
-                <div key={index} className="border rounded-lg p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <h4 className="font-medium text-sm">{tForm('faq_number', {number: index + 1})}</h4>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeFaq(index)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+            {/* 2. Special Powers (Features) */}
+            <ActionCard
+              title="⚡ Key Features"
+              description="Update the main features and capabilities"
+              icon={Zap}
+              className="p-6"
+            >
+              <div className="space-y-4">
+                {formData.features.map((feature, index) => (
+                  <div key={index} className="border-2 border-dashed border-border/60 rounded-lg p-4 subtle-hover">
+                    <div className="flex items-start justify-between mb-4">
+                      <h4 className="font-semibold text-primary flex items-center gap-2">
+                        <Star className="h-4 w-4" />
+                        Power #{index + 1}
+                      </h4>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeFeature(index)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Power Name</Label>
+                        <Input
+                          value={feature.name}
+                          onChange={(e) => updateFeature(index, 'name', e.target.value)}
+                          placeholder="e.g., Smart Automation"
+                          className="subtle-hover"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Power Description</Label>
+                        <Input
+                          value={feature.description}
+                          onChange={(e) => updateFeature(index, 'description', e.target.value)}
+                          placeholder="Brief explanation of this feature"
+                          className="subtle-hover"
+                        />
+                      </div>
+                    </div>
                   </div>
+                ))}
+                
+                <ActionCard
+                  title="Add New Power"
+                  description="Reveal another magical ability"
+                  icon={Plus}
+                  onClick={addFeature}
+                  variant="dashed"
+                  className="cursor-pointer"
+                />
+              </div>
+            </ActionCard>
+
+            {/* 3. Explorer Adventures & Types */}
+            <ActionCard
+              title="🎯 Use Cases & Target Audience"
+              description="Update use cases and target audience for your tool"
+              icon={Users}
+              className="p-6"
+            >
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Adventure Types */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Target className="h-5 w-5 text-primary" />
+                      <h3 className="font-semibold">Adventure Types</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">What can users do with this tool?</p>
+                    <div className="space-y-3">
+                      {formData.use_cases.map((useCase, index) => (
+                        <div key={index} className="flex gap-2">
+                          <Input
+                            value={useCase}
+                            onChange={(e) => updateArrayItem('use_cases', index, e.target.value)}
+                            placeholder="e.g., Content creation, Data analysis"
+                            className="subtle-hover"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeFromArray('use_cases', index)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => addToArray('use_cases', '')}
+                        className="w-full subtle-hover"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Adventure Type
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Explorer Profiles */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Users className="h-5 w-5 text-primary" />
+                      <h3 className="font-semibold">Target Audience</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">Who is this tool designed for?</p>
+                    <div className="space-y-3">
+                      {formData.target_audience.map((audience, index) => (
+                        <div key={index} className="flex gap-2">
+                          <Input
+                            value={audience}
+                            onChange={(e) => updateArrayItem('target_audience', index, e.target.value)}
+                            placeholder="e.g., Developers, Marketers, Students"
+                            className="subtle-hover"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeFromArray('target_audience', index)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => addToArray('target_audience', '')}
+                        className="w-full subtle-hover"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Target User
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ActionCard>
+
+            {/* 4. Explorer Questions (FAQ) */}
+            <ActionCard
+              title="❓ FAQ"
+              description="Answer common questions users might have about your tool"
+              icon={HelpCircle}
+              className="p-6"
+            >
+              <div className="space-y-4">
+                {formData.faq.map((item, index) => (
+                  <div key={index} className="border-2 border-dashed border-border/60 rounded-lg p-4 subtle-hover">
+                    <div className="flex items-start justify-between mb-4">
+                      <h4 className="font-semibold text-primary flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4" />
+                        Q&A #{index + 1}
+                      </h4>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeFaq(index)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Question</Label>
+                        <Input
+                          value={item.question}
+                          onChange={(e) => updateFaq(index, 'question', e.target.value)}
+                          placeholder="What question do users often ask?"
+                          className="subtle-hover"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Answer</Label>
+                        <Textarea
+                          value={item.answer}
+                          onChange={(e) => updateFaq(index, 'answer', e.target.value)}
+                          placeholder="Provide a helpful answer for users"
+                          rows={2}
+                          className="subtle-hover resize-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                <ActionCard
+                  title="Add FAQ Question"
+                  description="Answer another common question"
+                  icon={Plus}
+                  onClick={addFaq}
+                  variant="dashed"
+                  className="cursor-pointer"
+                />
+              </div>
+            </ActionCard>
+
+            {/* 5. Treasure Costs (Pricing) */}
+            <ActionCard
+              title="💰 Pricing"
+              description="Update how users access your tool"
+              icon={Coins}
+              className="p-6"
+            >
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium flex items-center gap-2">
+                      <Coins className="h-4 w-4 text-primary" />
+                      Pricing Model
+                    </Label>
+                    <Select
+                      value={formData.pricing_model}
+                      onValueChange={(value) => handleInputChange('pricing_model', value)}
+                    >
+                      <SelectTrigger className="subtle-hover">
+                        <SelectValue placeholder="Select how users pay for your tool" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PRICING_MODELS.map((model) => (
+                          <SelectItem key={model.value} value={model.value}>
+                            {tPricing(model.label)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="space-y-3">
-                    <div>
-                      <Label className="text-xs">{tForm('question')}</Label>
-                      <Input
-                        value={item.question}
-                        onChange={(e) => updateFaq(index, 'question', e.target.value)}
-                        placeholder={tForm('question_placeholder')}
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="has_free_version"
+                        checked={formData.has_free_version}
+                        onCheckedChange={(checked) => handleInputChange('has_free_version', !!checked)}
                       />
+                      <Label htmlFor="has_free_version" className="flex items-center gap-2">
+                        <Star className="h-4 w-4 text-primary" />
+                        Free Version Available
+                      </Label>
                     </div>
-                    <div>
-                      <Label className="text-xs">{tForm('answer')}</Label>
-                      <Textarea
-                        value={item.answer}
-                        onChange={(e) => updateFaq(index, 'answer', e.target.value)}
-                        placeholder={tForm('answer_placeholder')}
-                        rows={2}
+
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="api_available"
+                        checked={formData.api_available}
+                        onCheckedChange={(checked) => handleInputChange('api_available', !!checked)}
                       />
+                      <Label htmlFor="api_available" className="flex items-center gap-2">
+                        <Code className="h-4 w-4 text-primary" />
+                        Developer Bridge (API) Available
+                      </Label>
                     </div>
                   </div>
-                </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addFaq}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                {tForm('add_faq')}
-              </Button>
-            </CardContent>
-          </Card>
 
-          {/* 5. 定价 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{tForm('pricing')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <Label>{tForm('pricing_model')}</Label>
-                <Select
-                  value={formData.pricing_model}
-                  onValueChange={(value) => handleInputChange('pricing_model', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={tForm('pricing_model_placeholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PRICING_MODELS.map((model) => (
-                      <SelectItem key={model.value} value={model.value}>
-                        {tPricing(model.label)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="has_free_version"
-                    checked={formData.has_free_version}
-                    onCheckedChange={(checked) => handleInputChange('has_free_version', !!checked)}
-                  />
-                  <Label htmlFor="has_free_version">{tForm('has_free_version')}</Label>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="api_available"
-                    checked={formData.api_available}
-                    onCheckedChange={(checked) => handleInputChange('api_available', !!checked)}
-                  />
-                  <Label htmlFor="api_available">{tForm('api_available')}</Label>
-                </div>
-              </div>
-
-              {/* 定价计划 */}
-              <div>
-                <Label className="text-base font-medium mb-3 block">{tForm('pricing_plans')}</Label>
-                <div className="space-y-3">
-                  {formData.pricing_plans.map((plan, index) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <h4 className="font-medium text-sm">{tForm('plan_number', {number: index + 1})}</h4>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removePricingPlan(index)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                        <div>
-                          <Label className="text-xs">{tForm('plan_name')}</Label>
-                          <Input
-                            value={plan.name}
-                            onChange={(e) => updatePricingPlan(index, 'name', e.target.value)}
-                            placeholder={tForm('plan_name_placeholder')}
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs">{tForm('billing_cycle')}</Label>
-                          <Input
-                            value={plan.billing_cycle}
-                            onChange={(e) => updatePricingPlan(index, 'billing_cycle', e.target.value)}
-                            placeholder={tForm('billing_cycle_placeholder')}
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs">{tForm('price')}</Label>
-                          <Input
-                            value={plan.price}
-                            onChange={(e) => updatePricingPlan(index, 'price', e.target.value)}
-                            placeholder={tForm('price_placeholder')}
-                          />
-                        </div>
-                      </div>
-                      
-                      {/* 功能列表 */}
-                      <div>
-                        <Label className="text-xs">{tForm('features_max_5')}</Label>
-                        <div className="space-y-2 mt-2">
-                          {plan.features.map((feature, featureIndex) => (
-                            <div key={featureIndex} className="flex gap-2">
-                              <Input
-                                value={feature}
-                                onChange={(e) => updatePricingPlanFeature(index, featureIndex, e.target.value)}
-                                placeholder={tForm('feature_placeholder')}
-                              />
+                  {/* Detailed Pricing Plans */}
+                  {formData.pricing_plans.length > 0 && (
+                    <div className="pt-6 border-t border-border">
+                      <Label className="text-base font-medium mb-4 block flex items-center gap-2">
+                        💵 Pricing Plans (Optional)
+                      </Label>
+                      <div className="space-y-4">
+                        {formData.pricing_plans.map((plan, index) => (
+                          <div key={index} className="border-2 border-dashed border-border/60 rounded-lg p-4 subtle-hover">
+                            <div className="flex items-start justify-between mb-4">
+                              <h4 className="font-semibold text-primary">Plan #{index + 1}</h4>
                               <Button
                                 type="button"
-                                variant="outline"
+                                variant="ghost"
                                 size="sm"
-                                onClick={() => removePricingPlanFeature(index, featureIndex)}
+                                onClick={() => removePricingPlan(index)}
+                                className="text-destructive hover:text-destructive"
                               >
                                 <X className="h-4 w-4" />
                               </Button>
                             </div>
-                          ))}
-                          {plan.features.length < 5 && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => addPricingPlanFeature(index)}
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              {tForm('add_feature_to_plan')}
-                            </Button>
-                          )}
-                        </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium">Plan Name</Label>
+                                <Input
+                                  value={plan.name}
+                                  onChange={(e) => updatePricingPlan(index, 'name', e.target.value)}
+                                  placeholder="e.g., Basic Plan"
+                                  className="subtle-hover"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium">Billing Cycle</Label>
+                                <Input
+                                  value={plan.billing_cycle}
+                                  onChange={(e) => updatePricingPlan(index, 'billing_cycle', e.target.value)}
+                                  placeholder="e.g., monthly, yearly"
+                                  className="subtle-hover"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium">Price</Label>
+                                <Input
+                                  value={plan.price}
+                                  onChange={(e) => updatePricingPlan(index, 'price', e.target.value)}
+                                  placeholder="e.g., $9.99"
+                                  className="subtle-hover"
+                                />
+                              </div>
+                            </div>
+                            
+                            {/* Plan Features */}
+                            <div className="space-y-3">
+                              <Label className="text-sm font-medium">Plan Features (Max 5)</Label>
+                              <div className="space-y-2">
+                                {plan.features.map((feature, featureIndex) => (
+                                  <div key={featureIndex} className="flex gap-2">
+                                    <Input
+                                      value={feature}
+                                      onChange={(e) => updatePricingPlanFeature(index, featureIndex, e.target.value)}
+                                      placeholder="Feature description"
+                                      className="subtle-hover"
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => removePricingPlanFeature(index, featureIndex)}
+                                      className="text-destructive hover:text-destructive"
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                ))}
+                                {plan.features.length < 5 && (
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => addPricingPlanFeature(index)}
+                                    className="subtle-hover"
+                                  >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Add Feature
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  ))}
-                  
+                  )}
+
                   {formData.pricing_plans.length < 6 && (
-                    <Button
-                      type="button"
-                      variant="outline"
+                    <ActionCard
+                      title="Add Pricing Plan"
+                      description="Create another pricing option"
+                      icon={Plus}
                       onClick={addPricingPlan}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      {tForm('add_pricing_plan')}
-                    </Button>
+                      variant="dashed"
+                      className="cursor-pointer"
+                    />
                   )}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </ActionCard>
 
-          {/* 6. 社交媒体 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{tForm('social_media')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            {/* 6. Social Waters */}
+            <ActionCard
+              title="🌊 Social Waters"
+              description="Update your tool's social media and integrations"
+              icon={Waves}
+              className="p-6"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="twitter_url">{tForm('twitter')}</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="twitter_url" className="text-sm font-medium flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4 text-primary" />
+                    Social Media
+                  </Label>
                   <Input
                     id="twitter_url"
                     value={formData.twitter_url}
                     onChange={(e) => handleInputChange('twitter_url', e.target.value)}
-                    placeholder={tForm('twitter_placeholder')}
+                    placeholder="https://twitter.com/yourprofile"
+                    className="subtle-hover"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="linkedin_url">{tForm('linkedin')}</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="linkedin_url" className="text-sm font-medium flex items-center gap-2">
+                    <Users className="h-4 w-4 text-primary" />
+                    LinkedIn Professional Port
+                  </Label>
                   <Input
                     id="linkedin_url"
                     value={formData.linkedin_url}
                     onChange={(e) => handleInputChange('linkedin_url', e.target.value)}
-                    placeholder={tForm('linkedin_placeholder')}
+                    placeholder="https://linkedin.com/company/yourcompany"
+                    className="subtle-hover"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="facebook_url">{tForm('facebook')}</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="facebook_url" className="text-sm font-medium flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-primary" />
+                    Facebook Social Bay
+                  </Label>
                   <Input
                     id="facebook_url"
                     value={formData.facebook_url}
                     onChange={(e) => handleInputChange('facebook_url', e.target.value)}
-                    placeholder={tForm('facebook_placeholder')}
+                    placeholder="https://facebook.com/yourpage"
+                    className="subtle-hover"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="instagram_url">{tForm('instagram')}</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="instagram_url" className="text-sm font-medium flex items-center gap-2">
+                    <Star className="h-4 w-4 text-primary" />
+                    Instagram Visual Cove
+                  </Label>
                   <Input
                     id="instagram_url"
                     value={formData.instagram_url}
                     onChange={(e) => handleInputChange('instagram_url', e.target.value)}
-                    placeholder={tForm('instagram_placeholder')}
+                    placeholder="https://instagram.com/yourprofile"
+                    className="subtle-hover"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="youtube_url">{tForm('youtube')}</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="youtube_url" className="text-sm font-medium flex items-center gap-2">
+                    <Monitor className="h-4 w-4 text-primary" />
+                    YouTube Channel
+                  </Label>
                   <Input
                     id="youtube_url"
                     value={formData.youtube_url}
                     onChange={(e) => handleInputChange('youtube_url', e.target.value)}
-                    placeholder={tForm('youtube_placeholder')}
+                    placeholder="https://youtube.com/c/yourchannel"
+                    className="subtle-hover"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="discord_url">{tForm('discord')}</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="discord_url" className="text-sm font-medium flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4 text-primary" />
+                    Discord Community
+                  </Label>
                   <Input
                     id="discord_url"
                     value={formData.discord_url}
                     onChange={(e) => handleInputChange('discord_url', e.target.value)}
-                    placeholder={tForm('discord_placeholder')}
+                    placeholder="https://discord.gg/yourcommunity"
+                    className="subtle-hover"
                   />
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </ActionCard>
 
-          {/* 7. 集成 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{tForm('integrations')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-wrap gap-2 mb-4">
-                {COMMON_INTEGRATIONS.map((integration) => (
-                  <Button
-                    key={integration}
-                    type="button"
-                    variant={formData.integrations.includes(integration) ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => {
-                      if (formData.integrations.includes(integration)) {
-                        setFormData(prev => ({
-                          ...prev,
-                          integrations: prev.integrations.filter(i => i !== integration)
-                        }))
-                      } else {
-                        setFormData(prev => ({
-                          ...prev,
-                          integrations: [...prev.integrations, integration]
-                        }))
-                      }
-                    }}
-                  >
-                    {integration}
-                  </Button>
-                ))}
-              </div>
-              
-              <div className="space-y-2">
-                {formData.integrations.map((integration, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      value={integration}
-                      onChange={(e) => updateArrayItem('integrations', index, e.target.value)}
-                      placeholder={tForm('integration_name_placeholder')}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeFromArray('integrations', index)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => addToArray('integrations', '')}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  {tForm('add_integration')}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* 8. 平台 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{tForm('platforms')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h4 className="font-medium mb-3">{tForm('mobile_apps')}</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="ios_app_url">{tForm('ios_app_url')}</Label>
-                    <Input
-                      id="ios_app_url"
-                      value={formData.ios_app_url}
-                      onChange={(e) => handleInputChange('ios_app_url', e.target.value)}
-                      placeholder={tForm('ios_placeholder')}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="android_app_url">{tForm('android_app_url')}</Label>
-                    <Input
-                      id="android_app_url"
-                      value={formData.android_app_url}
-                      onChange={(e) => handleInputChange('android_app_url', e.target.value)}
-                      placeholder={tForm('android_placeholder')}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-medium mb-3">{tForm('web_app')}</h4>
+            {/* 7. Island Connections */}
+            <ActionCard
+              title="⚓ Integrations"
+              description="Update what other tools and services your tool connects with"
+              icon={Anchor}
+              className="p-6"
+            >
+              <div className="space-y-6">
                 <div>
-                  <Label htmlFor="web_app_url">{tForm('web_app_url')}</Label>
-                  <Input
-                    id="web_app_url"
-                    value={formData.web_app_url}
-                    onChange={(e) => handleInputChange('web_app_url', e.target.value)}
-                    placeholder={tForm('web_app_placeholder')}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-medium mb-3">{tForm('desktop_apps')}</h4>
-                <div className="grid grid-cols-3 gap-3">
-                  {DESKTOP_PLATFORMS.map((platform) => (
-                    <div key={platform.value} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={platform.value}
-                        checked={formData.desktop_platforms.includes(platform.value)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Waves className="h-4 w-4 text-primary" />
+                    Popular Trade Routes
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {COMMON_INTEGRATIONS.map((integration) => (
+                      <Button
+                        key={integration}
+                        type="button"
+                        variant={formData.integrations.includes(integration) ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => {
+                          if (formData.integrations.includes(integration)) {
                             setFormData(prev => ({
                               ...prev,
-                              desktop_platforms: [...prev.desktop_platforms, platform.value]
+                              integrations: prev.integrations.filter(i => i !== integration)
                             }))
                           } else {
                             setFormData(prev => ({
                               ...prev,
-                              desktop_platforms: prev.desktop_platforms.filter(p => p !== platform.value)
+                              integrations: [...prev.integrations, integration]
                             }))
                           }
                         }}
+                        className="subtle-hover"
+                      >
+                        {integration}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Plus className="h-4 w-4 text-primary" />
+                    Custom Connections
+                  </h4>
+                  {formData.integrations.filter(integration => !COMMON_INTEGRATIONS.includes(integration)).map((integration, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        value={integration}
+                        onChange={(e) => {
+                          const integrations = [...formData.integrations]
+                          const actualIndex = integrations.indexOf(integration)
+                          if (actualIndex !== -1) {
+                            integrations[actualIndex] = e.target.value
+                            setFormData(prev => ({ ...prev, integrations }))
+                          }
+                        }}
+                        placeholder="Custom integration name"
+                        className="subtle-hover"
                       />
-                      <Label htmlFor={platform.value}>
-                        {tForm(platform.label)}
-                      </Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setFormData(prev => ({
+                            ...prev,
+                            integrations: prev.integrations.filter(i => i !== integration)
+                          }))
+                        }}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
                   ))}
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setFormData(prev => ({
+                        ...prev,
+                        integrations: [...prev.integrations, '']
+                      }))
+                    }}
+                    className="subtle-hover"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Custom Connection
+                  </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </ActionCard>
 
-          {/* 提交按钮 */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex gap-4 pt-4">
-                <Button type="submit" disabled={saving}>
-                  {saving ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      {t('saving')}
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-4 w-4 mr-2" />
-                      {t('save_changes')}
-                    </>
-                  )}
-                </Button>
-                <Link href="/profile/submissions">
-                  <Button type="button" variant="outline">
-                    {tCommon('cancel')}
-                  </Button>
-                </Link>
+            {/* 8. Platform Ports */}
+            <ActionCard
+              title="🌍 Platform Ports"
+              description="Update where users can access your tool"
+              icon={Globe}
+              className="p-6"
+            >
+              <div className="space-y-6">
+                {/* Mobile Harbors */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Smartphone className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold">Mobile Apps</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="ios_app_url" className="text-sm font-medium">iOS App Store</Label>
+                      <Input
+                        id="ios_app_url"
+                        value={formData.ios_app_url}
+                        onChange={(e) => handleInputChange('ios_app_url', e.target.value)}
+                        placeholder="https://apps.apple.com/app/your-app"
+                        className="subtle-hover"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="android_app_url" className="text-sm font-medium">Google Play Store</Label>
+                      <Input
+                        id="android_app_url"
+                        value={formData.android_app_url}
+                        onChange={(e) => handleInputChange('android_app_url', e.target.value)}
+                        placeholder="https://play.google.com/store/apps/details?id=your.app"
+                        className="subtle-hover"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Web Port */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Globe className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold">Web Port</h3>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="web_app_url" className="text-sm font-medium">Web Application URL</Label>
+                    <Input
+                      id="web_app_url"
+                      value={formData.web_app_url}
+                      onChange={(e) => handleInputChange('web_app_url', e.target.value)}
+                      placeholder="https://app.your-tool.com"
+                      className="subtle-hover"
+                    />
+                  </div>
+                </div>
+
+                {/* Desktop Docks */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Monitor className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold">Desktop Docks</h3>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {DESKTOP_PLATFORMS.map((platform) => {
+                      const PlatformIcon = platform.value === 'mac' ? Laptop : Monitor
+                      return (
+                        <div key={platform.value} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={platform.value}
+                            checked={formData.desktop_platforms.includes(platform.value)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  desktop_platforms: [...prev.desktop_platforms, platform.value]
+                                }))
+                              } else {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  desktop_platforms: prev.desktop_platforms.filter(p => p !== platform.value)
+                                }))
+                              }
+                            }}
+                          />
+                          <Label htmlFor={platform.value} className="flex items-center gap-2 text-sm">
+                            <PlatformIcon className="h-4 w-4" />
+                            {platform.label}
+                          </Label>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </form>
-      </motion.div>
+            </ActionCard>
+
+            {/* Final Actions */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-6">
+              <Button 
+                type="submit" 
+                disabled={saving}
+                className="bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90 text-white shadow-lg subtle-hover"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Updating Tool Information...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    💾 Save Tool Updates
+                  </>
+                )}
+              </Button>
+              <Link href="/profile/submissions">
+                <Button type="button" variant="outline" className="w-full sm:w-auto subtle-hover">
+                  <Compass className="h-4 w-4 mr-2" />
+                  Cancel & Return to Dashboard
+                </Button>
+              </Link>
+            </div>
+          </form>
+        </motion.div>
       </div>
-    </ProfileLayout>
+    </div>
   )
 }

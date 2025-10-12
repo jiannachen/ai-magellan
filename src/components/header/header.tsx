@@ -178,7 +178,7 @@ export default function Header() {
                     <div className="p-1.5 rounded-lg bg-magellan-mint/10 group-hover/item:scale-110 transition-transform duration-300">
                       <CheckCircle className="h-3.5 w-3.5 text-magellan-mint" />
                     </div>
-                    <span>🆓 {tRank('types.free.title')}</span>
+                    <span>{tRank('types.free.title')}</span>
                   </Link>
                 </DropdownMenuItem>
                 
@@ -190,27 +190,11 @@ export default function Header() {
                     <div className="p-1.5 rounded-lg bg-magellan-teal/10 group-hover/item:scale-110 transition-transform duration-300">
                       <Plus className="h-3.5 w-3.5 text-magellan-teal" />
                     </div>
-                    <span>🆕 {tRank('types.new.title')}</span>
+                    <span>{tRank('types.new.title')}</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            {/* Submit Button - 新发现 */}
-            <Link href="/submit">
-              <Button
-                className={cn(
-                  "flex items-center gap-2 h-12 px-4 rounded-xl",
-                  "bg-gradient-to-r from-magellan-coral to-magellan-gold",
-                  "hover:from-magellan-coral/90 hover:to-magellan-gold/90",
-                  "text-white font-semibold shadow-lg hover:shadow-xl",
-                  "subtle-hover group"
-                )}
-              >
-                <Anchor className="h-4 w-4 subtle-rotate" />
-                <span>⚓ {t('navigation.submit_website')}</span>
-              </Button>
-            </Link>
           </div>
 
           {/* Right side controls - 船长控制台 */}

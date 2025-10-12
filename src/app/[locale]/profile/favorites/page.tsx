@@ -5,12 +5,38 @@ import { useUser } from '@clerk/nextjs'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ExternalLink, Heart, Bookmark, Globe, Trash2, TrendingUp } from 'lucide-react'
+import { 
+  ExternalLink, 
+  Heart, 
+  Bookmark, 
+  Globe, 
+  Trash2, 
+  TrendingUp,
+  Map,
+  Compass,
+  Star,
+  Eye,
+  Route,
+  Crown,
+  Search,
+  Filter,
+  SortAsc,
+  Grid3X3,
+  List,
+  MoreHorizontal,
+  Home,
+  ArrowRight
+} from 'lucide-react'
 import { Button } from '@/ui/common/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Badge } from '@/ui/common/badge'
+import { Input } from '@/ui/common/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/common/select'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/ui/common/dropdown-menu'
 import { ProfileLayout } from '@/components/profile/profile-layout'
 import { toast } from 'sonner'
+import { StatCard } from '@/components/ui/stat-card'
+import { cn } from '@/lib/utils/utils'
 
 interface Website {
   id: number
@@ -48,18 +74,20 @@ interface FavoritesResponse {
 export default function MyFavoritesPage() {
   const { isLoaded, isSignedIn } = useUser()
   const [favorites, setFavorites] = useState<Website[]>([])
+  const [filteredFavorites, setFilteredFavorites] = useState<Website[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState('recent')
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [pagination, setPagination] = useState({
     page: 1,
     total: 0,
     pages: 0
   })
   
-  // Translation hooks
   const t = useTranslations('common')
-  const tWebsite = useTranslations('website')
-  const tProfile = useTranslations('profile.favorites')
+  const tProfile = useTranslations('profile')
 
   useEffect(() => {
     if (isLoaded && isSignedIn) {
@@ -67,52 +95,94 @@ export default function MyFavoritesPage() {
     }
   }, [isLoaded, isSignedIn])
 
+  useEffect(() => {
+    filterAndSortFavorites()
+  }, [favorites, searchQuery, sortBy])
+
   const fetchFavorites = async (page = 1) => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/user/favorites?page=${page}&limit=10`)
+      const response = await fetch(`/api/user/favorites?page=${page}&limit=50`)
       
       if (!response.ok) {
         throw new Error('Failed to fetch favorites')
       }
 
-      const data: FavoritesResponse = await response.json()
-      setFavorites(data.websites)
+      const data = await response.json()
+      const websites = data.data || data.websites || []
+      setFavorites(websites)
       setPagination({
-        page: data.pagination.page,
-        total: data.pagination.total,
-        pages: data.pagination.pages
+        page: data.pagination?.page || 1,
+        total: data.pagination?.total || websites.length,
+        pages: data.pagination?.pages || 1
       })
     } catch (error) {
       console.error('Error fetching favorites:', error)
-      setError(tProfile('load_error'))
+      setError(tProfile('favorites.load_error'))
+      toast.error(tProfile('favorites.load_error'))
     } finally {
       setLoading(false)
     }
   }
 
+  const filterAndSortFavorites = () => {
+    let filtered = [...favorites]
+
+    // Search filter
+    if (searchQuery) {
+      filtered = filtered.filter(website =>
+        website.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        website.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        website.category.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+
+    // Sort
+    switch (sortBy) {
+      case 'recent':
+        filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        break
+      case 'popular':
+        filtered.sort((a, b) => b.visits - a.visits)
+        break
+      case 'quality':
+        filtered.sort((a, b) => b.quality_score - a.quality_score)
+        break
+      case 'alphabetical':
+        filtered.sort((a, b) => a.title.localeCompare(b.title))
+        break
+    }
+
+    setFilteredFavorites(filtered)
+  }
+
   const removeFavorite = async (websiteId: number) => {
     try {
-      const response = await fetch(`/api/user/favorites?websiteId=${websiteId}`, {
-        method: 'DELETE'
+      const response = await fetch('/api/user/favorites', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ websiteId })
       })
 
       if (!response.ok) {
         throw new Error('Failed to remove favorite')
       }
 
-      // 从列表中移除
       setFavorites(prev => prev.filter(website => website.id !== websiteId))
-      setPagination(prev => ({ ...prev, total: prev.total - 1 }))
-      
-      toast.success(tProfile('unfavorite_success'))
+      toast.success(tProfile('favorites.remove_success'))
     } catch (error) {
       console.error('Error removing favorite:', error)
-      toast.error(tProfile('unfavorite_error'))
+      toast.error(tProfile('favorites.remove_error'))
     }
   }
 
-  if (!isLoaded) {
+  const handleVisit = (website: Website) => {
+    // Track visit
+    fetch(`/api/websites/${website.id}/visit`, { method: 'POST' }).catch(console.error)
+    window.open(website.url, '_blank')
+  }
+
+  if (!isLoaded || !isSignedIn) {
     return (
       <ProfileLayout>
         <div className="flex items-center justify-center h-96">
@@ -125,23 +195,21 @@ export default function MyFavoritesPage() {
     )
   }
 
-  if (!isSignedIn) {
+  if (loading) {
     return (
       <ProfileLayout>
-        <div className="p-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{tProfile('login_required')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                {tProfile('login_description')}
-              </p>
-              <Link href="/auth/signin">
-                <Button>{tProfile('login_now')}</Button>
-              </Link>
-            </CardContent>
-          </Card>
+        <div className="space-y-8 animate-pulse">
+          <div className="h-8 bg-muted rounded w-1/3"></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="h-24 bg-muted rounded-xl"></div>
+            <div className="h-24 bg-muted rounded-xl"></div>
+            <div className="h-24 bg-muted rounded-xl"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-64 bg-muted rounded-xl"></div>
+            ))}
+          </div>
         </div>
       </ProfileLayout>
     )
@@ -149,230 +217,392 @@ export default function MyFavoritesPage() {
 
   return (
     <ProfileLayout>
-      <div className="space-y-8">
-        {/* 页面头部 */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-              {tProfile('title')}
-            </h1>
-            <p className="text-muted-foreground text-lg">{tProfile('description')}</p>
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Page Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+              <Bookmark className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">
+                {tProfile('favorites.title')}
+              </h1>
+              <p className="text-muted-foreground">{tProfile('favorites.description')}</p>
+            </div>
           </div>
-          <Link href="/">
-            <Button variant="outline" className="gap-2 hover:bg-primary hover:text-primary-foreground transition-colors">
-              <Globe className="h-4 w-4" />
-              {tProfile('discover_more')}
-            </Button>
-          </Link>
         </div>
 
-        {/* 统计信息 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <Card className="relative overflow-hidden border-blue-200 hover:border-blue-300 transition-colors">
-            <CardContent className="p-8">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-blue-600 mb-2">{tProfile('favorite_tools')}</p>
-                  <p className="text-4xl font-bold text-blue-700 mb-1">{pagination.total}</p>
-                  <p className="text-muted-foreground">{tProfile('saved_to_library')}</p>
-                </div>
-                <div className="relative">
-                  <div className="absolute inset-0 bg-blue-500/20 rounded-xl blur-lg" />
-                  <div className="relative h-16 w-16 bg-blue-100 rounded-xl flex items-center justify-center">
-                    <Bookmark className="h-8 w-8 text-blue-600" />
+        <div className="space-y-8">
+          {/* Stats Overview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <StatCard
+                label={tProfile('favorites.stats.total_bookmarks')}
+                value={favorites.length}
+                description={tProfile('favorites.stats.tools_in_collection')}
+                icon={Bookmark}
+                variant="highlight"
+              />
+              <StatCard
+                label={tProfile('favorites.stats.featured_tools')}
+                value={favorites.filter(w => w.is_featured).length}
+                description={tProfile('favorites.stats.premium_tools')}
+                icon={Crown}
+                variant="warning"
+              />
+              <StatCard
+                label={tProfile('favorites.stats.high_quality')}
+                value={favorites.filter(w => w.quality_score >= 80).length}
+                description={tProfile('favorites.stats.high_score_tools')}
+                icon={Star}
+                variant="success"
+              />
+            </div>
+          </motion.div>
+
+          {/* Search and Filters */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Search className="h-5 w-5 text-primary" />
+                  {tProfile('favorites.search.title')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col md:flex-row gap-4">
+                  {/* Search */}
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder={tProfile('favorites.search.placeholder')}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Sort */}
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-full md:w-48">
+                      <SortAsc className="h-4 w-4 mr-2" />
+                      <SelectValue placeholder={tProfile('favorites.sort.placeholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="recent">{tProfile('favorites.sort.recent')}</SelectItem>
+                      <SelectItem value="popular">{tProfile('favorites.sort.popular')}</SelectItem>
+                      <SelectItem value="quality">{tProfile('favorites.sort.quality')}</SelectItem>
+                      <SelectItem value="alphabetical">{tProfile('favorites.sort.alphabetical')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* View Mode */}
+                  <div className="flex gap-2">
+                    <Button
+                      variant={viewMode === 'grid' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setViewMode('grid')}
+                    >
+                      <Grid3X3 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant={viewMode === 'list' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setViewMode('list')}
+                    >
+                      <List className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-              </div>
-              {/* 装饰背景 */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-500/10 to-transparent rounded-full blur-2xl" />
-            </CardContent>
-          </Card>
-        </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-        {/* 收藏列表 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          {loading ? (
-            <div className="space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardContent className="p-6">
-                    <div className="flex gap-4">
-                      <div className="h-16 w-16 bg-muted rounded-lg" />
-                      <div className="flex-1 space-y-3">
-                        <div className="h-5 bg-muted rounded w-3/4" />
-                        <div className="h-4 bg-muted rounded w-1/2" />
-                        <div className="h-3 bg-muted rounded w-1/4" />
-                      </div>
+          {/* Results */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            {filteredFavorites.length === 0 ? (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <Bookmark className="h-16 w-16 text-muted-foreground mx-auto" />
+                      <Search className="h-6 w-6 text-primary absolute -top-1 -right-1" />
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : error ? (
-            <Card className="border-destructive/20">
-              <CardContent className="p-8 text-center">
-                <div className="text-destructive mb-4 text-lg font-medium">{error}</div>
-                <Button onClick={() => fetchFavorites()} variant="outline">
-                  {tProfile('retry')}
-                </Button>
-              </CardContent>
-            </Card>
-          ) : favorites.length === 0 ? (
-            <Card>
-              <CardContent className="p-12 text-center">
-                <div className="relative mb-8">
-                  <div className="absolute inset-0 bg-muted/20 rounded-full blur-3xl" />
-                  <Bookmark className="relative h-20 w-20 text-muted-foreground mx-auto" />
-                </div>
-                <h3 className="text-2xl font-semibold mb-4">{tProfile('no_favorites')}</h3>
-                <p className="text-muted-foreground mb-8 max-w-md mx-auto text-lg">
-                  {tProfile('no_favorites_desc')}
-                </p>
-                <Link href="/">
-                  <Button size="lg" className="gap-2">
-                    <TrendingUp className="h-5 w-5" />
-                    {t('visit')}
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-6">
-              {favorites.map((website, index) => (
+                    <h3 className="text-lg font-medium text-foreground">
+                      {searchQuery ? tProfile('favorites.empty.no_matching') : tProfile('favorites.empty.no_bookmarks')}
+                    </h3>
+                    <p className="text-muted-foreground max-w-md mx-auto">
+                      {searchQuery 
+                        ? tProfile('favorites.empty.try_different_search', { query: searchQuery })
+                        : tProfile('favorites.empty.start_exploring')
+                      }
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      {searchQuery && (
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setSearchQuery('')}
+                        >
+                          <Filter className="h-4 w-4 mr-2" />
+                          {tProfile('favorites.actions.clear_search')}
+                        </Button>
+                      )}
+                      <Link href="/">
+                        <Button>
+                          <Compass className="h-4 w-4 mr-2" />
+                          {tProfile('favorites.empty.start_button')}
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+            <div className={cn(
+              viewMode === 'grid' 
+                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                : "space-y-4"
+            )}>
+              {filteredFavorites.map((website, index) => (
                 <motion.div
                   key={website.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="group"
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
-                  <Card className="hover:shadow-xl hover:border-primary/30 transition-all duration-300">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex gap-5 flex-1">
-                          {/* 缩略图 */}
-                          {website.thumbnail ? (
-                            <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border border-border">
+                  {viewMode === 'grid' ? (
+                    // Grid View
+                    <Card className="group h-full hover:shadow-md transition-all duration-200 border border-border hover:border-primary/30">
+                      <CardContent className="p-6">
+                        <div className="space-y-4">
+                          {/* Tool Image */}
+                          <div className="relative aspect-video rounded-lg overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/10">
+                            {website.thumbnail ? (
                               <img 
                                 src={website.thumbnail} 
                                 alt={website.title}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                className="w-full h-full object-cover"
                               />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </div>
-                          ) : (
-                            <div className="w-20 h-20 bg-muted rounded-xl flex items-center justify-center flex-shrink-0">
-                              <Globe className="h-8 w-8 text-muted-foreground" />
-                            </div>
-                          )}
-                          
-                          {/* 内容 */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start gap-3 mb-3">
-                              <h3 className="text-xl font-semibold group-hover:text-primary transition-colors leading-tight">
-                                {website.title}
-                              </h3>
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Map className="h-8 w-8 text-primary" />
+                              </div>
+                            )}
+                            
+                            {/* Status Badges */}
+                            <div className="absolute top-3 left-3 flex gap-2">
                               {website.is_featured && (
-                                <Badge variant="default" className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0">
-                                  ✨ {tWebsite('featured')}
+                                <Badge className="bg-yellow-50 text-yellow-700 border-yellow-200 text-xs">
+                                  <Crown className="h-3 w-3 mr-1" />
+                                  {tProfile('favorites.badge.featured')}
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-2">
-                              {website.description}
-                            </p>
-                            <div className="flex items-center gap-6 text-sm">
-                              <span className="flex items-center gap-2 text-muted-foreground">
-                                <Heart className="h-4 w-4" />
-                                <span className="font-medium">{website._count.websiteLikes}</span>
-                                <span>{t('like')}</span>
-                              </span>
-                              <span className="flex items-center gap-2 text-muted-foreground">
-                                <Bookmark className="h-4 w-4" />
-                                <span className="font-medium">{website._count.websiteFavorites}</span>
-                                <span>{t('favorite')}</span>
-                              </span>
-                              <Badge variant="outline" className="bg-background">
+
+                            {/* Quick Actions */}
+                            <div className="absolute top-3 right-3">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 bg-background/80 backdrop-blur-sm">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem onClick={() => handleVisit(website)}>
+                                    <ExternalLink className="h-4 w-4 mr-2" />
+                                    {tProfile('favorites.actions.visit')}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem asChild>
+                                    <Link href={`/tools/${website.id}`}>
+                                      <Eye className="h-4 w-4 mr-2" />
+                                      {tProfile('favorites.actions.details')}
+                                    </Link>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={() => removeFavorite(website.id)}
+                                    className="text-red-600"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    {tProfile('favorites.actions.remove')}
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </div>
+
+                          {/* Tool Info */}
+                          <div className="space-y-3">
+                            <div className="space-y-2">
+                              <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-primary transition-colors">
+                                {website.title}
+                              </h3>
+                              <p className="text-sm text-muted-foreground line-clamp-2">
+                                {website.description}
+                              </p>
+                            </div>
+
+                            {/* Category and Stats */}
+                            <div className="flex items-center justify-between">
+                              <Badge variant="secondary" className="text-xs">
                                 {website.category.name}
                               </Badge>
+                              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-1">
+                                  <Eye className="h-3 w-3" />
+                                  {website.visits}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Star className="h-3 w-3" />
+                                  {website.quality_score}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-2 pt-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="flex-1"
+                                onClick={() => handleVisit(website)}
+                              >
+                                <ExternalLink className="h-3 w-3 mr-2" />
+                                {tProfile('favorites.actions.visit')}
+                              </Button>
+                              <Link href={`/tools/${website.id}`} className="flex-1">
+                                <Button variant="outline" size="sm" className="w-full">
+                                  <Eye className="h-3 w-3 mr-2" />
+                                  {tProfile('favorites.actions.details')}
+                                </Button>
+                              </Link>
                             </div>
                           </div>
                         </div>
-                        
-                        {/* 操作按钮 */}
-                        <div className="flex items-center gap-3 ml-6 flex-shrink-0">
-                          <Button 
-                            size="default" 
-                            asChild
-                            className="gap-2 hover:bg-primary/90"
-                          >
-                            <a 
-                              href={website.url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                              {t('visit')}
-                            </a>
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="default"
-                            onClick={() => removeFavorite(website.id)}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            {t('delete')}
-                          </Button>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    // List View
+                    <Card className="group hover:shadow-md transition-all duration-200">
+                      <CardContent className="p-4">
+                        <div className="flex gap-4">
+                          {/* Thumbnail */}
+                          <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/10 flex items-center justify-center flex-shrink-0">
+                            {website.thumbnail ? (
+                              <img 
+                                src={website.thumbnail} 
+                                alt={website.title}
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            ) : (
+                              <Map className="h-8 w-8 text-primary" />
+                            )}
+                          </div>
+
+                          {/* Content */}
+                          <div className="flex-1 space-y-2">
+                            <div className="flex items-start justify-between">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <h3 className="font-semibold group-hover:text-primary transition-colors">
+                                    {website.title}
+                                  </h3>
+                                  {website.is_featured && (
+                                    <Crown className="h-4 w-4 text-yellow-600" />
+                                  )}
+                                </div>
+                                <p className="text-sm text-muted-foreground line-clamp-1">
+                                  {website.description}
+                                </p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeFavorite(website.id)}
+                                className="text-muted-foreground hover:text-red-500"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4">
+                                <Badge variant="secondary" className="text-xs">
+                                  {website.category.name}
+                                </Badge>
+                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                  <div className="flex items-center gap-1">
+                                    <Eye className="h-3 w-3" />
+                                    {website.visits}
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Star className="h-3 w-3" />
+                                    {website.quality_score}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleVisit(website)}
+                                >
+                                  <ExternalLink className="h-3 w-3" />
+                                </Button>
+                                <Link href={`/tools/${website.id}`}>
+                                  <Button variant="outline" size="sm">
+                                    <Eye className="h-3 w-3" />
+                                  </Button>
+                                </Link>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  )}
                 </motion.div>
               ))}
-
-              {/* 分页 */}
-              {pagination.pages > 1 && (
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="flex justify-center items-center gap-4 mt-12"
-                >
-                  <Button
-                    variant="outline"
-                    disabled={pagination.page === 1}
-                    onClick={() => fetchFavorites(pagination.page - 1)}
-                    className="gap-2"
-                  >
-                    {t('previous')}
-                  </Button>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">
-                      {tProfile('page_info', { current: pagination.page, total: pagination.pages })}
-                    </span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    disabled={pagination.page === pagination.pages}
-                    onClick={() => fetchFavorites(pagination.page + 1)}
-                    className="gap-2"
-                  >
-                    {t('next')}
-                  </Button>
-                </motion.div>
-              )}
             </div>
           )}
         </motion.div>
+
+        {/* Results Summary */}
+        {filteredFavorites.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-center text-sm text-muted-foreground"
+          >
+            <p>
+              {searchQuery 
+                ? tProfile('favorites.results.showing_search', { 
+                  current: filteredFavorites.length, 
+                  total: favorites.length 
+                })
+                : tProfile('favorites.results.showing_total', { 
+                  count: filteredFavorites.length 
+                })
+              }
+            </p>
+          </motion.div>
+        )}
+        </div>
       </div>
     </ProfileLayout>
   )

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from '@clerk/nextjs/server';
 import { AjaxResponse } from "@/lib/utils";
 import { prisma } from "@/lib/db/db";
+import { validateWebsiteEdit } from "@/lib/validations/website";
 
 // GET /api/websites/[id]
 // 获取单个网站详细信息
@@ -101,6 +102,24 @@ export async function PUT(
     const { id } = await params;
     const websiteId = parseInt(id);
 
+    // 统一表单验证
+    const validationResult = validateWebsiteEdit(data);
+    
+    if (!validationResult.success) {
+      // 收集所有验证错误
+      const errors = validationResult.error.issues.map(issue => ({
+        field: issue.path.join('.'),
+        message: issue.message
+      }));
+      
+      return NextResponse.json(
+        AjaxResponse.fail("Form validation failed", { errors }),
+        { status: 400 }
+      );
+    }
+
+    const validatedData = validationResult.data;
+
     const existingWebsite = await prisma.website.findUnique({
       where: { id: websiteId },
     });
@@ -118,17 +137,8 @@ export async function PUT(
       });
     }
 
-    if (!data.title || !data.url || !data.category_id) {
-      return NextResponse.json(
-        AjaxResponse.fail(
-          "Missing required fields: title, url, or category_id"
-        ),
-        { status: 400 }
-      );
-    }
-
     const category = await prisma.category.findUnique({
-      where: { id: Number(data.category_id) },
+      where: { id: Number(validatedData.category_id) },
     });
 
     if (!category) {
@@ -140,7 +150,7 @@ export async function PUT(
     // 检查URL是否已存在（排除当前网站）
     const urlExists = await prisma.website.findFirst({
       where: { 
-        url: data.url,
+        url: validatedData.url,
         id: { not: websiteId }
       }
     });
@@ -154,31 +164,49 @@ export async function PUT(
     const website = await prisma.website.update({
       where: { id: websiteId },
       data: {
-        title: data.title.trim(),
-        url: data.url.trim(),
-        description: data.description?.trim() || "",
-        category_id: Number(data.category_id),
-        thumbnail: data.thumbnail?.trim() || null,
-        tagline: data.tagline?.trim() || null,
-        features: data.features || [],
-        use_cases: data.use_cases || null,
-        target_audience: data.target_audience || null,
-        faq: data.faq || null,
-        pricing_model: data.pricing_model || 'free',
-        has_free_version: Boolean(data.has_free_version),
-        api_available: Boolean(data.api_available),
-        tags: data.tags?.trim() || null,
-        twitter_url: data.twitter_url?.trim() || null,
-        linkedin_url: data.linkedin_url?.trim() || null,
-        facebook_url: data.facebook_url?.trim() || null,
-        instagram_url: data.instagram_url?.trim() || null,
-        youtube_url: data.youtube_url?.trim() || null,
-        discord_url: data.discord_url?.trim() || null,
-        integrations: data.integrations || null,
-        ios_app_url: data.ios_app_url?.trim() || null,
-        android_app_url: data.android_app_url?.trim() || null,
-        web_app_url: data.web_app_url?.trim() || null,
-        desktop_platforms: data.desktop_platforms || null,
+        // 基本信息
+        title: validatedData.title.trim(),
+        url: validatedData.url.trim(),
+        description: validatedData.description?.trim() || "",
+        category_id: Number(validatedData.category_id),
+        
+        // 标签和描述
+        tagline: validatedData.tagline?.trim() || null,
+        tags: validatedData.tags?.trim() || null,
+        
+        // 功能特性
+        features: validatedData.features || [],
+        
+        // 使用场景和目标受众
+        use_cases: validatedData.use_cases || [],
+        target_audience: validatedData.target_audience || [],
+        
+        // 常见问题
+        faq: validatedData.faq || [],
+        
+        // 定价信息
+        pricing_model: validatedData.pricing_model || 'free',
+        has_free_version: Boolean(validatedData.has_free_version),
+        api_available: Boolean(validatedData.api_available),
+        pricing_plans: validatedData.pricing_plans || [],
+        
+        // 社交媒体链接
+        twitter_url: validatedData.twitter_url?.trim() || null,
+        linkedin_url: validatedData.linkedin_url?.trim() || null,
+        facebook_url: validatedData.facebook_url?.trim() || null,
+        instagram_url: validatedData.instagram_url?.trim() || null,
+        youtube_url: validatedData.youtube_url?.trim() || null,
+        discord_url: validatedData.discord_url?.trim() || null,
+        
+        // 集成
+        integrations: validatedData.integrations || [],
+        
+        // 平台支持
+        ios_app_url: validatedData.ios_app_url?.trim() || null,
+        android_app_url: validatedData.android_app_url?.trim() || null,
+        web_app_url: validatedData.web_app_url?.trim() || null,
+        desktop_platforms: validatedData.desktop_platforms || [],
+        
         // 保持原状态或根据需要重置为待审核
         status: existingWebsite.status,
       },

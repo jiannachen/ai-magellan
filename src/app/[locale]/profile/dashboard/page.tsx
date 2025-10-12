@@ -14,14 +14,27 @@ import {
   ExternalLink,
   ArrowUpRight,
   Sparkles,
-  Target,
-  Trash2
+  Trash2,
+  Map,
+  Compass,
+  Star,
+  Eye,
+  Route,
+  Users,
+  Ship,
+  Telescope,
+  Flag,
+  Waves,
+  Home,
+  ArrowRight
 } from 'lucide-react'
 import { Button } from '@/ui/common/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Badge } from '@/ui/common/badge'
 import { ProfileLayout } from '@/components/profile/profile-layout'
 import { toast } from 'sonner'
+import { StatCard } from '@/components/ui/stat-card'
+import { ActionCard } from '@/components/ui/action-card'
 
 interface Website {
   id: number
@@ -53,33 +66,55 @@ export default function DashboardPage() {
     totalLikes: 0
   })
   const [loading, setLoading] = useState(true)
-  
-  // Translation hooks
-  const t = useTranslations('common')
-  const tProfile = useTranslations('profile.dashboard')
-  const tNav = useTranslations('profile.navigation')
+  const t = useTranslations()
+  const tProfile = useTranslations('profile')
 
   useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      fetchFavorites()
+    if (isSignedIn) {
+      fetchDashboardData()
     }
-  }, [isLoaded, isSignedIn])
+  }, [isSignedIn])
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true)
+      await Promise.all([
+        fetchFavorites(),
+        fetchStats()
+      ])
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+      toast.error('Failed to load dashboard data')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const fetchFavorites = async () => {
     try {
-      setLoading(true)
-      
-      // 获取收藏的工具（前6个）
-      const favoritesResponse = await fetch('/api/user/favorites?limit=6')
-      if (favoritesResponse.ok) {
-        const favoritesData = await favoritesResponse.json()
-        setFavorites(favoritesData.websites)
-        setStats(prev => ({ ...prev, totalFavorites: favoritesData.pagination.total }))
+      const response = await fetch('/api/user/favorites')
+      if (response.ok) {
+        const data = await response.json()
+        setFavorites(data.data?.slice(0, 6) || [])
       }
     } catch (error) {
       console.error('Error fetching favorites:', error)
-    } finally {
-      setLoading(false)
+    }
+  }
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('/api/user/stats')
+      if (response.ok) {
+        const data = await response.json()
+        setStats(data.data || {
+          totalFavorites: 0,
+          totalSubmissions: 0,
+          totalLikes: 0
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error)
     }
   }
 
@@ -100,6 +135,7 @@ export default function DashboardPage() {
     }
   }
 
+
   if (!isLoaded || !isSignedIn) {
     return (
       <ProfileLayout>
@@ -113,258 +149,241 @@ export default function DashboardPage() {
     )
   }
 
-  return (
-    <ProfileLayout>
-      <div className="space-y-8">
-        {/* 欢迎区域 - Atlassian简洁风格 */}
-        <div className="py-8">
-          <div className="flex items-center gap-4 mb-3">
-            <Sparkles className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-[32px] font-medium leading-[40px] tracking-[-0.01em] text-[var(--ds-text)]">
-                {tProfile('welcome', { name: user?.firstName || tNav('user') })}
-              </h1>
-              <p className="text-[16px] leading-[24px] text-muted-foreground">
-                {tProfile('welcome_back')}
-              </p>
+  if (loading) {
+    return (
+      <ProfileLayout>
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="space-y-8 animate-pulse">
+            <div className="h-8 bg-muted rounded w-1/3"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="h-24 bg-muted rounded-xl"></div>
+              <div className="h-24 bg-muted rounded-xl"></div>
+              <div className="h-24 bg-muted rounded-xl"></div>
             </div>
+            <div className="h-64 bg-muted rounded-xl"></div>
           </div>
         </div>
+      </ProfileLayout>
+    )
+  }
 
-        {/* 统计卡片 - Atlassian简洁风格 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card className="transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] hover:shadow-[0_4px_8px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[14px] font-semibold text-primary mb-2">{tProfile('favorites_tools')}</p>
-                    <p className="text-[32px] font-medium leading-[40px] text-[var(--ds-text)]">{stats.totalFavorites}</p>
-                    <p className="text-[12px] text-muted-foreground mt-1">{tProfile('saved_tools')}</p>
-                  </div>
-                  <div className="w-12 h-12 bg-primary/10 rounded-[8px] flex items-center justify-center">
-                    <Bookmark className="h-6 w-6 text-primary" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card className="transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] hover:shadow-[0_4px_8px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[14px] font-semibold text-muted-foreground mb-2">{tProfile('my_submissions')}</p>
-                    <p className="text-[32px] font-medium leading-[40px] text-[var(--ds-text)]">{stats.totalSubmissions}</p>
-                    <p className="text-[12px] text-muted-foreground mt-1">{tProfile('submitted_tools')}</p>
-                  </div>
-                  <div className="w-12 h-12 bg-muted rounded-[8px] flex items-center justify-center">
-                    <Upload className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+  return (
+    <ProfileLayout>
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Page Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+              <Ship className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">
+                {tProfile('dashboard.welcome', { name: user?.firstName || 'User' })}
+              </h1>
+              <p className="text-muted-foreground">{tProfile('dashboard.welcome_back')}</p>
+            </div>
+          </div>
+
         </div>
 
-        {/* 快速操作 - Atlassian简洁风格 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <Card className="shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)] transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] hover:shadow-[0_4px_8px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]">
-            <CardHeader className="pb-[16px] px-[24px] pt-[24px]">
-              <CardTitle className="flex items-center gap-3 text-[20px] font-medium leading-[28px] tracking-[-0.01em]">
-                <Target className="h-5 w-5 text-primary" />
-                {tProfile('quick_actions')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="px-[24px] pb-[24px]">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Link href="/submit">
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="group"
-                  >
-                    <Card className="h-20 border-2 border-dashed border-border/60 hover:border-primary hover:bg-primary/5 transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] cursor-pointer">
-                      <CardContent className="h-full flex flex-col items-center justify-center gap-2">
-                        <Plus className="h-5 w-5 text-primary subtle-scale" />
-                        <span className="text-[14px] font-medium text-[var(--ds-text)]">{tProfile('submit_new_tool')}</span>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </Link>
-                
-                <Link href="/profile/submissions">
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="group"
-                  >
-                    <Card className="h-20 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] cursor-pointer">
-                      <CardContent className="h-full flex flex-col items-center justify-center gap-2">
-                        <Upload className="h-5 w-5 text-primary subtle-scale" />
-                        <span className="text-[14px] font-medium text-[var(--ds-text)]">{tProfile('manage_submissions')}</span>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </Link>
-                
-                <Link href="/">
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="group"
-                  >
-                    <Card className="h-20 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] cursor-pointer">
-                      <CardContent className="h-full flex flex-col items-center justify-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-primary subtle-scale" />
-                        <span className="text-[14px] font-medium text-[var(--ds-text)]">{tProfile('discover_tools')}</span>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        <div className="space-y-8">
+          {/* Stats Overview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <StatCard
+                label={tProfile('dashboard.stats.bookmarked_tools')}
+                value={stats.totalFavorites}
+                description={tProfile('dashboard.stats.collected_favorites')}
+                icon={Bookmark}
+                variant="highlight"
+              />
+              <StatCard
+                label={tProfile('dashboard.stats.submitted_tools')}
+                value={stats.totalSubmissions}
+                description={tProfile('dashboard.stats.discoveries_shared')}
+                icon={Map}
+                variant="success"
+              />
+              <StatCard
+                label={tProfile('dashboard.stats.endorsed_tools')}
+                value={stats.totalLikes}
+                description={tProfile('dashboard.stats.users_helped')}
+                icon={Heart}
+                variant="warning"
+              />
+            </div>
+          </motion.div>
 
-        {/* 最近收藏 - Atlassian简洁风格 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <Card className="shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)] transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] hover:shadow-[0_4px_8px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]">
-            <CardHeader className="pb-[16px] px-[24px] pt-[24px]">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-3 text-[20px] font-medium leading-[28px] tracking-[-0.01em]">
-                  <Bookmark className="h-5 w-5 text-primary" />
-                  {tProfile('recent_favorites')}
+          {/* Quick Actions */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Compass className="h-5 w-5 text-primary" />
+                  {tProfile('dashboard.quick_actions')}
                 </CardTitle>
-                {favorites.length > 0 && (
-                  <Link href="/profile/favorites">
-                    <Button variant="ghost" size="sm" className="gap-2 text-primary hover:bg-primary/5 text-[14px]">
-                      {tProfile('view_all')}
-                      <ArrowUpRight className="h-3 w-3" />
-                    </Button>
-                  </Link>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="px-[24px] pb-[24px]">
-              {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[...Array(4)].map((_, i) => (
-                    <Card key={i} className="animate-pulse">
-                      <CardContent className="p-4">
-                        <div className="flex gap-3">
-                          <div className="h-12 w-12 bg-fill-quaternary rounded-xl" />
-                          <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-fill-quaternary rounded w-3/4" />
-                            <div className="h-3 bg-fill-quaternary rounded w-1/2" />
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <ActionCard
+                    title={tProfile('dashboard.actions.submit_new_tool')}
+                    description={tProfile('dashboard.actions.share_tool')}
+                    icon={Telescope}
+                    variant="dashed"
+                    onClick={() => window.location.href = '/submit'}
+                  />
+                  <ActionCard
+                    title={tProfile('dashboard.actions.review_submissions')}
+                    description={tProfile('dashboard.actions.manage_tools')}
+                    icon={Flag}
+                    onClick={() => window.location.href = '/profile/submissions'}
+                  />
+                  <ActionCard
+                    title={tProfile('dashboard.actions.browse_tools')}
+                    description={tProfile('dashboard.actions.discover_tools')}
+                    icon={Route}
+                    onClick={() => window.location.href = '/'}
+                  />
                 </div>
-              ) : favorites.length === 0 ? (
-                <div className="text-center py-16">
-                  <Bookmark className="h-16 w-16 text-label-quaternary mx-auto mb-4" />
-                  <h3 className="text-title3 font-semibold mb-2 text-label-primary">{tProfile('no_favorites')}</h3>
-                  <p className="text-subhead text-label-secondary mb-6 max-w-md mx-auto">
-                    {tProfile('no_favorites_desc')}
-                  </p>
-                  <Link href="/">
-                    <Button className="gap-2">
-                      <Sparkles className="h-4 w-4" />
-                      {tProfile('go_discover')}
-                    </Button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {favorites.map((website) => (
-                    <motion.div
-                      key={website.id}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="group"
-                    >
-                      <Card className="transition-apple hover:scale-[1.02]">
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Recent Bookmarks */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="h-5 w-5 text-primary" />
+                  {tProfile('dashboard.recent_favorites')}
+                </CardTitle>
+                <Link href="/profile/favorites">
+                  <Button variant="outline" size="sm">
+                    <Waves className="h-4 w-4 mr-2" />
+                    {tProfile('dashboard.actions.view_all_favorites')}
+                    <ArrowUpRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </Link>
+              </CardHeader>
+              <CardContent>
+                {favorites.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <Bookmark className="h-16 w-16 text-muted-foreground mx-auto" />
+                        <Sparkles className="h-6 w-6 text-primary absolute -top-1 -right-1" />
+                      </div>
+                      <h3 className="text-lg font-medium text-foreground">
+                        {tProfile('dashboard.no_favorites')}
+                      </h3>
+                      <p className="text-muted-foreground max-w-md mx-auto">
+                        {tProfile('dashboard.no_favorites_desc')}
+                      </p>
+                      <div className="pt-4">
+                        <Link href="/">
+                          <Button>
+                            <Compass className="h-4 w-4 mr-2" />
+                            {tProfile('dashboard.actions.get_started')}
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {favorites.map((website) => (
+                      <Card key={website.id} className="group hover:shadow-md transition-all duration-200 border border-border hover:border-primary/30">
                         <CardContent className="p-4">
-                          <div className="flex items-start gap-3 mb-3">
-                            {website.thumbnail && (
-                              <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+                          <div className="space-y-3">
+                            {/* Tool Image */}
+                            <div className="aspect-video rounded-lg bg-gradient-to-br from-primary/5 to-magellan-teal/5 border border-primary/10 flex items-center justify-center overflow-hidden">
+                              {website.thumbnail ? (
                                 <img 
                                   src={website.thumbnail} 
                                   alt={website.title}
                                   className="w-full h-full object-cover"
                                 />
+                              ) : (
+                                <Map className="h-8 w-8 text-primary" />
+                              )}
+                            </div>
+
+                            {/* Tool Info */}
+                            <div className="space-y-2">
+                              <div className="flex items-start justify-between gap-2">
+                                <h3 className="font-semibold text-sm line-clamp-1 group-hover:text-primary transition-colors">
+                                  {website.title}
+                                </h3>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => removeFavorite(website.id)}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
                               </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-headline font-semibold truncate text-label-primary group-hover:text-primary transition-apple">
-                                {website.title}
-                              </h4>
-                              <p className="text-subhead text-label-secondary line-clamp-2 mt-1">
+                              <p className="text-xs text-muted-foreground line-clamp-2">
                                 {website.description}
                               </p>
+                              <div className="flex items-center justify-between">
+                                <Badge variant="secondary" className="text-xs">
+                                  {website.category.name}
+                                </Badge>
+                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                  <div className="flex items-center gap-1">
+                                    <Heart className="h-3 w-3" />
+                                    {website._count.websiteLikes}
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Bookmark className="h-3 w-3" />
+                                    {website._count.websiteFavorites}
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                          
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3 text-caption1 text-label-tertiary">
-                              <span className="flex items-center gap-1">
-                                <Heart className="h-3 w-3" />
-                                {website._count.websiteLikes}
-                              </span>
-                              <Badge variant="secondary" className="text-caption2 px-2 py-1 bg-fill-quaternary text-label-secondary border-0">
-                                {website.category.name}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Button variant="outline" size="sm" asChild className="h-8 px-3">
-                                <a 
-                                  href={website.url} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="flex items-center gap-1"
-                                >
-                                  <ExternalLink className="h-3 w-3" />
-                                </a>
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="icon-sm"
-                                onClick={() => removeFavorite(website.id)}
-                                className="text-label-tertiary hover:text-destructive"
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-2 pt-2">
+                              <Link href={`/tools/${website.id}`} className="flex-1">
+                                <Button variant="outline" size="sm" className="w-full">
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  {tProfile('dashboard.actions.browse')}
+                                </Button>
+                              </Link>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className=""
+                                onClick={() => window.open(website.url, '_blank')}
                               >
-                                <Trash2 className="h-3 w-3" />
+                                <ExternalLink className="h-3 w-3" />
                               </Button>
                             </div>
                           </div>
                         </CardContent>
                       </Card>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+
+        </div>
       </div>
     </ProfileLayout>
   )

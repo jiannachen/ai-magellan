@@ -5,11 +5,37 @@ import { useUser } from '@clerk/nextjs'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Edit, ExternalLink, Heart, Bookmark, Calendar, Globe, ArrowLeft, CheckCircle, Clock, Upload } from 'lucide-react'
+import { 
+  Edit, 
+  ExternalLink, 
+  Heart, 
+  Bookmark, 
+  Calendar, 
+  Globe, 
+  ArrowLeft, 
+  CheckCircle, 
+  Clock, 
+  Upload,
+  Map,
+  Compass,
+  Anchor,
+  Ship,
+  Flag,
+  Crown,
+  Telescope,
+  Route,
+  Eye,
+  Star,
+  Waves,
+  Home,
+  ArrowRight
+} from 'lucide-react'
 import { Button } from '@/ui/common/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Badge } from '@/ui/common/badge'
 import { ProfileLayout } from '@/components/profile/profile-layout'
+import { PageHeader } from '@/components/ui/page-header'
+import { StatCard } from '@/components/ui/stat-card'
 
 interface Website {
   id: number
@@ -57,7 +83,7 @@ export default function MySubmissionsPage() {
   
   // Translation hooks
   const t = useTranslations('common')
-  const tProfile = useTranslations('profile.submissions')
+  const tProfile = useTranslations('profile')
   const tWebsite = useTranslations('website')
 
   useEffect(() => {
@@ -84,7 +110,7 @@ export default function MySubmissionsPage() {
       })
     } catch (error) {
       console.error('Error fetching submissions:', error)
-      setError(tProfile('load_error'))
+      setError(tProfile('submissions.load_error'))
     } finally {
       setLoading(false)
     }
@@ -92,12 +118,28 @@ export default function MySubmissionsPage() {
 
   const getStatusBadge = (status: string) => {
     const statusMap = {
-      pending: { label: tProfile('status_pending'), variant: 'secondary' as const },
-      approved: { label: tProfile('status_approved'), variant: 'default' as const },
-      rejected: { label: tProfile('status_rejected'), variant: 'destructive' as const }
+      pending: { 
+        label: `🟡 ${tProfile('submissions.status_pending')}`, 
+        variant: 'secondary' as const,
+        className: 'bg-yellow-50 text-yellow-700 border-yellow-200'
+      },
+      approved: { 
+        label: `🟢 ${tProfile('submissions.status_approved')}`, 
+        variant: 'default' as const,
+        className: 'bg-green-50 text-green-700 border-green-200'
+      },
+      rejected: { 
+        label: `🔴 ${tProfile('submissions.status_rejected')}`, 
+        variant: 'destructive' as const,
+        className: 'bg-red-50 text-red-700 border-red-200'
+      }
     }
     
-    return statusMap[status as keyof typeof statusMap] || { label: status, variant: 'secondary' as const }
+    return statusMap[status as keyof typeof statusMap] || { 
+      label: status, 
+      variant: 'secondary' as const,
+      className: ''
+    }
   }
 
   if (!isLoaded) {
@@ -116,17 +158,23 @@ export default function MySubmissionsPage() {
   if (!isSignedIn) {
     return (
       <ProfileLayout>
-        <div className="p-6">
-          <Card>
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <Card className="max-w-md mx-auto">
             <CardHeader>
-              <CardTitle>{tProfile('login_required')}</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Anchor className="h-5 w-5 text-primary" />
+                {tProfile('submissions.login_required')}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                {tProfile('login_description')}
+                {tProfile('submissions.login_description')}
               </p>
               <Link href="/auth/signin">
-                <Button>{tProfile('login_now')}</Button>
+                <Button className="w-full">
+                  <Ship className="h-4 w-4 mr-2" />
+                  {tProfile('submissions.login_now')}
+                </Button>
               </Link>
             </CardContent>
           </Card>
@@ -137,190 +185,242 @@ export default function MySubmissionsPage() {
 
   return (
     <ProfileLayout>
-      <div className="p-6 space-y-6">
-        {/* 页面头部 */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold mb-2">{tProfile('title')}</h1>
-            <p className="text-muted-foreground">{tProfile('description')}</p>
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Page Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+              <Map className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">{tProfile('submissions.title')}</h1>
+              <p className="text-muted-foreground">{tProfile('submissions.description')}</p>
+            </div>
           </div>
-          <Link href="/submit">
-            <Button>
-              <Globe className="h-4 w-4 mr-2" />
-              {tProfile('submit_new_tool')}
-            </Button>
-          </Link>
         </div>
 
-        {/* 统计信息 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{tProfile('total_submissions')}</p>
-                  <p className="text-2xl font-bold text-primary">{pagination.total}</p>
-                </div>
-                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Upload className="h-5 w-5 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{tProfile('approved')}</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {submissions.filter(w => w.status === 'approved').length}
-                  </p>
-                </div>
-                <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{tProfile('pending_review')}</p>
-                  <p className="text-2xl font-bold text-yellow-600">
-                    {submissions.filter(w => w.status === 'pending').length}
-                  </p>
-                </div>
-                <div className="h-10 w-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-yellow-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <div className="space-y-8">
+          {/* Stats Overview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <StatCard
+                label={`⚓ ${tProfile('submissions.total_submissions')}`}
+                value={pagination.total}
+                description={tProfile('submissions.total_submissions')}
+                icon={Map}
+                variant="highlight"
+              />
+              <StatCard
+                label={`✅ ${tProfile('submissions.approved')}`}
+                value={submissions.filter(w => w.status === 'approved').length}
+                description={tProfile('submissions.approved')}
+                icon={CheckCircle}
+                variant="success"
+              />
+              <StatCard
+                label={`🟡 ${tProfile('submissions.pending_review')}`}
+                value={submissions.filter(w => w.status === 'pending').length}
+                description={tProfile('submissions.pending_review')}
+                icon={Clock}
+                variant="warning"
+              />
+            </div>
+          </motion.div>
 
-        {/* 提交列表 */}
-        {loading ? (
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="p-6">
-                  <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-muted rounded w-1/2"></div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : error ? (
-          <Card>
-            <CardContent className="p-6 text-center">
-              <p className="text-destructive mb-4">{error}</p>
-              <Button onClick={() => fetchSubmissions()}>{tProfile('retry')}</Button>
-            </CardContent>
-          </Card>
-        ) : submissions.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <Globe className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">{tProfile('no_submissions')}</h3>
-              <p className="text-muted-foreground mb-4">
-                {tProfile('no_submissions_desc')}
-              </p>
-              <Link href="/submit">
-                <Button>{tProfile('submit_first_tool')}</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-6">
-            {submissions.map((website) => (
-              <motion.div
-                key={website.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="group"
-              >
-                <Card className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-medium group-hover:text-primary transition-colors">
-                            {website.title}
-                          </h3>
-                          {website.is_featured && (
-                            <Badge variant="default">{tWebsite('featured')}</Badge>
-                          )}
-                          <Badge {...getStatusBadge(website.status)}>
-                            {getStatusBadge(website.status).label}
-                          </Badge>
-                        </div>
-                        <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
-                          {website.description}
-                        </p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {new Date(website.created_at).toLocaleDateString()}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Heart className="h-3 w-3" />
-                            {website._count.websiteLikes}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Bookmark className="h-3 w-3" />
-                            {website._count.websiteFavorites}
-                          </span>
-                          <Badge variant="outline">{website.category.name}</Badge>
+          {/* Submissions List */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Ship className="h-5 w-5 text-primary" />
+                  {tProfile('submissions.title')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="space-y-4">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="animate-pulse">
+                        <div className="flex items-center space-x-4 p-4 border border-border rounded-lg">
+                          <div className="w-16 h-16 bg-muted rounded-lg"></div>
+                          <div className="flex-1 space-y-2">
+                            <div className="h-4 bg-muted rounded w-3/4"></div>
+                            <div className="h-3 bg-muted rounded w-1/2"></div>
+                            <div className="h-3 bg-muted rounded w-1/4"></div>
+                          </div>
                         </div>
                       </div>
-                      
-                      <div className="flex items-center gap-2 ml-4">
-                        <Button variant="outline" size="sm" asChild>
-                          <a 
-                            href={website.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        </Button>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/profile/submissions/${website.id}/edit`}>
-                            <Edit className="h-3 w-3" />
-                          </Link>
-                        </Button>
-                      </div>
+                    ))}
+                  </div>
+                ) : error ? (
+                  <div className="text-center py-12">
+                    <div className="space-y-4">
+                      <Compass className="h-16 w-16 text-muted-foreground mx-auto" />
+                      <h3 className="text-lg font-medium text-foreground">
+                        {tProfile('submissions.load_error')}
+                      </h3>
+                      <p className="text-muted-foreground">{error}</p>
+                      <Button onClick={() => fetchSubmissions()}>
+                        <Route className="h-4 w-4 mr-2" />
+                        {tProfile('submissions.retry')}
+                      </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+                  </div>
+                ) : submissions.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <Map className="h-16 w-16 text-muted-foreground mx-auto" />
+                        <Waves className="h-8 w-8 text-primary absolute -bottom-2 -right-2" />
+                      </div>
+                      <h3 className="text-lg font-medium text-foreground">
+                        {tProfile('submissions.no_submissions')}
+                      </h3>
+                      <p className="text-muted-foreground max-w-md mx-auto">
+                        {tProfile('submissions.no_submissions_desc')}
+                      </p>
+                      <Link href="/submit" className="mt-8 inline-block">
+                        <Button className="bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90">
+                          <Telescope className="h-4 w-4 mr-2" />
+                          {tProfile('submissions.submit_first_tool')}
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {submissions.map((website, index) => (
+                      <motion.div
+                        key={website.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                        className="group"
+                      >
+                        <div className="flex items-center space-x-4 p-4 border border-border rounded-lg hover:border-primary/30 hover:bg-muted/30 transition-all duration-200">
+                          {/* Tool Image */}
+                          <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-primary/5 to-magellan-teal/5 border border-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                            {website.thumbnail ? (
+                              <img 
+                                src={website.thumbnail} 
+                                alt={website.title}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <Map className="h-6 w-6 text-primary" />
+                            )}
+                          </div>
 
-            {/* 分页 */}
-            {pagination.pages > 1 && (
-              <div className="flex justify-center gap-2 mt-8">
-                <Button
-                  variant="outline"
-                  disabled={pagination.page === 1}
-                  onClick={() => fetchSubmissions(pagination.page - 1)}
-                >
-                  {t('previous')}
-                </Button>
-                <span className="flex items-center px-4">
-                  {tProfile('page_info', { current: pagination.page, total: pagination.pages })}
-                </span>
-                <Button
-                  variant="outline"
-                  disabled={pagination.page === pagination.pages}
-                  onClick={() => fetchSubmissions(pagination.page + 1)}
-                >
-                  {t('next')}
-                </Button>
-              </div>
-            )}
-          </div>
-        )}
+                          {/* Tool Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                                {website.title}
+                              </h3>
+                              {website.is_featured && (
+                                <Badge className="bg-magellan-gold/20 text-magellan-gold border-magellan-gold/30">
+                                  <Crown className="h-3 w-3 mr-1" />
+                                  {tWebsite('featured')}
+                                </Badge>
+                              )}
+                              <Badge className={getStatusBadge(website.status).className}>
+                                {getStatusBadge(website.status).label}
+                              </Badge>
+                            </div>
+                            <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+                              {website.description}
+                            </p>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                {new Date(website.created_at).toLocaleDateString()}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Eye className="h-3 w-3" />
+                                {website.visits}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Heart className="h-3 w-3" />
+                                {website._count.websiteLikes}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Bookmark className="h-3 w-3" />
+                                {website._count.websiteFavorites}
+                              </span>
+                              <Badge variant="outline" className="text-xs">
+                                {website.category.name}
+                              </Badge>
+                              <div className="flex items-center gap-1 text-xs">
+                                <Star className="h-3 w-3" />
+                                {website.quality_score}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+                            <Link href={`/tools/${website.id}`}>
+                              <Button variant="outline" size="sm">
+                                <Eye className="h-3 w-3 mr-1" />
+                                {t('view')}
+                              </Button>
+                            </Link>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className=""
+                              onClick={() => window.open(website.url, '_blank')}
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                            </Button>
+                            <Button variant="outline" size="sm" asChild>
+                              <Link href={`/profile/submissions/${website.id}/edit`}>
+                                <Edit className="h-3 w-3" />
+                              </Link>
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+
+                    {/* Pagination */}
+                    {pagination.pages > 1 && (
+                      <div className="flex justify-center gap-2 mt-8 pt-6 border-t border-border">
+                        <Button
+                          variant="outline"
+                          disabled={pagination.page === 1}
+                          onClick={() => fetchSubmissions(pagination.page - 1)}
+                        >
+                          <ArrowRight className="h-4 w-4 mr-2 rotate-180" />
+                          {t('previous')}
+                        </Button>
+                        <div className="flex items-center px-4 py-2 text-sm text-muted-foreground">
+                          {tProfile('submissions.page_info', { current: pagination.page, total: pagination.pages })}
+                        </div>
+                        <Button
+                          variant="outline"
+                          disabled={pagination.page === pagination.pages}
+                          onClick={() => fetchSubmissions(pagination.page + 1)}
+                        >
+                          {t('next')}
+                          <ArrowRight className="h-4 w-4 ml-2" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </div>
     </ProfileLayout>
   )

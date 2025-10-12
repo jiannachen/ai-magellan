@@ -40,7 +40,7 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
     {
       name: 'Dashboard',
       label: tProfile('dashboard'),
-      href: '/dashboard',
+      href: '/profile/dashboard',
       icon: LayoutDashboard,
       description: tProfile('dashboard_desc')
     },

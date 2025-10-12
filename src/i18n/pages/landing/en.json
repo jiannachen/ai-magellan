@@ -1,0 +1,133 @@
+{
+  "hero": {
+    "badge": "Chart Your AI Journey",
+    "title_start": "Discover the Best",
+    "title_highlight": "AI Navigation Tools",
+    "description": "Like Magellan's historic voyage, we chart the AI frontier to guide your exploration.",
+    "description_highlight": "Discover, compare, and navigate to the AI tools that will transform your work.",
+    "search_placeholder": "Chart your course... search AI tools",
+    "popular_searches": "Popular expeditions",
+    "search_tags": {
+      "coding_assistant": "code assistant",
+      "ai_writing": "writing companion"
+    },
+    "stats": {
+      "islands": "Charted Islands",
+      "territories": "Territories", 
+      "curated_treasures": "Curated Treasures",
+      "explorers": "Active Explorers"
+    },
+    "buttons": {
+      "explore_territories": "Explore Territories",
+      "mark_discovery": "Mark Discovery"
+    }
+  },
+  "sections": {
+    "view_all": "View All Treasures",
+    "explore_more": "Explore More in",
+    "ranking_sections": {
+      "premier_discoveries": {
+        "title": "Premier AI Discoveries",
+        "description": "Top-quality tools charted and verified by our expert exploration team"
+      },
+      "trending_expeditions": {
+        "title": "Trending Expeditions", 
+        "description": "AI tools gaining momentum in the exploration community"
+      },
+      "free_territory": {
+        "title": "Free Territory Explorer",
+        "description": "High-quality AI tools available for cost-free exploration"
+      },
+      "new_horizons": {
+        "title": "New Horizons",
+        "description": "Latest AI tools discovered and added to our exploration map"
+      }
+    },
+    "value_props": {
+      "badge": "Why Choose AI Magellan?",
+      "title": "Expert Navigation for AI Explorers", 
+      "description": "We don't just list tools - we chart the AI frontier, testing and mapping every solution.",
+      "expert_navigation": {
+        "title": "Expert Navigation",
+        "description": "Like Magellan's compass, we guide you through the vast AI landscape with precision and expertise"
+      },
+      "charted_territory": {
+        "title": "Charted Territory",
+        "description": "We map the AI frontier, testing and verifying every tool to chart safe passage for your exploration"
+      },
+      "optimal_routes": {
+        "title": "Optimal Routes",
+        "description": "Advanced filtering and intelligent recommendations help you find the shortest path to your perfect AI tool"
+      },
+      "verified_quality": {
+        "title": "Verified Quality",
+        "description": "Every tool is rigorously tested and verified by our exploration team before earning a place on our platform"
+      },
+      "global_discovery": {
+        "title": "Global Discovery", 
+        "description": "Discover AI innovations from around the world - from emerging startups to established enterprise solutions"
+      },
+      "pioneer_access": {
+        "title": "Pioneer Access",
+        "description": "Be among the first to discover breakthrough AI tools as they emerge on the technological horizon"
+      }
+    },
+    "faq": {
+      "badge": "Navigator's Guide",
+      "title": "Explorer's Frequently Asked Questions",
+      "description": "Everything you need to know about exploring AI tools with Magellan",
+      "questions": {
+        "what_makes_different": {
+          "question": "What makes AI Magellan different from other AI tool directories?",
+          "answer": "Like Magellan's historic voyage, we chart unknown territories in the AI landscape. Our expert team personally tests and verifies each tool, providing comprehensive reviews, real-world use cases, and quality scores."
+        },
+        "quality_assurance": {
+          "question": "How do you ensure the quality of listed AI tools?",
+          "answer": "Every tool undergoes our rigorous exploration process - we test functionality, verify company credentials, analyze user feedback, and assign quality scores based on performance, reliability, and innovation."
+        },
+        "free_tools": {
+          "question": "Are the AI tools on AI Magellan free to use?",
+          "answer": "We feature both free and premium AI tools across all categories. Each listing clearly shows pricing models - free, freemium, subscription, or one-time purchase."
+        },
+        "submit_tool": {
+          "question": "Can I submit my AI tool for review?",
+          "answer": "Absolutely! We welcome tool creators and innovators to submit their AI solutions. Our review team will thoroughly evaluate your tool against our quality standards."
+        },
+        "update_frequency": {
+          "question": "How often do you update the AI tool directory?",
+          "answer": "Like a navigator constantly updating charts, we refresh our directory daily. We track new releases, feature updates, pricing changes, and emerging trends in the AI space."
+        },
+        "account_required": {
+          "question": "Do I need an account to explore AI tools?",
+          "answer": "No account required for basic exploration! However, creating a free account unlocks additional features like saving favorites, rating tools, and receiving personalized recommendations."
+        }
+      },
+      "contact_cta": {
+        "title": "Ready for your next expedition?",
+        "description": "Can't find the answer you're looking for? Our exploration team is here to guide you.",
+        "contact_navigator": "Contact Navigator",
+        "join_expedition": "Join Expedition"
+      }
+    },
+    "final_cta": {
+      "badge": "Start Your Journey",
+      "title": "Ready to chart your AI expedition?",
+      "description": "Join thousands of explorers who trust AI Magellan to discover their next breakthrough tool.",
+      "stats": {
+        "active_explorers": "12,000+ Active Explorers",
+        "discoveries_made": "500+ Weekly Discoveries", 
+        "verified_treasures": "1,200+ Verified Treasures"
+      },
+      "chart_discovery": "Chart Your Discovery",
+      "explore_territories": "Explore All Territories"
+    }
+  },
+  "island": {
+    "treasure_mark": "Featured",
+    "explore_island": "Explore this AI island in detail",
+    "unnamed_island": "Unnamed Island",
+    "mysterious_island": "A mysterious island waiting to be explored",
+    "free_territory": "Free Territory",
+    "set_sail": "Set Sail"
+  }
+}

@@ -57,6 +57,7 @@ export default function SimplifiedHomePage({
   initialCategories,
 }: SimplifiedHomePageProps) {
   const t = useTranslations();
+  const tLanding = useTranslations('landing');
   const { user } = useUser();
   const [websites, setWebsites] = useAtom(websitesAtom);
   const [categories, setCategories] = useAtom(categoriesAtom);
@@ -75,28 +76,28 @@ export default function SimplifiedHomePage({
   // FAQ data - 融入 Magellan 探索精神
   const faqs = [
     {
-      question: t('home.faq.questions.what_makes_different.question'),
-      answer: t('home.faq.questions.what_makes_different.answer')
+      question: tLanding('sections.faq.questions.what_makes_different.question'),
+      answer: tLanding('sections.faq.questions.what_makes_different.answer')
     },
     {
-      question: t('home.faq.questions.quality_assurance.question'),
-      answer: t('home.faq.questions.quality_assurance.answer')
+      question: tLanding('sections.faq.questions.quality_assurance.question'),
+      answer: tLanding('sections.faq.questions.quality_assurance.answer')
     },
     {
-      question: t('home.faq.questions.free_tools.question'),
-      answer: t('home.faq.questions.free_tools.answer')
+      question: tLanding('sections.faq.questions.free_tools.question'),
+      answer: tLanding('sections.faq.questions.free_tools.answer')
     },
     {
-      question: t('home.faq.questions.submit_tool.question'),
-      answer: t('home.faq.questions.submit_tool.answer')
+      question: tLanding('sections.faq.questions.submit_tool.question'),
+      answer: tLanding('sections.faq.questions.submit_tool.answer')
     },
     {
-      question: t('home.faq.questions.update_frequency.question'),
-      answer: t('home.faq.questions.update_frequency.answer')
+      question: tLanding('sections.faq.questions.update_frequency.question'),
+      answer: tLanding('sections.faq.questions.update_frequency.answer')
     },
     {
-      question: t('home.faq.questions.account_required.question'),
-      answer: t('home.faq.questions.account_required.answer')
+      question: tLanding('sections.faq.questions.account_required.question'),
+      answer: tLanding('sections.faq.questions.account_required.answer')
     }
   ];
 
@@ -104,33 +105,33 @@ export default function SimplifiedHomePage({
   const valueProps = [
     {
       icon: Compass,
-      title: t('home.value_props.expert_navigation.title'),
-      description: t('home.value_props.expert_navigation.description')
+      title: tLanding('sections.value_props.expert_navigation.title'),
+      description: tLanding('sections.value_props.expert_navigation.description')
     },
     {
       icon: Map,
-      title: t('home.value_props.charted_territory.title'),
-      description: t('home.value_props.charted_territory.description')
+      title: tLanding('sections.value_props.charted_territory.title'),
+      description: tLanding('sections.value_props.charted_territory.description')
     },
     {
       icon: Route,
-      title: t('home.value_props.optimal_routes.title'),
-      description: t('home.value_props.optimal_routes.description')
+      title: tLanding('sections.value_props.optimal_routes.title'),
+      description: tLanding('sections.value_props.optimal_routes.description')
     },
     {
       icon: Shield,
-      title: t('home.value_props.verified_quality.title'),
-      description: t('home.value_props.verified_quality.description')
+      title: tLanding('sections.value_props.verified_quality.title'),
+      description: tLanding('sections.value_props.verified_quality.description')
     },
     {
       icon: Globe,
-      title: t('home.value_props.global_discovery.title'),
-      description: t('home.value_props.global_discovery.description')
+      title: tLanding('sections.value_props.global_discovery.title'),
+      description: tLanding('sections.value_props.global_discovery.description')
     },
     {
       icon: Rocket,
-      title: t('home.value_props.pioneer_access.title'), 
-      description: t('home.value_props.pioneer_access.description')
+      title: tLanding('sections.value_props.pioneer_access.title'), 
+      description: tLanding('sections.value_props.pioneer_access.description')
     }
   ];
 
@@ -354,7 +355,7 @@ export default function SimplifiedHomePage({
               )}
             >
               <Map className="h-4 w-4 group-hover:rotate-6 transition-transform duration-300 professional-rotate" />
-              {t('home.view_all')}
+              {tLanding('sections.view_all')}
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
           </Link>
@@ -400,7 +401,7 @@ export default function SimplifiedHomePage({
               )}
             >
               <Route className="h-5 w-5 mr-2" />
-              {t('home.explore_more')} {title}
+              {tLanding('sections.explore_more')} {title}
               <ExternalLink className="h-4 w-4 ml-2" />
             </Button>
           </Link>
@@ -451,7 +452,7 @@ export default function SimplifiedHomePage({
               )}
             >
               <Compass className="h-4 w-4 professional-compass" />
-              <span>🚀 {t('hero.badge')}</span>
+              <span>🚀 {tLanding('hero.badge')}</span>
               <div className="w-2 h-2 rounded-full bg-magellan-mint professional-glow"></div>
             </motion.div>
 
@@ -470,10 +471,10 @@ export default function SimplifiedHomePage({
                   "max-w-5xl mx-auto"
                 )}
               >
-                {t('hero.title_start')}
+                {tLanding('hero.title_start')}
                 <br />
                 <span className="bg-gradient-to-r from-primary via-magellan-teal to-magellan-coral bg-clip-text text-transparent">
-                  {t('hero.title_highlight')}
+                  {tLanding('hero.title_highlight')}
                 </span>
               </motion.h1>
 
@@ -486,9 +487,9 @@ export default function SimplifiedHomePage({
                 }}
                 className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
               >
-                🌊 {t('hero.description')}
+                🌊 {tLanding('hero.description')}
                 <br />
-                <span className="text-primary font-medium">{t('hero.description_highlight')}</span>
+                <span className="text-primary font-medium">{tLanding('hero.description_highlight')}</span>
               </motion.p>
             </div>
           </motion.div>
@@ -513,7 +514,7 @@ export default function SimplifiedHomePage({
                   <Compass className="h-5 w-5 text-primary professional-compass" />
                 </div>
                 <Input
-                  placeholder={t('hero.search_placeholder')}
+                  placeholder={tLanding('hero.search_placeholder')}
                   className={cn(
                     "pl-14 pr-6 h-14 text-lg",
                     "rounded-xl border border-primary/15",
@@ -536,9 +537,9 @@ export default function SimplifiedHomePage({
               </div>
             </div>
             
-            <p className="text-sm text-muted-foreground mt-3 flex items-center justify-center gap-2">
-              <span>💡 {t('hero.popular_searches')}:</span>
-              {['ChatGPT', 'Midjourney', t('hero.search_tags.coding_assistant'), t('hero.search_tags.ai_writing')].map((tag, index) => (
+            <div className="text-sm text-muted-foreground mt-3 flex items-center justify-center gap-2">
+              <span>💡 {tLanding('hero.popular_searches')}:</span>
+              {['ChatGPT', 'Midjourney', tLanding('hero.search_tags.coding_assistant'), tLanding('hero.search_tags.ai_writing')].map((tag, index) => (
                 <Badge 
                   key={tag}
                   variant="secondary" 
@@ -548,7 +549,7 @@ export default function SimplifiedHomePage({
                   {tag}
                 </Badge>
               ))}
-            </p>
+            </div>
           </motion.div>
 
           {/* 探索统计 - 航海数据 */}
@@ -565,25 +566,25 @@ export default function SimplifiedHomePage({
               <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
                 <Map className="h-4 w-4 text-primary" />
               </div>
-              <span className="font-medium">{websites.length}+ {t('hero.stats.islands')}</span>
+              <span className="font-medium">{websites.length}+ {tLanding('hero.stats.islands')}</span>
             </div>
             <div className="flex items-center gap-2 group">
               <div className="p-2 rounded-full bg-magellan-teal/10 group-hover:bg-magellan-teal/20 transition-colors">
                 <Compass className="h-4 w-4 text-magellan-teal" />
               </div>
-              <span className="font-medium">{categories.length} {t('hero.stats.territories')}</span>
+              <span className="font-medium">{categories.length} {tLanding('hero.stats.territories')}</span>
             </div>
             <div className="flex items-center gap-2 group">
               <div className="p-2 rounded-full bg-magellan-gold/10 group-hover:bg-magellan-gold/20 transition-colors">
                 <Crown className="h-4 w-4 text-magellan-gold" />
               </div>
-              <span className="font-medium">{t('hero.stats.curated_treasures')}</span>
+              <span className="font-medium">{tLanding('hero.stats.curated_treasures')}</span>
             </div>
             <div className="flex items-center gap-2 group">
               <div className="p-2 rounded-full bg-magellan-mint/10 group-hover:bg-magellan-mint/20 transition-colors">
                 <Users className="h-4 w-4 text-magellan-mint" />
               </div>
-              <span className="font-medium">{t('hero.stats.explorers')}</span>
+              <span className="font-medium">{tLanding('hero.stats.explorers')}</span>
             </div>
           </motion.div>
 
@@ -610,7 +611,7 @@ export default function SimplifiedHomePage({
                 )}
               >
                 <Map className="h-5 w-5 mr-2" />
-                🗺️ {t('hero.buttons.explore_territories')}
+                🗺️ {tLanding('hero.buttons.explore_territories')}
               </Button>
             </Link>
             <Link href="/submit">
@@ -625,7 +626,7 @@ export default function SimplifiedHomePage({
                 )}
               >
                 <Compass className="h-5 w-5 mr-2" />
-                ⚓ {t('hero.buttons.mark_discovery')}
+                ⚓ {tLanding('hero.buttons.mark_discovery')}
               </Button>
             </Link>
           </motion.div>
@@ -634,8 +635,8 @@ export default function SimplifiedHomePage({
 
       {/* Rankings Sections */}
       <RankingSection
-        title={t('home.ranking_sections.premier_discoveries.title')}
-        description={t('home.ranking_sections.premier_discoveries.description')}
+        title={tLanding('sections.ranking_sections.premier_discoveries.title')}
+        description={tLanding('sections.ranking_sections.premier_discoveries.description')}
         websites={topRatedWebsites}
         icon={Crown}
         viewAllLink="/rankings/top-rated"
@@ -643,8 +644,8 @@ export default function SimplifiedHomePage({
 
       <div className="bg-muted/30">
         <RankingSection
-          title={t('home.ranking_sections.trending_expeditions.title')}
-          description={t('home.ranking_sections.trending_expeditions.description')}
+          title={tLanding('sections.ranking_sections.trending_expeditions.title')}
+          description={tLanding('sections.ranking_sections.trending_expeditions.description')}
           websites={mostPopularWebsites}
           icon={TrendingUp}
           viewAllLink="/rankings/popular"
@@ -652,8 +653,8 @@ export default function SimplifiedHomePage({
       </div>
 
       <RankingSection
-        title={t('home.ranking_sections.free_territory.title')}
-        description={t('home.ranking_sections.free_territory.description')}
+        title={tLanding('sections.ranking_sections.free_territory.title')}
+        description={tLanding('sections.ranking_sections.free_territory.description')}
         websites={topFreeWebsites}
         icon={CheckCircle}
         viewAllLink="/rankings/free"
@@ -661,8 +662,8 @@ export default function SimplifiedHomePage({
 
       <div className="bg-muted/30">
         <RankingSection
-          title={t('home.ranking_sections.new_horizons.title')}
-          description={t('home.ranking_sections.new_horizons.description')}
+          title={tLanding('sections.ranking_sections.new_horizons.title')}
+          description={tLanding('sections.ranking_sections.new_horizons.description')}
           websites={recentWebsites}
           icon={Clock}
           viewAllLink="/rankings/recent"
@@ -690,14 +691,14 @@ export default function SimplifiedHomePage({
           >
             <div className="inline-flex items-center gap-3 mb-6 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-magellan-teal/10 border border-primary/20">
               <Map className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium text-primary">{t('home.value_props.badge')}</span>
+              <span className="text-sm font-medium text-primary">{tLanding('sections.value_props.badge')}</span>
               <div className="w-2 h-2 rounded-full bg-magellan-coral animate-pulse"></div>
             </div>
             <h2 className="text-atlassian-h2 font-semibold mb-4 flex items-center justify-center gap-3">
-              ⚓ {t('home.value_props.title')}
+              ⚓ {tLanding('sections.value_props.title')}
             </h2>
             <p className="text-atlassian-body-large text-muted-foreground max-w-4xl mx-auto">
-              🌊 {t('home.value_props.description')}
+              🌊 {tLanding('sections.value_props.description')}
             </p>
           </motion.div>
 
@@ -779,14 +780,14 @@ export default function SimplifiedHomePage({
           >
             <div className="inline-flex items-center gap-3 mb-6 px-4 py-2 rounded-full bg-gradient-to-r from-magellan-gold/10 to-magellan-coral/10 border border-magellan-gold/20">
               <Compass className="h-5 w-5 text-magellan-gold professional-compass" />
-              <span className="text-sm font-medium text-magellan-gold">{t('home.faq.badge')}</span>
+              <span className="text-sm font-medium text-magellan-gold">{tLanding('sections.faq.badge')}</span>
               <div className="w-2 h-2 rounded-full bg-magellan-mint professional-glow"></div>
             </div>
             <h2 className="text-atlassian-h2 font-semibold mb-4 flex items-center justify-center gap-3">
-              🧭 {t('home.faq.title')}
+              🧭 {tLanding('sections.faq.title')}
             </h2>
             <p className="text-atlassian-body-large text-muted-foreground max-w-3xl mx-auto">
-              {t('home.faq.description')}
+              {tLanding('sections.faq.description')}
             </p>
           </motion.div>
 
@@ -872,73 +873,6 @@ export default function SimplifiedHomePage({
               </motion.div>
             ))}
           </div>
-
-          {/* 联系CTA - 航海支援 */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: 0.4, 
-              delay: 0.6,
-              ease: [0.25, 0.1, 0.25, 1]
-            }}
-            className="mt-16 text-center"
-          >
-            <Card className={cn(
-              "max-w-2xl mx-auto relative overflow-hidden",
-              "bg-gradient-to-br from-primary/5 via-background to-magellan-teal/5",
-              "border border-primary/20 rounded-2xl shadow-xl"
-            )}>
-              {/* 背景光效 */}
-              <div className="absolute inset-0 bg-gradient-to-r from-magellan-coral/5 via-transparent to-magellan-gold/5"></div>
-              
-              <CardContent className="p-8 relative z-10">
-                <div className="space-y-6">
-                  {/* 图标 */}
-                  <div className="flex justify-center">
-                    <div className="p-4 rounded-2xl bg-gradient-to-br from-magellan-gold/20 to-magellan-coral/15 border border-magellan-gold/30">
-                      <Lightbulb className="h-8 w-8 text-magellan-gold" />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-atlassian-h4 font-semibold text-foreground">
-                      {t('home.faq.contact_cta.title')}
-                    </h3>
-                    <p className="text-atlassian-body text-muted-foreground">
-                      {t('home.faq.contact_cta.description')}
-                    </p>
-                  </div>
-                  
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button 
-                      variant="outline"
-                      className={cn(
-                        "rounded-xl px-6 py-3 border-primary/30",
-                        "hover:bg-primary/10 hover:border-primary/50",
-                        "subtle-hover"
-                      )}
-                    >
-                      <Compass className="h-4 w-4 mr-2" />
-                      {t('home.faq.contact_cta.contact_navigator')}
-                    </Button>
-                    <Button 
-                      className={cn(
-                        "bg-gradient-to-r from-primary to-magellan-teal",
-                        "hover:from-primary/90 hover:to-magellan-teal/90",
-                        "rounded-xl px-6 py-3 text-white",
-                        "shadow-lg hover:shadow-xl",
-                        "subtle-hover"
-                      )}
-                    >
-                      <Route className="h-4 w-4 mr-2" />
-                      {t('home.faq.contact_cta.join_expedition')}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
         </div>
       </section>
 
@@ -964,7 +898,7 @@ export default function SimplifiedHomePage({
             {/* 最终徽章 */}
             <div className="inline-flex items-center gap-3 mb-8 px-6 py-3 rounded-full bg-gradient-to-r from-primary/15 to-magellan-coral/10 border border-primary/30 shadow-lg">
               <Rocket className="h-5 w-5 text-primary" />
-              <span className="text-sm font-semibold text-primary">{t('home.final_cta.badge')}</span>
+              <span className="text-sm font-semibold text-primary">{tLanding('sections.final_cta.badge')}</span>
               <div className="w-2 h-2 rounded-full bg-magellan-mint animate-pulse"></div>
             </div>
             
@@ -972,11 +906,11 @@ export default function SimplifiedHomePage({
             <div className="space-y-6">
               <h2 className="text-atlassian-h1 font-bold leading-tight flex items-center justify-center gap-4 flex-wrap">
                 <span>⚓</span>
-                {t('home.final_cta.title')}
+                {tLanding('sections.final_cta.title')}
                 <span>🗺️</span>
               </h2>
               <p className="text-atlassian-body-large text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                🌊 {t('home.final_cta.description')}
+                🌊 {tLanding('sections.final_cta.description')}
               </p>
             </div>
             
@@ -991,19 +925,19 @@ export default function SimplifiedHomePage({
                 <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
                   <Users className="h-4 w-4 text-primary" />
                 </div>
-                <span className="font-medium">{t('home.final_cta.stats.active_explorers')}</span>
+                <span className="font-medium">{tLanding('sections.final_cta.stats.active_explorers')}</span>
               </div>
               <div className="flex items-center gap-2 group">
                 <div className="p-2 rounded-full bg-magellan-teal/10 group-hover:bg-magellan-teal/20 transition-colors">
                   <Star className="h-4 w-4 text-magellan-teal" />
                 </div>
-                <span className="font-medium">{t('home.final_cta.stats.discoveries_made')}</span>
+                <span className="font-medium">{tLanding('sections.final_cta.stats.discoveries_made')}</span>
               </div>
               <div className="flex items-center gap-2 group">
                 <div className="p-2 rounded-full bg-magellan-gold/10 group-hover:bg-magellan-gold/20 transition-colors">
                   <Crown className="h-4 w-4 text-magellan-gold" />
                 </div>
-                <span className="font-medium">{t('home.final_cta.stats.verified_treasures')}</span>
+                <span className="font-medium">{tLanding('sections.final_cta.stats.verified_treasures')}</span>
               </div>
             </motion.div>
             
@@ -1040,7 +974,7 @@ export default function SimplifiedHomePage({
                   
                   <div className="relative flex items-center gap-3">
                     <Map className="h-6 w-6 group-hover:rotate-6 transition-transform duration-300 professional-rotate" />
-                    ⚓ {t('home.final_cta.chart_discovery')}
+                    ⚓ {tLanding('sections.final_cta.chart_discovery')}
                     <ExternalLink className="h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
                   </div>
                 </Button>
@@ -1061,7 +995,7 @@ export default function SimplifiedHomePage({
                 >
                   <div className="flex items-center gap-3">
                     <Compass className="h-6 w-6 text-primary group-hover:rotate-12 transition-transform duration-500 professional-rotate" />
-                    🗺️ {t('home.final_cta.explore_territories')}
+                    🗺️ {tLanding('sections.final_cta.explore_territories')}
                     <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                   </div>
                 </Button>

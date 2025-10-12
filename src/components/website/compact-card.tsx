@@ -3,7 +3,7 @@
 import { Card } from "@/ui/common/card";
 import { Button } from "@/ui/common/button";
 import { Badge } from "@/ui/common/badge";
-import { ExternalLink, Star, Eye, Heart, Compass, Map } from "lucide-react";
+import { ExternalLink, Star, Compass, Map } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 import type { Website } from "@/lib/types";
 import { WebsiteThumbnail } from "./website-thumbnail";
@@ -17,7 +17,7 @@ interface CompactCardProps {
 }
 
 export function CompactCard({ website, onVisit, className }: CompactCardProps) {
-  const t = useTranslations();
+  const tLanding = useTranslations('landing');
   
   return (
     <div className={cn("group", className)}>
@@ -37,12 +37,12 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
         {/* 微妙的背景效果 */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/1 via-transparent to-magellan-coral/1 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"></div>
         
-        {/* 探索状态指示器 */}
+        {/* 探索状态指示器 - 与访问按钮垂直对齐 */}
         {website.is_featured && (
-          <div className="absolute top-2 left-2 z-[3]">
+          <div className="absolute top-3 right-14 z-[3]">
             <div className="flex items-center gap-1 px-2 py-1 bg-magellan-gold/20 text-magellan-gold rounded-full text-xs font-medium border border-magellan-gold/30">
               <Star className="h-3 w-3 fill-current" />
-              <span>{t('island.treasure_mark')}</span>
+              <span>{tLanding('island.treasure_mark')}</span>
             </div>
           </div>
         )}
@@ -70,7 +70,7 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
               // 添加微妙的罗盘效果
               "group/btn"
             )}
-            title={t('island.explore_island')}
+            title={tLanding('island.explore_island')}
           >
             <Compass className="h-4 w-4 group-hover/btn:rotate-45 transition-transform duration-300" />
           </Button>
@@ -95,65 +95,77 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
               "text-sm font-semibold text-foreground line-clamp-1",
               "group-hover:text-primary transition-colors duration-300"
             )}>
-              {website.title || t('island.unnamed_island')}
+              {website.title || tLanding('island.unnamed_island')}
             </h3>
             
             {/* 岛屿描述 */}
             <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-              {website.description || t('island.mysterious_island')}
+              {website.description || tLanding('island.mysterious_island')}
             </p>
 
-            {/* 岛屿标签和统计 */}
-            <div className="flex items-center justify-between mt-3">
-              {/* 价格标签 */}
-              <div className="flex items-center gap-2">
-                {website.pricing_model === 'free' ? (
-                  <Badge variant="secondary" className="text-xs bg-magellan-mint/10 text-magellan-mint border-magellan-mint/20">
-                    🆓 {t('island.free_territory')}
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="text-xs">
-                    💎 {t('island.premium_territory')}
-                  </Badge>
-                )}
-              </div>
-
-              {/* 探索数据 */}
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Eye className="h-3 w-3" />
-                  <span>{website.visits || 0}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Heart className="h-3 w-3" />
-                  <span>{website.likes || 0}</span>
-                </div>
-                {website.quality_score && website.quality_score > 0 && (
-                  <div className="flex items-center gap-1 text-magellan-gold">
-                    <Star className="h-3 w-3 fill-current" />
-                    <span>{website.quality_score}</span>
-                  </div>
-                )}
-              </div>
+            {/* 岛屿标签 */}
+            <div className="flex items-center mt-3">
+              {/* 免费价格标签 */}
+              {website.pricing_model === 'free' && (
+                <Badge variant="secondary" className="text-xs bg-magellan-mint/10 text-magellan-mint border-magellan-mint/20">
+                  🆓 {tLanding('island.free_territory')}
+                </Badge>
+              )}
             </div>
           </div>
         </div>
 
-        {/* 底部探索按钮条 */}
+        {/* 底部标签区域 */}
         <div className="relative p-3 pt-0">
-          <Button 
-            size="sm" 
-            className="w-full bg-gradient-to-r from-primary/90 to-magellan-teal/90 hover:from-primary hover:to-magellan-teal text-white rounded-lg font-medium transition-all duration-200 subtle-hover"
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              onVisit(website);
-            }}
-          >
-            <Map className="h-4 w-4 mr-2" />
-            {t('island.set_sail')}
-            <ExternalLink className="h-3 w-3 ml-2 group-hover:translate-x-0.5 transition-transform duration-200" />
-          </Button>
+          <div className="flex flex-wrap gap-1.5">
+            {/* 定价模式标签 - 优先显示 */}
+            {website.pricing_model && (
+              <Badge variant="outline" className="text-xs bg-primary/5 text-primary border-primary/20">
+                {website.pricing_model === 'free' ? '免费' : 
+                 website.pricing_model === 'freemium' ? '免费增值' :
+                 website.pricing_model === 'subscription' ? '订阅制' :
+                 website.pricing_model === 'one_time' ? '一次性付费' : 
+                 website.pricing_model === 'tiered' ? '分层定价' :
+                 website.pricing_model === 'custom' ? '定制定价' :
+                 website.pricing_model === 'usage_based' ? '按量付费' :
+                 website.pricing_model === 'open_source' ? '开源' :
+                 website.pricing_model}
+              </Badge>
+            )}
+            
+            {/* 主要特色功能标签 - 显示第一个功能名称 */}
+            {(() => {
+              // 处理可能的JSON字符串格式
+              let features = website.features;
+              if (typeof features === 'string') {
+                try {
+                  features = JSON.parse(features);
+                } catch (e) {
+                  features = [];
+                }
+              }
+              
+              return features && Array.isArray(features) && features.length > 0 && features[0]?.name && (
+                <Badge variant="secondary" className="text-xs bg-muted/50 text-muted-foreground border-muted-foreground/20">
+                  {features[0].name}
+                </Badge>
+              );
+            })()}
+
+            {/* 类别标签 */}
+            {website.category?.name && (
+              <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                {website.category.name}
+              </Badge>
+            )}
+
+            {/* API可用性标签 - 作为补充信息 */}
+            {website.api_available && (
+              <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                API
+              </Badge>
+            )}
+          </div>
         </div>
       </Card>
     </div>

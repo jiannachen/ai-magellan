@@ -16,9 +16,20 @@ export default getRequestConfig(async ({requestLocale}) => {
     locale = defaultLocale;
   }
   
+  // Load main translations, profile translations, and page-specific translations
+  const [mainMessages, profileMessages, landingMessages] = await Promise.all([
+    import(`./i18n/messages/${locale}.json`),
+    import(`./i18n/messages/profile.${locale}.json`),
+    import(`./i18n/pages/landing/${locale}.json`)
+  ]);
+  
   return {
     locale,
-    messages: (await import(`./i18n/messages/${locale}.json`)).default,
+    messages: {
+      ...mainMessages.default,
+      profile: profileMessages.default,
+      landing: landingMessages.default
+    },
     timeZone: 'Asia/Taipei',
     now: new Date(),
     // Enable rich text formatting

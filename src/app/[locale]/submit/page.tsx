@@ -1,5 +1,5 @@
-import EnhancedSubmitToolPage from '@/components/forms/enhanced-submit-form'
+import SingleStepSubmitForm from '@/components/forms/single-step-submit-form'
 
 export default function SubmitPage() {
-  return <EnhancedSubmitToolPage />
+  return <SingleStepSubmitForm />
 }
