@@ -3,7 +3,7 @@
 import { Card } from "@/ui/common/card";
 import { Button } from "@/ui/common/button";
 import { Badge } from "@/ui/common/badge";
-import { ExternalLink, Star, Compass, Map } from "lucide-react";
+import { ExternalLink, Star } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 import type { Website } from "@/lib/types";
 import { WebsiteThumbnail } from "./website-thumbnail";
@@ -50,8 +50,8 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
         {/* 整个卡片的点击区域 - 跳转到详情页 */}
         <Link href={`/tools/${website.id}`} className="absolute inset-0 z-[1]" />
 
-        {/* 访问按钮 - 航海风格 */}
-        <div className="absolute top-3 right-3 z-[2]">
+        {/* 访问按钮 - 外部链接图标，hover时显示，大小缩小一半 */}
+        <div className="absolute top-3 right-3 z-[2] opacity-0 group-hover:opacity-100 transition-all duration-200">
           <Button
             variant="ghost"
             size="sm"
@@ -61,62 +61,63 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
               onVisit(website);
             }}
             className={cn(
-              "h-9 w-9 p-0 rounded-xl",
+              "h-7 w-7 p-0 rounded-md",
               "bg-background/90 hover:bg-primary/10 backdrop-blur-sm",
               "text-muted-foreground hover:text-primary",
-              "border border-primary/20 hover:border-primary/40",
               "shadow-md hover:shadow-lg",
               "transition-all duration-200 subtle-scale",
-              // 添加微妙的罗盘效果
-              "group/btn"
+              "group/btn",
+              "min-h-7 min-w-7 max-h-7 max-w-7",
+              "flex items-center justify-center"
             )}
             title={tLanding('island.explore_island')}
           >
-            <Compass className="h-4 w-4 group-hover/btn:rotate-45 transition-transform duration-300" />
+            <ExternalLink className="h-3 w-3 group-hover/btn:scale-110 transition-transform duration-300" />
           </Button>
         </div>
 
         {/* 卡片内容 - 岛屿信息展示 */}
-        <div className="relative p-5 flex items-start gap-4">
-          {/* 岛屿缩略图 - 增强视觉效果 */}
-          <div className="relative group/thumb">
-            <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/20 to-magellan-coral/20 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
-            <WebsiteThumbnail
-              url={website.url}
-              thumbnail={website.thumbnail}
-              title={website.title}
-              className="relative w-14 h-14 rounded-xl flex-shrink-0 border border-primary/10 group-hover:border-primary/30 transition-all duration-300" 
-            />
-          </div>
+        <div className="relative p-5 flex flex-col gap-4">
+          {/* 上半部分：缩略图和基本信息 */}
+          <div className="flex items-start gap-4">
+            {/* 岛屿缩略图 - 增强视觉效果 */}
+            <div className="relative group/thumb">
+              <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/20 to-magellan-coral/20 rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+              <WebsiteThumbnail
+                url={website.url}
+                thumbnail={website.thumbnail}
+                title={website.title}
+                className="relative w-14 h-14 rounded-xl flex-shrink-0 border border-primary/10 group-hover:border-primary/30 transition-all duration-300" 
+              />
+            </div>
 
-          <div className="flex-1 min-w-0 space-y-2">
-            {/* 岛屿名称 */}
-            <h3 className={cn(
-              "text-sm font-semibold text-foreground line-clamp-1",
-              "group-hover:text-primary transition-colors duration-300"
-            )}>
-              {website.title || tLanding('island.unnamed_island')}
-            </h3>
-            
-            {/* 岛屿描述 */}
-            <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-              {website.description || tLanding('island.mysterious_island')}
-            </p>
+            <div className="flex-1 min-w-0 space-y-2">
+              {/* 岛屿名称 */}
+              <h3 className={cn(
+                "text-sm font-semibold text-foreground line-clamp-1",
+                "group-hover:text-primary transition-colors duration-300"
+              )}>
+                {website.title || tLanding('island.unnamed_island')}
+              </h3>
+              
+              {/* 岛屿描述 */}
+              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                {website.description || tLanding('island.mysterious_island')}
+              </p>
 
-            {/* 岛屿标签 */}
-            <div className="flex items-center mt-3">
-              {/* 免费价格标签 */}
-              {website.pricing_model === 'free' && (
-                <Badge variant="secondary" className="text-xs bg-magellan-mint/10 text-magellan-mint border-magellan-mint/20">
-                  🆓 {tLanding('island.free_territory')}
-                </Badge>
-              )}
+              {/* 岛屿标签 */}
+              <div className="flex items-center mt-3">
+                {/* 免费价格标签 */}
+                {website.pricing_model === 'free' && (
+                  <Badge variant="secondary" className="text-xs bg-magellan-mint/10 text-magellan-mint border-magellan-mint/20">
+                    🆓 {tLanding('island.free_territory')}
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* 底部标签区域 */}
-        <div className="relative p-3 pt-0">
+          {/* 下半部分：底部标签区域 */}
           <div className="flex flex-wrap gap-1.5">
             {/* 定价模式标签 - 优先显示 */}
             {website.pricing_model && (
@@ -130,32 +131,6 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
                  website.pricing_model === 'usage_based' ? '按量付费' :
                  website.pricing_model === 'open_source' ? '开源' :
                  website.pricing_model}
-              </Badge>
-            )}
-            
-            {/* 主要特色功能标签 - 显示第一个功能名称 */}
-            {(() => {
-              // 处理可能的JSON字符串格式
-              let features = website.features;
-              if (typeof features === 'string') {
-                try {
-                  features = JSON.parse(features);
-                } catch (e) {
-                  features = [];
-                }
-              }
-              
-              return features && Array.isArray(features) && features.length > 0 && features[0]?.name && (
-                <Badge variant="secondary" className="text-xs bg-muted/50 text-muted-foreground border-muted-foreground/20">
-                  {features[0].name}
-                </Badge>
-              );
-            })()}
-
-            {/* 类别标签 */}
-            {website.category?.name && (
-              <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                {website.category.name}
               </Badge>
             )}
 
