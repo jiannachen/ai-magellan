@@ -29,7 +29,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         // Atlassian Primary Button - 完全符合规范
-        default: "bg-primary !text-white hover:bg-primary/90 active:bg-primary/80 border-none rounded-[4px] min-h-[40px] hover:!text-white active:!text-white focus:!text-white [&_*]:!text-white",
+        default: "bg-primary border-none rounded-[4px] min-h-[40px] !text-white hover:bg-primary/90 active:bg-primary/80 hover:!text-white active:!text-white focus:!text-white [&_*]:!text-white [&_svg]:!text-white",
         
         // Atlassian Secondary Button - 完全符合规范  
         secondary: "bg-card text-card-foreground border border-border hover:bg-muted hover:border-border rounded-[4px] min-h-[40px]",

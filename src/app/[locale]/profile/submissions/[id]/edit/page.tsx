@@ -1,73 +1,89 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useUser } from '@clerk/nextjs'
+import React, { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { useForm, useFieldArray } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useAtom } from 'jotai'
+import { useUser } from '@clerk/nextjs'
+import { useTranslations } from 'next-intl'
+import { cn } from '@/lib/utils/utils'
+import { categoriesAtom } from '@/lib/atoms'
+import { fetchMetadata } from '@/lib/utils'
 import { websiteEditSchema, type WebsiteEditData } from '@/lib/validations/website'
-import { 
-  Save, 
-  Loader2, 
-  Plus, 
-  X, 
-  Map, 
-  Compass, 
-  Anchor, 
-  Ship, 
-  Telescope, 
-  Flag, 
-  Star, 
-  Zap, 
-  Users, 
-  Target, 
-  Lightbulb, 
-  HelpCircle, 
-  Coins, 
-  Waves, 
-  Globe,
-  MessageSquare,
-  Code,
-  Monitor,
-  Smartphone,
-  Laptop
-} from 'lucide-react'
 import { Button } from '@/ui/common/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Input } from '@/ui/common/input'
 import { Textarea } from '@/ui/common/textarea'
 import { Label } from '@/ui/common/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/common/select'
+import { RequiredLabel, FormFieldWrapper } from '@/ui/common/required-label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/ui/common/select'
 import { Checkbox } from '@/ui/common/checkbox'
 import { toast } from 'sonner'
-import { PageHeader } from '@/components/ui/page-header'
-import { ActionCard } from '@/components/ui/action-card'
-import { cn } from '@/lib/utils/utils'
+import GlobalLoading from '@/components/loading/global-loading'
+import { 
+  Map,
+  Compass,
+  Anchor,
+  Ship,
+  Globe, 
+  Plus, 
+  X,
+  Save,
+  MessageSquare,
+  Code,
+  Users,
+  Target,
+  FileText,
+  HelpCircle,
+  Monitor,
+  Smartphone,
+  Laptop,
+  MapPin,
+  Telescope,
+  Flag,
+  Coins,
+  Waves,
+  Star,
+  Zap,
+  Video,
+  ArrowRight,
+  Lightbulb,
+  Loader2
+} from 'lucide-react'
 
-const PRICING_MODELS = [
-  { value: 'free', label: 'free' },
-  { value: 'freemium', label: 'freemium' },
-  { value: 'subscription', label: 'subscription' },
-  { value: 'tiered', label: 'tiered' },
-  { value: 'custom', label: 'custom' },
-  { value: 'one_time', label: 'one_time' },
-  { value: 'tiered_subscription', label: 'tiered_subscription' },
-  { value: 'usage_based', label: 'usage_based' },
-  { value: 'pay_as_you_go', label: 'pay_as_you_go' },
-  { value: 'open_source', label: 'open_source' }
+const PRICING_MODEL_VALUES = [
+  'free', 'freemium', 'subscription', 'tiered', 'custom', 
+  'one_time', 'tiered_subscription', 'usage_based', 'pay_as_you_go', 'open_source'
 ]
 
 const DESKTOP_PLATFORMS = [
-  { value: 'mac', label: 'macos' },
-  { value: 'windows', label: 'windows' },
-  { value: 'linux', label: 'linux' }
+  { value: 'mac', key: 'macos', icon: Laptop },
+  { value: 'windows', key: 'windows', icon: Monitor },
+  { value: 'linux', key: 'linux', icon: Monitor }
+]
+
+const SOCIAL_PLATFORMS = [
+  { key: 'twitter_url', labelKey: 'twitter', icon: MessageSquare, placeholderKey: 'twitter_placeholder' },
+  { key: 'linkedin_url', labelKey: 'linkedin', icon: MessageSquare, placeholderKey: 'linkedin_placeholder' },
+  { key: 'facebook_url', labelKey: 'facebook', icon: Globe, placeholderKey: 'facebook_placeholder' },
+  { key: 'instagram_url', labelKey: 'instagram', icon: Globe, placeholderKey: 'instagram_placeholder' },
+  { key: 'youtube_url', labelKey: 'youtube', icon: Video, placeholderKey: 'youtube_placeholder' },
+  { key: 'discord_url', labelKey: 'discord', icon: MessageSquare, placeholderKey: 'discord_placeholder' }
 ]
 
 const COMMON_INTEGRATIONS = [
   'Slack', 'Discord', 'Telegram', 'Zapier', 'API', 'Webhook',
   'Google Sheets', 'Notion', 'Trello', 'Asana', 'GitHub',
-  'OpenAI', 'Anthropic', 'HuggingFace', 'AWS', 'Azure', 'Stripe'
+  'OpenAI', 'Anthropic', 'HuggingFace', 'AWS', 'Azure', 'Stripe',
+  'PayPal', 'Shopify', 'WordPress', 'Salesforce'
 ]
 
 interface Website {
@@ -80,6 +96,7 @@ interface Website {
   status: string
   submittedBy: string
   tagline: string | null
+  email: string | null
   features: any
   use_cases: string[] | null
   target_audience: string[] | null
@@ -99,6 +116,7 @@ interface Website {
   android_app_url: string | null
   web_app_url: string | null
   desktop_platforms: string[] | null
+  pricing_plans: Array<{name: string, billing_cycle: string, price: string, features: string[]}> | null
 }
 
 interface Category {
@@ -112,50 +130,115 @@ export default function EditWebsitePage() {
   const router = useRouter()
   const params = useParams()
   const websiteId = params?.id as string
-  const t = useTranslations('profile.edit')
-  const tForm = useTranslations('form')
-  const tCommon = useTranslations('common')
-  const tPricing = useTranslations('pricing_models')
-
-  const [website, setWebsite] = useState<Website | null>(null)
-  const [categories, setCategories] = useState<Category[]>([])
+  
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isFetching, setIsFetching] = useState(false)
+  const [categories, setCategories] = useAtom(categoriesAtom)
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [website, setWebsite] = useState<Website | null>(null)
+  
+  // Translation hooks
+  const t = useTranslations()
+  const tForm = useTranslations('form')
+  const tSubmit = useTranslations('profile.submit')
+  const tEdit = useTranslations('profile.edit')
+  const tPricing = useTranslations('pricing_models')
+  const tMessages = useTranslations('profile.submit.messages')
 
-  const [formData, setFormData] = useState({
-    title: '',
-    url: '',
-    description: '',
-    category_id: 0,
-    thumbnail: '',
-    tagline: '',
-    features: [] as Array<{name: string, description: string}>,
-    use_cases: [] as string[],
-    target_audience: [] as string[],
-    faq: [] as Array<{question: string, answer: string}>,
-    pricing_model: 'free',
-    pricing_plans: [] as Array<{name: string, billing_cycle: string, price: string, features: string[]}>,
-    has_free_version: false,
-    api_available: false,
-    tags: '',
-    twitter_url: '',
-    linkedin_url: '',
-    facebook_url: '',
-    instagram_url: '',
-    youtube_url: '',
-    discord_url: '',
-    integrations: [] as string[],
-    ios_app_url: '',
-    android_app_url: '',
-    web_app_url: '',
-    desktop_platforms: [] as string[]
+  // Form navigation sections
+  const formSections = [
+    { id: 'basic', title: tSubmit('basic_info'), icon: Map, description: tSubmit('basic_info_desc') },
+    { id: 'features', title: tSubmit('key_features'), icon: Zap, description: tSubmit('features_desc') },
+    { id: 'audience', title: tSubmit('use_cases_audience'), icon: Users, description: tSubmit('audience_desc') },
+    { id: 'pricing', title: tSubmit('pricing_info'), icon: Coins, description: tSubmit('pricing_desc') },
+    { id: 'social', title: tSubmit('social_integrations'), icon: Waves, description: tSubmit('social_desc') },
+    { id: 'platforms', title: tSubmit('platform_support'), icon: Anchor, description: tSubmit('platforms_desc') }
+  ]
+
+  const form = useForm<WebsiteEditData>({
+    resolver: zodResolver(websiteEditSchema),
+    defaultValues: {
+      url: '',
+      email: '',
+      title: '',
+      category_id: '',
+      tags: '',
+      tagline: '',
+      description: '',
+      features: [{ name: '', description: '' }],
+      use_cases: [],
+      target_audience: [],
+      faq: [],
+      pricing_model: '',
+      has_free_version: false,
+      api_available: false,
+      pricing_plans: [],
+      twitter_url: '',
+      linkedin_url: '',
+      facebook_url: '',
+      instagram_url: '',
+      youtube_url: '',
+      discord_url: '',
+      integrations: [],
+      ios_app_url: '',
+      android_app_url: '',
+      web_app_url: '',
+      desktop_platforms: []
+    }
   })
 
+  const { watch, setValue, getValues, control, reset } = form
+
+  const {
+    fields: featureFields,
+    append: appendFeature,
+    remove: removeFeature
+  } = useFieldArray({
+    control,
+    name: "features"
+  })
+
+  const {
+    fields: faqFields,
+    append: appendFaq,
+    remove: removeFaq
+  } = useFieldArray({
+    control,
+    name: "faq"
+  })
+
+  const {
+    fields: pricingPlansFields,
+    append: appendPricingPlan,
+    remove: removePricingPlan
+  } = useFieldArray({
+    control,
+    name: "pricing_plans"
+  })
+
+  // Load categories
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await fetch('/api/categories')
+        if (!response.ok) throw new Error('Failed to load categories')
+        const data = await response.json()
+        setCategories(data.data)
+      } catch (error) {
+        toast.error(tMessages('load_categories_error'))
+      }
+    }
+
+    if (categories.length === 0) {
+      loadCategories()
+    }
+  }, [categories.length, setCategories])
+
+  // Load website data for editing
   useEffect(() => {
     if (isLoaded && isSignedIn && websiteId) {
       fetchWebsite()
-      fetchCategories()
     }
   }, [isLoaded, isSignedIn, websiteId])
 
@@ -165,14 +248,14 @@ export default function EditWebsitePage() {
       
       if (!response.ok) {
         if (response.status === 404) {
-          setError(t('errors.website_not_found'))
+          setError(tEdit('errors.website_not_found'))
           return
         }
         if (response.status === 403) {
-          setError(t('errors.permission_denied'))
+          setError(tEdit('errors.permission_denied'))
           return
         }
-        throw new Error(t('errors.fetch_failed'))
+        throw new Error(tEdit('errors.fetch_failed'))
       }
 
       const data = await response.json()
@@ -180,7 +263,7 @@ export default function EditWebsitePage() {
 
       // 检查是否是当前用户提交的网站
       if (websiteData.submittedBy !== user?.id) {
-        setError(t('errors.only_own_websites'))
+        setError(tEdit('errors.only_own_websites'))
         return
       }
 
@@ -188,7 +271,7 @@ export default function EditWebsitePage() {
       
       // 处理 features 数据
       const processFeatures = (features: any) => {
-        if (!features) return []
+        if (!features) return [{ name: '', description: '' }]
         try {
           const parsedFeatures = typeof features === 'string' ? JSON.parse(features) : features
           if (Array.isArray(parsedFeatures) && parsedFeatures.length > 0) {
@@ -197,28 +280,29 @@ export default function EditWebsitePage() {
             }
             return parsedFeatures.map((f: string) => ({ name: f, description: '' }))
           }
-          return []
+          return [{ name: '', description: '' }]
         } catch {
-          return []
+          return [{ name: '', description: '' }]
         }
       }
       
-      setFormData({
+      // 重置表单数据
+      reset({
         title: websiteData.title,
         url: websiteData.url,
+        email: websiteData.email || '',
         description: websiteData.description,
-        category_id: websiteData.category_id,
-        thumbnail: websiteData.thumbnail || '',
+        category_id: websiteData.category_id.toString(),
         tagline: websiteData.tagline || '',
+        tags: websiteData.tags || '',
         features: processFeatures(websiteData.features),
         use_cases: websiteData.use_cases || [],
         target_audience: websiteData.target_audience || [],
         faq: websiteData.faq || [],
-        pricing_model: websiteData.pricing_model || 'free',
+        pricing_model: websiteData.pricing_model || '',
         pricing_plans: websiteData.pricing_plans || [],
         has_free_version: websiteData.has_free_version || false,
         api_available: websiteData.api_available || false,
-        tags: websiteData.tags || '',
         twitter_url: websiteData.twitter_url || '',
         linkedin_url: websiteData.linkedin_url || '',
         facebook_url: websiteData.facebook_url || '',
@@ -233,271 +317,52 @@ export default function EditWebsitePage() {
       })
     } catch (error) {
       console.error('Error fetching website:', error)
-      setError(t('errors.fetch_failed'))
+      setError(tEdit('errors.fetch_failed'))
     } finally {
       setLoading(false)
     }
   }
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('/api/categories')
-      if (response.ok) {
-        const data = await response.json()
-        setCategories(data.data || data)
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error)
-    }
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!formData.title || !formData.url || !formData.category_id) {
-      toast.error(t('errors.required_fields'))
-      return
-    }
-
-    setSaving(true)
-    
-    try {
-      const response = await fetch(`/api/websites/${websiteId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || t('errors.update_failed'))
-      }
-
-      toast.success(t('success.updated'))
-      router.push('/profile/submissions')
-    } catch (error) {
-      console.error('Error updating website:', error)
-      toast.error(error instanceof Error ? error.message : t('errors.update_failed'))
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const handleInputChange = (field: string, value: string | number | boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }))
-  }
-
-  const addToArray = (fieldName: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [fieldName]: [...(prev[fieldName as keyof typeof prev] as string[]), value]
-    }))
-  }
-
-  const removeFromArray = (fieldName: string, index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      [fieldName]: (prev[fieldName as keyof typeof prev] as string[]).filter((_, i) => i !== index)
-    }))
-  }
-
-  const updateArrayItem = (fieldName: string, index: number, value: string) => {
-    setFormData(prev => {
-      const array = [...(prev[fieldName as keyof typeof prev] as string[])]
-      array[index] = value
-      return { ...prev, [fieldName]: array }
-    })
-  }
-
-  const addFeature = () => {
-    setFormData(prev => ({
-      ...prev,
-      features: [...prev.features, { name: '', description: '' }]
-    }))
-  }
-
-  const removeFeature = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      features: prev.features.filter((_, i) => i !== index)
-    }))
-  }
-
-  const updateFeature = (index: number, field: 'name' | 'description', value: string) => {
-    setFormData(prev => {
-      const features = [...prev.features]
-      features[index] = { ...features[index], [field]: value }
-      return { ...prev, features }
-    })
-  }
-
-  const addFaq = () => {
-    setFormData(prev => ({
-      ...prev,
-      faq: [...prev.faq, { question: '', answer: '' }]
-    }))
-  }
-
-  const removeFaq = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      faq: prev.faq.filter((_, i) => i !== index)
-    }))
-  }
-
-  const updateFaq = (index: number, field: 'question' | 'answer', value: string) => {
-    setFormData(prev => {
-      const faq = [...prev.faq]
-      faq[index] = { ...faq[index], [field]: value }
-      return { ...prev, faq }
-    })
-  }
-
-  const addPricingPlan = () => {
-    if (formData.pricing_plans.length < 6) {
-      setFormData(prev => ({
-        ...prev,
-        pricing_plans: [...prev.pricing_plans, { name: '', billing_cycle: '', price: '', features: [] }]
-      }))
-    }
-  }
-
-  const removePricingPlan = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      pricing_plans: prev.pricing_plans.filter((_, i) => i !== index)
-    }))
-  }
-
-  const updatePricingPlan = (index: number, field: 'name' | 'billing_cycle' | 'price', value: string) => {
-    setFormData(prev => {
-      const plans = [...prev.pricing_plans]
-      plans[index] = { ...plans[index], [field]: value }
-      return { ...prev, pricing_plans: plans }
-    })
-  }
-
-  const addPricingPlanFeature = (planIndex: number) => {
-    if (formData.pricing_plans[planIndex].features.length < 5) {
-      setFormData(prev => {
-        const plans = [...prev.pricing_plans]
-        plans[planIndex].features.push('')
-        return { ...prev, pricing_plans: plans }
-      })
-    }
-  }
-
-  const removePricingPlanFeature = (planIndex: number, featureIndex: number) => {
-    setFormData(prev => {
-      const plans = [...prev.pricing_plans]
-      plans[planIndex].features = plans[planIndex].features.filter((_, i) => i !== featureIndex)
-      return { ...prev, pricing_plans: plans }
-    })
-  }
-
-  const updatePricingPlanFeature = (planIndex: number, featureIndex: number, value: string) => {
-    setFormData(prev => {
-      const plans = [...prev.pricing_plans]
-      plans[planIndex].features[featureIndex] = value
-      return { ...prev, pricing_plans: plans }
-    })
-  }
-
+  // Early returns after all hooks are called
   if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="relative">
-            <Compass className="h-12 w-12 text-primary mx-auto animate-spin" />
-            <div className="absolute inset-0 animate-pulse">
-              <Waves className="h-12 w-12 text-magellan-teal mx-auto opacity-50" />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-foreground">⚙️ Loading Tool Information</h3>
-            <p className="text-sm text-muted-foreground">Preparing your discovery for editing...</p>
-          </div>
-        </div>
-      </div>
-    )
+    return <GlobalLoading variant="fullscreen" />
   }
 
   if (!isSignedIn) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="container mx-auto px-4 py-8 max-w-md">
-          <ActionCard
-            title="🔐 Sign In Required"
-            description="You need to sign in to edit your tool submissions"
-            icon={Anchor}
-            className="p-8 text-center"
-          >
-            <div className="mt-6">
-              <Link href="/auth/signin">
-                <Button className="bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90">
-                  <Compass className="h-4 w-4 mr-2" />
-                  Sign In
-                </Button>
-              </Link>
-            </div>
-          </ActionCard>
-        </div>
-      </div>
-    )
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
-          <div className="animate-pulse space-y-8">
-            {/* Header skeleton */}
-            <div className="space-y-4">
-              <div className="h-8 bg-gradient-to-r from-primary/20 to-magellan-teal/20 rounded w-1/3"></div>
-              <div className="h-4 bg-muted rounded w-2/3"></div>
-            </div>
-            
-            {/* Form sections skeleton */}
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-gradient-to-br from-card to-card/95 border border-primary/10 rounded-2xl p-6 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="h-5 w-5 bg-primary/30 rounded"></div>
-                  <div className="h-6 bg-primary/30 rounded w-1/4"></div>
-                </div>
-                <div className="h-4 bg-muted rounded w-3/4"></div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="h-10 bg-muted rounded"></div>
-                  <div className="h-10 bg-muted rounded"></div>
-                </div>
-              </div>
-            ))}
+          <div className="p-8 text-center">
+            <h3 className="text-lg font-semibold mb-4">{tEdit('sign_in_required')}</h3>
+            <p className="text-muted-foreground mb-6">{tEdit('sign_in_description')}</p>
+            <Link href="/auth/signin">
+              <Button className="bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90 !text-white">
+                <Compass className="h-4 w-4 mr-2" />
+                {t('common.sign_in')}
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
     )
   }
 
+  if (loading) {
+    return <GlobalLoading variant="fullscreen" />
+  }
+
   if (error) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="container mx-auto px-4 py-8 max-w-md">
-          <ActionCard
-            title="⚠️ Navigation Error"
-            description={error}
-            icon={Compass}
-            variant="default"
-            className="p-8 text-center border-destructive/20"
-          >
-            <div className="mt-6 flex flex-col sm:flex-row gap-4">
+          <div className="p-8 text-center border border-destructive/20 rounded-lg">
+            <h3 className="text-lg font-semibold mb-4">{tEdit('navigation_error')}</h3>
+            <p className="text-muted-foreground mb-6">{error}</p>
+            <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/profile/submissions" className="flex-1">
-                <Button variant="outline" className="w-full subtle-hover">
+                <Button variant="outline" className="w-full">
                   <Anchor className="h-4 w-4 mr-2" />
-                  Return to Home
+                  Return to Submissions
                 </Button>
               </Link>
               <Button 
@@ -505,866 +370,1169 @@ export default function EditWebsitePage() {
                 className="flex-1 bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90 text-white"
               >
                 <Compass className="h-4 w-4 mr-2" />
-                Retry Navigation
+                {tEdit('retry')}
               </Button>
             </div>
-          </ActionCard>
+          </div>
         </div>
       </div>
     )
   }
 
+  // Auto fetch website info
+  const fetchWebsiteInfo = async () => {
+    const url = getValues('url')
+    if (!url || !url.startsWith('http')) return
+
+    setIsFetching(true)
+    try {
+      const metadata = await fetchMetadata(url)
+      if (metadata.title) setValue('title', metadata.title)
+      if (metadata.description) setValue('description', metadata.description)
+
+      toast.success(tMessages('auto_fill_success'))
+    } catch (error) {
+      toast.error(tMessages('auto_fill_error'))
+    } finally {
+      setIsFetching(false)
+    }
+  }
+
+  // Array manipulation helpers
+  const addToArray = (fieldName: keyof WebsiteEditData, value: string) => {
+    const current = getValues(fieldName) as string[]
+    if (!current.includes(value)) {
+      setValue(fieldName, [...current, value] as any)
+    }
+  }
+
+  const removeFromArray = (fieldName: keyof WebsiteEditData, value: string) => {
+    const current = getValues(fieldName) as string[]
+    setValue(fieldName, current.filter(item => item !== value) as any)
+  }
+
+  // Form submission
+  const onSubmit = async (data: WebsiteEditData) => {
+    setIsSubmitting(true)
+    
+    // Clear previous errors
+    form.clearErrors()
+    
+    try {
+      console.log('Submitting data:', data) // 调试用
+      
+      const response = await fetch(`/api/websites/${websiteId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+
+      console.log('Response status:', response.status) // 调试用
+      console.log('Response headers:', response.headers) // 调试用
+
+      const responseText = await response.text()
+      console.log('Response text:', responseText) // 调试用
+
+      if (!response.ok) {
+        let errorData
+        try {
+          errorData = JSON.parse(responseText)
+        } catch (parseError) {
+          console.error('Failed to parse error response as JSON:', parseError)
+          console.error('Raw response:', responseText)
+          throw new Error(`Server returned ${response.status}: ${responseText.substring(0, 200)}...`)
+        }
+        
+        // 如果是验证错误，显示具体的错误信息并滚动到第一个错误
+        if (errorData.data?.errors) {
+          const firstErrorField = errorData.data.errors[0]?.field
+          
+          errorData.data.errors.forEach((error: { field: string, message: string }) => {
+            form.setError(error.field as any, { message: error.message })
+          })
+          
+          // 滚动到第一个错误字段
+          if (firstErrorField) {
+            scrollToFirstError(firstErrorField)
+          }
+          
+          toast.error(tMessages('fix_form_errors'))
+        } else {
+          throw new Error(errorData.message || 'Update failed')
+        }
+        return
+      }
+
+      const result = JSON.parse(responseText)
+      console.log('Success result:', result) // 调试用
+
+      toast.success(tEdit('success.updated'))
+      router.push('/profile/submissions')
+    } catch (error) {
+      console.error('Submit error:', error)
+      toast.error(error instanceof Error ? error.message : tEdit('errors.update_failed'))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Scroll to first error field
+  const scrollToFirstError = (fieldName: string) => {
+    // Map field names to section IDs for better scrolling
+    const fieldToSectionMap: Record<string, string> = {
+      url: 'basic',
+      email: 'basic',
+      title: 'basic',
+      category_id: 'basic',
+      tagline: 'basic',
+      description: 'basic',
+      features: 'features',
+      pricing_model: 'pricing'
+    }
+
+    const sectionId = fieldToSectionMap[fieldName] || 'basic'
+    const element = document.getElementById(sectionId)
+    
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      })
+    }
+  }
+
+  // Handle form errors from react-hook-form
+  const onInvalid = async (errors: any) => {
+    // 强制触发所有字段的验证显示
+    await form.trigger()
+    
+    const firstErrorField = Object.keys(errors)[0]
+    if (firstErrorField) {
+      scrollToFirstError(firstErrorField)
+      toast.error(tMessages('fill_required_fields'))
+    }
+  }
+
+  // 改进的提交处理 - 确保显示所有验证错误
+  const handleFormSubmit = async () => {
+    // 清除之前的错误
+    form.clearErrors()
+    
+    // 触发表单验证
+    const isValid = await form.trigger()
+    
+    if (!isValid) {
+      // 如果验证失败，显示错误并滚动到第一个错误
+      const errors = form.formState.errors
+      const firstErrorField = Object.keys(errors)[0]
+      
+      console.log('Form validation errors:', errors) // 调试用
+      
+      if (firstErrorField) {
+        scrollToFirstError(firstErrorField)
+      }
+      
+      // 检查关键必填字段的验证问题（按重要性排序）
+      if (errors.url) {
+        toast.error(tMessages('enter_valid_url'))
+      } else if (errors.email) {
+        toast.error(tMessages('enter_valid_email'))
+      } else if (errors.title) {
+        toast.error(tMessages('enter_valid_name'))
+      } else if (errors.category_id) {
+        toast.error(tMessages('select_category'))
+      } else if (errors.tagline) {
+        toast.error(tMessages('enter_valid_tagline'))
+      } else if (errors.description) {
+        toast.error(tMessages('enter_valid_description'))
+      } else if (errors.features) {
+        toast.error(tMessages('add_feature_required'))
+      } else if (errors.pricing_model) {
+        toast.error(tMessages('select_pricing_model'))
+      } else {
+        // 其他验证错误显示通用提示
+        toast.error(tMessages('fill_required_fields'))
+      }
+      return
+    }
+    
+    // 如果验证通过，直接提交表单
+    const data = form.getValues()
+    await onSubmit(data)
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <PageHeader
-          title="Update Tool Submission"
-          description="🌊 Enhance your AI tool submission with new information and improvements"
-          icon={<Map className="h-8 w-8 text-primary" />}
-          backHref="/profile/submissions"
-          backLabel="🧭 Back to My Submissions"
-          badge={
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-magellan-teal/10 border border-primary/20">
-              <Anchor className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-primary">🔧 Tool Enhancement</span>
+      <div className="container mx-auto px-4 py-8 max-w-7xl min-h-[calc(100vh-4rem)]">
+        {/* Page Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+              <Map className="h-6 w-6 text-primary" />
             </div>
-          }
-        />
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Edit Tool Submission</h1>
+              <p className="text-muted-foreground">Update your AI tool information</p>
+            </div>
+          </div>
+          
+          {/* Back Button */}
+          <div className="mb-6">
+            <Link href="/profile/submissions">
+              <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10">
+                <ArrowRight className="h-4 w-4 rotate-180" />
+                {t('common.back')}
+              </Button>
+            </Link>
+          </div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-12"
-        >
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* 1. Island Coordinates & Basic Info */}
-            <ActionCard
-              title="📝 Basic Information"
-              description="Update the essential details of your AI tool"
-              icon={Map}
-              className="p-6"
-            >
-              <div className="space-y-6">
-                {/* Island Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="title" className="text-sm font-medium flex items-center gap-2">
-                    <Flag className="h-4 w-4 text-primary" />
-                    Tool Name *
-                  </Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
-                    placeholder="Enter your AI tool's name"
-                    required
-                    className="subtle-hover"
-                  />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Left Navigation Sidebar */}
+          <div className="lg:col-span-1 min-h-screen">
+            <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
+              <Card className="p-6">
+                <div className="space-y-1 mb-6">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Compass className="h-5 w-5 text-primary" />
+                    Edit Tool
+                  </h3>
+                  <p className="text-sm text-muted-foreground">Update your tool information</p>
                 </div>
-
-                {/* Island URL */}
-                <div className="space-y-2">
-                  <Label htmlFor="url" className="text-sm font-medium flex items-center gap-2">
-                    <Anchor className="h-4 w-4 text-primary" />
-                    Website URL *
-                  </Label>
-                  <Input
-                    id="url"
-                    type="url"
-                    value={formData.url}
-                    onChange={(e) => handleInputChange('url', e.target.value)}
-                    placeholder="https://your-ai-tool.com"
-                    required
-                    className="subtle-hover"
-                  />
-                </div>
-
-                {/* Island Motto */}
-                <div className="space-y-2">
-                  <Label htmlFor="tagline" className="text-sm font-medium flex items-center gap-2">
-                    <Star className="h-4 w-4 text-primary" />
-                    Tagline
-                  </Label>
-                  <Input
-                    id="tagline"
-                    value={formData.tagline}
-                    onChange={(e) => handleInputChange('tagline', e.target.value)}
-                    placeholder="A compelling one-line description"
-                    className="subtle-hover"
-                  />
-                </div>
-
-                {/* Island Chronicle */}
-                <div className="space-y-2">
-                  <Label htmlFor="description" className="text-sm font-medium flex items-center gap-2">
-                    <Telescope className="h-4 w-4 text-primary" />
-                    Description *
-                  </Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Tell the full story of your AI tool - what it does, how it helps, and why users should try it"
-                    rows={4}
-                    className="subtle-hover resize-none"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Territory Classification */}
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium flex items-center gap-2">
-                      <Compass className="h-4 w-4 text-primary" />
-                      Territory Classification *
-                    </Label>
-                    <Select
-                      value={formData.category_id.toString()}
-                      onValueChange={(value) => handleInputChange('category_id', parseInt(value))}
-                    >
-                      <SelectTrigger className="subtle-hover">
-                        <SelectValue placeholder="Select the category this tool belongs to" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category.id} value={category.id.toString()}>
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Navigation Tags */}
-                  <div className="space-y-2">
-                    <Label htmlFor="tags" className="text-sm font-medium flex items-center gap-2">
-                      <Star className="h-4 w-4 text-primary" />
-                      Navigation Tags
-                    </Label>
-                    <Input
-                      id="tags"
-                      value={formData.tags}
-                      onChange={(e) => handleInputChange('tags', e.target.value)}
-                      placeholder="AI, automation, productivity (comma separated)"
-                      className="subtle-hover"
-                    />
-                  </div>
-                </div>
-
-                {/* Island Visual Map */}
-                <div className="space-y-2">
-                  <Label htmlFor="thumbnail" className="text-sm font-medium flex items-center gap-2">
-                    <Map className="h-4 w-4 text-primary" />
-                    Thumbnail URL
-                  </Label>
-                  <Input
-                    id="thumbnail"
-                    type="url"
-                    value={formData.thumbnail}
-                    onChange={(e) => handleInputChange('thumbnail', e.target.value)}
-                    placeholder="https://example.com/your-tool-screenshot.png"
-                    className="subtle-hover"
-                  />
-                  {formData.thumbnail && (
-                    <div className="mt-3 p-3 bg-gradient-to-br from-primary/5 to-magellan-teal/5 border border-primary/10 rounded-lg">
-                      <img 
-                        src={formData.thumbnail} 
-                        alt="Tool preview" 
-                        className="w-20 h-20 object-cover rounded border border-primary/20"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none'
+                
+                <nav className="space-y-2">
+                  {formSections.map((section) => {
+                    const SectionIcon = section.icon
+                    
+                    return (
+                      <button
+                        key={section.id}
+                        type="button"
+                        onClick={() => {
+                          const element = document.getElementById(section.id)
+                          element?.scrollIntoView({ behavior: 'smooth' })
                         }}
-                      />
-                      <p className="text-xs text-muted-foreground mt-2">🖼️ Tool Preview Image</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </ActionCard>
-
-            {/* 2. Special Powers (Features) */}
-            <ActionCard
-              title="⚡ Key Features"
-              description="Update the main features and capabilities"
-              icon={Zap}
-              className="p-6"
-            >
-              <div className="space-y-4">
-                {formData.features.map((feature, index) => (
-                  <div key={index} className="border-2 border-dashed border-border/60 rounded-lg p-4 subtle-hover">
-                    <div className="flex items-start justify-between mb-4">
-                      <h4 className="font-semibold text-primary flex items-center gap-2">
-                        <Star className="h-4 w-4" />
-                        Power #{index + 1}
-                      </h4>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeFeature(index)}
-                        className="text-destructive hover:text-destructive"
+                        className="w-full text-left p-3 rounded-lg transition-all duration-200 border hover:bg-muted/50 border-transparent text-muted-foreground hover:text-foreground"
                       >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Power Name</Label>
-                        <Input
-                          value={feature.name}
-                          onChange={(e) => updateFeature(index, 'name', e.target.value)}
-                          placeholder="e.g., Smart Automation"
-                          className="subtle-hover"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Power Description</Label>
-                        <Input
-                          value={feature.description}
-                          onChange={(e) => updateFeature(index, 'description', e.target.value)}
-                          placeholder="Brief explanation of this feature"
-                          className="subtle-hover"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                
-                <ActionCard
-                  title="Add New Power"
-                  description="Reveal another magical ability"
-                  icon={Plus}
-                  onClick={addFeature}
-                  variant="dashed"
-                  className="cursor-pointer"
-                />
-              </div>
-            </ActionCard>
-
-            {/* 3. Explorer Adventures & Types */}
-            <ActionCard
-              title="🎯 Use Cases & Target Audience"
-              description="Update use cases and target audience for your tool"
-              icon={Users}
-              className="p-6"
-            >
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Adventure Types */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Target className="h-5 w-5 text-primary" />
-                      <h3 className="font-semibold">Adventure Types</h3>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-3">What can users do with this tool?</p>
-                    <div className="space-y-3">
-                      {formData.use_cases.map((useCase, index) => (
-                        <div key={index} className="flex gap-2">
-                          <Input
-                            value={useCase}
-                            onChange={(e) => updateArrayItem('use_cases', index, e.target.value)}
-                            placeholder="e.g., Content creation, Data analysis"
-                            className="subtle-hover"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removeFromArray('use_cases', index)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
+                        <div className="flex items-center gap-3">
+                          <SectionIcon className="h-4 w-4 text-muted-foreground" />
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-sm text-foreground">
+                              {section.title}
+                            </div>
+                            <div className="text-xs text-muted-foreground truncate">
+                              {section.description}
+                            </div>
+                          </div>
                         </div>
-                      ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => addToArray('use_cases', '')}
-                        className="w-full subtle-hover"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Adventure Type
-                      </Button>
-                    </div>
-                  </div>
+                      </button>
+                    )
+                  })}
+                </nav>
+              </Card>
+            </div>
+          </div>
 
-                  {/* Explorer Profiles */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Users className="h-5 w-5 text-primary" />
-                      <h3 className="font-semibold">Target Audience</h3>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-3">Who is this tool designed for?</p>
-                    <div className="space-y-3">
-                      {formData.target_audience.map((audience, index) => (
-                        <div key={index} className="flex gap-2">
-                          <Input
-                            value={audience}
-                            onChange={(e) => updateArrayItem('target_audience', index, e.target.value)}
-                            placeholder="e.g., Developers, Marketers, Students"
-                            className="subtle-hover"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removeFromArray('target_audience', index)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => addToArray('target_audience', '')}
-                        className="w-full subtle-hover"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Target User
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </ActionCard>
-
-            {/* 4. Explorer Questions (FAQ) */}
-            <ActionCard
-              title="❓ FAQ"
-              description="Answer common questions users might have about your tool"
-              icon={HelpCircle}
-              className="p-6"
-            >
-              <div className="space-y-4">
-                {formData.faq.map((item, index) => (
-                  <div key={index} className="border-2 border-dashed border-border/60 rounded-lg p-4 subtle-hover">
-                    <div className="flex items-start justify-between mb-4">
-                      <h4 className="font-semibold text-primary flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4" />
-                        Q&A #{index + 1}
-                      </h4>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeFaq(index)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Question</Label>
+          {/* Right Form Content - All sections displayed */}
+          <div className="lg:col-span-3">
+            <div className="space-y-8">
+              {/* Basic Information */}
+              <Card id="basic" className="p-6">
+                <CardHeader className="px-0 pt-0">
+                  <CardTitle className="flex items-center gap-2">
+                    <Map className="h-5 w-5 text-primary" />
+                    {tSubmit('basic_info')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="px-0 space-y-6">
+                    {/* Tool URL */}
+                    <div className="space-y-2">
+                      <Label htmlFor="url" className="text-sm font-medium flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-primary" />
+                        {tSubmit('simple_form.tool_url_required')}
+                        <span className="text-destructive ml-1">*</span>
+                      </Label>
+                      <div className="flex gap-3">
                         <Input
-                          value={item.question}
-                          onChange={(e) => updateFaq(index, 'question', e.target.value)}
-                          placeholder="What question do users often ask?"
-                          className="subtle-hover"
+                          id="url"
+                          placeholder={tSubmit('simple_form.tool_url_placeholder')}
+                          {...form.register('url')}
+                          className="flex-1"
                         />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={fetchWebsiteInfo}
+                          disabled={isFetching}
+                        >
+                          <Telescope className="h-4 w-4 mr-2" />
+                          {isFetching ? (
+                            <GlobalLoading variant="inline" size="sm" />
+                          ) : (
+                            tSubmit('simple_form.auto_fill')
+                          )}
+                        </Button>
                       </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Answer</Label>
-                        <Textarea
-                          value={item.answer}
-                          onChange={(e) => updateFaq(index, 'answer', e.target.value)}
-                          placeholder="Provide a helpful answer for users"
-                          rows={2}
-                          className="subtle-hover resize-none"
-                        />
-                      </div>
+                      {form.formState.errors.url && (
+                        <p className="text-sm text-destructive">
+                          {form.formState.errors.url.message}
+                        </p>
+                      )}
                     </div>
-                  </div>
-                ))}
-                
-                <ActionCard
-                  title="Add FAQ Question"
-                  description="Answer another common question"
-                  icon={Plus}
-                  onClick={addFaq}
-                  variant="dashed"
-                  className="cursor-pointer"
-                />
-              </div>
-            </ActionCard>
 
-            {/* 5. Treasure Costs (Pricing) */}
-            <ActionCard
-              title="💰 Pricing"
-              description="Update how users access your tool"
-              icon={Coins}
-              className="p-6"
-            >
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium flex items-center gap-2">
-                      <Coins className="h-4 w-4 text-primary" />
-                      Pricing Model
-                    </Label>
-                    <Select
-                      value={formData.pricing_model}
-                      onValueChange={(value) => handleInputChange('pricing_model', value)}
-                    >
-                      <SelectTrigger className="subtle-hover">
-                        <SelectValue placeholder="Select how users pay for your tool" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {PRICING_MODELS.map((model) => (
-                          <SelectItem key={model.value} value={model.value}>
-                            {tPricing(model.label)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <Checkbox
-                        id="has_free_version"
-                        checked={formData.has_free_version}
-                        onCheckedChange={(checked) => handleInputChange('has_free_version', !!checked)}
+                    {/* Business Email */}
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
+                        <Ship className="h-4 w-4 text-primary" />
+                        {tSubmit('simple_form.business_email_required')}
+                        <span className="text-destructive ml-1">*</span>
+                      </Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder={tSubmit('simple_form.business_email_placeholder')}
+                        {...form.register('email')}
                       />
-                      <Label htmlFor="has_free_version" className="flex items-center gap-2">
+                      {form.formState.errors.email && (
+                        <p className="text-sm text-destructive">
+                          {form.formState.errors.email.message}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Tool Name */}
+                    <div className="space-y-2">
+                      <Label htmlFor="title" className="text-sm font-medium flex items-center gap-2">
+                        <Flag className="h-4 w-4 text-primary" />
+                        {tSubmit('simple_form.tool_name_required')}
+                        <span className="text-destructive ml-1">*</span>
+                      </Label>
+                      <Input
+                        id="title"
+                        placeholder={tSubmit('simple_form.tool_name_placeholder')}
+                        {...form.register('title')}
+                      />
+                      {form.formState.errors.title && (
+                        <p className="text-sm text-destructive">
+                          {form.formState.errors.title.message}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Category Selection */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium flex items-center gap-2">
+                        <Compass className="h-4 w-4 text-primary" />
+                        {tSubmit('simple_form.category_required')}
+                        <span className="text-destructive ml-1">*</span>
+                      </Label>
+                      <Select 
+                        onValueChange={(value) => {
+                          setValue('category_id', value)
+                          form.clearErrors('category_id')
+                        }}
+                        value={watch('category_id') || ''}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={tSubmit('simple_form.category_placeholder')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map((category: { id: number; name: string }) => (
+                            <SelectItem key={category.id} value={category.id.toString()}>
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {form.formState.errors.category_id && (
+                        <p className="text-sm text-destructive">
+                          {form.formState.errors.category_id.message}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Tagline */}
+                    <div className="space-y-2">
+                      <Label htmlFor="tagline" className="text-sm font-medium flex items-center gap-2">
+                        <Flag className="h-4 w-4 text-primary" />
+                        {tSubmit('simple_form.tagline')}
+                        <span className="text-destructive ml-1">*</span>
+                      </Label>
+                      <Input
+                        id="tagline"
+                        placeholder={tSubmit('simple_form.tagline_placeholder')}
+                        {...form.register('tagline')}
+                      />
+                      {form.formState.errors.tagline && (
+                        <p className="text-sm text-destructive">
+                          {form.formState.errors.tagline.message}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Description */}
+                    <div className="space-y-2">
+                      <Label htmlFor="description" className="text-sm font-medium flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-primary" />
+                        {tSubmit('simple_form.description_required')}
+                        <span className="text-destructive ml-1">*</span>
+                      </Label>
+                      <Textarea
+                        id="description"
+                        placeholder={tSubmit('simple_form.description_placeholder')}
+                        rows={5}
+                        {...form.register('description')}
+                        className="resize-none"
+                      />
+                      {form.formState.errors.description && (
+                        <p className="text-sm text-destructive">
+                          {form.formState.errors.description.message}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Tags */}
+                    <div className="space-y-2">
+                      <Label htmlFor="tags" className="text-sm font-medium flex items-center gap-2">
                         <Star className="h-4 w-4 text-primary" />
-                        Free Version Available
+                        {tSubmit('simple_form.tags')}
                       </Label>
-                    </div>
-
-                    <div className="flex items-center space-x-3">
-                      <Checkbox
-                        id="api_available"
-                        checked={formData.api_available}
-                        onCheckedChange={(checked) => handleInputChange('api_available', !!checked)}
+                      <Input
+                        id="tags"
+                        placeholder={tForm('tags_placeholder')}
+                        {...form.register('tags')}
                       />
-                      <Label htmlFor="api_available" className="flex items-center gap-2">
-                        <Code className="h-4 w-4 text-primary" />
-                        Developer Bridge (API) Available
-                      </Label>
+                      <p className="text-xs text-muted-foreground">{tSubmit('simple_form.tags_help')}</p>
                     </div>
-                  </div>
+                  </CardContent>
+                </Card>
 
-                  {/* Detailed Pricing Plans */}
-                  {formData.pricing_plans.length > 0 && (
-                    <div className="pt-6 border-t border-border">
-                      <Label className="text-base font-medium mb-4 block flex items-center gap-2">
-                        💵 Pricing Plans (Optional)
-                      </Label>
+              {/* Features Section */}
+              <Card id="features" className="p-6">
+                <CardHeader className="px-0 pt-0">
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-primary" />
+                    {tSubmit('key_features')}
+                    <span className="text-destructive ml-2">*</span>
+                  </CardTitle>
+                </CardHeader>
+                  <CardContent className="px-0 space-y-6">
+                    {form.formState.errors.features && (
+                      <p className="text-sm text-destructive animate-in slide-in-from-left-1 duration-200">
+                        {form.formState.errors.features.message}
+                      </p>
+                    )}
+                    <div className="space-y-4">
+                      {featureFields.map((field, index) => (
+                        <div key={field.id} className="border-2 border-dashed border-border/60 rounded-lg p-4">
+                          <div className="flex items-start justify-between mb-4">
+                            <h4 className="font-semibold text-primary flex items-center gap-2">
+                              <Lightbulb className="h-4 w-4" />
+                              {tForm('feature_number', { number: index + 1 })}
+                            </h4>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeFeature(index)}
+                              disabled={featureFields.length === 1}
+                              className="text-destructive hover:text-destructive disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium">
+                                {tForm('feature_name')}
+                                <span className="text-destructive ml-1">*</span>
+                              </Label>
+                              <Input
+                                placeholder={tForm('feature_name_placeholder')}
+                                {...form.register(`features.${index}.name`)}
+                              />
+                              {form.formState.errors.features?.[index]?.name && (
+                                <p className="text-sm text-destructive">
+                                  {form.formState.errors.features[index]?.name?.message}
+                                </p>
+                              )}
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium">
+                                {tForm('feature_description')}
+                                <span className="text-destructive ml-1">*</span>
+                              </Label>
+                              <Input
+                                placeholder={tForm('feature_description_placeholder')}
+                                {...form.register(`features.${index}.description`)}
+                              />
+                              {form.formState.errors.features?.[index]?.description && (
+                                <p className="text-sm text-destructive">
+                                  {form.formState.errors.features[index]?.description?.message}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => appendFeature({ name: '', description: '' })}
+                        className="w-full border-dashed"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        {tForm('add_feature')}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+              {/* Audience & Use Cases */}
+              <Card id="audience" className="p-6">
+                <CardHeader className="px-0 pt-0">
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-primary" />
+                    {tSubmit('use_cases_audience')}
+                  </CardTitle>
+                </CardHeader>
+                  <CardContent className="px-0 space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Use Cases */}
                       <div className="space-y-4">
-                        {formData.pricing_plans.map((plan, index) => (
-                          <div key={index} className="border-2 border-dashed border-border/60 rounded-lg p-4 subtle-hover">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Target className="h-5 w-5 text-primary" />
+                          <h3 className="font-semibold">{tForm('use_cases')}</h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">{tSubmit('use_cases_help')}</p>
+                        <div className="space-y-3">
+                          {watch('use_cases').length === 0 ? (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setValue('use_cases', [''])}
+                              className="w-full"
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              {tForm('add_use_case')}
+                            </Button>
+                          ) : (
+                            <>
+                              {watch('use_cases').map((useCase, index) => (
+                                <div key={index} className="flex gap-2">
+                                  <Input
+                                    value={useCase}
+                                    onChange={(e) => {
+                                      const useCases = [...watch('use_cases')]
+                                      useCases[index] = e.target.value
+                                      setValue('use_cases', useCases)
+                                    }}
+                                    placeholder={tForm('use_case_placeholder')}
+                                  />
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const useCases = watch('use_cases').filter((_, i) => i !== index)
+                                      setValue('use_cases', useCases)
+                                    }}
+                                    className="text-destructive hover:text-destructive"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                              
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setValue('use_cases', [...watch('use_cases'), ''])}
+                                className="w-full"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                {tForm('add_use_case')}
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Target Audience */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Users className="h-5 w-5 text-primary" />
+                          <h3 className="font-semibold">{tForm('target_audience')}</h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">{tSubmit('target_audience_help')}</p>
+                        <div className="space-y-3">
+                          {watch('target_audience').length === 0 ? (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setValue('target_audience', [''])}
+                              className="w-full"
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              {tForm('add_target_audience')}
+                            </Button>
+                          ) : (
+                            <>
+                              {watch('target_audience').map((audience, index) => (
+                                <div key={index} className="flex gap-2">
+                                  <Input
+                                    value={audience}
+                                    onChange={(e) => {
+                                      const audiences = [...watch('target_audience')]
+                                      audiences[index] = e.target.value
+                                      setValue('target_audience', audiences)
+                                    }}
+                                    placeholder={tForm('target_audience_placeholder')}
+                                  />
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const audiences = watch('target_audience').filter((_, i) => i !== index)
+                                      setValue('target_audience', audiences)
+                                    }}
+                                    className="text-destructive hover:text-destructive"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                              
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setValue('target_audience', [...watch('target_audience'), ''])}
+                                className="w-full"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                {tForm('add_target_audience')}
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* FAQ Section */}
+                    <div className="pt-6 border-t border-border">
+                      <div className="flex items-center gap-2 mb-4">
+                        <HelpCircle className="h-5 w-5 text-primary" />
+                        <h3 className="font-semibold">{tForm('faq')}</h3>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-4">{tForm('faq_description')}</p>
+                      <div className="space-y-4">
+                        {faqFields.map((field, index) => (
+                          <div key={field.id} className="border-2 border-dashed border-border/60 rounded-lg p-4">
                             <div className="flex items-start justify-between mb-4">
-                              <h4 className="font-semibold text-primary">Plan #{index + 1}</h4>
+                              <h4 className="font-semibold text-primary flex items-center gap-2">
+                                <MessageSquare className="h-4 w-4" />
+                                {tForm('faq_number', { number: index + 1 })}
+                              </h4>
                               <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => removePricingPlan(index)}
+                                onClick={() => removeFaq(index)}
                                 className="text-destructive hover:text-destructive"
                               >
                                 <X className="h-4 w-4" />
                               </Button>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                              <div className="space-y-2">
-                                <Label className="text-sm font-medium">Plan Name</Label>
-                                <Input
-                                  value={plan.name}
-                                  onChange={(e) => updatePricingPlan(index, 'name', e.target.value)}
-                                  placeholder="e.g., Basic Plan"
-                                  className="subtle-hover"
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label className="text-sm font-medium">Billing Cycle</Label>
-                                <Input
-                                  value={plan.billing_cycle}
-                                  onChange={(e) => updatePricingPlan(index, 'billing_cycle', e.target.value)}
-                                  placeholder="e.g., monthly, yearly"
-                                  className="subtle-hover"
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label className="text-sm font-medium">Price</Label>
-                                <Input
-                                  value={plan.price}
-                                  onChange={(e) => updatePricingPlan(index, 'price', e.target.value)}
-                                  placeholder="e.g., $9.99"
-                                  className="subtle-hover"
-                                />
-                              </div>
-                            </div>
-                            
-                            {/* Plan Features */}
                             <div className="space-y-3">
-                              <Label className="text-sm font-medium">Plan Features (Max 5)</Label>
                               <div className="space-y-2">
-                                {plan.features.map((feature, featureIndex) => (
-                                  <div key={featureIndex} className="flex gap-2">
-                                    <Input
-                                      value={feature}
-                                      onChange={(e) => updatePricingPlanFeature(index, featureIndex, e.target.value)}
-                                      placeholder="Feature description"
-                                      className="subtle-hover"
-                                    />
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => removePricingPlanFeature(index, featureIndex)}
-                                      className="text-destructive hover:text-destructive"
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                ))}
-                                {plan.features.length < 5 && (
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => addPricingPlanFeature(index)}
-                                    className="subtle-hover"
-                                  >
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Add Feature
-                                  </Button>
-                                )}
+                                <Label className="text-sm font-medium">{tForm('question')}</Label>
+                                <Input
+                                  placeholder={tForm('question_placeholder')}
+                                  {...form.register(`faq.${index}.question`)}
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium">{tForm('answer')}</Label>
+                                <Textarea
+                                  placeholder={tForm('answer_placeholder')}
+                                  rows={2}
+                                  {...form.register(`faq.${index}.answer`)}
+                                  className="resize-none"
+                                />
                               </div>
                             </div>
                           </div>
                         ))}
+                        
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => appendFaq({ question: '', answer: '' })}
+                          className="w-full border-dashed"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          {tForm('add_faq')}
+                        </Button>
                       </div>
                     </div>
-                  )}
+                  </CardContent>
+                </Card>
 
-                  {formData.pricing_plans.length < 6 && (
-                    <ActionCard
-                      title="Add Pricing Plan"
-                      description="Create another pricing option"
-                      icon={Plus}
-                      onClick={addPricingPlan}
-                      variant="dashed"
-                      className="cursor-pointer"
-                    />
-                  )}
-                </div>
-              </div>
-            </ActionCard>
+              {/* Pricing Information */}
+              <Card id="pricing" className="p-6">
+                <CardHeader className="px-0 pt-0">
+                  <CardTitle className="flex items-center gap-2">
+                    <Coins className="h-5 w-5 text-primary" />
+                    {tSubmit('pricing_info')}
+                    <span className="text-destructive ml-2">*</span>
+                  </CardTitle>
+                </CardHeader>
+                  <CardContent className="px-0 space-y-6">
+                    {/* Pricing Attributes - All in One Row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                      {/* Pricing Model */}
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <Coins className="h-4 w-4 text-primary" />
+                          {tForm('pricing_model')}
+                          <span className="text-destructive ml-1">*</span>
+                        </Label>
+                        <Select 
+                          onValueChange={(value) => {
+                            setValue('pricing_model', value as any)
+                            form.clearErrors('pricing_model')
+                          }}
+                          value={watch('pricing_model') || ''}
+                        >
+                          <SelectTrigger className="w-full h-[60px]">
+                            <SelectValue placeholder={tForm('pricing_model_placeholder')} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {PRICING_MODEL_VALUES.map((model) => (
+                              <SelectItem key={model} value={model}>
+                                {tPricing(model)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {form.formState.errors.pricing_model && (
+                          <p className="text-sm text-destructive animate-in slide-in-from-left-1 duration-200">
+                            {form.formState.errors.pricing_model.message}
+                          </p>
+                        )}
+                      </div>
 
-            {/* 6. Social Waters */}
-            <ActionCard
-              title="🌊 Social Waters"
-              description="Update your tool's social media and integrations"
-              icon={Waves}
-              className="p-6"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="twitter_url" className="text-sm font-medium flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4 text-primary" />
-                    Social Media
-                  </Label>
-                  <Input
-                    id="twitter_url"
-                    value={formData.twitter_url}
-                    onChange={(e) => handleInputChange('twitter_url', e.target.value)}
-                    placeholder="https://twitter.com/yourprofile"
-                    className="subtle-hover"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="linkedin_url" className="text-sm font-medium flex items-center gap-2">
-                    <Users className="h-4 w-4 text-primary" />
-                    LinkedIn Professional Port
-                  </Label>
-                  <Input
-                    id="linkedin_url"
-                    value={formData.linkedin_url}
-                    onChange={(e) => handleInputChange('linkedin_url', e.target.value)}
-                    placeholder="https://linkedin.com/company/yourcompany"
-                    className="subtle-hover"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="facebook_url" className="text-sm font-medium flex items-center gap-2">
-                    <Globe className="h-4 w-4 text-primary" />
-                    Facebook Social Bay
-                  </Label>
-                  <Input
-                    id="facebook_url"
-                    value={formData.facebook_url}
-                    onChange={(e) => handleInputChange('facebook_url', e.target.value)}
-                    placeholder="https://facebook.com/yourpage"
-                    className="subtle-hover"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="instagram_url" className="text-sm font-medium flex items-center gap-2">
-                    <Star className="h-4 w-4 text-primary" />
-                    Instagram Visual Cove
-                  </Label>
-                  <Input
-                    id="instagram_url"
-                    value={formData.instagram_url}
-                    onChange={(e) => handleInputChange('instagram_url', e.target.value)}
-                    placeholder="https://instagram.com/yourprofile"
-                    className="subtle-hover"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="youtube_url" className="text-sm font-medium flex items-center gap-2">
-                    <Monitor className="h-4 w-4 text-primary" />
-                    YouTube Channel
-                  </Label>
-                  <Input
-                    id="youtube_url"
-                    value={formData.youtube_url}
-                    onChange={(e) => handleInputChange('youtube_url', e.target.value)}
-                    placeholder="https://youtube.com/c/yourchannel"
-                    className="subtle-hover"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="discord_url" className="text-sm font-medium flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4 text-primary" />
-                    Discord Community
-                  </Label>
-                  <Input
-                    id="discord_url"
-                    value={formData.discord_url}
-                    onChange={(e) => handleInputChange('discord_url', e.target.value)}
-                    placeholder="https://discord.gg/yourcommunity"
-                    className="subtle-hover"
-                  />
-                </div>
-              </div>
-            </ActionCard>
-
-            {/* 7. Island Connections */}
-            <ActionCard
-              title="⚓ Integrations"
-              description="Update what other tools and services your tool connects with"
-              icon={Anchor}
-              className="p-6"
-            >
-              <div className="space-y-6">
-                <div>
-                  <h4 className="font-medium mb-3 flex items-center gap-2">
-                    <Waves className="h-4 w-4 text-primary" />
-                    Popular Trade Routes
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {COMMON_INTEGRATIONS.map((integration) => (
-                      <Button
-                        key={integration}
-                        type="button"
-                        variant={formData.integrations.includes(integration) ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => {
-                          if (formData.integrations.includes(integration)) {
-                            setFormData(prev => ({
-                              ...prev,
-                              integrations: prev.integrations.filter(i => i !== integration)
-                            }))
-                          } else {
-                            setFormData(prev => ({
-                              ...prev,
-                              integrations: [...prev.integrations, integration]
-                            }))
-                          }
-                        }}
-                        className="subtle-hover"
-                      >
-                        {integration}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="space-y-3">
-                  <h4 className="font-medium flex items-center gap-2">
-                    <Plus className="h-4 w-4 text-primary" />
-                    Custom Connections
-                  </h4>
-                  {formData.integrations.filter(integration => !COMMON_INTEGRATIONS.includes(integration)).map((integration, index) => (
-                    <div key={index} className="flex gap-2">
-                      <Input
-                        value={integration}
-                        onChange={(e) => {
-                          const integrations = [...formData.integrations]
-                          const actualIndex = integrations.indexOf(integration)
-                          if (actualIndex !== -1) {
-                            integrations[actualIndex] = e.target.value
-                            setFormData(prev => ({ ...prev, integrations }))
-                          }
-                        }}
-                        placeholder="Custom integration name"
-                        className="subtle-hover"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setFormData(prev => ({
-                            ...prev,
-                            integrations: prev.integrations.filter(i => i !== integration)
-                          }))
-                        }}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                  
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setFormData(prev => ({
-                        ...prev,
-                        integrations: [...prev.integrations, '']
-                      }))
-                    }}
-                    className="subtle-hover"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Custom Connection
-                  </Button>
-                </div>
-              </div>
-            </ActionCard>
-
-            {/* 8. Platform Ports */}
-            <ActionCard
-              title="🌍 Platform Ports"
-              description="Update where users can access your tool"
-              icon={Globe}
-              className="p-6"
-            >
-              <div className="space-y-6">
-                {/* Mobile Harbors */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Smartphone className="h-5 w-5 text-primary" />
-                    <h3 className="font-semibold">Mobile Apps</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="ios_app_url" className="text-sm font-medium">iOS App Store</Label>
-                      <Input
-                        id="ios_app_url"
-                        value={formData.ios_app_url}
-                        onChange={(e) => handleInputChange('ios_app_url', e.target.value)}
-                        placeholder="https://apps.apple.com/app/your-app"
-                        className="subtle-hover"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="android_app_url" className="text-sm font-medium">Google Play Store</Label>
-                      <Input
-                        id="android_app_url"
-                        value={formData.android_app_url}
-                        onChange={(e) => handleInputChange('android_app_url', e.target.value)}
-                        placeholder="https://play.google.com/store/apps/details?id=your.app"
-                        className="subtle-hover"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Web Port */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Globe className="h-5 w-5 text-primary" />
-                    <h3 className="font-semibold">Web Port</h3>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="web_app_url" className="text-sm font-medium">Web Application URL</Label>
-                    <Input
-                      id="web_app_url"
-                      value={formData.web_app_url}
-                      onChange={(e) => handleInputChange('web_app_url', e.target.value)}
-                      placeholder="https://app.your-tool.com"
-                      className="subtle-hover"
-                    />
-                  </div>
-                </div>
-
-                {/* Desktop Docks */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Monitor className="h-5 w-5 text-primary" />
-                    <h3 className="font-semibold">Desktop Docks</h3>
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    {DESKTOP_PLATFORMS.map((platform) => {
-                      const PlatformIcon = platform.value === 'mac' ? Laptop : Monitor
-                      return (
-                        <div key={platform.value} className="flex items-center space-x-2">
+                      {/* Free Version - Atlassian风格优化 */}
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium opacity-0 pointer-events-none">Placeholder</Label>
+                        <div className="flex items-center space-x-4 p-4 rounded-lg border border-border hover:border-magellan-primary/30 hover:bg-magellan-primary/5 transition-all duration-ds-medium group h-[60px]">
                           <Checkbox
-                            id={platform.value}
-                            checked={formData.desktop_platforms.includes(platform.value)}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setFormData(prev => ({
-                                  ...prev,
-                                  desktop_platforms: [...prev.desktop_platforms, platform.value]
-                                }))
-                              } else {
-                                setFormData(prev => ({
-                                  ...prev,
-                                  desktop_platforms: prev.desktop_platforms.filter(p => p !== platform.value)
-                                }))
-                              }
-                            }}
+                            id="has_free_version"
+                            checked={watch('has_free_version')}
+                            onCheckedChange={(checked) => setValue('has_free_version', !!checked)}
+                            className="w-5 h-5 border-2 border-border group-hover:border-magellan-primary/50 data-[state=checked]:bg-magellan-primary data-[state=checked]:border-magellan-primary data-[state=checked]:text-white"
                           />
-                          <Label htmlFor={platform.value} className="flex items-center gap-2 text-sm">
-                            <PlatformIcon className="h-4 w-4" />
-                            {platform.label}
+                          <Label htmlFor="has_free_version" className="text-sm font-medium cursor-pointer flex items-center gap-3 flex-1 group-hover:text-magellan-primary transition-colors">
+                            <Star className="h-4 w-4 text-magellan-primary" />
+                            <span className="font-medium">{tForm('has_free_version')}</span>
                           </Label>
                         </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              </div>
-            </ActionCard>
+                      </div>
 
-            {/* Final Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-6">
-              <Button 
-                type="submit" 
-                disabled={saving}
-                className="bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90 text-white shadow-lg subtle-hover"
-              >
-                {saving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Updating Tool Information...
-                  </>
-                ) : (
-                  <>
+                      {/* API Available - Atlassian风格优化 */}
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium opacity-0 pointer-events-none">Placeholder</Label>
+                        <div className="flex items-center space-x-4 p-4 rounded-lg border border-border hover:border-primary/30 hover:bg-primary/5 transition-all duration-ds-medium group h-[60px]">
+                          <Checkbox
+                            id="api_available"
+                            checked={watch('api_available')}
+                            onCheckedChange={(checked) => setValue('api_available', !!checked)}
+                            className="w-5 h-5 border-2 border-border group-hover:border-primary/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-white"
+                          />
+                          <Label htmlFor="api_available" className="text-sm font-medium cursor-pointer flex items-center gap-3 flex-1 group-hover:text-primary transition-colors">
+                            <Code className="h-4 w-4 text-primary" />
+                            <span className="font-medium">{tForm('api_available')}</span>
+                          </Label>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Pricing Plans Section */}
+                    <div className="pt-6 border-t border-border">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <Star className="h-5 w-5 text-primary" />
+                          <h3 className="font-semibold">{tForm('pricing_plans')}</h3>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => appendPricingPlan({ 
+                            name: '', 
+                            billing_cycle: '', 
+                            price: '', 
+                            features: ['']
+                          })}
+                          disabled={pricingPlansFields.length >= 6}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          {tForm('add_pricing_plan')}
+                        </Button>
+                      </div>
+
+                      {pricingPlansFields.length > 0 && (
+                        <div className="space-y-4">
+                          {pricingPlansFields.map((field, index) => (
+                            <div key={field.id} className="p-4 border border-border rounded-lg space-y-4">
+                              <div className="flex items-center justify-between">
+                                <h4 className="font-medium">
+                                  {tForm('pricing_plan')} {index + 1}
+                                </h4>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removePricingPlan(index)}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="space-y-2">
+                                  <Label className="text-sm font-medium">
+                                    {tForm('plan_name')}
+                                  </Label>
+                                  <Input
+                                    placeholder={tForm('plan_name_placeholder')}
+                                    {...form.register(`pricing_plans.${index}.name` as const)}
+                                  />
+                                </div>
+                                
+                                <div className="space-y-2">
+                                  <Label className="text-sm font-medium">
+                                    {tForm('billing_cycle')}
+                                  </Label>
+                                  <Select 
+                                    onValueChange={(value) => setValue(`pricing_plans.${index}.billing_cycle`, value)}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder={tForm('billing_cycle_placeholder')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="monthly">{tForm('monthly')}</SelectItem>
+                                      <SelectItem value="yearly">{tForm('yearly')}</SelectItem>
+                                      <SelectItem value="one_time">{tForm('one_time')}</SelectItem>
+                                      <SelectItem value="usage_based">{tForm('usage_based')}</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                
+                                <div className="space-y-2">
+                                  <Label className="text-sm font-medium">
+                                    {tForm('price')}
+                                  </Label>
+                                  <Input
+                                    placeholder={tForm('price_placeholder')}
+                                    {...form.register(`pricing_plans.${index}.price` as const)}
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Plan Features */}
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium">
+                                  {tForm('plan_features')}
+                                </Label>
+                                <div className="space-y-2">
+                                  {(watch(`pricing_plans.${index}.features`) || ['']).map((_, featureIndex) => (
+                                    <div key={featureIndex} className="flex gap-2">
+                                      <Input
+                                        placeholder={tForm('plan_feature_placeholder')}
+                                        {...form.register(`pricing_plans.${index}.features.${featureIndex}` as const)}
+                                      />
+                                      {featureIndex > 0 && (
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => {
+                                            const currentFeatures = watch(`pricing_plans.${index}.features`) || []
+                                            const newFeatures = currentFeatures.filter((_, i) => i !== featureIndex)
+                                            setValue(`pricing_plans.${index}.features`, newFeatures)
+                                          }}
+                                        >
+                                          <X className="h-4 w-4" />
+                                        </Button>
+                                      )}
+                                    </div>
+                                  ))}
+                                  {(watch(`pricing_plans.${index}.features`) || []).length < 5 && (
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        const currentFeatures = watch(`pricing_plans.${index}.features`) || ['']
+                                        setValue(`pricing_plans.${index}.features`, [...currentFeatures, ''])
+                                      }}
+                                    >
+                                      <Plus className="h-4 w-4 mr-2" />
+                                      {tForm('add_feature')}
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <p className="text-sm text-muted-foreground mt-2">
+                        {tSubmit('pricing_plans_help')}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+              {/* Social Media */}
+              <Card id="social" className="p-6">
+                <CardHeader className="px-0 pt-0">
+                  <CardTitle className="flex items-center gap-2">
+                    <Waves className="h-5 w-5 text-primary" />
+                    {tSubmit('social_integrations')}
+                  </CardTitle>
+                </CardHeader>
+                  <CardContent className="px-0 space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {SOCIAL_PLATFORMS.map((platform) => {
+                        const IconComponent = platform.icon
+                        return (
+                          <div key={platform.key} className="space-y-2">
+                            <Label htmlFor={platform.key} className="text-sm font-medium flex items-center gap-2">
+                              <IconComponent className="h-4 w-4 text-primary" />
+                              {tForm(platform.labelKey)}
+                            </Label>
+                            <Input
+                              id={platform.key}
+                              placeholder={tForm(platform.placeholderKey)}
+                              {...form.register(platform.key as any)}
+                            />
+                            {form.formState.errors[platform.key as keyof typeof form.formState.errors] && (
+                              <p className="text-sm text-destructive">
+                                {form.formState.errors[platform.key as keyof typeof form.formState.errors]?.message === 'Please enter a valid URL' 
+                                  ? tSubmit('validation.valid_url')
+                                  : form.formState.errors[platform.key as keyof typeof form.formState.errors]?.message}
+                              </p>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+
+                    <div className="pt-6 border-t border-border">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Anchor className="h-5 w-5 text-primary" />
+                        <h3 className="font-semibold">{tForm('integrations')}</h3>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-4">{tSubmit('integrations_help')}</p>
+                      
+                      <div className="space-y-4">
+                        <div className="flex flex-wrap gap-2">
+                          {COMMON_INTEGRATIONS.map((integration) => (
+                            <Button
+                              key={integration}
+                              type="button"
+                              variant={watch('integrations').includes(integration) ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => {
+                                if (watch('integrations').includes(integration)) {
+                                  removeFromArray('integrations', integration)
+                                } else {
+                                  addToArray('integrations', integration)
+                                }
+                              }}
+                            >
+                              {integration}
+                            </Button>
+                          ))}
+                        </div>
+                        
+                        <div className="space-y-2">
+                          {watch('integrations').filter(integration => !COMMON_INTEGRATIONS.includes(integration)).map((integration, index) => (
+                            <div key={index} className="flex gap-2">
+                              <Input
+                                value={integration}
+                                onChange={(e) => {
+                                  const integrations = [...watch('integrations')]
+                                  const actualIndex = integrations.indexOf(integration)
+                                  if (actualIndex !== -1) {
+                                    integrations[actualIndex] = e.target.value
+                                    setValue('integrations', integrations)
+                                  }
+                                }}
+                                placeholder={tForm('integration_name_placeholder')}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => removeFromArray('integrations', integration)}
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                          
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setValue('integrations', [...watch('integrations'), ''])}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            {tForm('add_integration')}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+              {/* Platform Support */}
+              <Card id="platforms" className="p-6">
+                <CardHeader className="px-0 pt-0">
+                  <CardTitle className="flex items-center gap-2">
+                    <Anchor className="h-5 w-5 text-primary" />
+                    {tSubmit('platform_support')}
+                  </CardTitle>
+                </CardHeader>
+                  <CardContent className="px-0 space-y-6">
+                    {/* Mobile Apps */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Smartphone className="h-5 w-5 text-primary" />
+                        <h3 className="font-semibold">{tForm('mobile_apps')}</h3>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="ios_app_url" className="text-sm font-medium">{tForm('ios_app_url')}</Label>
+                          <Input
+                            id="ios_app_url"
+                            placeholder={tForm('ios_placeholder')}
+                            {...form.register('ios_app_url')}
+                          />
+                          {form.formState.errors.ios_app_url && (
+                            <p className="text-sm text-destructive">
+                              {form.formState.errors.ios_app_url.message === 'Please enter a valid URL'
+                                ? tSubmit('validation.valid_url')
+                                : form.formState.errors.ios_app_url.message}
+                            </p>
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="android_app_url" className="text-sm font-medium">{tForm('android_app_url')}</Label>
+                          <Input
+                            id="android_app_url"
+                            placeholder={tForm('android_placeholder')}
+                            {...form.register('android_app_url')}
+                          />
+                          {form.formState.errors.android_app_url && (
+                            <p className="text-sm text-destructive">
+                              {form.formState.errors.android_app_url.message === 'Please enter a valid URL'
+                                ? tSubmit('validation.valid_url')
+                                : form.formState.errors.android_app_url.message}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Web App */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Globe className="h-5 w-5 text-primary" />
+                        <h3 className="font-semibold">{tForm('web_app')}</h3>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="web_app_url" className="text-sm font-medium">{tForm('web_app_url')}</Label>
+                        <Input
+                          id="web_app_url"
+                          placeholder={tForm('web_app_placeholder')}
+                          {...form.register('web_app_url')}
+                        />
+                        {form.formState.errors.web_app_url && (
+                          <p className="text-sm text-destructive">
+                            {form.formState.errors.web_app_url.message === 'Please enter a valid URL'
+                              ? tSubmit('validation.valid_url')
+                              : form.formState.errors.web_app_url.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Desktop Platforms */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Monitor className="h-5 w-5 text-primary" />
+                        <h3 className="font-semibold">{tForm('desktop_apps')}</h3>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3">
+                        {DESKTOP_PLATFORMS.map((platform) => {
+                          const PlatformIcon = platform.icon
+                          return (
+                            <div key={platform.value} className="flex items-center space-x-4 p-4 rounded-lg border border-border hover:border-primary/30 hover:bg-primary/5 transition-all duration-ds-medium group">
+                              <Checkbox
+                                id={platform.value}
+                                checked={watch('desktop_platforms').includes(platform.value as any)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    addToArray('desktop_platforms', platform.value)
+                                  } else {
+                                    removeFromArray('desktop_platforms', platform.value)
+                                  }
+                                }}
+                                className="w-5 h-5 border-2 border-border group-hover:border-primary/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-white"
+                              />
+                              <Label htmlFor={platform.value} className="text-sm font-medium cursor-pointer flex items-center gap-2 flex-1 group-hover:text-primary transition-colors">
+                                <PlatformIcon className="h-4 w-4 text-primary" />
+                                <span className="font-medium">{tForm(platform.key)}</span>
+                              </Label>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                {/* Submit Button - Moved to bottom of form */}
+                <div className="mt-8">
+                  <Button 
+                    type="button"
+                    onClick={handleFormSubmit}
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90 !text-white [&_*]:!text-white"
+                    size="lg"
+                  >
                     <Save className="h-4 w-4 mr-2" />
-                    💾 Save Tool Updates
-                  </>
-                )}
-              </Button>
-              <Link href="/profile/submissions">
-                <Button type="button" variant="outline" className="w-full sm:w-auto subtle-hover">
-                  <Compass className="h-4 w-4 mr-2" />
-                  Cancel & Return to Dashboard
-                </Button>
-              </Link>
+                    {isSubmitting ? (
+                      <GlobalLoading variant="inline" size="sm" />
+                    ) : (
+                      tEdit('save_changes')
+                    )}
+                  </Button>
+                </div>
             </div>
-          </form>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </div>
   )

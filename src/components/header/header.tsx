@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link";
-import { Trophy, Plus, Compass, ChevronDown, Star, TrendingUp, CheckCircle, Map, Anchor } from "lucide-react";
+import { Trophy, Plus, Compass, ChevronDown, Star, TrendingUp, CheckCircle, Map, Anchor, Code, Palette, Brain, Zap, Monitor, Shield, Users, Camera, Music, Gamepad2, Briefcase, Heart, GraduationCap, ShoppingCart, Wrench } from "lucide-react";
 import { Button } from "@/ui/common/button";
 import {
   DropdownMenu,
@@ -24,6 +24,30 @@ export default function Header() {
   const tRank = useTranslations('pages.rankings');
   const tCat = useTranslations('pages.categories');
   const [categories, setCategories] = useAtom(categoriesAtom);
+
+  // 分类图标映射 - 根据slug选择合适的图标
+  const getCategoryIcon = (slug: string) => {
+    const iconMap: { [key: string]: any } = {
+      'developer-tools': Code,
+      'design': Palette,
+      'ai-tools': Brain,
+      'productivity': Zap,
+      'web-apps': Monitor,
+      'security': Shield,
+      'social': Users,
+      'photography': Camera,
+      'music': Music,
+      'games': Gamepad2,
+      'business': Briefcase,
+      'health': Heart,
+      'education': GraduationCap,
+      'ecommerce': ShoppingCart,
+      'utilities': Wrench,
+      'default': Map
+    };
+    const IconComponent = iconMap[slug] || iconMap['default'];
+    return <IconComponent className="h-4 w-4 text-muted-foreground" />;
+  };
 
   // 加载分类数据
   useEffect(() => {
@@ -50,7 +74,7 @@ export default function Header() {
       "border-b border-border",
       "shadow-sm"
     )}>
-      <nav className="container mx-auto px-4 h-14">
+      <nav className="container mx-auto px-4 h-[65px]">
         <div className="flex h-full items-center gap-6">
           {/* Logo and Title - 船舵风格 */}
           <Link
@@ -110,7 +134,7 @@ export default function Header() {
                       href={`/categories/${category.slug}`}
                       className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-accent"
                     >
-                      <div className="w-2 h-2 rounded-full bg-muted-foreground"></div>
+                      {getCategoryIcon(category.slug)}
                       <span>{(() => { try { return tCat(`names.${category.slug}`); } catch { return category.name; } })()}</span>
                     </Link>
                   </DropdownMenuItem>
@@ -173,11 +197,9 @@ export default function Header() {
                 <DropdownMenuItem asChild>
                   <Link 
                     href="/rankings/free"
-                    className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-magellan-mint/10 transition-all duration-300 group/item"
+                    className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-accent"
                   >
-                    <div className="p-1.5 rounded-lg bg-magellan-mint/10 group-hover/item:scale-110 transition-transform duration-300">
-                      <CheckCircle className="h-3.5 w-3.5 text-magellan-mint" />
-                    </div>
+                    <CheckCircle className="h-4 w-4 text-muted-foreground" />
                     <span>{tRank('types.free.title')}</span>
                   </Link>
                 </DropdownMenuItem>
@@ -185,11 +207,9 @@ export default function Header() {
                 <DropdownMenuItem asChild>
                   <Link 
                     href="/rankings/new"
-                    className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-magellan-teal/10 transition-all duration-300 group/item"
+                    className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-accent"
                   >
-                    <div className="p-1.5 rounded-lg bg-magellan-teal/10 group-hover/item:scale-110 transition-transform duration-300">
-                      <Plus className="h-3.5 w-3.5 text-magellan-teal" />
-                    </div>
+                    <Plus className="h-4 w-4 text-muted-foreground" />
                     <span>{tRank('types.new.title')}</span>
                   </Link>
                 </DropdownMenuItem>
@@ -199,7 +219,7 @@ export default function Header() {
 
           {/* Right side controls - 船长控制台 */}
           <div className="hidden md:flex items-center gap-3">
-            <div className="flex items-center gap-2 p-2 rounded-xl bg-primary/5 border border-primary/20">
+            <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50">
               <ThemeSwitch />
               <LanguageSwitcher />
             </div>

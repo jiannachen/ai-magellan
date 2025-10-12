@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { locales } from '@/i18n';
 import Header from "@/components/header/header";
 import Footer from "@/components/footer/index";
+import { HrefLang } from "@/components/seo/hreflang";
 
 interface LocaleLayoutProps {
   children: ReactNode;
@@ -26,6 +27,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages} locale={locale}>
+      <HrefLang />
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />

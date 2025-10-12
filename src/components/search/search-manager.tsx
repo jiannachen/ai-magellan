@@ -9,7 +9,7 @@ interface SearchManagerProps {
   websites: Website[]
   categories: Category[]
   searchQuery: string
-  selectedCategory: string
+  selectedCategory?: string | number | null
   onSearchChange: (query: string) => void
   onResultsChange: (results: Website[]) => void
 }

@@ -21,10 +21,17 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware((auth, req) => {
-  // Skip internationalization for API routes
-  if (req.nextUrl.pathname.startsWith('/api/')) {
-    // For protected API routes, we'll handle auth in the API route itself
-    // since middleware auth is complex with async operations
+  const { pathname } = req.nextUrl;
+  
+  // Skip internationalization for API routes but not admin routes
+  if (pathname.startsWith('/api/')) {
+    console.log(`Skipping intl middleware for: ${pathname}`);
+    return;
+  }
+
+  // Handle admin routes - protect them but don't use intl middleware
+  if (pathname.startsWith('/admin')) {
+    auth.protect();
     return;
   }
 

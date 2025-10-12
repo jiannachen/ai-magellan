@@ -59,12 +59,41 @@ export default async function Home() {
     searchText: `${website.title.toLowerCase()} ${website.description.toLowerCase()}`,
   }));
 
+  // FAQ数据 - 用于结构化数据 (英文版本，SEO友好)
+  const faqData = [
+    {
+      question: "What makes AI Magellan different from other AI tool directories?",
+      answer: "AI Magellan focuses on professional-grade exploration experience. Like Magellan's global voyage spirit, we carefully curate each AI tool, providing in-depth reviews and practical guides for professionals."
+    },
+    {
+      question: "How do you ensure tool quality?",
+      answer: "We have a professional review team that tests each tool for functionality, security, and user experience. We only recommend truly valuable AI products that meet our high standards."
+    },
+    {
+      question: "Are there free tools on the platform?",
+      answer: "Yes, we've curated a large collection of high-quality free AI tools. We clearly mark each tool's pricing model to help users find solutions that fit their budget."
+    },
+    {
+      question: "How can I submit an AI tool?",
+      answer: "Click the 'Submit Tool' button and fill in the detailed information. Our team will review submissions within 48 hours, and approved tools will be featured on the platform."
+    },
+    {
+      question: "How often is tool information updated?",
+      answer: "We update tool information daily, including price changes and new feature releases. Popular tools receive even more frequent updates to ensure accuracy."
+    },
+    {
+      question: "Do I need to register an account to use the platform?",
+      answer: "Browsing tools requires no registration, but creating an account allows you to bookmark tools, submit tools, participate in ratings, and get a complete user experience."
+    }
+  ];
+
   return (
     <>
       {/* JSON-LD结构化数据 */}
       <StructuredData type="website" />
       <StructuredData type="organization" />
       <StructuredData type="itemList" websites={preFilteredWebsites.slice(0, 20)} />
+      <StructuredData type="faq" faqs={faqData} />
       
       <SimplifiedHomePage
         initialWebsites={preFilteredWebsites}

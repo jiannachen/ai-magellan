@@ -1,6 +1,6 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Lightbulb } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/ui/common/button";
 import { cn } from "@/lib/utils/utils";
@@ -39,9 +39,9 @@ export default function ThemeSwitch() {
       size="sm"
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
       className={cn(
-        "relative w-9 h-9 p-0 rounded-md",
+        "relative w-9 h-9 p-0 rounded-lg",
         "hover:bg-accent hover:text-accent-foreground",
-        "focus-visible:ring-1 focus-visible:ring-ring",
+        "focus-visible:ring-2 focus-visible:ring-ring",
         "transition-colors duration-200"
       )}
       title={theme === "light" ? "切换到暗色模式" : "切换到亮色模式"}

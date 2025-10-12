@@ -167,6 +167,7 @@ export async function PUT(
         // 基本信息
         title: validatedData.title.trim(),
         url: validatedData.url.trim(),
+        email: validatedData.email?.trim() || null,
         description: validatedData.description?.trim() || "",
         category_id: Number(validatedData.category_id),
         

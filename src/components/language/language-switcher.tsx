@@ -10,12 +10,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/ui/common/dropdown-menu'
-import { Languages } from 'lucide-react'
+import { Globe, MapPin, CheckCircle } from 'lucide-react'
+import { cn } from '@/lib/utils/utils'
 import type { Locale } from '@/i18n'
 
 const locales = [
-  { code: 'en' as Locale, name: 'English', flag: '🇺🇸' },
-  { code: 'tw' as Locale, name: '繁體中文', flag: '🇹🇼' },
+  { 
+    code: 'en' as Locale, 
+    name: 'English', 
+    flag: '🇺🇸',
+    region: 'Americas',
+    nativeName: 'English'
+  },
+  { 
+    code: 'tw' as Locale, 
+    name: '繁體中文', 
+    flag: '🇹🇼',
+    region: 'Asia Pacific',
+    nativeName: '繁體中文'
+  },
 ]
 
 export function LanguageSwitcher() {
@@ -38,32 +51,47 @@ export function LanguageSwitcher() {
         <Button 
           variant="ghost" 
           size="sm" 
-          className="flex items-center gap-2 h-9"
+          className={cn(
+            "flex items-center gap-2 h-9 px-3 rounded-lg",
+            "hover:bg-accent hover:text-accent-foreground",
+            "focus-visible:ring-2 focus-visible:ring-ring",
+            "transition-colors duration-200",
+            isPending && "opacity-50 cursor-wait"
+          )}
           disabled={isPending}
-          aria-label="Select language"
+          aria-label="选择语言"
         >
-          <Languages className="h-4 w-4" />
-          <span className="hidden lg:inline">
-            {currentLocale.flag} {currentLocale.name}
+          <Globe className="h-4 w-4" />
+          <span className="hidden lg:inline text-sm">
+            {currentLocale.flag} {currentLocale.nativeName}
           </span>
-          <span className="lg:hidden">
+          <span className="lg:hidden text-sm">
             {currentLocale.flag}
           </span>
+          
+          {isPending && (
+            <div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin ml-1" />
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[180px]">
+      
+      <DropdownMenuContent 
+        align="end" 
+        className="min-w-[180px]"
+      >
         {locales.map((loc) => (
           <DropdownMenuItem
             key={loc.code}
             onClick={() => handleLocaleChange(loc.code)}
-            className={`flex items-center gap-2 cursor-pointer ${
-              locale === loc.code ? 'bg-accent' : ''
-            }`}
+            className={cn(
+              "flex items-center gap-2 cursor-pointer",
+              locale === loc.code && "bg-accent"
+            )}
           >
             <span>{loc.flag}</span>
-            <span>{loc.name}</span>
+            <span>{loc.nativeName}</span>
             {locale === loc.code && (
-              <span className="ml-auto text-xs text-muted-foreground">✓</span>
+              <CheckCircle className="h-3 w-3 ml-auto text-muted-foreground" />
             )}
           </DropdownMenuItem>
         ))}

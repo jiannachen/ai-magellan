@@ -27,6 +27,7 @@ import {
 } from '@/ui/common/select'
 import { Checkbox } from '@/ui/common/checkbox'
 import { toast } from 'sonner'
+import GlobalLoading from '@/components/loading/global-loading'
 import { 
   Map,
   Compass,
@@ -118,7 +119,7 @@ export default function SingleStepSubmitForm() {
       tags: '',
       tagline: '',
       description: '',
-      features: [],
+      features: [{ name: '', description: '' }], // 默认添加一个空的 feature
       use_cases: [],
       target_audience: [],
       faq: [],
@@ -190,14 +191,7 @@ export default function SingleStepSubmitForm() {
 
   // Early returns after all hooks are called
   if (!isLoaded) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>{t('common.loading')}</p>
-        </div>
-      </div>
-    )
+    return <GlobalLoading variant="fullscreen" />
   }
 
   if (!isSignedIn) {
@@ -266,7 +260,7 @@ export default function SingleStepSubmitForm() {
             scrollToFirstError(firstErrorField)
           }
           
-          toast.error('Please fix the form errors and try again')
+          toast.error(tMessages('fix_form_errors'))
         } else {
           throw new Error(errorData.message || 'Submission failed')
         }
@@ -315,7 +309,7 @@ export default function SingleStepSubmitForm() {
     const firstErrorField = Object.keys(errors)[0]
     if (firstErrorField) {
       scrollToFirstError(firstErrorField)
-      toast.error('Please fill in all required fields correctly')
+      toast.error(tMessages('fill_required_fields'))
     }
   }
 
@@ -332,16 +326,54 @@ export default function SingleStepSubmitForm() {
       const errors = form.formState.errors
       const firstErrorField = Object.keys(errors)[0]
       
+      console.log('Form validation errors:', errors) // 调试用
+      
       if (firstErrorField) {
         scrollToFirstError(firstErrorField)
       }
       
-      toast.error('Please fill in all required fields correctly')
+      // 检查关键必填字段的验证问题（按重要性排序）
+      if (errors.url) {
+        toast.error(tMessages('enter_valid_url'))
+      } else if (errors.email) {
+        toast.error(tMessages('enter_valid_email'))
+      } else if (errors.title) {
+        toast.error(tMessages('enter_valid_name'))
+      } else if (errors.category_id) {
+        toast.error(tMessages('select_category'))
+      } else if (errors.tagline) {
+        toast.error(tMessages('enter_valid_tagline'))
+      } else if (errors.description) {
+        toast.error(tMessages('enter_valid_description'))
+      } else if (errors.features) {
+        toast.error(tMessages('add_feature_required'))
+      } else if (errors.pricing_model) {
+        toast.error(tMessages('select_pricing_model'))
+      } else {
+        // 其他验证错误显示通用提示
+        toast.error(tMessages('fill_required_fields'))
+      }
       return
     }
     
     // 如果验证通过，提交表单
     const data = form.getValues()
+    
+    // 验证 features 不为空且填写完整
+    if (!data.features || data.features.length === 0) {
+      toast.error(tMessages('add_feature_required'))
+      scrollToFirstError('features')
+      return
+    }
+    
+    // 检查 features 是否填写完整
+    const incompleteFeature = data.features.find(feature => !feature.name.trim() || !feature.description.trim())
+    if (incompleteFeature) {
+      toast.error(tMessages('complete_all_features'))
+      scrollToFirstError('features')
+      return
+    }
+    
     await onSubmit(data)
   }
 
@@ -450,7 +482,11 @@ export default function SingleStepSubmitForm() {
                           disabled={isFetching}
                         >
                           <Telescope className="h-4 w-4 mr-2" />
-                          {isFetching ? t('common.loading') : tSubmit('simple_form.auto_fill')}
+                          {isFetching ? (
+                            <GlobalLoading variant="inline" size="sm" />
+                          ) : (
+                            tSubmit('simple_form.auto_fill')
+                          )}
                         </Button>
                       </div>
                       {form.formState.errors.url && (
@@ -506,7 +542,13 @@ export default function SingleStepSubmitForm() {
                         {tSubmit('simple_form.category_required')}
                         <span className="text-destructive ml-1">*</span>
                       </Label>
-                      <Select onValueChange={(value) => setValue('category_id', value)}>
+                      <Select 
+                        onValueChange={(value) => {
+                          setValue('category_id', value)
+                          form.clearErrors('category_id')
+                        }}
+                        value={watch('category_id') || ''}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder={tSubmit('simple_form.category_placeholder')} />
                         </SelectTrigger>
@@ -609,25 +651,42 @@ export default function SingleStepSubmitForm() {
                               variant="ghost"
                               size="sm"
                               onClick={() => removeFeature(index)}
-                              className="text-destructive hover:text-destructive"
+                              disabled={featureFields.length === 1}
+                              className="text-destructive hover:text-destructive disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               <X className="h-4 w-4" />
                             </Button>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <Label className="text-sm font-medium">{tForm('feature_name')}</Label>
+                              <Label className="text-sm font-medium">
+                                {tForm('feature_name')}
+                                <span className="text-destructive ml-1">*</span>
+                              </Label>
                               <Input
                                 placeholder={tForm('feature_name_placeholder')}
                                 {...form.register(`features.${index}.name`)}
                               />
+                              {form.formState.errors.features?.[index]?.name && (
+                                <p className="text-sm text-destructive">
+                                  {form.formState.errors.features[index]?.name?.message}
+                                </p>
+                              )}
                             </div>
                             <div className="space-y-2">
-                              <Label className="text-sm font-medium">{tForm('feature_description')}</Label>
+                              <Label className="text-sm font-medium">
+                                {tForm('feature_description')}
+                                <span className="text-destructive ml-1">*</span>
+                              </Label>
                               <Input
                                 placeholder={tForm('feature_description_placeholder')}
                                 {...form.register(`features.${index}.description`)}
                               />
+                              {form.formState.errors.features?.[index]?.description && (
+                                <p className="text-sm text-destructive">
+                                  {form.formState.errors.features[index]?.description?.message}
+                                </p>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -1218,11 +1277,15 @@ export default function SingleStepSubmitForm() {
                     type="button"
                     onClick={handleFormSubmit}
                     disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90"
+                    className="w-full bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90 !text-white [&_*]:!text-white"
                     size="lg"
                   >
                     <Send className="h-4 w-4 mr-2" />
-                    {isSubmitting ? t('common.loading') : tSubmit('simple_form.submit')}
+                    {isSubmitting ? (
+                      <GlobalLoading variant="inline" size="sm" />
+                    ) : (
+                      tSubmit('simple_form.submit')
+                    )}
                   </Button>
                 </div>
             </div>

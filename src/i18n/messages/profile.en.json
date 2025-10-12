@@ -402,7 +402,18 @@
       "auto_fill_success": "Information retrieved successfully, website information has been auto-filled",
       "auto_fill_error": "Retrieval failed, please manually fill in website information",
       "submit_success": "Submission successful! Your AI tool has been submitted for review, we will process it within 24-48 hours.",
-      "submit_error": "Submission failed, please try again"
+      "submit_error": "Submission failed, please try again",
+      "fix_form_errors": "Please fix the form errors and try again",
+      "fill_required_fields": "Please fill in all required fields correctly",
+      "add_feature_required": "Please add at least one feature for your tool",
+      "select_pricing_model": "Please select a pricing model",
+      "select_category": "Please select a category",
+      "enter_valid_email": "Please enter a valid business email",
+      "enter_valid_url": "Please enter a valid tool URL",
+      "enter_valid_name": "Please enter a valid tool name",
+      "enter_valid_tagline": "Please enter a valid tagline",
+      "enter_valid_description": "Please enter a valid description",
+      "complete_all_features": "Please complete all feature names and descriptions"
     }
   },
   "edit": {
@@ -410,6 +421,9 @@
     "back_to_submissions": "Back to My Submissions",
     "saving": "Saving...",
     "save_changes": "Save Changes",
+    "sign_in_required": "🔐 Sign In Required",
+    "navigation_error": "⚠️ Navigation Error",
+    "sign_in_description": "You need to sign in to edit your tool submissions",
     "errors": {
       "required_fields": "Please fill in all required fields",
       "update_failed": "Update failed",

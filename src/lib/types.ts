@@ -25,7 +25,7 @@ export interface Website {
   // 增强表单字段
   email?: string;
   tagline?: string;
-  features?: string[];
+  features?: string[] | Array<{name: string; description: string}>;
   pricing_model?: "free" | "paid" | "freemium" | "subscription" | string;
   has_free_version?: boolean;
   base_price?: string;

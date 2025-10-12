@@ -5,6 +5,7 @@ import { useUser } from '@clerk/nextjs'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import GlobalLoading from '@/components/loading/global-loading'
 import { 
   Edit, 
   ExternalLink, 
@@ -145,12 +146,7 @@ export default function MySubmissionsPage() {
   if (!isLoaded) {
     return (
       <ProfileLayout>
-        <div className="flex items-center justify-center h-96">
-          <div className="text-center">
-            <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-muted-foreground">{t('loading')}</p>
-          </div>
-        </div>
+        <GlobalLoading variant="default" />
       </ProfileLayout>
     )
   }
@@ -288,7 +284,7 @@ export default function MySubmissionsPage() {
                         {tProfile('submissions.no_submissions_desc')}
                       </p>
                       <Link href="/submit" className="mt-8 inline-block">
-                        <Button className="bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90">
+                        <Button className="bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90 !text-white [&_*]:!text-white">
                           <Telescope className="h-4 w-4 mr-2" />
                           {tProfile('submissions.submit_first_tool')}
                         </Button>

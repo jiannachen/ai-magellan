@@ -8,6 +8,7 @@ import SWRProvider from "@/components/providers/swr-provider";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { Analytics as OtherAnalytics } from "@/components/analytics";
 import { getLocale } from 'next-intl/server';
+import { CriticalResources } from "@/components/performance/critical-resources";
 
 // 全局SEO配置
 export const metadata: Metadata = {
@@ -119,6 +120,12 @@ export default async function RootLayout({
         suppressHydrationWarning
         className="min-h-screen flex flex-col bg-background"
       >
+        <CriticalResources 
+          images={[
+            '/images/og-image.png',
+            '/images/logo.png'
+          ]}
+        />
         <ClerkProvider>
           <ThemeProvider
             attribute="class"

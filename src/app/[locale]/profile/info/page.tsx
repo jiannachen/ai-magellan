@@ -287,48 +287,6 @@ export default function ProfileInfoPage() {
             </Card>
           </motion.div>
 
-          {/* Navigator Guidelines */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Compass className="h-5 w-5 text-primary" />
-                  {tProfile('info.usage_tips')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3 p-4 rounded-lg bg-gradient-to-r from-primary/5 to-magellan-teal/5 border border-primary/10">
-                    <Telescope className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
-                      <h4 className="font-medium text-foreground">{tProfile('info.tip_1')}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">{tProfile('info.tip_1')}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3 p-4 rounded-lg bg-gradient-to-r from-primary/5 to-magellan-teal/5 border border-primary/10">
-                    <Route className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
-                      <h4 className="font-medium text-foreground">{tProfile('info.tip_2')}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">{tProfile('info.tip_2')}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3 p-4 rounded-lg bg-gradient-to-r from-primary/5 to-magellan-teal/5 border border-primary/10">
-                    <Map className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
-                      <h4 className="font-medium text-foreground">{tProfile('info.tip_3')}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">{tProfile('info.tip_3')}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
         </div>
       </div>
     </ProfileLayout>

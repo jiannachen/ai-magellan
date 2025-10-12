@@ -64,7 +64,7 @@ export function WebsiteThumbnail({
         alt={title}
         fill
         sizes="56px"
-        className="object-contain"
+        className="object-cover"
         unoptimized
         onError={() => setImageError(true)}
       />

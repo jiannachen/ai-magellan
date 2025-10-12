@@ -10,16 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Setting {
-  id         Int      @id @default(autoincrement())
-  key        String   @unique
-  value      String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@map("settings")
-  @@index([key])
-}
 
 // Clerk用户系统 - 简化的用户模型
 model User {
@@ -28,6 +18,7 @@ model User {
   email         String    @unique
   image         String?
   role          String    @default("user") // user, admin, moderator
+  status        String    @default("active") // active, banned, suspended
   locale        String    @default("zh-CN") // 用户偏好语言
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

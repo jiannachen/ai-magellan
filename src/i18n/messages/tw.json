@@ -93,6 +93,9 @@
     "rankings": {
       "title": "AI工具排行榜",
       "description": "基於造訪量、按讚數和品質評分的AI工具排行榜",
+      "hero": {
+        "badge": "探險指南"
+      },
       "sort_by_visits": "按造訪量排序",
       "sort_by_likes": "按按讚數排序",
       "sort_by_quality": "按品質評分排序",
@@ -209,7 +212,12 @@
         "ai-writing": "AI 寫作",
         "ai-coding": "AI 程式",
         "ai-tools": "AI 工具",
-        "llm": "大型語言模型"
+        "llm": "大型語言模型",
+        "design": "設計",
+        "develop": "開發",
+        "development": "開發",
+        "finance": "金融",
+        "productivity": "效率工具"
       },
       "search_placeholder": "搜尋 {category} 工具...",
       "filters": {

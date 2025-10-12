@@ -67,7 +67,7 @@ export function UserNav() {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/dashboard" className="flex items-center">
+          <Link href="/profile/dashboard" className="flex items-center">
             <User className="mr-2 h-4 w-4" />
             <span>{t('profile')}</span>
           </Link>

@@ -36,16 +36,16 @@ export const websiteSubmitSchema = z.object({
   })).min(1, 'At least one feature is required'),
   
   // 使用场景（可选）
-  use_cases: z.array(z.string().min(1, 'Use case cannot be empty')).default([]),
+  use_cases: z.array(z.string().min(1, 'Use case cannot be empty')).default([]).transform(arr => arr.filter(item => item.trim() !== '')),
   
   // 目标受众（可选）
-  target_audience: z.array(z.string().min(1, 'Target audience cannot be empty')).default([]),
+  target_audience: z.array(z.string().min(1, 'Target audience cannot be empty')).default([]).transform(arr => arr.filter(item => item.trim() !== '')),
   
   // FAQ（可选，但如果有则必须完整）
   faq: z.array(z.object({
     question: z.string().min(1, 'Question cannot be empty'),
     answer: z.string().min(1, 'Answer cannot be empty')
-  })).default([]),
+  })).default([]).transform(arr => arr.filter(item => item.question.trim() !== '' && item.answer.trim() !== '')),
   
   // 定价信息
   pricing_model: z.string()
@@ -73,47 +73,47 @@ export const websiteSubmitSchema = z.object({
     name: z.string().min(1, 'Plan name cannot be empty'),
     billing_cycle: z.string().min(1, 'Billing cycle cannot be empty'),
     price: z.string().min(1, 'Price cannot be empty'),
-    features: z.array(z.string()).max(5, 'Maximum 5 features per plan')
-  })).max(6, 'Maximum 6 pricing plans').default([]),
+    features: z.array(z.string()).max(5, 'Maximum 5 features per plan').transform(arr => arr.filter(item => item.trim() !== ''))
+  })).max(6, 'Maximum 6 pricing plans').default([]).transform(arr => arr.filter(plan => plan.name.trim() !== '' && plan.billing_cycle.trim() !== '' && plan.price.trim() !== '')),
   
   // 社交媒体（可选）
-  twitter_url: z.string().url().optional().or(z.literal('')),
-  linkedin_url: z.string().url().optional().or(z.literal('')),
-  facebook_url: z.string().url().optional().or(z.literal('')),
-  instagram_url: z.string().url().optional().or(z.literal('')),
-  youtube_url: z.string().url().optional().or(z.literal('')),
-  discord_url: z.string().url().optional().or(z.literal('')),
+  twitter_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
+    message: 'Please enter a valid URL'
+  }),
+  linkedin_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
+    message: 'Please enter a valid URL'
+  }),
+  facebook_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
+    message: 'Please enter a valid URL'
+  }),
+  instagram_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
+    message: 'Please enter a valid URL'
+  }),
+  youtube_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
+    message: 'Please enter a valid URL'
+  }),
+  discord_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
+    message: 'Please enter a valid URL'
+  }),
   
   // 集成（可选）
-  integrations: z.array(z.string()).default([]),
+  integrations: z.array(z.string()).default([]).transform(arr => arr.filter(item => item.trim() !== '')),
   
   // 平台支持（可选）
-  ios_app_url: z.string().url().optional().or(z.literal('')),
-  android_app_url: z.string().url().optional().or(z.literal('')),
-  web_app_url: z.string().url().optional().or(z.literal('')),
+  ios_app_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
+    message: 'Please enter a valid URL'
+  }),
+  android_app_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
+    message: 'Please enter a valid URL'
+  }),
+  web_app_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
+    message: 'Please enter a valid URL'
+  }),
   desktop_platforms: z.array(z.enum(['mac', 'windows', 'linux'])).default([])
 })
 
-// 网站编辑表单验证 schema（基于提交 schema，但某些必填限制可选）
-export const websiteEditSchema = websiteSubmitSchema.extend({
-  email: z.string().email('Please enter a valid business email address').optional().or(z.literal('')),
-  features: z.array(z.object({
-    name: z.string().min(1, 'Feature name cannot be empty'),
-    description: z.string().min(1, 'Feature description cannot be empty')
-  })).default([]),
-  use_cases: z.array(z.string()).default([]),
-  target_audience: z.array(z.string()).default([]),
-  faq: z.array(z.object({
-    question: z.string().min(1, 'Question cannot be empty'),
-    answer: z.string().min(1, 'Answer cannot be empty')
-  })).default([]),
-  pricing_plans: z.array(z.object({
-    name: z.string().min(1, 'Plan name cannot be empty'),
-    billing_cycle: z.string().min(1, 'Billing cycle cannot be empty'),
-    price: z.string().min(1, 'Price cannot be empty'),
-    features: z.array(z.string()).max(5, 'Maximum 5 features per plan')
-  })).max(6, 'Maximum 6 pricing plans').default([])
-})
+// 网站编辑表单验证 schema（与提交schema相同的验证要求）
+export const websiteEditSchema = websiteSubmitSchema
 
 export type WebsiteSubmitData = z.infer<typeof websiteSubmitSchema>
 export type WebsiteEditData = z.infer<typeof websiteEditSchema>

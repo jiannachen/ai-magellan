@@ -93,6 +93,9 @@
     "rankings": {
       "title": "AI Tools Rankings",
       "description": "AI tools ranking based on visits, likes, and quality scores",
+      "hero": {
+        "badge": "Expedition Guide"
+      },
       "sort_by_visits": "Sort by Visits",
       "sort_by_likes": "Sort by Likes",
       "sort_by_quality": "Sort by Quality",
@@ -209,7 +212,12 @@
         "ai-writing": "AI Writing",
         "ai-coding": "AI Coding",
         "ai-tools": "AI Tools",
-        "llm": "Large Language Models"
+        "llm": "Large Language Models",
+        "design": "Design",
+        "develop": "Development",
+        "development": "Development",
+        "finance": "Finance",
+        "productivity": "Productivity"
       },
       "search_placeholder": "Search {category} tools...",
       "filters": {

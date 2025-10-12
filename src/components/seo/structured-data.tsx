@@ -2,12 +2,14 @@ import Script from 'next/script';
 import { useTranslations } from 'next-intl';
 
 interface StructuredDataProps {
-  type: 'website' | 'organization' | 'webpage' | 'itemList';
+  type: 'website' | 'organization' | 'webpage' | 'itemList' | 'faq' | 'breadcrumb';
   data?: any;
   websites?: any[];
+  faqs?: { question: string; answer: string }[];
+  breadcrumbs?: { name: string; url: string }[];
 }
 
-export function StructuredData({ type, data, websites }: StructuredDataProps) {
+export function StructuredData({ type, data, websites, faqs, breadcrumbs }: StructuredDataProps) {
   const t = useTranslations();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yoursite.com';
   
@@ -87,6 +89,32 @@ export function StructuredData({ type, data, websites }: StructuredDataProps) {
                 "priceCurrency": "USD"
               }
             }
+          })) || []
+        };
+        
+      case 'faq':
+        return {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": faqs?.map((faq) => ({
+            "@type": "Question",
+            "name": faq.question,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": faq.answer
+            }
+          })) || []
+        };
+        
+      case 'breadcrumb':
+        return {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": breadcrumbs?.map((breadcrumb, index) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "name": breadcrumb.name,
+            "item": breadcrumb.url
           })) || []
         };
         

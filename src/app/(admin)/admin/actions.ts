@@ -27,29 +27,3 @@ export async function getCategories() {
     return [];
   }
 }
-
-export async function getSettings() {
-  try {
-    // 获取所有设置
-    const settings = await prisma.setting.findMany({
-      select: {
-        id: true,
-        key: true,
-        value: true,
-      },
-    });
-
-    // 转换为对象格式
-    const settingsObject = settings.reduce((acc, setting) => {
-      acc[setting.key] = setting.value;
-      return acc;
-    }, {} as Record<string, string>);
-
-    console.log(settingsObject);
-
-    return settingsObject;
-  } catch (error) {
-    console.error("Error fetching settings:", error);
-    return null;
-  }
-}

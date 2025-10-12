@@ -11,11 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/common/select";
-import { Tabs, TabsList, TabsTrigger } from "@/ui/common/tabs";
 import type { Website } from "@/lib/types";
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { Settings, ListFilter } from "lucide-react";
+import { ListFilter, Users } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 
 export function AdminPageClient({
@@ -70,29 +68,27 @@ export function AdminPageClient({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-background/30 backdrop-blur-sm p-6 rounded-xl border border-border/40">
         <div>
           <h1 className="text-2xl sm:text-3xl font-semibold text-foreground">
-            后台管理
+            网站管理
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            管理网站内容和系统设置
+            审核和管理用户提交的网站内容
           </p>
         </div>
-        <Tabs defaultValue="websites" className="w-full sm:w-auto">
-          <TabsList className="grid w-full sm:w-auto grid-cols-2 bg-background/50">
-            <TabsTrigger
-              value="websites"
-              className="flex items-center gap-2 data-[state=active]:bg-background/60"
-            >
+        <div className="w-full sm:w-auto">
+          <div className="grid w-full sm:w-auto grid-cols-2 bg-background/50 rounded-lg p-1">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-background/60 text-foreground">
               <ListFilter className="w-4 h-4" />
               网站管理
-            </TabsTrigger>
-            <TabsTrigger value="settings" asChild>
-              <Link href="/admin/settings" className="flex items-center gap-2">
-                <Settings className="w-4 h-4" />
-                系统设置
-              </Link>
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+            </div>
+            <a
+              href="/admin/users"
+              className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-background/60"
+            >
+              <Users className="w-4 h-4" />
+              用户管理
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* Main Content */}

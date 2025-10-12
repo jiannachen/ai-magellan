@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { websitesAtom, categoriesAtom, searchQueryAtom, selectedCategoryAtom } from "@/lib/atoms";
-import { SearchManager } from "@/components/search/search-manager";
+import { websitesAtom, categoriesAtom } from "@/lib/atoms";
 import { CompactCard } from "@/components/website/compact-card";
 import { Button } from "@/ui/common/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/common/card";
@@ -45,6 +45,7 @@ import {
 import type { Website, Category } from "@/lib/types";
 import { useTranslations } from 'next-intl';
 import Link from "next/link";
+import { ValuePropCard } from "@/components/ui/value-prop-card";
 import { useUser } from '@clerk/nextjs';
 
 interface SimplifiedHomePageProps {
@@ -58,12 +59,11 @@ export default function SimplifiedHomePage({
 }: SimplifiedHomePageProps) {
   const t = useTranslations();
   const tLanding = useTranslations('landing');
+  const router = useRouter();
   const { user } = useUser();
   const [websites, setWebsites] = useAtom(websitesAtom);
   const [categories, setCategories] = useAtom(categoriesAtom);
-  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
-  const [selectedCategory] = useAtom(selectedCategoryAtom);
-  const [filteredWebsites, setFilteredWebsites] = useState<Website[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [topRatedWebsites, setTopRatedWebsites] = useState<Website[]>([]);
   const [mostPopularWebsites, setMostPopularWebsites] = useState<Website[]>([]);
   const [recentWebsites, setRecentWebsites] = useState<Website[]>([]);
@@ -72,6 +72,15 @@ export default function SimplifiedHomePage({
   const [userLikes, setUserLikes] = useState<Set<number>>(new Set());
   const [userFavorites, setUserFavorites] = useState<Set<number>>(new Set());
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+  // 搜索处理函数
+  const handleSearch = (query: string) => {
+    if (query.trim()) {
+      const params = new URLSearchParams();
+      params.set('q', query.trim());
+      router.push(`/search?${params.toString()}`);
+    }
+  };
 
   // FAQ data - 融入 Magellan 探索精神
   const faqs = [
@@ -525,12 +534,17 @@ export default function SimplifiedHomePage({
                   )}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && searchQuery.trim()) {
+                      handleSearch(searchQuery);
+                    }
+                  }}
                 />
                 
                 {/* 搜索按钮 */}
                 <Button 
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 px-4 bg-primary hover:bg-primary/90 text-white rounded-lg"
-                  onClick={() => {/* 触发搜索 */}}
+                  onClick={() => handleSearch(searchQuery)}
                 >
                   <Search className="h-4 w-4" />
                 </Button>
@@ -539,12 +553,12 @@ export default function SimplifiedHomePage({
             
             <div className="text-sm text-muted-foreground mt-3 flex items-center justify-center gap-2">
               <span>💡 {tLanding('hero.popular_searches')}:</span>
-              {['ChatGPT', 'Midjourney', tLanding('hero.search_tags.coding_assistant'), tLanding('hero.search_tags.ai_writing')].map((tag, index) => (
+              {['ChatGPT', 'Midjourney', tLanding('hero.search_tags.coding_assistant'), tLanding('hero.search_tags.ai_writing')].map((tag) => (
                 <Badge 
                   key={tag}
                   variant="secondary" 
                   className="cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors"
-                  onClick={() => setSearchQuery(tag)}
+                  onClick={() => handleSearch(tag)}
                 >
                   {tag}
                 </Badge>
@@ -705,55 +719,13 @@ export default function SimplifiedHomePage({
           {/* 价值主张网格 - 探索能力 */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {valueProps.map((prop, index) => (
-              <motion.div
+              <ValuePropCard
                 key={index}
-                initial={{ opacity: 0, y: 40, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ 
-                  duration: 0.5, 
-                  delay: index * 0.1,
-                  ease: [0.15, 1, 0.3, 1]
-                }}
-              >
-                <Card className={cn(
-                  "group h-full text-center relative overflow-hidden",
-                  "bg-card/95 backdrop-blur-sm border border-primary/10",
-                  "rounded-2xl shadow-lg hover:shadow-2xl",
-                  "transition-all duration-500 ease-out",
-                  "subtle-hover",
-                  "hover:border-primary/30"
-                )}>
-                  {/* 背景海洋效果 */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-magellan-coral/3 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                  
-                  <CardContent className="p-8 relative z-10">
-                    {/* 图标容器 - 罗盘风格 */}
-                    <div className="mb-6 flex justify-center">
-                      <div className={cn(
-                        "relative p-4 rounded-2xl",
-                        "bg-gradient-to-br from-primary/15 to-magellan-teal/10",
-                        "border border-primary/20 shadow-lg",
-                        "subtle-scale",
-                        "transition-all duration-500"
-                      )}>
-                        <prop.icon className="h-8 w-8 text-primary group-hover:text-magellan-teal transition-colors duration-300" />
-                        {/* 发光环效果 */}
-                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      </div>
-                    </div>
-                    
-                    <h3 className="text-atlassian-h5 font-semibold mb-4 text-foreground group-hover:text-primary transition-colors duration-300">
-                      {prop.title}
-                    </h3>
-                    <p className="text-atlassian-body text-muted-foreground leading-relaxed">
-                      {prop.description}
-                    </p>
-                    
-                    {/* 底部装饰线 */}
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                icon={prop.icon}
+                title={prop.title}
+                description={prop.description}
+                index={index}
+              />
             ))}
           </div>
         </div>
@@ -1004,22 +976,6 @@ export default function SimplifiedHomePage({
           </motion.div>
         </div>
       </section>
-
-      {/* Search Results */}
-      {searchQuery && (
-        <section className="py-8 px-4 border-t">
-          <div className="container mx-auto">
-            <SearchManager
-              websites={websites}
-              categories={categories}
-              searchQuery={searchQuery}
-              selectedCategory={selectedCategory}
-              onSearchChange={setSearchQuery}
-              onResultsChange={setFilteredWebsites}
-            />
-          </div>
-        </section>
-      )}
     </div>
   );
 }

@@ -1,11 +1,13 @@
-# AI导航站 - robots.txt
+# AI Magellan - robots.txt
 User-agent: *
 Allow: /
 
 # 允许搜索引擎访问所有页面
 Allow: /about
+Allow: /categories
 Allow: /rankings
 Allow: /submit
+Allow: /tools
 
 # 禁止访问API和管理页面
 Disallow: /api/
@@ -16,10 +18,24 @@ Disallow: /.*\?
 # 允许访问静态资源
 Allow: /favicon.ico
 Allow: /images/
+Allow: /icons/
 Allow: /scripts/
 
 # 网站地图
-Sitemap: https://yoursite.com/sitemap.xml
+Sitemap: https://aimagellan.com/sitemap.xml
 
 # 爬取延迟（可选）
 Crawl-delay: 1
+
+# 针对特定搜索引擎的优化
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 2

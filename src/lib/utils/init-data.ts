@@ -1,6 +1,5 @@
 import { prisma } from '../db/db';
 import type { Prisma, PrismaClient, Category } from '@prisma/client';
-import { WebsiteSettings } from '../constraint';
 
 
 
@@ -153,39 +152,8 @@ export async function initializeData() {
   }
 }
 
-export async function initializeSettings() {
-  const requiredSettings = [
-    { key: WebsiteSettings.title, value: 'AI导航' },
-    { key: WebsiteSettings.description, value: '发现、分享和收藏优质AI工具与资源' },
-    { key: WebsiteSettings.keywords, value: 'AI导航,AI工具,人工智能,AI资源' },
-    { key: WebsiteSettings.logo, value: '/static/logo.png' },
-    { key: WebsiteSettings.siteIcp, value: '' },
-    { key: WebsiteSettings.siteFooter, value: '© 2024 AI导航. All rights reserved.' },
-    { key: WebsiteSettings.allowSubmissions, value: 'true' },
-    { key: WebsiteSettings.requireApproval, value: 'true' },
-    { key: WebsiteSettings.itemsPerPage, value: '12' },
-    { key: WebsiteSettings.adminPassword, value: process.env.ADMIN_PASSWORD || 'admin' },
-    { key: WebsiteSettings.siteUrl, value: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' },
-    { key: WebsiteSettings.siteEmail, value: process.env.SITE_EMAIL || 'admin@example.com' },
-    { key: WebsiteSettings.siteCopyright, value: '© 2024 AI导航. All rights reserved.' },
-    { key: WebsiteSettings.googleAnalytics, value: process.env.GOOGLE_ANALYTICS || '' },
-    { key: WebsiteSettings.baiduAnalytics, value: process.env.BAIDU_ANALYTICS || '' },
-  ];
-  
-  await Promise.all(
-    requiredSettings.map(setting =>
-      prisma.setting.upsert({
-        where: { key: setting.key },
-        update: { value: setting.value },
-        create: setting,
-      })
-    )
-  );
-}
-
 module.exports = {
-  initializeData,
-  initializeSettings
+  initializeData
 }; 
 
 // 如果直接运行此文件，则执行初始化
@@ -193,8 +161,7 @@ if (require.main === module) {
   (async () => {
     try {
       await initializeData();
-      await initializeSettings();
-      console.log('所有数据初始化完成！');
+      console.log('数据初始化完成！');
       process.exit(0);
     } catch (error) {
       console.error('初始化失败:', error);

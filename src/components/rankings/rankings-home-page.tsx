@@ -110,20 +110,55 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
 
   const WebsiteCard = ({ website, rank }: { website: any; rank: number }) => (
     <div className="relative group">
-      {/* 排名宝藏标识 - 航海主题 */}
-      <div className={cn(
-        "absolute -top-2 -left-2 z-10 w-8 h-8 rounded-xl flex items-center justify-center",
-        "text-xs font-bold shadow-lg border transition-all duration-300",
-        "subtle-scale",
-        rank === 1 ? 'bg-gradient-to-br from-magellan-gold to-magellan-coral text-white border-magellan-gold/30 professional-glow' :
-        rank === 2 ? 'bg-gradient-to-br from-primary to-magellan-teal text-white border-primary/30' :
-        rank === 3 ? 'bg-gradient-to-br from-magellan-coral to-magellan-gold text-white border-magellan-coral/30' :
-        'bg-gradient-to-br from-muted to-background text-muted-foreground border-border'
-      )}>
+      {/* 排名徽章 - Atlassian Design System Compliant */}
+      <div 
+        className={cn(
+          "absolute z-10 flex items-center justify-center",
+          "w-6 h-6 text-xs font-medium transition-all",
+          // Atlassian 设计规范：使用语义化颜色和正确的 tokens
+          rank === 1 ? [
+            // 第一名：品牌主色
+            "bg-[#0052CC] text-white border-[#0747A6]",
+            "shadow-[0px_1px_1px_rgba(9,30,66,0.25),0px_0px_1px_rgba(9,30,66,0.31)]",
+            "hover:shadow-[0px_4px_8px_rgba(9,30,66,0.25),0px_0px_1px_rgba(9,30,66,0.31)]",
+            "hover:bg-[#0747A6]"
+          ] :
+          rank === 2 ? [
+            // 第二名：成功色
+            "bg-[#22A06B] text-white border-[#1F845A]", 
+            "shadow-[0px_1px_1px_rgba(9,30,66,0.25),0px_0px_1px_rgba(9,30,66,0.31)]",
+            "hover:shadow-[0px_4px_8px_rgba(9,30,66,0.25),0px_0px_1px_rgba(9,30,66,0.31)]",
+            "hover:bg-[#1F845A]"
+          ] :
+          rank === 3 ? [
+            // 第三名：警告色
+            "bg-[#E56910] text-white border-[#974F0C]",
+            "shadow-[0px_1px_1px_rgba(9,30,66,0.25),0px_0px_1px_rgba(9,30,66,0.31)]", 
+            "hover:shadow-[0px_4px_8px_rgba(9,30,66,0.25),0px_0px_1px_rgba(9,30,66,0.31)]",
+            "hover:bg-[#974F0C]"
+          ] :
+          [
+            // 其他排名：中性色
+            "bg-[#F7F8F9] text-[#172B4D] border-[#DCDFE4]",
+            "shadow-[0px_1px_1px_rgba(9,30,66,0.25),0px_0px_1px_rgba(9,30,66,0.31)]",
+            "hover:shadow-[0px_4px_8px_rgba(9,30,66,0.25),0px_0px_1px_rgba(9,30,66,0.31)]",
+            "hover:bg-[#F1F2F4]"
+          ],
+          // Atlassian 标准：4px 圆角，200ms 标准过渡，2px 边框
+          "rounded border-2",
+          "duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+          // 24px grid positioning (-12px = -3 * 4px)
+          "-top-3 -left-3"
+        )}
+        style={{
+          // 确保过渡使用 Atlassian 标准曲线
+          transitionTimingFunction: 'cubic-bezier(0.25, 0.1, 0.25, 1)'
+        }}
+      >
         {rank <= 3 ? (
-          <Crown className="h-3 w-3" />
+          <Crown className="w-3 h-3" />
         ) : (
-          rank
+          <span className="font-semibold text-xs">{rank}</span>
         )}
       </div>
       

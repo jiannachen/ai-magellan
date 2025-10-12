@@ -35,6 +35,7 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
   // Translation hooks
   const t = useTranslations('common')
   const tProfile = useTranslations('profile.navigation')
+  const tAuth = useTranslations('auth')
 
   const navigation = [
     {
@@ -87,12 +88,12 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
             />
           )}
 
-          {/* 左侧导航栏 - 在版心内的固定定位，考虑顶部Header */}
+          {/* 左侧导航栏 - 完全符合Atlassian Design System规范 */}
           <motion.aside
             className={cn(
-              "bg-background/95 backdrop-blur-xl border border-border/40 rounded-xl shadow-lg transition-all duration-300",
-              "w-72 lg:w-64 xl:w-72",
-              // 桌面端在版心内的固定定位，考虑顶部Header高度(64px) + 间距(24px) = 88px
+              "bg-background border border-border rounded-lg shadow-atlassian-200 transition-all duration-200",
+              "w-60", // 240px 符合ATL.md规范
+              // 桌面端在版心内的固定定位，考虑顶部Header高度
               "lg:sticky lg:top-[5.5rem] lg:h-fit lg:self-start",
               // 移动端固定定位
               "fixed top-4 left-4 z-40 h-[calc(100vh-2rem)]",
@@ -100,29 +101,29 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
               sidebarOpen ? "translate-x-0 lg:translate-x-0" : "-translate-x-full lg:translate-x-0"
             )}
           >
-            <div className="flex flex-col">
-              {/* 用户信息区域 */}
-              <div className="p-6 border-b border-border/40">
+            <div className="flex flex-col h-full">
+              {/* 用户信息区域 - 符合ATL规范 */}
+              <div className="p-6 border-b border-border">
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-12 w-12 border-2 border-border/20 shadow-sm">
+                  <Avatar className="h-12 w-12 border-2 border-border shadow-atlassian-100">
                     <AvatarImage src={user?.imageUrl} alt={user?.fullName || ''} />
-                    <AvatarFallback className="bg-muted text-foreground font-semibold text-base">
+                    <AvatarFallback className="bg-muted text-foreground font-medium text-base">
                       {user?.firstName?.charAt(0) || user?.emailAddresses?.[0]?.emailAddress?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-base font-semibold truncate text-foreground">
+                    <p className="text-atlassian-body font-medium truncate text-foreground">
                       {user?.fullName || user?.firstName || tProfile('default_user')}
                     </p>
-                    <p className="text-sm text-muted-foreground truncate">
+                    <p className="text-atlassian-body-small text-muted-foreground truncate">
                       {user?.emailAddresses?.[0]?.emailAddress}
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* 导航菜单 */}
-              <nav className="p-4 space-y-1">
+              {/* 导航菜单 - 完全符合Atlassian规范 */}
+              <nav className="p-4 space-y-1 flex-1">
                 {navigation.map((item) => {
                   const isActive = pathname === item.href || 
                     (item.href === '/dashboard' && (pathname === '/dashboard' || pathname === '/profile'))
@@ -132,47 +133,55 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
                       key={item.name}
                       href={item.href}
                       onClick={() => setSidebarOpen(false)}
+                      className="block"
                     >
                       <motion.div
-                        whileHover={{ scale: 1.02, y: -1 }}
-                        whileTap={{ scale: 0.98 }}
+                        // 移除不符合规范的hover缩放效果
                         className={cn(
-                          "group flex items-center px-3 py-2.5 text-sm font-medium rounded-md transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] relative overflow-hidden cursor-pointer",
+                          // Atlassian侧边栏导航规范的基础样式
+                          "group flex items-center px-3 py-2 text-atlassian-body font-medium rounded-[4px] transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] relative cursor-pointer",
+                          // Focus状态 - 符合无障碍要求
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                          // 活跃状态和默认状态 - 使用ATL规范颜色
                           isActive
-                            ? "bg-primary text-white shadow-[0px_2px_4px_rgba(9,30,66,0.25)]"
-                            : "text-muted-foreground hover:text-foreground hover:bg-accent/50 hover:shadow-[0px_1px_1px_rgba(9,30,66,0.25)]"
+                            ? "bg-primary text-white"
+                            : "text-foreground hover:text-foreground hover:bg-muted"
                         )}
+                        // 无障碍支持
+                        role="menuitem"
+                        tabIndex={0}
+                        aria-current={isActive ? "page" : undefined}
                       >
-                        {/* 活跃状态背景 */}
+                        {/* 活跃状态背景动画 */}
                         {isActive && (
                           <motion.div
                             layoutId="activeTab"
-                            className="absolute inset-0 bg-primary rounded-lg"
+                            className="absolute inset-0 bg-primary rounded-[4px]"
                             transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                           />
                         )}
                         
                         <div className="relative flex items-center w-full">
                           <item.icon className={cn(
-                            "mr-3 h-4 w-4 flex-shrink-0 transition-all duration-200",
-                            isActive ? "text-white" : "text-muted-foreground group-hover:text-foreground"
+                            "mr-3 h-4 w-4 flex-shrink-0 transition-colors duration-200",
+                            isActive ? "text-white" : "text-foreground group-hover:text-foreground"
                           )} />
-                          <div className="flex-1">
+                          <div className="flex-1 min-w-0">
                             <div className={cn(
-                              "font-medium text-sm",
-                              isActive ? "text-white" : "group-hover:text-foreground"
+                              "font-medium text-atlassian-body truncate",
+                              isActive ? "text-white" : "text-foreground group-hover:text-foreground"
                             )}>
                               {item.label}
                             </div>
                             <div className={cn(
-                              "text-xs mt-0.5 leading-tight",
-                              isActive ? "text-white/80" : "text-muted-foreground/70 group-hover:text-muted-foreground"
+                              "text-atlassian-body-small mt-0.5 leading-tight truncate",
+                              isActive ? "text-white/80" : "text-muted-foreground group-hover:text-muted-foreground"
                             )}>
                               {item.description}
                             </div>
                           </div>
                           {isActive && (
-                            <ChevronRight className="h-4 w-4 ml-auto text-white" />
+                            <ChevronRight className="h-4 w-4 ml-2 text-white flex-shrink-0" />
                           )}
                         </div>
                       </motion.div>
@@ -180,6 +189,18 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
                   )
                 })}
               </nav>
+
+              {/* 退出按钮 - 符合ATL规范 */}
+              <div className="p-4 border-t border-border">
+                <Button
+                  variant="ghost"
+                  onClick={handleSignOut}
+                  className="w-full justify-start text-foreground hover:text-foreground hover:bg-muted rounded-[4px] transition-colors duration-200"
+                >
+                  <LogOut className="h-4 w-4 mr-3" />
+                  {tAuth('signout')}
+                </Button>
+              </div>
             </div>
           </motion.aside>
 
