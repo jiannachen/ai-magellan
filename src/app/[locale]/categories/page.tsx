@@ -12,12 +12,16 @@ export const metadata: Metadata = {
 };
 
 export default async function CategoriesPage() {
-  // Get all categories with tool counts
+  // Get all categories with their subcategories and website counts
   const categoriesWithCounts = await prisma.category.findMany({
+    where: {
+      parent_id: null  // 只获取一级分类
+    },
     select: {
       id: true,
       name: true,
       slug: true,
+      sort_order: true,
       _count: {
         select: {
           websites: {
@@ -26,42 +30,45 @@ export default async function CategoriesPage() {
             }
           }
         }
+      },
+      children: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          sort_order: true,
+          _count: {
+            select: {
+              websites: {
+                where: {
+                  status: 'approved'
+                }
+              }
+            }
+          }
+        },
+        orderBy: {
+          sort_order: 'asc'
+        }
       }
     },
     orderBy: {
-      name: 'asc'
+      sort_order: 'asc'
     }
   });
 
-  // Get featured tools from each category
-  const featuredByCategory = await Promise.all(
-    categoriesWithCounts.map(async (category) => {
-      const tools = await prisma.website.findMany({
-        where: {
-          category_id: category.id,
-          status: 'approved',
-          is_featured: true
-        },
-        select: {
-          id: true,
-          title: true,
-          thumbnail: true,
-          tagline: true,
-          quality_score: true
-        },
-        take: 3,
-        orderBy: {
-          quality_score: 'desc'
-        }
-      });
+  // Transform to match component structure
+  const categoriesWithSubcategories = categoriesWithCounts.map(category => ({
+    ...category,
+    toolCount: category._count.websites,
+    subcategories: category.children.map(child => ({
+      id: child.id,
+      name: child.name,
+      slug: child.slug,
+      toolCount: child._count.websites,
+      description: `${child.name}相关的AI工具`
+    }))
+  }));
 
-      return {
-        ...category,
-        featuredTools: tools,
-        toolCount: category._count.websites
-      };
-    })
-  );
-
-  return <CategoriesListPage categories={featuredByCategory} />;
+  return <CategoriesListPage categories={categoriesWithSubcategories} />;
 }

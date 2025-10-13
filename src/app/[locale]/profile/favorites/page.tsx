@@ -253,14 +253,14 @@ export default function MyFavoritesPage() {
                 value={favorites.filter(w => w.is_featured).length}
                 description={tProfile('favorites.stats.premium_tools')}
                 icon={Crown}
-                variant="warning"
+                variant="highlight"
               />
               <StatCard
                 label={tProfile('favorites.stats.high_quality')}
                 value={favorites.filter(w => w.quality_score >= 80).length}
                 description={tProfile('favorites.stats.high_score_tools')}
                 icon={Star}
-                variant="success"
+                variant="highlight"
               />
             </div>
           </motion.div>

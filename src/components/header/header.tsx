@@ -9,7 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/ui/common/dropdown-menu";
-import ThemeSwitch from "@/components/theme-switcher/theme-switch";
 import MobileMenu from "./mobile-menu";
 import { UserNav } from "@/components/auth/user-nav";
 import { LanguageSwitcher } from "@/components/language/language-switcher";
@@ -74,8 +73,8 @@ export default function Header() {
       "border-b border-border",
       "shadow-sm"
     )}>
-      <nav className="container mx-auto px-4 h-[65px]">
-        <div className="flex h-full items-center gap-6">
+      <nav className="container mx-auto px-4 h-[60px] sm:h-[65px]">
+        <div className="flex h-full items-center justify-between">
           {/* Logo and Title - 船舵风格 */}
           <Link
             href="/"
@@ -85,7 +84,7 @@ export default function Header() {
               "p-2 rounded-lg hover:bg-muted/50"
             )}
           >
-            <Compass className="h-7 w-7 text-primary" />
+            <img src="/logo.png" alt="AI Magellan Logo" className="h-7 w-7 rounded-lg" />
             <div className="flex flex-col">
               <span className="font-bold text-lg text-foreground">
                 AI Magellan
@@ -97,7 +96,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation - 航海仪表板风格 */}
-          <div className="hidden md:flex items-center gap-4 flex-1">
+          <div className="hidden md:flex items-center gap-4 flex-1 ml-6">
             {/* Categories Dropdown - 海域地图 */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -131,11 +130,11 @@ export default function Header() {
                 {categories.slice(0, 6).map((category: { id: number; name: string; slug: string }) => (
                   <DropdownMenuItem key={category.id} asChild>
                     <Link 
-                      href={`/categories/${category.slug}`}
+                      href={`/categories#${category.slug}`}
                       className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-accent"
                     >
                       {getCategoryIcon(category.slug)}
-                      <span>{(() => { try { return tCat(`names.${category.slug}`); } catch { return category.name; } })()}</span>
+                      <span>{category.name}</span>
                     </Link>
                   </DropdownMenuItem>
                 ))}
@@ -219,10 +218,7 @@ export default function Header() {
 
           {/* Right side controls - 船长控制台 */}
           <div className="hidden md:flex items-center gap-3">
-            <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50">
-              <ThemeSwitch />
-              <LanguageSwitcher />
-            </div>
+            <LanguageSwitcher />
             <UserNav />
           </div>
 

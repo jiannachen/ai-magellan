@@ -26,8 +26,11 @@ async function getRankingsData() {
     }
   });
 
-  // Get categories with tool counts
+  // Get categories with tool counts (只获取一级分类)
   const categories = await prisma.category.findMany({
+    where: {
+      parent_id: null
+    },
     include: {
       _count: {
         select: {
@@ -39,7 +42,7 @@ async function getRankingsData() {
         }
       }
     },
-    orderBy: { name: 'asc' }
+    orderBy: { sort_order: 'asc' }
   });
 
   // Calculate different rankings

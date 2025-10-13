@@ -1,141 +1,259 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Trophy, Plus, Download, Info, Menu, X, ChevronDown, TrendingUp, Star, CheckCircle } from "lucide-react";
+import { 
+  Trophy, 
+  Plus, 
+  Menu, 
+  X, 
+  ChevronDown, 
+  TrendingUp, 
+  Star, 
+  CheckCircle,
+  Map,
+  Code,
+  Palette,
+  Brain,
+  Zap,
+  Monitor,
+  Shield,
+  Users,
+  Camera,
+  Music,
+  Gamepad2,
+  Briefcase,
+  Heart,
+  GraduationCap,
+  ShoppingCart,
+  Wrench
+} from "lucide-react";
 import { Button } from "@/ui/common/button";
-import ThemeSwitch from "@/components/theme-switcher/theme-switch";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/ui/common/tooltip";
+import { LanguageSwitcher } from "@/components/language/language-switcher";
+import { UserNav } from "@/components/auth/user-nav";
 import { useTranslations } from 'next-intl';
+import { useAtom } from 'jotai';
+import { categoriesAtom } from '@/lib/atoms';
+import { cn } from "@/lib/utils/utils";
 
 export default function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [rankingsOpen, setRankingsOpen] = useState(false);
   const t = useTranslations();
   const tRank = useTranslations('pages.rankings');
+  const tCat = useTranslations('pages.categories');
+  const [categories, setCategories] = useAtom(categoriesAtom);
 
+  // 分类图标映射 - 与桌面版保持一致
+  const getCategoryIcon = (slug: string) => {
+    const iconMap: { [key: string]: any } = {
+      'developer-tools': Code,
+      'design': Palette,
+      'ai-tools': Brain,
+      'productivity': Zap,
+      'web-apps': Monitor,
+      'security': Shield,
+      'social': Users,
+      'photography': Camera,
+      'music': Music,
+      'games': Gamepad2,
+      'business': Briefcase,
+      'health': Heart,
+      'education': GraduationCap,
+      'ecommerce': ShoppingCart,
+      'utilities': Wrench,
+      'default': Map
+    };
+    const IconComponent = iconMap[slug] || iconMap['default'];
+    return <IconComponent className="h-4 w-4 text-muted-foreground" />;
+  };
+
+  // 加载分类数据 - 与桌面版保持一致
+  useEffect(() => {
+    const loadCategories = async () => {
+      if (categories.length === 0) {
+        try {
+          const response = await fetch('/api/categories');
+          if (response.ok) {
+            const data = await response.json();
+            setCategories(data.data || []);
+          }
+        } catch (error) {
+          console.error('Failed to load categories:', error);
+        }
+      }
+    };
+    loadCategories();
+  }, [categories.length, setCategories]);
+
+  // Rankings 与桌面版保持一致
   const rankingLinks = [
     { href: "/rankings/popular", title: tRank('types.popular.title'), icon: TrendingUp },
     { href: "/rankings/top-rated", title: tRank('types.top-rated.title'), icon: Star },
-    { href: "/rankings/trending", title: tRank('types.trending.title'), icon: Trophy },
     { href: "/rankings/free", title: tRank('types.free.title'), icon: CheckCircle },
     { href: "/rankings/new", title: tRank('types.new.title'), icon: Plus },
-    { href: "/rankings/monthly-hot", title: tRank('types.monthly-hot.title'), icon: TrendingUp },
   ];
 
   return (
     <div className="md:hidden">
-      <button onClick={() => setIsOpen(!isOpen)}>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="p-2 rounded-lg hover:bg-muted transition-colors"
+        aria-label={isOpen ? '关闭菜单' : '打开菜单'}
+      >
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 mt-2 mx-4 p-4 rounded-xl shadow-lg bg-background/90 backdrop-blur-xl border">
-          <div className="flex flex-col gap-3">
-            <div className="space-y-2">
-              {/* Rankings Section */}
-              <div>
-                <button
-                  onClick={() => setRankingsOpen(!rankingsOpen)}
-                  className="w-full"
-                >
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-between hover:bg-primary/5 font-medium text-base rounded-lg h-12"
-                  >
-                    <div className="flex items-center">
-                      <Trophy className="h-5 w-5 mr-3 text-primary" />
-                      {t('navigation.rankings')}
-                    </div>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${rankingsOpen ? 'rotate-180' : ''}`} />
-                  </Button>
-                </button>
+        <>
+          {/* 遮罩层 */}
+          <div 
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40" 
+            onClick={() => setIsOpen(false)}
+            aria-label="关闭菜单"
+          />
+          
+          {/* 菜单内容 */}
+          <div className="absolute top-full left-0 right-0 mt-2 mx-2 sm:mx-4 z-50">
+            <div className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-lg p-3 sm:p-4">
+              <div className="flex flex-col space-y-4">
                 
-                {rankingsOpen && (
-                  <div className="mt-2 pl-8 space-y-1">
-                    <Link href="/rankings" className="block">
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start hover:bg-primary/5 text-sm rounded-lg h-10"
-                      >
-                        <Trophy className="h-4 w-4 mr-2 text-primary" />
-                        {tRank('view_all')}
-                      </Button>
-                    </Link>
-                    {rankingLinks.map((link) => (
-                      <Link key={link.href} href={link.href} className="block">
+                {/* Categories Section - 海域地图 */}
+                <div>
+                  <button
+                    onClick={() => setCategoriesOpen(!categoriesOpen)}
+                    className="w-full"
+                  >
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-between hover:bg-muted/50 font-medium text-sm sm:text-base rounded-lg h-10 sm:h-11"
+                    >
+                      <div className="flex items-center">
+                        <Map className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-primary" />
+                        {t('navigation.categories')}
+                      </div>
+                      <ChevronDown className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        categoriesOpen && "rotate-180"
+                      )} />
+                    </Button>
+                  </button>
+                  
+                  {categoriesOpen && (
+                    <div className="mt-2 pl-6 sm:pl-8 space-y-1">
+                      <Link href="/categories" className="block" onClick={() => setIsOpen(false)}>
                         <Button
                           variant="ghost"
-                          className="w-full justify-start hover:bg-primary/5 text-sm rounded-lg h-10"
+                          className="w-full justify-start hover:bg-accent text-sm rounded-lg h-9"
                         >
-                          <link.icon className="h-4 w-4 mr-2 text-primary" />
-                          {link.title}
+                          <Map className="h-4 w-4 mr-2 text-primary" />
+                          {t('filters.all_categories')}
                         </Button>
                       </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href="/scripts/ai-nav-collector.user.js"
-                      className="w-full"
+                      {categories.slice(0, 6).map((category: { id: number; name: string; slug: string }) => (
+                        <Link 
+                          key={category.id} 
+                          href={`/categories#${category.slug}`} 
+                          className="block" 
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start hover:bg-accent text-sm rounded-lg h-9"
+                          >
+                            {getCategoryIcon(category.slug)}
+                            <span className="ml-2">
+                              {category.name}
+                            </span>
+                          </Button>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Rankings Section - 排行榜航线 */}
+                <div>
+                  <button
+                    onClick={() => setRankingsOpen(!rankingsOpen)}
+                    className="w-full"
+                  >
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-between hover:bg-muted/50 font-medium text-sm sm:text-base rounded-lg h-10 sm:h-11"
                     >
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start hover:bg-primary/5 font-medium text-base rounded-lg h-12"
-                      >
-                        <Download className="h-5 w-5 mr-3 text-primary" />
-                        安装脚本
-                      </Button>
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-[300px] p-4">
-                    <p className="font-medium mb-2 text-primary">
-                      AI导航助手脚本
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      功能：自动识别并采集当前网页的AI工具信息，快速提交到AI导航。
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      需要先安装 Tampermonkey 或 Violentmonkey 浏览器扩展。
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+                      <div className="flex items-center">
+                        <Trophy className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-primary" />
+                        {t('navigation.rankings')}
+                      </div>
+                      <ChevronDown className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        rankingsOpen && "rotate-180"
+                      )} />
+                    </Button>
+                  </button>
+                  
+                  {rankingsOpen && (
+                    <div className="mt-2 pl-6 sm:pl-8 space-y-1">
+                      <Link href="/rankings" className="block" onClick={() => setIsOpen(false)}>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start hover:bg-accent text-sm rounded-lg h-9"
+                        >
+                          <Trophy className="h-4 w-4 mr-2 text-primary" />
+                          {tRank('view_all')}
+                        </Button>
+                      </Link>
+                      {rankingLinks.map((link) => (
+                        <Link 
+                          key={link.href} 
+                          href={link.href} 
+                          className="block" 
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start hover:bg-accent text-sm rounded-lg h-9"
+                          >
+                            <link.icon className="h-4 w-4 mr-2 text-muted-foreground" />
+                            {link.title}
+                          </Button>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-            <div className="space-y-2">
-              <Link href="/submit" className="w-full">
-                <Button className="w-full justify-start font-medium text-base rounded-lg h-12 bg-primary/10 hover:bg-primary/15 text-primary">
-                  <Plus className="h-5 w-5 mr-3" />
-                  提交网站
-                </Button>
-              </Link>
-              <Link href="/about" className="w-full">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start hover:bg-primary/5 font-medium text-base rounded-lg h-12"
-                >
-                  <Info className="h-5 w-5 mr-3 text-primary" />
-                  关于
-                </Button>
-              </Link>
-            </div>
+                {/* 分隔线 */}
+                <div className="h-px bg-border/50" />
 
-            <div className="h-px my-1 bg-border/10" />
-            <div className="flex justify-end pt-1">
-              <ThemeSwitch />
+                {/* 用户导航区域 */}
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-sm text-muted-foreground font-medium">
+                    {t('auth.account', 'Account')}
+                  </span>
+                  <div className="flex-shrink-0">
+                    <UserNav />
+                  </div>
+                </div>
+
+                {/* 分隔线 */}
+                <div className="h-px bg-border/50" />
+
+                {/* 控制面板 - 追随桌面版风格 */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground font-medium">
+                    {t('common.settings', 'Settings')}
+                  </span>
+                  <div className="flex-shrink-0">
+                    <LanguageSwitcher />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

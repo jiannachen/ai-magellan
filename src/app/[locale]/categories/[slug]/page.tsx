@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db/db';
 import CategoryPage from '@/components/category/category-page';
 
@@ -48,59 +48,94 @@ export default async function CategoryPageRoute({
 }) {
   const { slug } = await params;
   
-  // Get category data
+  // 获取分类信息
   const category = await prisma.category.findUnique({
     where: { slug },
-    select: { id: true, name: true, slug: true }
+    select: { 
+      id: true, 
+      name: true, 
+      slug: true,
+      parent_id: true
+    }
   });
 
   if (!category) {
-    notFound();
+    // 如果是子分类页面不存在，重定向到主分类页面
+    redirect(`/categories#${slug}`);
   }
 
-  // Get websites in this category
+  // 获取该分类下的网站
   const websites = await prisma.website.findMany({
-    where: { 
+    where: {
       category_id: category.id,
       status: 'approved'
     },
-    select: {
-      id: true,
-      title: true,
-      url: true,
-      description: true,
-      category_id: true,
-      thumbnail: true,
-      status: true,
-      visits: true,
-      likes: true,
-      quality_score: true,
-      is_featured: true,
-      is_trusted: true,
-      pricing_model: true,
-      has_free_version: true,
-      tagline: true,
-      features: true,
-      created_at: true,
-      updated_at: true,
-    },
     orderBy: [
       { is_featured: 'desc' },
-      { quality_score: 'desc' },
-      { visits: 'desc' }
+      { quality_score: 'desc' }
     ]
   });
 
-  // Get all categories for navigation
+  // 获取所有分类（用于导航）
   const allCategories = await prisma.category.findMany({
-    select: { id: true, name: true, slug: true }
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      parent_id: true,
+      _count: {
+        select: {
+          websites: {
+            where: {
+              status: 'approved'
+            }
+          }
+        }
+      }
+    },
+    orderBy: {
+      sort_order: 'asc'
+    }
   });
 
+  // 如果是子分类，获取父分类信息
+  let parentCategory = null;
+  if (category.parent_id) {
+    parentCategory = await prisma.category.findUnique({
+      where: { id: category.parent_id },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        children: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            _count: {
+              select: {
+                websites: {
+                  where: {
+                    status: 'approved'
+                  }
+                }
+              }
+            }
+          },
+          orderBy: {
+            sort_order: 'asc'
+          }
+        }
+      }
+    });
+  }
+
   return (
-    <CategoryPage
+    <CategoryPage 
       category={category}
       websites={websites}
       allCategories={allCategories}
+      parentCategory={parentCategory}
     />
   );
 }

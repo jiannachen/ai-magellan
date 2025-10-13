@@ -159,7 +159,7 @@ export default function FooterContent({
               className="flex items-center gap-3"
             >
               <div className="relative">
-                <Compass className="h-8 w-8 text-primary" />
+                <img src="/logo.png" alt="AI Magellan Logo" className="h-8 w-8 rounded-lg" />
                 <div className="absolute inset-0 rounded-full border-2 border-primary/20"></div>
               </div>
               <div className="flex flex-col">

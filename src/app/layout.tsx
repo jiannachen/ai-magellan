@@ -9,6 +9,7 @@ import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { Analytics as OtherAnalytics } from "@/components/analytics";
 import { getLocale } from 'next-intl/server';
 import { CriticalResources } from "@/components/performance/critical-resources";
+import ErrorDeduplicationProvider from "@/components/providers/error-deduplication-provider";
 
 // 全局SEO配置
 export const metadata: Metadata = {
@@ -127,6 +128,7 @@ export default async function RootLayout({
           ]}
         />
         <ClerkProvider>
+          <ErrorDeduplicationProvider />
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

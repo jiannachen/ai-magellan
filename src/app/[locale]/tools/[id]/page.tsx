@@ -108,24 +108,12 @@ interface Website {
   }
 }
 
-interface RelatedTool {
-  id: number
-  title: string
-  description: string
-  thumbnail: string | null
-  category: {
-    name: string
-  }
-  quality_score: number
-  is_featured: boolean
-}
 
 export default function ToolDetailPage() {
   const params = useParams()
   const { isSignedIn, user } = useUser()
   const t = useTranslations()
   const [website, setWebsite] = useState<Website | null>(null)
-  const [relatedTools, setRelatedTools] = useState<RelatedTool[]>([])
   const [loading, setLoading] = useState(true)
   const [isLiked, setIsLiked] = useState(false)
   const [isFavorited, setIsFavorited] = useState(false)
@@ -171,10 +159,6 @@ export default function ToolDetailPage() {
       setWebsite(website)
       setLikesCount(website._count?.websiteLikes || 0)
 
-      if (website.category?.id) {
-        fetchRelatedTools(website.category.id, website.id)
-      }
-
       recordVisit(website.id)
     } catch (error) {
       console.error('Error fetching tool details:', error)
@@ -184,18 +168,6 @@ export default function ToolDetailPage() {
     }
   }
 
-  const fetchRelatedTools = async (categoryId: number, currentToolId: number) => {
-    try {
-      const response = await fetch(`/api/websites?category=${categoryId}&limit=6`)
-      if (response.ok) {
-        const data = await response.json()
-        const tools = (data.data || data).filter((tool: RelatedTool) => tool.id !== currentToolId)
-        setRelatedTools(tools.slice(0, 6))
-      }
-    } catch (error) {
-      console.error('Error fetching related tools:', error)
-    }
-  }
 
   const recordVisit = async (websiteId: number) => {
     try {
@@ -210,20 +182,18 @@ export default function ToolDetailPage() {
     
     try {
       const [likesResponse, favoritesResponse] = await Promise.all([
-        fetch('/api/user/likes/check'),
-        fetch('/api/user/favorites/check')
+        fetch(`/api/user/likes/check?websiteId=${website.id}`),
+        fetch(`/api/user/favorites/check?websiteId=${website.id}`)
       ])
 
       if (likesResponse.ok) {
         const likesData = await likesResponse.json()
-        const userLikes = likesData.data || []
-        setIsLiked(userLikes.some((like: any) => like.websiteId === website.id))
+        setIsLiked(likesData.isLiked || false)
       }
 
       if (favoritesResponse.ok) {
         const favoritesData = await favoritesResponse.json()
-        const userFavorites = favoritesData.data || []
-        setIsFavorited(userFavorites.some((fav: any) => fav.websiteId === website.id))
+        setIsFavorited(favoritesData.isFavorited || false)
       }
     } catch (error) {
       console.error('Error checking user interactions:', error)
@@ -232,63 +202,151 @@ export default function ToolDetailPage() {
 
   const handleLike = async () => {
     if (!isSignedIn || !website) {
-      toast.error('Please sign in to like tools')
+      toast.error(t('profile.tools.detail.messages.sign_in_to_like'))
       return
     }
 
     try {
       const response = await fetch(`/api/websites/${website.id}/like`, {
-        method: 'POST'
+        method: isLiked ? 'DELETE' : 'POST'
       })
 
       if (response.ok) {
         setIsLiked(!isLiked)
         setLikesCount(prev => isLiked ? prev - 1 : prev + 1)
-        toast.success(isLiked ? 'Removed from likes' : 'Added to likes')
+        toast.success(isLiked ? t('profile.tools.detail.messages.removed_from_likes') : t('profile.tools.detail.messages.added_to_likes'))
       }
     } catch (error) {
       console.error('Error toggling like:', error)
-      toast.error('Failed to update like status')
+      toast.error(t('profile.tools.detail.messages.failed_to_update_like'))
     }
   }
 
   const handleFavorite = async () => {
     if (!isSignedIn || !website) {
-      toast.error('Please sign in to bookmark tools')
+      toast.error(t('profile.tools.detail.messages.sign_in_to_bookmark'))
       return
     }
 
     try {
-      const response = await fetch('/api/user/favorites', {
+      const response = await fetch(`/api/user/favorites${isFavorited ? `?websiteId=${website.id}` : ''}`, {
         method: isFavorited ? 'DELETE' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ websiteId: website.id })
+        body: isFavorited ? undefined : JSON.stringify({ websiteId: website.id })
       })
 
       if (response.ok) {
         setIsFavorited(!isFavorited)
-        toast.success(isFavorited ? 'Removed from bookmarks' : 'Added to bookmarks')
+        toast.success(isFavorited ? t('profile.tools.detail.messages.removed_from_bookmarks') : t('profile.tools.detail.messages.added_to_bookmarks'))
       }
     } catch (error) {
       console.error('Error toggling favorite:', error)
-      toast.error('Failed to update bookmark status')
+      toast.error(t('profile.tools.detail.messages.failed_to_update_bookmark'))
     }
   }
 
-  const handleShare = async () => {
-    if (navigator.share && website) {
+  const copyToClipboard = async (text: string) => {
+    console.log('Attempting to copy:', text)
+    
+    // 方法1：尝试现代 Clipboard API
+    if (navigator.clipboard && window.isSecureContext) {
       try {
-        await navigator.share({
-          title: website.title,
-          text: website.description,
-          url: window.location.href
-        })
+        await navigator.clipboard.writeText(text)
+        console.log('Clipboard API success')
+        return true
       } catch (error) {
-        console.error('Error sharing:', error)
+        console.warn('Clipboard API failed:', error)
       }
-    } else {
-      navigator.clipboard.writeText(window.location.href)
-      toast.success('Link copied to clipboard')
+    }
+    
+    // 方法2：降级到传统方法
+    try {
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      textArea.style.position = 'fixed'
+      textArea.style.left = '-999999px'
+      textArea.style.top = '-999999px'
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      
+      const success = document.execCommand('copy')
+      document.body.removeChild(textArea)
+      
+      console.log('execCommand result:', success)
+      if (success) {
+        return true
+      }
+    } catch (error) {
+      console.warn('execCommand failed:', error)
+    }
+    
+    // 方法3：最简单的降级方案 - 选择地址栏
+    try {
+      const selection = window.getSelection()
+      const range = document.createRange()
+      const span = document.createElement('span')
+      span.textContent = text
+      span.style.position = 'fixed'
+      span.style.left = '-9999px'
+      document.body.appendChild(span)
+      
+      range.selectNodeContents(span)
+      selection?.removeAllRanges()
+      selection?.addRange(range)
+      
+      const success = document.execCommand('copy')
+      document.body.removeChild(span)
+      selection?.removeAllRanges()
+      
+      console.log('Selection method result:', success)
+      if (success) {
+        return true
+      }
+    } catch (error) {
+      console.warn('Selection method failed:', error)
+    }
+    
+    return false
+  }
+
+  const handleShare = async () => {
+    if (!website) return
+    
+    const shareUrl = window.location.href
+    console.log('Share URL:', shareUrl)
+    
+    // 直接尝试复制，不依赖原生分享
+    try {
+      // 最简单直接的方法
+      await navigator.clipboard.writeText(shareUrl)
+      toast.success(t('common.copy_success'))
+      return
+    } catch (error) {
+      console.warn('Modern clipboard failed:', error)
+    }
+
+    // 降级方法
+    try {
+      const textArea = document.createElement('textarea')
+      textArea.value = shareUrl
+      textArea.style.position = 'absolute'
+      textArea.style.left = '-9999px'
+      document.body.appendChild(textArea)
+      textArea.select()
+      textArea.setSelectionRange(0, 99999)
+      
+      const success = document.execCommand('copy')
+      document.body.removeChild(textArea)
+      
+      if (success) {
+        toast.success(t('common.copy_success'))
+      } else {
+        toast.error(t('common.copy_failed') || `复制失败，请手动复制: ${shareUrl}`)
+      }
+    } catch (error) {
+      console.error('All copy methods failed:', error)
+      toast.error(t('common.copy_failed') || `复制失败，请手动复制: ${shareUrl}`)
     }
   }
 
@@ -366,7 +424,7 @@ export default function ToolDetailPage() {
                   
                   {/* Tagline/Description */}
                   <div className="pl-16">
-                    <p className="text-muted-foreground text-lg leading-relaxed">{website.tagline || website.description}</p>
+                    <p className="text-muted-foreground text-lg leading-relaxed">{website.tagline}</p>
                   </div>
                   
                   {/* Status Badges - 使用 AM.md 中定义的海洋色彩 */}
@@ -528,8 +586,8 @@ export default function ToolDetailPage() {
               {/* Description and Details Section */}
               <Card id="overview" className="p-6">
                 <CardContent className="px-0 space-y-6">
-                  {/* Detailed Description - only if different from tagline */}
-                  {website.description && website.description !== website.tagline && (
+                  {/* Detailed Description - always show */}
+                  {website.description && (
                     <div className="space-y-3">
                       <h3 className="font-semibold text-foreground flex items-center gap-2">
                         <Lightbulb className="h-5 w-5 text-primary" />
@@ -564,6 +622,7 @@ export default function ToolDetailPage() {
                     </div>
                   )}
 
+
                   {/* Tags */}
                   {website.tags && (
                     <div className="space-y-3">
@@ -583,7 +642,7 @@ export default function ToolDetailPage() {
 
                   {/* Category Info */}
                   <div className="p-4 rounded-lg bg-muted/50 border border-primary/10">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <div className="p-2 rounded-lg bg-primary/10">
                           <Map className="h-5 w-5 text-primary" />
@@ -593,12 +652,14 @@ export default function ToolDetailPage() {
                           <p className="text-sm text-muted-foreground">{website.category?.name}</p>
                         </div>
                       </div>
-                      <Link href={`/categories/${website.category?.slug || ''}`}>
-                        <Button variant="outline" size="sm">
-                          <Route className="h-4 w-4 mr-2" />
-                          {t('profile.tools.detail.actions.explore_category')}
-                        </Button>
-                      </Link>
+                      <div className="flex-shrink-0">
+                        <Link href={`/categories/${website.category?.slug || ''}`}>
+                          <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                            <Route className="h-4 w-4 mr-2" />
+                            {t('profile.tools.detail.actions.explore_category')}
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -636,7 +697,7 @@ export default function ToolDetailPage() {
               )}
 
               {/* Use Cases & Target Audience */}
-              {(website.use_cases?.length || website.target_audience?.length) && (
+              {((Array.isArray(website.use_cases) && website.use_cases.length > 0) || (Array.isArray(website.target_audience) && website.target_audience.length > 0)) && (
                 <Card id="audience" className="p-6">
                   <CardHeader className="px-0 pt-0">
                     <CardTitle className="flex items-center gap-2">
@@ -647,7 +708,7 @@ export default function ToolDetailPage() {
                   <CardContent className="px-0 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Use Cases */}
-                      {website.use_cases?.length && (
+                      {Array.isArray(website.use_cases) && website.use_cases.length > 0 && (
                         <div className="space-y-4">
                           <div className="flex items-center gap-2">
                             <Target className="h-5 w-5 text-primary" />
@@ -665,7 +726,7 @@ export default function ToolDetailPage() {
                       )}
 
                       {/* Target Audience */}
-                      {website.target_audience?.length && (
+                      {Array.isArray(website.target_audience) && website.target_audience.length > 0 && (
                         <div className="space-y-4">
                           <div className="flex items-center gap-2">
                             <Users className="h-5 w-5 text-primary" />
@@ -823,7 +884,7 @@ export default function ToolDetailPage() {
                   </div>
 
                   {/* Integrations */}
-                  {website.integrations?.length && (
+                  {Array.isArray(website.integrations) && website.integrations.length > 0 && (
                     <div className="space-y-3">
                       <h3 className="font-semibold">{t('profile.tools.detail.sections.integrations')}</h3>
                       <div className="flex flex-wrap gap-2">
@@ -928,7 +989,7 @@ export default function ToolDetailPage() {
                     )}
 
                     {/* Desktop Apps */}
-                    {website.desktop_platforms?.length && (
+                    {Array.isArray(website.desktop_platforms) && website.desktop_platforms.length > 0 && (
                       <div className="space-y-4">
                         <div className="flex items-center gap-3 mb-6">
                           <div className="p-2 rounded-lg bg-magellan-coral/8 border border-magellan-coral/15">
@@ -988,7 +1049,7 @@ export default function ToolDetailPage() {
               </Card>
 
               {/* FAQ Section */}
-              {website.faq?.length && (
+              {Array.isArray(website.faq) && website.faq.length > 0 && (
                 <Card className="p-6">
                   <CardHeader className="px-0 pt-0">
                     <CardTitle className="flex items-center gap-2">
@@ -1022,62 +1083,6 @@ export default function ToolDetailPage() {
                 </CardContent>
               </Card>
 
-              {/* Related Tools */}
-              {relatedTools.length > 0 && (
-                <Card className="p-6">
-                  <CardHeader className="px-0 pt-0">
-                    <CardTitle className="flex items-center gap-2">
-                      <Route className="h-5 w-5 text-primary" />
-                      {t('profile.tools.detail.sections.related_tools', { category: website.category?.name })}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="px-0">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {relatedTools.filter(tool => tool && tool.category).map((tool) => (
-                        <Link key={tool.id} href={`/tools/${tool.id}`}>
-                          <Card className="group h-full cursor-pointer hover:shadow-md transition-shadow">
-                            <CardContent className="p-4 space-y-3">
-                              <div className="aspect-video rounded-lg bg-gradient-to-br from-primary/5 to-magellan-teal/5 border border-primary/10 flex items-center justify-center">
-                                {tool.thumbnail ? (
-                                  <img 
-                                    src={tool.thumbnail} 
-                                    alt={tool.title}
-                                    className="w-full h-full object-cover rounded-lg"
-                                  />
-                                ) : (
-                                  <Map className="h-8 w-8 text-primary" />
-                                )}
-                              </div>
-                              <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                  <h3 className="font-semibold text-sm line-clamp-1 group-hover:text-primary transition-colors">
-                                    {tool.title}
-                                  </h3>
-                                  {tool.is_featured && (
-                                    <Crown className="h-3 w-3 text-magellan-gold" />
-                                  )}
-                                </div>
-                                <p className="text-xs text-muted-foreground line-clamp-2">
-                                  {tool.description}
-                                </p>
-                                <div className="flex items-center justify-between">
-                                  <Badge variant="secondary" className="text-xs">
-                                    {tool.category?.name || 'Uncategorized'}
-                                  </Badge>
-                                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                    <Star className="h-3 w-3" />
-                                    {tool.quality_score}
-                                  </div>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </Link>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
             </div>
           </div>
         </div>

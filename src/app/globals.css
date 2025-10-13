@@ -570,6 +570,27 @@
   .text-magellan-mint {
     color: hsl(var(--magellan-mint));
   }
+
+  .text-magellan-navy {
+    color: hsl(var(--magellan-navy));
+  }
+
+  /* 海洋深度文字颜色 */
+  .text-magellan-depth-900 {
+    color: hsl(var(--magellan-depth-900));
+  }
+
+  .text-magellan-depth-800 {
+    color: hsl(var(--magellan-depth-800));
+  }
+
+  .text-magellan-depth-700 {
+    color: hsl(var(--magellan-depth-700));
+  }
+
+  .text-magellan-depth-600 {
+    color: hsl(var(--magellan-depth-600));
+  }
   
   /* 海洋主题边框 */
   .border-magellan-primary {
@@ -583,10 +604,30 @@
   .border-magellan-gold {
     border-color: hsl(var(--magellan-gold));
   }
+
+  .border-magellan-teal {
+    border-color: hsl(var(--magellan-teal));
+  }
+
+  .border-magellan-mint {
+    border-color: hsl(var(--magellan-mint));
+  }
+
+  .border-magellan-navy {
+    border-color: hsl(var(--magellan-navy));
+  }
   
   /* 海洋主题背景色 */
   .bg-magellan-primary {
     background-color: hsl(var(--magellan-primary));
+  }
+
+  .bg-magellan-navy {
+    background-color: hsl(var(--magellan-navy));
+  }
+
+  .bg-magellan-teal {
+    background-color: hsl(var(--magellan-teal));
   }
   
   .bg-magellan-coral {
@@ -599,6 +640,15 @@
   
   .bg-magellan-mint {
     background-color: hsl(var(--magellan-mint));
+  }
+
+  /* 海洋深度背景色 */
+  .bg-magellan-depth-50 {
+    background-color: hsl(var(--magellan-depth-50));
+  }
+
+  .bg-magellan-depth-100 {
+    background-color: hsl(var(--magellan-depth-100));
   }
   
   /* 岛屿卡片效果 */

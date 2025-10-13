@@ -344,6 +344,16 @@
         "no": "否",
         "available": "可用",
         "not_available": "不可用"
+      },
+      "messages": {
+        "sign_in_to_like": "請先登入才能點讚工具",
+        "sign_in_to_bookmark": "請先登入才能收藏工具",
+        "added_to_likes": "已添加到喜歡",
+        "removed_from_likes": "已從喜歡中移除",
+        "added_to_bookmarks": "已添加到收藏",
+        "removed_from_bookmarks": "已從收藏中移除",
+        "failed_to_update_like": "更新喜歡狀態失敗",
+        "failed_to_update_bookmark": "更新收藏狀態失敗"
       }
     }
   },

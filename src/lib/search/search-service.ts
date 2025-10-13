@@ -83,7 +83,6 @@ export async function searchWebsites(params: SearchParams): Promise<{
         },
         {
           tags: {
-            not: null,
             contains: searchTerm,
             mode: 'insensitive'
           }
@@ -124,25 +123,27 @@ export async function searchWebsites(params: SearchParams): Promise<{
     }
 
     // 排序逻辑
-    const orderBy: any = {};
+    let orderBy: any = [];
     switch (searchParams.sortBy) {
       case 'created_at':
-        orderBy.created_at = searchParams.sortOrder;
+        orderBy = [{ created_at: searchParams.sortOrder }];
         break;
       case 'visits':
-        orderBy.visits = searchParams.sortOrder;
+        orderBy = [{ visits: searchParams.sortOrder }];
         break;
       case 'likes':
-        orderBy.likes = searchParams.sortOrder;
+        orderBy = [{ likes: searchParams.sortOrder }];
         break;
       case 'title':
-        orderBy.title = searchParams.sortOrder;
+        orderBy = [{ title: searchParams.sortOrder }];
         break;
       case 'quality_score':
       default:
         // 默认排序：精选优先，然后按质量评分
-        orderBy.is_featured = 'desc';
-        orderBy.quality_score = 'desc';
+        orderBy = [
+          { is_featured: 'desc' },
+          { quality_score: 'desc' }
+        ];
         break;
     }
 

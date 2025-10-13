@@ -192,9 +192,7 @@
     "faq": "FAQ",
     "faq_description": "Answer common questions",
     "add_feature": "Add Feature",
-    "add_use_case": "Add Use Case",
     "add_target_audience": "Add Target User",
-    "add_faq": "Add FAQ",
     "add_integration": "Add Integration"
   },
   "tools": {
@@ -346,6 +344,16 @@
         "no": "No",
         "available": "Available",
         "not_available": "Not Available"
+      },
+      "messages": {
+        "sign_in_to_like": "Please sign in to like tools",
+        "sign_in_to_bookmark": "Please sign in to bookmark tools",
+        "added_to_likes": "Added to likes",
+        "removed_from_likes": "Removed from likes",
+        "added_to_bookmarks": "Added to bookmarks",
+        "removed_from_bookmarks": "Removed from bookmarks",
+        "failed_to_update_like": "Failed to update like status",
+        "failed_to_update_bookmark": "Failed to update bookmark status"
       }
     }
   },

@@ -207,14 +207,14 @@ export default function DashboardPage() {
                 value={stats.totalSubmissions}
                 description={tProfile('dashboard.stats.discoveries_shared')}
                 icon={Map}
-                variant="success"
+                variant="highlight"
               />
               <StatCard
                 label={tProfile('dashboard.stats.endorsed_tools')}
                 value={stats.totalLikes}
                 description={tProfile('dashboard.stats.users_helped')}
                 icon={Heart}
-                variant="warning"
+                variant="highlight"
               />
             </div>
           </motion.div>

@@ -184,13 +184,23 @@ export default function MySubmissionsPage() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Page Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
-              <Map className="h-6 w-6 text-primary" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                <Map className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">{tProfile('submissions.title')}</h1>
+                <p className="text-muted-foreground">{tProfile('submissions.description')}</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">{tProfile('submissions.title')}</h1>
-              <p className="text-muted-foreground">{tProfile('submissions.description')}</p>
+            <div className="flex-shrink-0">
+              <Link href="/submit">
+                <Button className="bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90 !text-white [&_*]:!text-white w-full sm:w-auto">
+                  <Upload className="h-4 w-4 mr-2" />
+                  {tProfile('dashboard.actions.submit_new_tool')}
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -215,14 +225,14 @@ export default function MySubmissionsPage() {
                 value={submissions.filter(w => w.status === 'approved').length}
                 description={tProfile('submissions.approved')}
                 icon={CheckCircle}
-                variant="success"
+                variant="highlight"
               />
               <StatCard
                 label={`🟡 ${tProfile('submissions.pending_review')}`}
                 value={submissions.filter(w => w.status === 'pending').length}
                 description={tProfile('submissions.pending_review')}
                 icon={Clock}
-                variant="warning"
+                variant="highlight"
               />
             </div>
           </motion.div>

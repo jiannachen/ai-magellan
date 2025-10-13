@@ -8,7 +8,6 @@ import { websitesAtom, categoriesAtom } from "@/lib/atoms";
 import { CompactCard } from "@/components/website/compact-card";
 import { Button } from "@/ui/common/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/common/card";
-import { Badge } from "@/ui/common/badge";
 import { Input } from "@/ui/common/input";
 import { cn } from "@/lib/utils/utils";
 import { 
@@ -519,13 +518,10 @@ export default function SimplifiedHomePage({
               <div className="absolute -inset-1 bg-gradient-to-r from-primary/8 via-magellan-coral/8 to-magellan-teal/8 rounded-2xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all duration-500"></div>
               
               <div className="relative">
-                <div className="absolute left-5 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
-                  <Compass className="h-5 w-5 text-primary professional-compass" />
-                </div>
                 <Input
                   placeholder={tLanding('hero.search_placeholder')}
                   className={cn(
-                    "pl-14 pr-6 h-14 text-lg",
+                    "pl-6 pr-6 h-14 text-lg",
                     "rounded-xl border border-primary/15",
                     "bg-background/90 backdrop-blur-sm",
                     "focus:border-primary focus:bg-background",
@@ -549,20 +545,6 @@ export default function SimplifiedHomePage({
                   <Search className="h-4 w-4" />
                 </Button>
               </div>
-            </div>
-            
-            <div className="text-sm text-muted-foreground mt-3 flex items-center justify-center gap-2">
-              <span>💡 {tLanding('hero.popular_searches')}:</span>
-              {['ChatGPT', 'Midjourney', tLanding('hero.search_tags.coding_assistant'), tLanding('hero.search_tags.ai_writing')].map((tag) => (
-                <Badge 
-                  key={tag}
-                  variant="secondary" 
-                  className="cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors"
-                  onClick={() => handleSearch(tag)}
-                >
-                  {tag}
-                </Badge>
-              ))}
             </div>
           </motion.div>
 

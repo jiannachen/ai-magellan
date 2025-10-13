@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import SearchResults from './search-results';
 import SearchSkeleton from './search-skeleton';
 import { searchWebsites } from '@/lib/search/search-service';
+import { getTranslations } from 'next-intl/server';
 
 interface SearchPageProps {
   searchParams: Promise<{ 
@@ -73,20 +74,21 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 export async function generateMetadata({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const query = params.q || '';
+  const t = await getTranslations('search');
   
   if (!query) {
     return {
-      title: 'AI工具搜索 - AI Magellan',
-      description: '搜索和发现最优质的AI工具，找到最适合您需求的人工智能解决方案。',
+      title: t('title'),
+      description: t('description'),
     };
   }
 
   return {
-    title: `"${query}" 的搜索结果 - AI Magellan`,
-    description: `搜索 "${query}" 相关的AI工具，发现最适合您的人工智能解决方案。`,
+    title: t('page_title', { query }),
+    description: t('page_description', { query }),
     openGraph: {
-      title: `"${query}" 的搜索结果 - AI Magellan`,
-      description: `搜索 "${query}" 相关的AI工具，发现最适合您的人工智能解决方案。`,
+      title: t('page_title', { query }),
+      description: t('page_description', { query }),
     },
   };
 }

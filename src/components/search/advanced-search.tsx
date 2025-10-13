@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 import { 
   Search, 
   Filter, 
@@ -46,22 +47,6 @@ export interface SearchFilters {
   sortOrder?: 'asc' | 'desc'
 }
 
-const PRICING_OPTIONS = [
-  { value: 'free', label: '免费' },
-  { value: 'freemium', label: '免费增值' },
-  { value: 'paid', label: '付费' },
-  { value: 'enterprise', label: '企业版' }
-]
-
-const SORT_OPTIONS = [
-  { value: 'relevance', label: '相关度' },
-  { value: 'created_at', label: '最新添加' },
-  { value: 'visits', label: '访问量' },
-  { value: 'likes', label: '点赞数' },
-  { value: 'quality_score', label: '质量评分' },
-  { value: 'title', label: '名称' }
-]
-
 export function AdvancedSearch({ value, onChange, onFiltersChange, className }: AdvancedSearchProps) {
   const [showFilters, setShowFilters] = useState(false)
   const [searchFocused, setSearchFocused] = useState(false)
@@ -73,78 +58,124 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
     sortBy: 'relevance',
     sortOrder: 'desc'
   })
-  const [suggestions, setSuggestions] = useState<string[]>([])
-  const [showSuggestions, setShowSuggestions] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-
-  // 模拟搜索建议
-  const searchSuggestions = [
-    'AI写作工具', 'AI图像生成', 'AI视频编辑', 'AI代码助手', 
-    'AI聊天机器人', 'AI翻译工具', 'AI数据分析', 'AI设计工具',
-    'AI音频处理', 'AI项目管理', 'AI营销工具', 'AI学习平台'
+  
+  // 翻译hooks
+  const t = useTranslations('search')
+  
+  // 获取翻译后的选项
+  const PRICING_OPTIONS = [
+    { value: 'free', label: t('filters.pricing_free') },
+    { value: 'freemium', label: t('filters.pricing_freemium') },
+    { value: 'paid', label: t('filters.pricing_paid') },
+    { value: 'enterprise', label: t('filters.pricing_enterprise') }
   ]
 
+  const SORT_OPTIONS = [
+    { value: 'relevance', label: t('filters.sort_relevance') },
+    { value: 'created_at', label: t('filters.sort_newest') },
+    { value: 'visits', label: t('filters.sort_visits') },
+    { value: 'likes', label: t('filters.sort_likes') },
+    { value: 'quality_score', label: t('filters.sort_quality') },
+    { value: 'title', label: t('filters.sort_name') }
+  ]
+
+
   useEffect(() => {
+    // 只同步值，不触发搜索
     setFilters(prev => ({ ...prev, query: value }))
   }, [value])
 
-  useEffect(() => {
-    onFiltersChange(filters)
-  }, [filters, onFiltersChange])
+  // 移除自动触发搜索的 useEffect
+  // useEffect(() => {
+  //   onFiltersChange(filters)
+  // }, [filters, onFiltersChange])
 
-  useEffect(() => {
-    if (value) {
-      const filtered = searchSuggestions.filter(suggestion =>
-        suggestion.toLowerCase().includes(value.toLowerCase()) && suggestion !== value
-      )
-      setSuggestions(filtered.slice(0, 5))
-    } else {
-      setSuggestions([])
-    }
-  }, [value])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false)
-        setSearchFocused(false)
+      // 增加空值检查
+      if (searchRef.current && event.target && event.target instanceof Node) {
+        if (!searchRef.current.contains(event.target)) {
+          setSearchFocused(false)
+        }
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    // 只在组件挂载时添加监听器
+    if (typeof document !== 'undefined') {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    
+    return () => {
+      // 确保清理时移除监听器
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('mousedown', handleClickOutside)
+      }
+    }
   }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value
     onChange(newValue)
-    setShowSuggestions(newValue.length > 0)
+  }
+
+  const handleSearch = () => {
+    if (value.trim()) {
+      const searchFilters: SearchFilters = {
+        ...filters,
+        query: value.trim()
+      }
+      onFiltersChange(searchFilters)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSearch()
+    }
   }
 
   const handleFilterChange = (key: keyof SearchFilters, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }))
+    const newFilters = { ...filters, [key]: value }
+    setFilters(newFilters)
+    
+    // 立即触发搜索（除了查询词变化）
+    if (key !== 'query') {
+      onFiltersChange(newFilters)
+    }
   }
 
   const handlePricingToggle = (pricing: string) => {
-    setFilters(prev => ({
-      ...prev,
-      pricingModel: prev.pricingModel?.includes(pricing)
-        ? prev.pricingModel.filter(p => p !== pricing)
-        : [...(prev.pricingModel || []), pricing]
-    }))
+    const newPricingModel = filters.pricingModel?.includes(pricing)
+      ? filters.pricingModel.filter(p => p !== pricing)
+      : [...(filters.pricingModel || []), pricing]
+    
+    const newFilters = {
+      ...filters,
+      pricingModel: newPricingModel
+    }
+    
+    setFilters(newFilters)
+    // 立即触发搜索
+    onFiltersChange(newFilters)
   }
 
   const clearFilters = () => {
-    setFilters({
+    const clearedFilters = {
       query: '',
       pricingModel: [],
       minQualityScore: 0,
       tags: [],
       sortBy: 'relevance',
-      sortOrder: 'desc'
-    })
+      sortOrder: 'desc' as 'desc'
+    }
+    setFilters(clearedFilters)
     onChange('')
+    // 立即触发搜索以清除结果
+    onFiltersChange(clearedFilters)
   }
 
   const hasActiveFilters = !!(
@@ -168,89 +199,74 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
           "transition-all duration-200",
           searchFocused && "ring-2 ring-primary/20 border-primary/30"
         )}>
-          <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
           <Input
             ref={inputRef}
             type="text"
-            placeholder="搜索AI工具... (例如: AI写作、图像生成)"
+            placeholder={t('placeholder')}
             value={value}
             onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
             onFocus={() => {
               setSearchFocused(true)
-              setShowSuggestions(value.length > 0)
             }}
             className={cn(
-              "flex-1 pl-10 pr-20 py-3 border-0 bg-transparent",
-              "placeholder:text-muted-foreground",
+              "flex-1 pl-4 pr-24 sm:pr-28 py-2.5 sm:py-3 border-0 bg-transparent",
+              "placeholder:text-muted-foreground text-sm sm:text-base",
               "focus-visible:ring-0 focus-visible:ring-offset-0"
             )}
           />
           
-          {/* 清除和过滤按钮 */}
-          <div className="absolute right-2 flex items-center gap-1">
+          {/* 清除、搜索和过滤按钮 - 移动端优化 */}
+          <div className="absolute right-2 flex items-center gap-0.5 sm:gap-1">
             {value && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => {
                   onChange('')
-                  inputRef.current?.focus()
+                  // 安全地处理输入框焦点
+                  if (inputRef.current && inputRef.current.focus) {
+                    try {
+                      inputRef.current.focus()
+                    } catch (e) {
+                      console.warn('Failed to focus input:', e)
+                    }
+                  }
                 }}
-                className="h-7 w-7 p-0 hover:bg-muted"
+                className="h-6 w-6 sm:h-7 sm:w-7 p-0 hover:bg-muted"
               >
                 <X className="h-3 w-3" />
               </Button>
             )}
+            
+            {/* 搜索按钮 */}
+            <Button
+              size="sm"
+              onClick={handleSearch}
+              className="h-6 sm:h-7 px-1 sm:px-2 gap-0.5 sm:gap-1"
+              disabled={!value.trim()}
+            >
+              <Search className="h-3 w-3" />
+              <span className="hidden sm:inline text-xs">{t('search_button')}</span>
+            </Button>
             
             <Button
               variant={showFilters ? "default" : "ghost"}
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
               className={cn(
-                "h-7 px-2 gap-1",
+                "h-6 sm:h-7 px-1 sm:px-2 gap-0.5 sm:gap-1",
                 hasActiveFilters && !showFilters && "border-primary/30 bg-primary/5 text-primary"
               )}
             >
               <SlidersHorizontal className="h-3 w-3" />
               {hasActiveFilters && !showFilters && (
-                <span className="text-xs">({Object.values(filters).filter(Boolean).length})</span>
+                <span className="text-xs hidden xs:inline">({Object.values(filters).filter(Boolean).length})</span>
               )}
             </Button>
           </div>
         </div>
 
-        {/* 搜索建议 */}
-        <AnimatePresence>
-          {showSuggestions && suggestions.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="absolute top-full left-0 right-0 z-50 mt-1"
-            >
-              <Card className="shadow-lg border-border/50">
-                <CardContent className="p-2">
-                  {suggestions.map((suggestion, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        onChange(suggestion)
-                        setShowSuggestions(false)
-                        inputRef.current?.focus()
-                      }}
-                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted transition-colors text-sm"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Search className="h-3 w-3 text-muted-foreground" />
-                        {suggestion}
-                      </div>
-                    </button>
-                  ))}
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       {/* 高级过滤面板 */}
@@ -268,12 +284,12 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Filter className="h-5 w-5" />
-                    高级筛选
+                    {t('advanced_filters')}
                   </CardTitle>
                   <div className="flex items-center gap-2">
                     {hasActiveFilters && (
                       <Button variant="outline" size="sm" onClick={clearFilters}>
-                        清除筛选
+                        {t('clear_filters')}
                       </Button>
                     )}
                     <Button variant="ghost" size="sm" onClick={() => setShowFilters(false)}>
@@ -288,7 +304,7 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                 <div>
                   <label className="text-sm font-medium mb-3 flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    定价模型
+                    {t('filters.pricing_model')}
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {PRICING_OPTIONS.map((option) => (
@@ -314,7 +330,7 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                 <div>
                   <label className="text-sm font-medium mb-3 flex items-center gap-2">
                     <Star className="h-4 w-4" />
-                    最低质量评分: {filters.minQualityScore}
+                    {t('filters.quality_score', { score: filters.minQualityScore })}
                   </label>
                   <Slider
                     value={[filters.minQualityScore || 0]}
@@ -336,7 +352,7 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                 <div>
                   <label className="text-sm font-medium mb-3 flex items-center gap-2">
                     <Shield className="h-4 w-4" />
-                    特性筛选
+                    {t('filters.features')}
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="flex items-center space-x-2">
@@ -345,7 +361,7 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                         checked={filters.isTrusted}
                         onCheckedChange={(checked) => handleFilterChange('isTrusted', checked)}
                       />
-                      <label htmlFor="trusted" className="text-sm">可信工具</label>
+                      <label htmlFor="trusted" className="text-sm">{t('filters.trusted_tools')}</label>
                     </div>
                     
                     <div className="flex items-center space-x-2">
@@ -354,7 +370,7 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                         checked={filters.isFeatured}
                         onCheckedChange={(checked) => handleFilterChange('isFeatured', checked)}
                       />
-                      <label htmlFor="featured" className="text-sm">精选工具</label>
+                      <label htmlFor="featured" className="text-sm">{t('filters.featured_tools')}</label>
                     </div>
                     
                     <div className="flex items-center space-x-2">
@@ -363,7 +379,7 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                         checked={filters.hasFreePlan}
                         onCheckedChange={(checked) => handleFilterChange('hasFreePlan', checked)}
                       />
-                      <label htmlFor="freePlan" className="text-sm">有免费版本</label>
+                      <label htmlFor="freePlan" className="text-sm">{t('filters.free_version')}</label>
                     </div>
                     
                     <div className="flex items-center space-x-2">
@@ -372,7 +388,7 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                         checked={filters.sslEnabled}
                         onCheckedChange={(checked) => handleFilterChange('sslEnabled', checked)}
                       />
-                      <label htmlFor="ssl" className="text-sm">SSL安全</label>
+                      <label htmlFor="ssl" className="text-sm">{t('filters.ssl_security')}</label>
                     </div>
                   </div>
                 </div>
@@ -384,7 +400,7 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                   <div>
                     <label className="text-sm font-medium mb-2 flex items-center gap-2">
                       <TrendingUp className="h-4 w-4" />
-                      排序方式
+                      {t('filters.sort_by')}
                     </label>
                     <Select
                       value={filters.sortBy}
@@ -404,7 +420,7 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                   </div>
                   
                   <div>
-                    <label className="text-sm font-medium mb-2 block">排序方向</label>
+                    <label className="text-sm font-medium mb-2 block">{t('filters.sort_direction')}</label>
                     <Select
                       value={filters.sortOrder}
                       onValueChange={(value: 'asc' | 'desc') => handleFilterChange('sortOrder', value)}
@@ -413,8 +429,8 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="desc">降序</SelectItem>
-                        <SelectItem value="asc">升序</SelectItem>
+                        <SelectItem value="desc">{t('filters.sort_desc')}</SelectItem>
+                        <SelectItem value="asc">{t('filters.sort_asc')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -446,14 +462,14 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
           
           {filters.minQualityScore && filters.minQualityScore > 0 && (
             <Badge variant="secondary">
-              质量评分 ≥ {filters.minQualityScore}
+              {t('filters.quality_score', { score: filters.minQualityScore })}
             </Badge>
           )}
           
-          {filters.isTrusted && <Badge variant="secondary">可信工具</Badge>}
-          {filters.isFeatured && <Badge variant="secondary">精选工具</Badge>}
-          {filters.hasFreePlan && <Badge variant="secondary">免费版本</Badge>}
-          {filters.sslEnabled && <Badge variant="secondary">SSL安全</Badge>}
+          {filters.isTrusted && <Badge variant="secondary">{t('filters.trusted_tools')}</Badge>}
+          {filters.isFeatured && <Badge variant="secondary">{t('filters.featured_tools')}</Badge>}
+          {filters.hasFreePlan && <Badge variant="secondary">{t('filters.free_version')}</Badge>}
+          {filters.sslEnabled && <Badge variant="secondary">{t('filters.ssl_security')}</Badge>}
         </motion.div>
       )}
     </div>

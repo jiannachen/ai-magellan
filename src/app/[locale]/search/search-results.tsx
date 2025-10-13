@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { CompactCard } from '@/components/website/compact-card';
+import { AdvancedSearch, SearchFilters } from '@/components/search/advanced-search';
 import { Button } from '@/ui/common/button';
 import { Input } from '@/ui/common/input';
 import { Badge } from '@/ui/common/badge';
@@ -35,7 +37,10 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
   const [data, setData] = useState<SearchResult | null>(initialData);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState(initialSearchParams.q || '');
-  const [showFilters, setShowFilters] = useState(false);
+  
+  // 翻译hooks
+  const t = useTranslations('search');
+  const tCommon = useTranslations('common');
 
   // 搜索函数
   const performSearch = async (params: URLSearchParams) => {
@@ -58,19 +63,26 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
     }
   };
 
-  // 处理搜索提交
-  const handleSearch = (query: string = searchQuery) => {
-    if (!query.trim()) return;
-    
+  // 处理筛选器变化
+  const handleFiltersChange = (filters: SearchFilters) => {
     const params = new URLSearchParams();
-    params.set('q', query.trim());
     
-    // 保持其他过滤参数
-    searchParams.forEach((value, key) => {
-      if (key !== 'q' && key !== 'page') {
-        params.set(key, value);
-      }
-    });
+    // 设置查询参数
+    if (filters.query) {
+      params.set('q', filters.query);
+    }
+    
+    // 设置筛选参数
+    if (filters.category) params.set('category', filters.category);
+    if (filters.pricingModel?.length) {
+      filters.pricingModel.forEach(model => params.append('pricingModel', model));
+    }
+    if (filters.minQualityScore) params.set('minQualityScore', filters.minQualityScore.toString());
+    if (filters.isTrusted) params.set('isTrusted', 'true');
+    if (filters.isFeatured) params.set('isFeatured', 'true');
+    if (filters.hasFreePlan) params.set('hasFreePlan', 'true');
+    if (filters.sortBy && filters.sortBy !== 'relevance') params.set('sortBy', filters.sortBy === 'relevance' ? 'quality_score' : filters.sortBy);
+    if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
     
     // 重置到第一页
     params.set('page', '1');
@@ -85,27 +97,16 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
     router.push(`/search?${params.toString()}`);
   };
 
-  // 处理过滤器变化
-  const handleFilterChange = (key: string, value: string | boolean) => {
-    const params = new URLSearchParams(searchParams.toString());
-    
-    if (value === false || value === '' || value === null) {
-      params.delete(key);
-    } else {
-      params.set(key, value.toString());
-    }
-    
-    // 过滤器变化时重置到第一页
-    params.set('page', '1');
-    router.push(`/search?${params.toString()}`);
-  };
-
   // 监听URL变化并更新搜索
   useEffect(() => {
     const query = searchParams.get('q');
-    if (query && query !== searchQuery) {
+    if (query) {
       setSearchQuery(query);
       performSearch(searchParams);
+    } else {
+      // 清空搜索结果如果没有查询参数
+      setData(null);
+      setSearchQuery('');
     }
   }, [searchParams]);
 
@@ -133,77 +134,32 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
     <>
       {/* 搜索头部 */}
       <section className="bg-gradient-to-br from-primary/5 via-background to-background border-b sticky top-0 z-10 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
           <div className="flex items-center gap-4 mb-6">
             <Link href="/">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
-                返回首页
+                {t('back_to_home')}
               </Button>
             </Link>
             <div className="flex items-center gap-2 text-muted-foreground">
               <Compass className="h-4 w-4" />
-              <span className="text-sm">AI工具搜索</span>
+              <span className="text-sm">{t('page_header')}</span>
             </div>
           </div>
 
-          {/* 搜索栏 */}
-          <div className="max-w-2xl mx-auto">
-            <div className="relative group">
-              <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                <Search className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <Input
-                placeholder="搜索AI工具..."
-                className={cn(
-                  "pl-12 pr-12 h-12 text-base",
-                  "rounded-xl border border-primary/20",
-                  "bg-background/90 backdrop-blur-sm",
-                  "focus:border-primary focus:bg-background",
-                  "shadow-sm hover:shadow-md transition-all duration-300"
-                )}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleSearch();
-                  }
-                }}
-              />
-              <Button 
-                size="sm"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8"
-                onClick={() => handleSearch()}
-                disabled={loading}
-              >
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Search className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* 过滤器切换 */}
-          <div className="flex justify-center mt-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowFilters(!showFilters)}
-              className="gap-2"
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              高级筛选
-              <Filter className={cn("h-4 w-4 transition-transform", showFilters && "rotate-180")} />
-            </Button>
-          </div>
+          {/* 高级搜索组件 */}
+          <AdvancedSearch
+            value={searchQuery}
+            onChange={setSearchQuery}
+            onFiltersChange={handleFiltersChange}
+          />
         </div>
       </section>
 
       {/* 搜索结果 */}
       <section className="py-8">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-3 sm:px-4">
           <div className="space-y-6">
             {/* 搜索结果统计 */}
             {currentQuery && (
@@ -211,11 +167,11 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
                 <div className="flex items-center gap-2">
                   <Map className="h-5 w-5 text-primary" />
                   <h1 className="text-xl font-semibold">
-                    搜索结果: "{currentQuery}"
+                    {t('results_title', { query: currentQuery })}
                   </h1>
                   {data && (
                     <Badge variant="secondary">
-                      {data.pagination.total} 个结果
+                      {t('results_count', { count: data.pagination.total })}
                     </Badge>
                   )}
                 </div>
@@ -227,7 +183,7 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
               <div className="flex items-center justify-center py-16">
                 <div className="text-center space-y-4">
                   <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-                  <p className="text-muted-foreground">正在搜索...</p>
+                  <p className="text-muted-foreground">{t('searching')}</p>
                 </div>
               </div>
             )}
@@ -236,7 +192,7 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
             {!loading && currentQuery ? (
               data && data.websites.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                     {data.websites.map((website, index) => (
                       <motion.div
                         key={website.id}
@@ -263,7 +219,7 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
                         disabled={!data.pagination.hasPrevPage || loading}
                       >
                         <ChevronLeft className="h-4 w-4" />
-                        上一页
+                        {t('pagination.previous')}
                       </Button>
                       
                       <div className="flex items-center gap-1">
@@ -291,7 +247,7 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={!data.pagination.hasNextPage || loading}
                       >
-                        下一页
+                        {t('pagination.next')}
                         <ChevronRight className="h-4 w-4" />
                       </Button>
                     </div>
@@ -303,9 +259,9 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
                     <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto">
                       <Search className="h-8 w-8 text-muted-foreground" />
                     </div>
-                    <h3 className="text-lg font-medium">没有找到相关结果</h3>
+                    <h3 className="text-lg font-medium">{t('no_results_title')}</h3>
                     <p className="text-muted-foreground">
-                      尝试使用不同的关键词或调整筛选条件
+                      {t('no_results_desc')}
                     </p>
                     <Button
                       variant="outline"
@@ -315,7 +271,7 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
                       }}
                       className="mt-4"
                     >
-                      清除搜索条件
+                      {t('clear_search')}
                     </Button>
                   </div>
                 </div>
@@ -327,22 +283,10 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
                     <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                       <Compass className="h-8 w-8 text-primary" />
                     </div>
-                    <h3 className="text-lg font-medium">开始探索AI工具</h3>
+                    <h3 className="text-lg font-medium">{t('start_exploring_title')}</h3>
                     <p className="text-muted-foreground">
-                      在上方搜索框中输入关键词来发现优质的AI工具
+                      {t('start_exploring_desc')}
                     </p>
-                    <div className="flex flex-wrap justify-center gap-2 mt-6">
-                      {['ChatGPT', 'Midjourney', '编程助手', 'AI写作'].map((tag) => (
-                        <Badge 
-                          key={tag}
-                          variant="secondary" 
-                          className="cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors"
-                          onClick={() => handleSearch(tag)}
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
                   </div>
                 </div>
               )

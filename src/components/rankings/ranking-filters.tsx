@@ -21,12 +21,12 @@ interface RankingFiltersProps {
 
 // 时间范围选项 - 航海时间线
 const timeRangeOptions = [
-  { value: 'all', labelKey: 'filters.time_range.all_time', icon: Compass },
-  { value: 'today', labelKey: 'filters.time_range.today', icon: Clock },
-  { value: 'week', labelKey: 'filters.time_range.this_week', icon: Calendar },
-  { value: 'month', labelKey: 'filters.time_range.this_month', icon: Calendar },
-  { value: 'quarter', labelKey: 'filters.time_range.this_quarter', icon: TrendingUp },
-  { value: 'year', labelKey: 'filters.time_range.this_year', icon: Route }
+  { value: 'all', labelKey: 'filters.time_ranges.all_time', icon: Compass },
+  { value: 'today', labelKey: 'filters.time_ranges.today', icon: Clock },
+  { value: 'week', labelKey: 'filters.time_ranges.this_week', icon: Calendar },
+  { value: 'month', labelKey: 'filters.time_ranges.this_month', icon: Calendar },
+  { value: 'quarter', labelKey: 'filters.time_ranges.this_quarter', icon: TrendingUp },
+  { value: 'year', labelKey: 'filters.time_ranges.this_year', icon: Route }
 ];
 
 export default function RankingFilters({

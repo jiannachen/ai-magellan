@@ -19,7 +19,7 @@ const defaultSettings: SiteSettings = {
   keywords: ["AI导航", "AI工具", "人工智能", "AI资源", "AI网站导航"],
   author: "AI导航",
   url: "https://ai-nav.cn",
-  logo: "/static/logo.png",
+  logo: "/logo.png",
   themeColor: {
     light: "white",
     dark: "#020817"

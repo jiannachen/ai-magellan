@@ -156,7 +156,9 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
         }}
       >
         {rank <= 3 ? (
-          <Crown className="w-3 h-3" />
+          rank === 1 ? <Crown className="w-3 h-3" /> :
+          rank === 2 ? <Trophy className="w-3 h-3" /> :
+          <Star className="w-3 h-3 fill-current" />
         ) : (
           <span className="font-semibold text-xs">{rank}</span>
         )}
@@ -242,7 +244,7 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
         </div>
 
         {/* 宝藏发现网格 - 海洋主题 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {data.slice(0, 12).map((website: any, index: number) => (
             <motion.div
               key={website.id}
@@ -319,12 +321,12 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
             </div>
             
             <h1 className={cn(
-              "text-5xl md:text-6xl lg:text-7xl font-bold leading-tight",
+              "text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight",
               "bg-gradient-to-r from-primary via-magellan-gold to-magellan-coral bg-clip-text text-transparent"
             )}>
               🗺️ {tRank('home_header_title')}
             </h1>
-            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               ⚓ {tRank('home_header_subtitle')}
             </p>
           </motion.div>
@@ -337,7 +339,7 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
               duration: 0.5, 
               delay: 0.3
             }}
-            className="mt-16 flex justify-center gap-8 text-sm text-muted-foreground flex-wrap"
+            className="mt-12 sm:mt-16 flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-muted-foreground"
           >
             <div className="flex items-center gap-2 group">
               <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
@@ -390,7 +392,7 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {rankingTypes.map((type, index) => (
               <motion.div
                 key={type.key}
@@ -523,7 +525,7 @@ export default function RankingsHomePage({ rankings, categories, totalTools }: R
               🌊 {tRank('cta_subtitle')}
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center sm:items-stretch">
               <Link href="/categories">
                 <Button 
                   size="lg" 

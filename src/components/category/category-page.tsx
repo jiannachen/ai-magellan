@@ -2,34 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent } from '@/ui/common/card';
 import { Button } from '@/ui/common/button';
-import { Badge } from '@/ui/common/badge';
-import { Input } from '@/ui/common/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/common/select';
 import { CompactCard } from '@/components/website/compact-card';
+import { AdvancedSearch, SearchFilters } from '@/components/search/advanced-search';
+import { useTranslations } from 'next-intl';
 import {
-  Search,
-  Filter,
-  Grid3X3,
-  List,
-  Star,
-  Heart,
-  Eye,
-  ExternalLink,
-  TrendingUp,
-  Clock,
-  Award,
-  CheckCircle,
-  Bookmark,
+  Compass,
   ArrowLeft,
-  SlidersHorizontal,
   Brain,
   Code,
   Image,
   PenTool,
   MessageSquare,
-  Sparkles
+  Sparkles,
+  Telescope
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
@@ -39,106 +25,188 @@ interface CategoryPageProps {
     id: number;
     name: string;
     slug: string;
+    parent_id: number | null;
   };
   websites: any[];
   allCategories: any[];
+  parentCategory?: {
+    id: number;
+    name: string;
+    slug: string;
+    children: Array<{
+      id: number;
+      name: string;
+      slug: string;
+      _count: {
+        websites: number;
+      };
+    }>;
+  } | null;
 }
 
-type SortOption = 'featured' | 'popular' | 'newest' | 'rating' | 'name';
-type FilterOption = 'all' | 'free' | 'paid' | 'freemium';
 
-// Category icons mapping
-const categoryIcons = {
+// 专业级动画变量
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.1, 0.25, 1]
+    }
+  }
+};
+
+// Maritime-themed category icons mapping - 海域探索图标
+const categoryIcons: Record<string, any> = {
   'ai-chat': MessageSquare,
   'ai-art': Image,
   'ai-writing': PenTool,
   'ai-coding': Code,
   'ai-tools': Brain,
   'llm': Sparkles,
+  'machine-learning': Brain,
+  'data-science': Brain,
+  'automation': Sparkles,
+  'productivity': Compass,
+  'design': Image,
+  'marketing': Sparkles,
+  'education': Brain,
+  'business': Sparkles,
+  'research': Telescope,
+  'entertainment': Sparkles,
+  'finance': Sparkles,
+  'healthcare': Compass,
+  'development': Code,
+  'analytics': Sparkles,
+  'default': Brain
 };
 
-export default function CategoryPage({ category, websites: initialWebsites, allCategories }: CategoryPageProps) {
+export default function CategoryPage({ category, websites: initialWebsites }: CategoryPageProps) {
   const { user } = useUser();
+  const tCategory = useTranslations('pages.categories');
+  const tCommon = useTranslations('common');
   const [websites, setWebsites] = useState(initialWebsites);
   const [filteredWebsites, setFilteredWebsites] = useState(initialWebsites);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>('featured');
-  const [priceFilter, setPriceFilter] = useState<FilterOption>('all');
-  const [userLikes, setUserLikes] = useState<Set<number>>(new Set());
-  const [userFavorites, setUserFavorites] = useState<Set<number>>(new Set());
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
+    query: '',
+    pricingModel: [],
+    minQualityScore: 0,
+    tags: [],
+    sortBy: 'relevance',
+    sortOrder: 'desc'
+  });
 
   // Load user interactions if logged in
   useEffect(() => {
     if (user) {
-      Promise.all([
-        fetch('/api/user/likes/check').then(res => res.ok ? res.json() : { data: [] }),
-        fetch('/api/user/favorites/check').then(res => res.ok ? res.json() : { data: [] })
-      ]).then(([likesRes, favoritesRes]) => {
-        if (likesRes.data) {
-          setUserLikes(new Set(likesRes.data.map((item: any) => item.websiteId)));
-        }
-        if (favoritesRes.data) {
-          setUserFavorites(new Set(favoritesRes.data.map((item: any) => item.websiteId)));
-        }
-      }).catch(console.error);
+      // Future implementation for user interactions
     }
   }, [user]);
 
-  // Filter and sort websites
+  // Filter and sort websites using the advanced search logic
   useEffect(() => {
     let filtered = [...websites];
 
     // Apply search filter
-    if (searchQuery) {
+    if (searchFilters.query) {
       filtered = filtered.filter(website =>
-        website.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        website.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (website.tagline && website.tagline.toLowerCase().includes(searchQuery.toLowerCase()))
+        website.title.toLowerCase().includes(searchFilters.query.toLowerCase()) ||
+        website.description.toLowerCase().includes(searchFilters.query.toLowerCase()) ||
+        (website.tagline && website.tagline.toLowerCase().includes(searchFilters.query.toLowerCase()))
       );
     }
 
-    // Apply price filter
-    if (priceFilter !== 'all') {
-      if (priceFilter === 'free') {
-        filtered = filtered.filter(website => 
-          website.pricing_model === 'free' || website.has_free_version
-        );
-      } else if (priceFilter === 'paid') {
-        filtered = filtered.filter(website => 
-          website.pricing_model !== 'free' && !website.has_free_version
-        );
-      } else if (priceFilter === 'freemium') {
-        filtered = filtered.filter(website => 
-          website.pricing_model === 'freemium'
-        );
-      }
+    // Apply pricing model filter
+    if (searchFilters.pricingModel && searchFilters.pricingModel.length > 0) {
+      filtered = filtered.filter(website => {
+        if (searchFilters.pricingModel?.includes('free')) {
+          if (website.pricing_model === 'free' || website.has_free_version) return true;
+        }
+        if (searchFilters.pricingModel?.includes('freemium')) {
+          if (website.pricing_model === 'freemium') return true;
+        }
+        if (searchFilters.pricingModel?.includes('paid')) {
+          if (website.pricing_model !== 'free' && !website.has_free_version && website.pricing_model !== 'freemium') return true;
+        }
+        return false;
+      });
+    }
+
+    // Apply quality score filter
+    if (searchFilters.minQualityScore && searchFilters.minQualityScore > 0) {
+      filtered = filtered.filter(website => website.quality_score >= (searchFilters.minQualityScore || 0));
+    }
+
+    // Apply feature filters
+    if (searchFilters.isTrusted) {
+      filtered = filtered.filter(website => website.is_trusted);
+    }
+    if (searchFilters.isFeatured) {
+      filtered = filtered.filter(website => website.is_featured);
+    }
+    if (searchFilters.hasFreePlan) {
+      filtered = filtered.filter(website => website.has_free_version);
+    }
+    if (searchFilters.sslEnabled) {
+      filtered = filtered.filter(website => website.ssl_enabled);
     }
 
     // Apply sorting
+    const sortBy = searchFilters.sortBy || 'relevance';
+    const sortOrder = searchFilters.sortOrder || 'desc';
+
     switch (sortBy) {
-      case 'featured':
+      case 'relevance':
+      default:
         filtered.sort((a, b) => {
           if (a.is_featured && !b.is_featured) return -1;
           if (!a.is_featured && b.is_featured) return 1;
           return b.quality_score - a.quality_score;
         });
         break;
-      case 'popular':
-        filtered.sort((a, b) => b.visits - a.visits);
+      case 'visits':
+        filtered.sort((a, b) => sortOrder === 'desc' ? b.visits - a.visits : a.visits - b.visits);
         break;
-      case 'newest':
-        filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      case 'created_at':
+        filtered.sort((a, b) => {
+          const aDate = new Date(a.created_at).getTime();
+          const bDate = new Date(b.created_at).getTime();
+          return sortOrder === 'desc' ? bDate - aDate : aDate - bDate;
+        });
         break;
-      case 'rating':
-        filtered.sort((a, b) => b.quality_score - a.quality_score);
+      case 'quality_score':
+        filtered.sort((a, b) => sortOrder === 'desc' ? b.quality_score - a.quality_score : a.quality_score - b.quality_score);
         break;
-      case 'name':
-        filtered.sort((a, b) => a.title.localeCompare(b.title));
+      case 'likes':
+        filtered.sort((a, b) => sortOrder === 'desc' ? (b.likes || 0) - (a.likes || 0) : (a.likes || 0) - (b.likes || 0));
+        break;
+      case 'title':
+        filtered.sort((a, b) => {
+          return sortOrder === 'desc' ? b.title.localeCompare(a.title) : a.title.localeCompare(b.title);
+        });
         break;
     }
 
     setFilteredWebsites(filtered);
-  }, [websites, searchQuery, sortBy, priceFilter]);
+  }, [websites, searchFilters]);
 
   const handleVisit = async (website: any) => {
     try {
@@ -153,166 +221,142 @@ export default function CategoryPage({ category, websites: initialWebsites, allC
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <section className="py-12 px-4 bg-gradient-to-b from-primary/5 to-background border-b">
-        <div className="max-w-7xl mx-auto">
-          {/* Navigation */}
-          <div className="mb-6">
-            <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Home
-            </Link>
-          </div>
+    <motion.div 
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      className="min-h-screen bg-background"
+    >
+      {/* 简洁的头部 */}
+      <section className="relative py-8 px-4 bg-gradient-to-br from-primary/5 via-background to-accent/5 border-b border-border">
+        {/* 专业级背景装饰 */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-primary/5 rounded-full blur-3xl professional-decoration opacity-6"></div>
+          <div className="absolute bottom-1/3 right-1/3 w-24 h-24 bg-accent/5 rounded-full blur-2xl professional-decoration opacity-6"></div>
+        </div>
 
-          {/* Title */}
-          <div className="mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">
-                {category.name} AI Tools
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-3xl">
-                Discover the best {category.name} AI tools. Curated and ranked to help you find exactly what you need.
-              </p>
-            </motion.div>
-          </div>
-
-          {/* Filters and Controls */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-background/80 backdrop-blur rounded-xl border p-6"
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* 面包屑导航 */}
+          <motion.div 
+            variants={itemVariants}
+            className="mb-6"
           >
-            <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-              {/* Search */}
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={`Search ${category.name} tools...`}
-                  className="pl-10"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
+            <Link 
+              href="/categories" 
+              className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors p-2 rounded-lg hover:bg-muted/50"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {tCategory('navigation.back_to_home')}
+            </Link>
+          </motion.div>
 
-              {/* Filters */}
-              <div className="flex items-center gap-4">
-                <Select value={priceFilter} onValueChange={(value: FilterOption) => setPriceFilter(value)}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Tools</SelectItem>
-                    <SelectItem value="free">Free</SelectItem>
-                    <SelectItem value="freemium">Freemium</SelectItem>
-                    <SelectItem value="paid">Paid</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="featured">Featured First</SelectItem>
-                    <SelectItem value="popular">Most Popular</SelectItem>
-                    <SelectItem value="rating">Highest Rated</SelectItem>
-                    <SelectItem value="newest">Newest</SelectItem>
-                    <SelectItem value="name">Name A-Z</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          {/* 分类标题区域 */}
+          <motion.div
+            variants={itemVariants}
+            className="flex items-center gap-4 mb-6"
+          >
+            <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 professional-float">
+              {(() => {
+                const IconComponent = categoryIcons[category.slug] || categoryIcons.default;
+                return <IconComponent className="h-8 w-8 text-primary" />;
+              })()}
             </div>
-
-            {/* Results count */}
-            <div className="mt-4 text-center">
-              <p className="text-muted-foreground">
-                Showing {filteredWebsites.length} of {websites.length} {category.name} tools
+            <div>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
+                {tCategory('title', { category: category.name })}
+              </h1>
+              <p className="text-base sm:text-lg text-muted-foreground">
+                {tCategory('description', { category: category.name })}
               </p>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Main Content with Sidebar */}
+      {/* 主要内容区域 */}
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex gap-8">
-          {/* Left Sidebar - Categories */}
-          <aside className="w-64 flex-shrink-0 sticky top-4 h-fit">
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="font-semibold mb-4 text-lg">Categories</h3>
-                <div className="space-y-2">
-                  {allCategories.map((cat) => {
-                    const IconComponent = categoryIcons[cat.slug as keyof typeof categoryIcons] || Brain;
-                    const isActive = cat.id === category.id;
-                    
-                    return (
-                      <Link key={cat.id} href={`/categories/${cat.slug}`}>
-                        <div className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 hover:bg-muted/50 ${
-                          isActive ? 'bg-primary text-primary-foreground' : ''
-                        }`}>
-                          <IconComponent className="h-4 w-4 flex-shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <p className={`font-medium text-sm truncate ${isActive ? 'text-primary-foreground' : ''}`}>
-                              {cat.name}
-                            </p>
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-                
-                {/* Browse All Categories Link */}
-                <div className="mt-6 pt-4 border-t">
-                  <Link href="/categories">
-                    <Button variant="outline" size="sm" className="w-full">
-                      <Grid3X3 className="h-4 w-4 mr-2" />
-                      Browse All
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          </aside>
+        {/* 高级搜索和筛选控制栏 */}
+        <motion.div
+          variants={itemVariants}
+          className="mb-8"
+        >
+          <AdvancedSearch
+            value={searchQuery}
+            onChange={setSearchQuery}
+            onFiltersChange={setSearchFilters}
+            className="max-w-full"
+          />
+          
+          {/* 结果统计 */}
+          <div className="mt-6 flex items-center justify-between text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Telescope className="h-4 w-4 text-primary" />
+              <span>
+                {tCategory('results_count', { 
+                  found: filteredWebsites.length, 
+                  total: websites.length, 
+                  category: category.name 
+                })}
+              </span>
+            </div>
+          </div>
+        </motion.div>
 
-          {/* Main Content */}
-          <main className="flex-1">
-            {filteredWebsites.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredWebsites.map((website, index) => (
-                  <CompactCard key={website.id} website={website} onVisit={handleVisit} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16">
-                <div className="max-w-md mx-auto">
-                  <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">No tools found</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Try adjusting your search or filters to find more {category.name} tools.
-                  </p>
-                  <Button 
-                    variant="default"
-                    onClick={() => {
-                    setSearchQuery('');
-                    setPriceFilter('all');
-                    setSortBy('featured');
-                  }}>
-                    Clear Filters
-                  </Button>
+        {/* 工具展示区域 */}
+        {filteredWebsites.length > 0 ? (
+          <motion.div 
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+          >
+            {filteredWebsites.map((website) => (
+              <motion.div
+                key={website.id}
+                variants={itemVariants}
+                className="professional-glow"
+              >
+                <CompactCard website={website} onVisit={handleVisit} />
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div 
+            variants={itemVariants}
+            className="text-center py-20"
+          >
+            <div className="max-w-md mx-auto">
+              <div className="mb-8 flex justify-center">
+                <div className="p-6 rounded-2xl bg-muted/50 border border-border">
+                  <Telescope className="h-16 w-16 text-muted-foreground mx-auto" />
                 </div>
               </div>
-            )}
-          </main>
-        </div>
+              <h3 className="text-xl font-bold mb-4 text-foreground">{tCategory('empty_state.title')}</h3>
+              <p className="text-muted-foreground mb-6">
+                {tCategory('empty_state.description', { category: category.name })}
+              </p>
+              <Button 
+                variant="default"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSearchFilters({
+                    query: '',
+                    pricingModel: [],
+                    minQualityScore: 0,
+                    tags: [],
+                    sortBy: 'relevance',
+                    sortOrder: 'desc'
+                  });
+                }}
+              >
+                <Compass className="h-4 w-4 mr-2" />
+                {tCommon('reset_filters')}
+              </Button>
+            </div>
+          </motion.div>
+        )}
       </div>
-    </div>
+    </motion.div>
   );
 }
