@@ -114,38 +114,34 @@ export default function MobileMenu() {
             aria-label="关闭菜单"
           />
           
-          {/* 菜单内容 */}
-          <div className="absolute top-full left-0 right-0 mt-2 mx-2 sm:mx-4 z-50">
-            <div className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-lg p-3 sm:p-4">
+          {/* 菜单内容 - 优化移动端定位和尺寸 */}
+          <div className="absolute top-full left-1 right-1 sm:left-4 sm:right-4 mt-2 z-50">
+            <div className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-lg p-3 sm:p-4 max-w-full overflow-hidden mx-auto" style={{ maxWidth: '420px' }}>
               <div className="flex flex-col space-y-4">
                 
                 {/* Categories Section - 海域地图 */}
                 <div>
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => setCategoriesOpen(!categoriesOpen)}
-                    className="w-full"
+                    className="w-full justify-between hover:bg-muted/50 font-medium text-sm sm:text-base rounded-lg h-11 sm:h-12 px-3 sm:px-4 min-h-[44px]"
                   >
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-between hover:bg-muted/50 font-medium text-sm sm:text-base rounded-lg h-10 sm:h-11"
-                    >
-                      <div className="flex items-center">
-                        <Map className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-primary" />
-                        {t('navigation.categories')}
-                      </div>
-                      <ChevronDown className={cn(
-                        "h-4 w-4 transition-transform duration-200",
-                        categoriesOpen && "rotate-180"
-                      )} />
-                    </Button>
-                  </button>
+                    <div className="flex items-center">
+                      <Map className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-primary" />
+                      {t('navigation.categories')}
+                    </div>
+                    <ChevronDown className={cn(
+                      "h-4 w-4 transition-transform duration-200",
+                      categoriesOpen && "rotate-180"
+                    )} />
+                  </Button>
                   
                   {categoriesOpen && (
                     <div className="mt-2 pl-6 sm:pl-8 space-y-1">
                       <Link href="/categories" className="block" onClick={() => setIsOpen(false)}>
                         <Button
                           variant="ghost"
-                          className="w-full justify-start hover:bg-accent text-sm rounded-lg h-9"
+                          className="w-full justify-start hover:bg-accent text-sm rounded-lg h-10 min-h-[40px] px-3"
                         >
                           <Map className="h-4 w-4 mr-2 text-primary" />
                           {t('filters.all_categories')}
@@ -175,31 +171,27 @@ export default function MobileMenu() {
 
                 {/* Rankings Section - 排行榜航线 */}
                 <div>
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => setRankingsOpen(!rankingsOpen)}
-                    className="w-full"
+                    className="w-full justify-between hover:bg-muted/50 font-medium text-sm sm:text-base rounded-lg h-11 sm:h-12 px-3 sm:px-4 min-h-[44px]"
                   >
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-between hover:bg-muted/50 font-medium text-sm sm:text-base rounded-lg h-10 sm:h-11"
-                    >
-                      <div className="flex items-center">
-                        <Trophy className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-primary" />
-                        {t('navigation.rankings')}
-                      </div>
-                      <ChevronDown className={cn(
-                        "h-4 w-4 transition-transform duration-200",
-                        rankingsOpen && "rotate-180"
-                      )} />
-                    </Button>
-                  </button>
+                    <div className="flex items-center">
+                      <Trophy className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-primary" />
+                      {t('navigation.rankings')}
+                    </div>
+                    <ChevronDown className={cn(
+                      "h-4 w-4 transition-transform duration-200",
+                      rankingsOpen && "rotate-180"
+                    )} />
+                  </Button>
                   
                   {rankingsOpen && (
                     <div className="mt-2 pl-6 sm:pl-8 space-y-1">
                       <Link href="/rankings" className="block" onClick={() => setIsOpen(false)}>
                         <Button
                           variant="ghost"
-                          className="w-full justify-start hover:bg-accent text-sm rounded-lg h-9"
+                          className="w-full justify-start hover:bg-accent text-sm rounded-lg h-10 min-h-[40px] px-3"
                         >
                           <Trophy className="h-4 w-4 mr-2 text-primary" />
                           {tRank('view_all')}

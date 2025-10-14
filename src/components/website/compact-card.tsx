@@ -31,8 +31,9 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
           "transition-all duration-300 ease-out",
           "hover:shadow-lg hover:border-magellan-primary/20",
           "hover:bg-card/98",
-          // 专业级轻微浮动效果 - 2px而非8px
-          "hover:-translate-y-[2px]",
+          // 专业级轻微浮动效果 - 只在桌面端生效，移动端使用按压效果
+          "md:hover:-translate-y-[2px]",
+          "active:scale-[0.98] md:active:scale-100", // 移动端按压效果
           // Focus 状态
           "focus-within:outline-none focus-within:ring-1 focus-within:ring-magellan-primary/50"
         )}
@@ -47,7 +48,7 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
         <Link href={`/tools/${website.id}`} className="absolute inset-0 z-[1]" />
 
         {/* 探索按钮 - 航海风格外部链接 */}
-        <div className="absolute top-3 right-3 z-[2] opacity-0 group-hover:opacity-100 transition-all duration-300">
+        <div className="absolute top-3 right-3 z-[2] opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300"> {/* 移动端始终显示 */}
           <Button
             variant="ghost"
             size="sm"

@@ -277,9 +277,9 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="mt-4"
+            className="mt-4 relative z-20" /* 确保层级高于其他元素 */
           >
-            <Card>
+            <Card className="max-h-[80vh] overflow-y-auto md:max-h-none"> /* 移动端限制高度并可滚动 */
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg flex items-center gap-2">
@@ -299,14 +299,14 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                 </div>
               </CardHeader>
               
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4 sm:space-y-6"> {/* 移动端减少间距 */}
                 {/* 定价模型 */}
                 <div>
                   <label className="text-sm font-medium mb-3 flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
                     {t('filters.pricing_model')}
                   </label>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2"> {/* 移动端使用网格布局 */}
                     {PRICING_OPTIONS.map((option) => (
                       <button
                         key={option.value}
@@ -433,6 +433,26 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                         <SelectItem value="asc">{t('filters.sort_asc')}</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                </div>
+                
+                {/* 移动端操作按钮 */}
+                <div className="md:hidden pt-4 border-t border-border">
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={applyFilters}
+                      className="flex-1"
+                      size="sm"
+                    >
+                      {t('apply_filters')}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowFilters(false)}
+                      size="sm"
+                    >
+                      {t('close')}
+                    </Button>
                   </div>
                 </div>
               </CardContent>

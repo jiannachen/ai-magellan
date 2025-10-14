@@ -358,7 +358,7 @@ export default function ToolDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-24 md:pb-8">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="animate-pulse space-y-8">
             <div className="h-8 bg-muted rounded w-1/4"></div>
@@ -381,7 +381,7 @@ export default function ToolDetailPage() {
 
   if (!website) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center pb-24 md:pb-8">
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold text-foreground">Tool not found</h1>
           <p className="text-muted-foreground">The tool you're looking for doesn't exist.</p>
@@ -397,7 +397,7 @@ export default function ToolDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-24 md:pb-8"> {/* 移动端底部留空间 */}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
 
         {/* Header Section - Tool Info and Image in Left-Right Layout */}

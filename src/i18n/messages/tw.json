@@ -45,7 +45,8 @@
   "header": {
     "title": "AI Magellan",
     "subtitle": "開啟AI探索之旅",
-    "description": "以專家指導航行AI前沿"
+    "description": "以專家指導航行AI前沿",
+    "language": "語言"
   },
   "auth": {
     "signin": "登入",

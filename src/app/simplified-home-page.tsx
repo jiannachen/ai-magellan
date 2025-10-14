@@ -419,7 +419,7 @@ export default function SimplifiedHomePage({
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background mobile-safe-bottom">
       {/* Hero Section - AI Magellan 海洋探险主题 */}
       <section className="relative py-24 px-4 bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
         {/* 海洋装饰背景元素 - 专业级低调版本 */}

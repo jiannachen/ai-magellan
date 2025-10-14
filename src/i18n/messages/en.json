@@ -45,7 +45,8 @@
   "header": {
     "title": "AI Magellan",
     "subtitle": "Chart Your AI Journey",
-    "description": "Navigate the AI Frontier with Expert Guidance"
+    "description": "Navigate the AI Frontier with Expert Guidance",
+    "language": "Language"
   },
   "auth": {
     "signin": "Sign In",

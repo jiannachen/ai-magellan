@@ -84,6 +84,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
+  // 移动端优化：防止地址栏影响布局
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#0f172a" }
@@ -100,11 +102,14 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
-        {/* 额外的meta标签 */}
+        {/* 移动端优化meta标签 */}
         <meta name="format-detection" content="telephone=no" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="AI Magellan" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        {/* 防止移动端viewport跳动 */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
         
         {/* 网站图标 */}
         <link rel="icon" href="/favicon.ico" sizes="any" />

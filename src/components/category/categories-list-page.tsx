@@ -85,7 +85,8 @@ const SubcategoryCard = ({ subcategory }: {
         "group cursor-pointer transition-all duration-300",
         "bg-background border border-border hover:border-primary/30",
         "rounded-lg shadow-sm hover:shadow-md",
-        "hover:transform hover:-translate-y-1"
+        "md:hover:transform md:hover:-translate-y-1", // 只在桌面端有hover效果
+        "active:scale-[0.98] md:active:scale-100" // 移动端按压效果
       )}>
         <CardContent className="p-3">
           <div className="flex items-center gap-3">
@@ -168,7 +169,7 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
   }, [categories, activeCategory]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-24 md:pb-8"> {/* 移动端底部留空间 */}
       {/* 简化的头部 */}
       <section className="bg-background border-b border-border py-6">
         <div className="max-w-7xl mx-auto px-4">
@@ -340,7 +341,7 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                   ) : (
                     <div className="max-w-sm">
                       <Link href={`/categories/${category.slug}`}>
-                        <Card className="group cursor-pointer transition-all duration-300 bg-background border border-border hover:border-primary/30 rounded-lg shadow-sm hover:shadow-md hover:transform hover:-translate-y-1">
+                        <Card className="group cursor-pointer transition-all duration-300 bg-background border border-border hover:border-primary/30 rounded-lg shadow-sm hover:shadow-md md:hover:transform md:hover:-translate-y-1 active:scale-[0.98] md:active:scale-100">
                           <CardContent className="p-4">
                             <div className="flex items-center gap-4">
                               <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors flex-shrink-0">

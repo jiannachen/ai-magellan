@@ -1,10 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import React from 'react'
 import { useUser, useClerk } from '@clerk/nextjs'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { 
   LayoutDashboard, 
@@ -12,10 +11,7 @@ import {
   Upload,
   LogOut, 
   Settings,
-  Menu,
-  X,
-  ChevronRight,
-  Sparkles
+  ChevronRight
 } from 'lucide-react'
 import { Button } from '@/ui/common/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/common/avatar'
@@ -30,10 +26,7 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
   const { signOut } = useClerk()
   const pathname = usePathname()
   const router = useRouter()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  
   // Translation hooks
-  const t = useTranslations('common')
   const tProfile = useTranslations('profile.navigation')
   const tAuth = useTranslations('auth')
 
@@ -75,34 +68,17 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       {/* 主要内容区域 - 在版心内 */}
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex gap-6 items-start min-h-[calc(100vh-3rem)]">
-          {/* 移动端遮罩 */}
-          {sidebarOpen && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-30 bg-black/50 lg:hidden"
-              onClick={() => setSidebarOpen(false)}
-            />
-          )}
-
-          {/* 左侧导航栏 - 完全符合Atlassian Design System规范 */}
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
+        <div className="flex gap-6 items-start"> {/* 移除强制最小高度 */}
+          {/* 左侧导航栏（桌面端可见） */}
           <motion.aside
             className={cn(
-              "bg-background border border-border rounded-lg shadow-atlassian-200 transition-all duration-200",
-              "w-60", // 240px 符合ATL.md规范
-              // 桌面端在版心内的固定定位，考虑顶部Header高度
-              "lg:sticky lg:top-[5.5rem] lg:h-fit lg:self-start",
-              // 移动端固定定位
-              "fixed top-4 left-4 z-40 h-[calc(100vh-2rem)]",
-              // 移动端隐藏，桌面端显示
-              sidebarOpen ? "translate-x-0 lg:translate-x-0" : "-translate-x-full lg:translate-x-0"
+              "hidden lg:block bg-background border border-border rounded-lg shadow-atlassian-200 transition-all duration-200",
+              "w-60 lg:sticky lg:top-[5.5rem] lg:h-fit lg:self-start"
             )}
           >
             <div className="flex flex-col h-full">
-              {/* 用户信息区域 - 符合ATL规范 */}
+              {/* 用户信息区域 */}
               <div className="p-6 border-b border-border">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-12 w-12 border-2 border-border shadow-atlassian-100">
@@ -122,7 +98,7 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
                 </div>
               </div>
 
-              {/* 导航菜单 - 完全符合Atlassian规范 */}
+              {/* 导航菜单 */}
               <nav className="p-4 space-y-1 flex-1">
                 {navigation.map((item) => {
                   const isActive = pathname === item.href || 
@@ -132,27 +108,20 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
                     <Link
                       key={item.name}
                       href={item.href}
-                      onClick={() => setSidebarOpen(false)}
                       className="block"
                     >
                       <motion.div
-                        // 移除不符合规范的hover缩放效果
                         className={cn(
-                          // Atlassian侧边栏导航规范的基础样式
                           "group flex items-center px-3 py-2 text-atlassian-body font-medium rounded-[4px] transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)] relative cursor-pointer",
-                          // Focus状态 - 符合无障碍要求
                           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-                          // 活跃状态和默认状态 - 使用ATL规范颜色
                           isActive
                             ? "bg-primary text-white"
                             : "text-foreground hover:text-foreground hover:bg-muted"
                         )}
-                        // 无障碍支持
                         role="menuitem"
                         tabIndex={0}
                         aria-current={isActive ? "page" : undefined}
                       >
-                        {/* 活跃状态背景动画 */}
                         {isActive && (
                           <motion.div
                             layoutId="activeTab"
@@ -190,7 +159,7 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
                 })}
               </nav>
 
-              {/* 退出按钮 - 符合ATL规范 */}
+              {/* 退出按钮 */}
               <div className="p-4 border-t border-border">
                 <Button
                   variant="ghost"
@@ -204,20 +173,10 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
             </div>
           </motion.aside>
 
-          {/* 主内容区域 */}
-          <div className="flex-1 min-h-screen">
-            {/* 移动端菜单按钮 */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="lg:hidden fixed top-4 right-4 z-50 bg-background border border-border rounded-lg"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-            
+
+
             {/* 页面内容 */}
-            <main className="w-full">
+            <main className="w-full px-2 sm:px-0">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -229,6 +188,5 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
           </div>
         </div>
       </div>
-    </div>
   )
 }

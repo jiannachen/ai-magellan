@@ -158,7 +158,7 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
       </section>
 
       {/* 搜索结果 */}
-      <section className="py-8">
+      <section className="py-8 pb-24 md:pb-8">
         <div className="container mx-auto px-3 sm:px-4">
           <div className="space-y-6">
             {/* 搜索结果统计 */}
