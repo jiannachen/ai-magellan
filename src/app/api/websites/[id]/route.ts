@@ -13,7 +13,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const website = await prisma.website.findUnique({
       where: { id: websiteId },
       include: { 
-        category: true,
+        category: {
+          include: {
+            parent: true
+          }
+        },
         _count: {
           select: {
             websiteLikes: true,

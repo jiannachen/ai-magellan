@@ -34,7 +34,7 @@ import { Input } from '@/ui/common/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/common/select'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/ui/common/dropdown-menu'
 import { ProfileLayout } from '@/components/profile/profile-layout'
-import { toast } from 'sonner'
+import { toast } from '@/hooks/use-toast'
 import { StatCard } from '@/components/ui/stat-card'
 import { cn } from '@/lib/utils/utils'
 

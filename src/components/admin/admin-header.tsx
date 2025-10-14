@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/ui/common/tabs";
-import { ListFilter, Users } from "lucide-react";
+import { ListFilter, Users, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 
 export function AdminHeader() {
@@ -19,8 +19,8 @@ export function AdminHeader() {
           管理网站内容和系统设置
         </p>
       </div>
-      <Tabs value={pathname === "/admin/users" ? "users" : "websites"} className="w-full sm:w-auto">
-        <TabsList className="grid w-full sm:w-auto grid-cols-2 bg-background/50">
+  <Tabs value={pathname === "/admin/users" ? "users" : pathname === "/admin/feedback" ? "feedback" : "websites"} className="w-full sm:w-auto">
+    <TabsList className="grid w-full sm:w-auto grid-cols-2 bg-background/50">
           <TabsTrigger
             value="websites"
             asChild
@@ -31,18 +31,28 @@ export function AdminHeader() {
               网站管理
             </Link>
           </TabsTrigger>
-          <TabsTrigger 
-            value="users" 
-            asChild
-            className="flex items-center gap-2 data-[state=active]:bg-background/60"
-          >
-            <Link href="/admin/users">
-              <Users className="w-4 h-4" />
-              用户管理
-            </Link>
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <TabsTrigger 
+        value="users" 
+        asChild
+        className="flex items-center gap-2 data-[state=active]:bg-background/60"
+      >
+        <Link href="/admin/users">
+          <Users className="w-4 h-4" />
+          用户管理
+        </Link>
+      </TabsTrigger>
+      <TabsTrigger
+        value="feedback"
+        asChild
+        className="flex items-center gap-2 data-[state=active]:bg-background/60"
+      >
+        <Link href="/admin/feedback">
+          <MessageSquare className="w-4 h-4" />
+          反馈管理
+        </Link>
+      </TabsTrigger>
+    </TabsList>
+  </Tabs>
     </div>
   );
 }

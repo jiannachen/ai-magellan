@@ -133,8 +133,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...localizedCategoryPages,
     ]
   } catch (error) {
-    console.error('Error generating sitemap:', error)
-    
     // 返回基本的sitemap
     return [
       {

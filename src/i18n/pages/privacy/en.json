@@ -1,0 +1,46 @@
+{
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last Updated",
+    "introduction": {
+      "title": "Introduction",
+      "content": "AI Magellan is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or use our services."
+    },
+    "information_collection": {
+      "title": "Information We Collect",
+      "personal_info": "We collect personal information that you provide directly to us, such as when you create an account, submit a website, or contact us. This may include your name, email address, and any content you submit.",
+      "usage_data": "We automatically collect certain information about your device and how you interact with our services, including IP address, browser type, operating system, pages visited, and time spent on our site.",
+      "cookies": "We use cookies and similar tracking technologies to enhance your experience and analyze usage patterns on our website."
+    },
+    "information_use": {
+      "title": "How We Use Your Information",
+      "service_provision": "To provide, maintain, and improve our services",
+      "communication": "To communicate with you about your account and our services",
+      "personalization": "To personalize your experience and provide relevant content",
+      "analytics": "To analyze usage patterns and improve our website functionality",
+      "security": "To detect, prevent, and address technical issues and security threats"
+    },
+    "information_sharing": {
+      "title": "Information Sharing and Disclosure",
+      "third_parties": "We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this policy.",
+      "service_providers": "We may share your information with trusted service providers who assist us in operating our website and conducting our business, provided they agree to keep this information confidential.",
+      "legal_compliance": "We may disclose your information when required by law or to protect our rights, property, or safety, or that of others."
+    },
+    "data_security": {
+      "title": "Data Security",
+      "measures": "We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.",
+      "limitations": "However, no method of transmission over the internet or electronic storage is 100% secure, and we cannot guarantee absolute security."
+    },
+    "user_rights": {
+      "title": "Your Rights",
+      "access": "You have the right to access, update, or delete your personal information",
+      "opt_out": "You can opt out of receiving promotional communications from us",
+      "cookies_control": "You can control cookie settings through your browser preferences"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "If you have any questions about this Privacy Policy, please contact us at:",
+      "email": "Email"
+    }
+  }
+}

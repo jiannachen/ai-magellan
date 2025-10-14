@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { useAtom } from "jotai";
 import { motion } from "framer-motion";
 import { Button } from "@/ui/common/button";
-import { Plus, Compass, Anchor, Map, Route, Star, TrendingUp, Shield } from "lucide-react";
+import { Plus, Compass, Anchor, Map, Route, Star, TrendingUp, Shield, Info, FileText, ExternalLink, Copyright, Heart, Zap } from "lucide-react";
 import { isAdminModeAtom, footerSettingsAtom } from "@/lib/atoms";
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Link from "next/link";
 import {
   Dialog,
@@ -26,11 +26,17 @@ export default function FooterContent({
   initialSettings: FooterSettings;
 }) {
   const t = useTranslations();
+  const locale = useLocale();
   const [isAdmin] = useAtom(isAdminModeAtom);
   const [settings, setSettings] = useAtom(footerSettingsAtom);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newLink, setNewLink] = useState({ title: "", url: "" });
   const { toast } = useToast();
+
+  // Helper function to construct proper locale paths
+  const getLocalizedPath = (path: string) => {
+    return locale === 'en' ? path : `/${locale}${path}`;
+  };
 
   // Initialize settings
   useEffect(() => {
@@ -124,7 +130,7 @@ export default function FooterContent({
   // 排行榜链接数据 - 探索航线
   const rankingLinks = [
     { href: "/rankings", label: t('footer.rankings.all_rankings'), icon: Route },
-    { href: "/rankings/popular", label: t('footer.rankings.most_popular'), icon: TrendingUp },
+    { href: "/rankings/popular", label: t('footer.rankings.most_popular'), icon: Heart },
     { href: "/rankings/top-rated", label: t('footer.rankings.top_rated'), icon: Star },
     { href: "/rankings/trending", label: t('footer.rankings.trending'), icon: TrendingUp },
     { href: "/rankings/free", label: t('footer.rankings.best_free'), icon: Shield },
@@ -141,10 +147,10 @@ export default function FooterContent({
         "border-t border-primary/20"
       )}
     >
-      {/* 航海主题背景装饰 */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-primary/5 to-transparent rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-tl from-magellan-coral/5 to-transparent rounded-full blur-2xl"></div>
+      {/* 航海主题背景装饰 - 按照AM.md专业级标准优化为6-8%透明度 */}
+      <div className="absolute inset-0 opacity-[0.06] pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-primary/8 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-tl from-magellan-coral/6 to-transparent rounded-full blur-2xl"></div>
       </div>
       
       <div className="container mx-auto px-4 py-16 relative z-10">
@@ -167,7 +173,7 @@ export default function FooterContent({
                   AI Magellan
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  🧭 Chart Your AI Journey
+                  🧭 {t('footer.brand.tagline')}
                 </span>
               </div>
             </motion.div>
@@ -179,7 +185,7 @@ export default function FooterContent({
             >
               🌊 {t('footer.description')}
               <br />
-              <span className="text-primary font-medium">Discover your next AI treasure.</span>
+              <span className="text-primary font-medium">{t('footer.brand.subtitle')}</span>
             </motion.p>
             
             {/* 航海统计 */}
@@ -208,8 +214,7 @@ export default function FooterContent({
             className="space-y-6"
           >
             <h3 className="font-semibold text-foreground flex items-center gap-2">
-              <Map className="h-4 w-4 text-primary" />
-              🗺️ Navigation Routes
+              🗺️ {t('footer.sections.navigation_routes')}
             </h3>
             <ul className="space-y-3">
               {quickLinks.map((link, index) => (
@@ -220,16 +225,10 @@ export default function FooterContent({
                   transition={{ duration: 0.3, delay: 0.1 * index }}
                 >
                   <Link
-                    href={link.href}
-                    className={cn(
-                      "flex items-center gap-3 text-sm text-muted-foreground",
-                      "hover:text-primary transition-all duration-300 group",
-                      "p-2 rounded-lg hover:bg-primary/5"
-                    )}
+                    href={getLocalizedPath(link.href)}
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
                   >
-                    <div className="p-1 rounded-md bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
-                      <link.icon className="h-3 w-3 text-primary" />
-                    </div>
+                    <link.icon className="h-3 w-3" />
                     {link.label}
                   </Link>
                 </motion.li>
@@ -240,17 +239,11 @@ export default function FooterContent({
                 transition={{ duration: 0.3, delay: 0.4 }}
               >
                 <Link
-                  href="/about"
-                  className={cn(
-                    "flex items-center gap-3 text-sm text-muted-foreground",
-                    "hover:text-primary transition-all duration-300 group",
-                    "p-2 rounded-lg hover:bg-primary/5"
-                  )}
+                  href={getLocalizedPath("/about")}
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
                 >
-                  <div className="p-1 rounded-md bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
-                    <Shield className="h-3 w-3 text-primary" />
-                  </div>
-                  ⚓ {t('navigation.about')}
+                  <Info className="h-3 w-3" />
+                  {t('navigation.about')}
                 </Link>
               </motion.li>
             </ul>
@@ -264,8 +257,7 @@ export default function FooterContent({
             className="space-y-6"
           >
             <h3 className="font-semibold text-foreground flex items-center gap-2">
-              <Star className="h-4 w-4 text-magellan-gold" />
-              🏆 Expedition Rankings
+              🏆 {t('footer.sections.expedition_rankings')}
             </h3>
             <ul className="space-y-3">
               {rankingLinks.map((link, index) => (
@@ -276,16 +268,10 @@ export default function FooterContent({
                   transition={{ duration: 0.3, delay: 0.1 * index }}
                 >
                   <Link
-                    href={link.href}
-                    className={cn(
-                      "flex items-center gap-3 text-sm text-muted-foreground",
-                      "hover:text-magellan-gold transition-all duration-300 group",
-                      "p-2 rounded-lg hover:bg-magellan-gold/5"
-                    )}
+                    href={getLocalizedPath(link.href)}
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-magellan-gold transition-colors duration-300"
                   >
-                    <div className="p-1 rounded-md bg-magellan-gold/10 group-hover:bg-magellan-gold/20 transition-colors duration-300">
-                      <link.icon className="h-3 w-3 text-magellan-gold" />
-                    </div>
+                    <link.icon className="h-3 w-3" />
                     {link.label}
                   </Link>
                 </motion.li>
@@ -302,8 +288,7 @@ export default function FooterContent({
           >
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-foreground flex items-center gap-2">
-                <Anchor className="h-4 w-4 text-magellan-coral" />
-                ⚓ Expedition Support
+                ⚓ {t('footer.sections.expedition_support')}
               </h3>
               {isAdmin && (
                 <Button
@@ -330,19 +315,15 @@ export default function FooterContent({
                     transition={{ duration: 0.3, delay: 0.1 * index }}
                     className="flex items-center gap-2"
                   >
-                    <a
+                    <Link
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={cn(
-                        "flex items-center gap-3 text-sm text-muted-foreground",
-                        "hover:text-magellan-coral transition-all duration-300 group",
-                        "p-2 rounded-lg hover:bg-magellan-coral/5 flex-1"
-                      )}
+                      className="flex items-center gap-2 text-sm text-muted-foreground hover:text-magellan-coral transition-colors duration-300 flex-1"
                     >
-                      <div className="w-2 h-2 rounded-full bg-magellan-coral group-hover:scale-150 transition-transform duration-300"></div>
+                      <ExternalLink className="h-3 w-3" />
                       {link.title}
-                    </a>
+                    </Link>
                     {isAdmin && (
                       <Button
                         variant="ghost"
@@ -361,40 +342,32 @@ export default function FooterContent({
                 </li>
               )}
               
-              {/* 法律信息 */}
+              {/* 法律信息 - 按照AM.md专业级标准优化 */}
               <motion.li
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: 0.5 }}
               >
-                <a
-                  href="#"
-                  className={cn(
-                    "flex items-center gap-3 text-sm text-muted-foreground",
-                    "hover:text-primary transition-all duration-300 group",
-                    "p-2 rounded-lg hover:bg-primary/5"
-                  )}
+                <Link
+                  href={getLocalizedPath("/privacy-policy")}
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
                 >
-                  <div className="w-2 h-2 rounded-full bg-primary group-hover:scale-150 transition-transform duration-300"></div>
-                  🛡️ {t('footer.legal.privacy')}
-                </a>
+                  <Shield className="h-3 w-3" />
+                  {t('footer.legal.privacy')}
+                </Link>
               </motion.li>
               <motion.li
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: 0.6 }}
               >
-                <a
-                  href="#"
-                  className={cn(
-                    "flex items-center gap-3 text-sm text-muted-foreground",
-                    "hover:text-primary transition-all duration-300 group",
-                    "p-2 rounded-lg hover:bg-primary/5"
-                  )}
+                <Link
+                  href={getLocalizedPath("/terms-of-service")}
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
                 >
-                  <div className="w-2 h-2 rounded-full bg-primary group-hover:scale-150 transition-transform duration-300"></div>
-                  📜 {t('footer.legal.terms')}
-                </a>
+                  <FileText className="h-3 w-3" />
+                  {t('footer.legal.terms')}
+                </Link>
               </motion.li>
               {settings.icpBeian && (
                 <motion.li
@@ -406,13 +379,9 @@ export default function FooterContent({
                     href="https://beian.miit.gov.cn/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={cn(
-                      "flex items-center gap-3 text-sm text-muted-foreground",
-                      "hover:text-primary transition-all duration-300 group",
-                      "p-2 rounded-lg hover:bg-primary/5"
-                    )}
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
                   >
-                    <div className="w-2 h-2 rounded-full bg-primary group-hover:scale-150 transition-transform duration-300"></div>
+                    <FileText className="h-3 w-3" />
                     {settings.icpBeian}
                   </a>
                 </motion.li>
@@ -433,12 +402,12 @@ export default function FooterContent({
           
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="text-sm text-muted-foreground flex items-center gap-2">
-              <Compass className="h-3 w-3 text-primary" />
-              © {new Date().getFullYear()} AI Magellan. ⚓ {t('footer.copyright')}
+              <Copyright className="h-3 w-3" />
+              © {new Date().getFullYear()} AI Magellan. {t('footer.copyright')}
             </div>
             <div className="text-sm text-muted-foreground flex items-center gap-2">
-              <Anchor className="h-3 w-3 text-magellan-coral" />
-              🌊 {t('footer.site_info')}
+              <Info className="h-3 w-3" />
+              {t('footer.site_info')}
             </div>
           </div>
         </motion.div>

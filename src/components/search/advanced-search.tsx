@@ -440,7 +440,10 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                 <div className="md:hidden pt-4 border-t border-border">
                   <div className="flex gap-2">
                     <Button 
-                      onClick={applyFilters}
+                      onClick={() => {
+                        onFiltersChange(filters)
+                        setShowFilters(false)
+                      }}
                       className="flex-1"
                       size="sm"
                     >

@@ -13,39 +13,28 @@ import { cn } from "@/lib/utils/utils";
 import { 
   Search, 
   TrendingUp, 
-  Star,
   Users,
   ExternalLink,
   ArrowRight,
-  Heart,
-  Bookmark,
-  Eye,
   Clock,
-  Award,
   Shield,
-  Zap,
-  Target,
   CheckCircle,
   ChevronDown,
   Plus,
-  Minus,
-  BarChart3,
   Rocket,
   Globe,
-  Lightbulb,
   Crown,
-  Calendar,
-  ThumbsUp,
-  Grid3X3,
   Compass,
   Map,
-  Route
+  Route,
+  MessageSquare
 } from "lucide-react";
 import type { Website, Category } from "@/lib/types";
 import { useTranslations } from 'next-intl';
 import Link from "next/link";
 import { ValuePropCard } from "@/components/ui/value-prop-card";
 import { useUser } from '@clerk/nextjs';
+import FeedbackDialog from "@/components/feedback/feedback-dialog";
 
 interface SimplifiedHomePageProps {
   initialWebsites: Website[];
@@ -56,7 +45,6 @@ export default function SimplifiedHomePage({
   initialWebsites,
   initialCategories,
 }: SimplifiedHomePageProps) {
-  const t = useTranslations();
   const tLanding = useTranslations('landing');
   const router = useRouter();
   const { user } = useUser();
@@ -67,9 +55,6 @@ export default function SimplifiedHomePage({
   const [mostPopularWebsites, setMostPopularWebsites] = useState<Website[]>([]);
   const [recentWebsites, setRecentWebsites] = useState<Website[]>([]);
   const [topFreeWebsites, setTopFreeWebsites] = useState<Website[]>([]);
-  const [topPaidWebsites, setTopPaidWebsites] = useState<Website[]>([]);
-  const [userLikes, setUserLikes] = useState<Set<number>>(new Set());
-  const [userFavorites, setUserFavorites] = useState<Set<number>>(new Set());
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   // 搜索处理函数
@@ -149,22 +134,22 @@ export default function SimplifiedHomePage({
     setCategories(initialCategories);
   }, [initialWebsites, initialCategories, setWebsites, setCategories]);
 
-  // Load user interactions if logged in
-  useEffect(() => {
-    if (user) {
-      Promise.all([
-        fetch('/api/user/likes/check').then(res => res.ok ? res.json() : { data: [] }),
-        fetch('/api/user/favorites/check').then(res => res.ok ? res.json() : { data: [] })
-      ]).then(([likesRes, favoritesRes]) => {
-        if (likesRes.data) {
-          setUserLikes(new Set(likesRes.data.map((item: any) => item.websiteId)));
-        }
-        if (favoritesRes.data) {
-          setUserFavorites(new Set(favoritesRes.data.map((item: any) => item.websiteId)));
-        }
-      }).catch(console.error);
-    }
-  }, [user]);
+  // Load user interactions if logged in - 暂时移除，当前页面不需要
+  // useEffect(() => {
+  //   if (user) {
+  //     Promise.all([
+  //       fetch('/api/user/likes/check').then(res => res.ok ? res.json() : { data: [] }),
+  //       fetch('/api/user/favorites/check').then(res => res.ok ? res.json() : { data: [] })
+  //     ]).then(([likesRes, favoritesRes]) => {
+  //       if (likesRes.data) {
+  //         setUserLikes(new Set(likesRes.data.map((item: any) => item.websiteId)));
+  //       }
+  //       if (favoritesRes.data) {
+  //         setUserFavorites(new Set(favoritesRes.data.map((item: any) => item.websiteId)));
+  //       }
+  //     }).catch(console.error);
+  //   }
+  // }, [user]);
 
   // Process websites for different rankings
   useEffect(() => {
@@ -215,13 +200,13 @@ export default function SimplifiedHomePage({
     console.log('Top free websites:', topFree.length, 'filtered from', approvedWebsites.length);
     setTopFreeWebsites(topFree);
 
-    // Top paid tools
-    const topPaid = approvedWebsites
-      .filter(w => w.pricing_model !== 'free' && !w.has_free_version)
-      .sort((a, b) => (b.quality_score ?? 50) - (a.quality_score ?? 50))
-      .slice(0, 12);
-    console.log('Top paid websites:', topPaid.length);
-    setTopPaidWebsites(topPaid);
+    // Top paid tools - 暂时移除，未在页面中使用
+    // const topPaid = approvedWebsites
+    //   .filter(w => w.pricing_model !== 'free' && !w.has_free_version)
+    //   .sort((a, b) => (b.quality_score ?? 50) - (a.quality_score ?? 50))
+    //   .slice(0, 12);
+    // console.log('Top paid websites:', topPaid.length);
+    // setTopPaidWebsites(topPaid);
   }, [websites]);
 
   const handleVisit = async (website: Website) => {
@@ -236,61 +221,7 @@ export default function SimplifiedHomePage({
     window.open(website.url, "_blank");
   };
 
-  const handleLike = async (websiteId: number) => {
-    if (!user) return;
-    
-    try {
-      const response = await fetch(`/api/websites/${websiteId}/like`, { method: "POST" });
-      if (response.ok) {
-        const isLiked = userLikes.has(websiteId);
-        setUserLikes(prev => {
-          const newSet = new Set(prev);
-          if (isLiked) {
-            newSet.delete(websiteId);
-          } else {
-            newSet.add(websiteId);
-          }
-          return newSet;
-        });
-        
-        setWebsites(prev => prev.map(w => 
-          w.id === websiteId 
-            ? { ...w, likes: isLiked ? w.likes - 1 : w.likes + 1 }
-            : w
-        ));
-      }
-    } catch (error) {
-      console.error('Failed to like website:', error);
-    }
-  };
-
-  const handleFavorite = async (websiteId: number) => {
-    if (!user) return;
-    
-    try {
-      const response = await fetch('/api/user/favorites', {
-        method: userFavorites.has(websiteId) ? 'DELETE' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ websiteId })
-      });
-      
-      if (response.ok) {
-        setUserFavorites(prev => {
-          const newSet = new Set(prev);
-          if (userFavorites.has(websiteId)) {
-            newSet.delete(websiteId);
-          } else {
-            newSet.add(websiteId);
-          }
-          return newSet;
-        });
-      }
-    } catch (error) {
-      console.error('Failed to favorite website:', error);
-    }
-  };
-
-  const WebsiteCard = ({ website, rank }: { website: Website; rank?: number }) => (
+  const WebsiteCard = ({ website }: { website: Website }) => (
     <CompactCard website={website} onVisit={handleVisit} />
   );
 
@@ -383,7 +314,7 @@ export default function SimplifiedHomePage({
               }}
               className="group"
             >
-              <WebsiteCard website={website} rank={index + 1} />
+              <WebsiteCard website={website} />
             </motion.div>
           ))}
         </div>
@@ -420,6 +351,29 @@ export default function SimplifiedHomePage({
 
   return (
     <div className="min-h-screen bg-background mobile-safe-bottom">
+      {/* 浮动反馈按钮 - FAB 风格 */}
+      <motion.div
+        className="fixed bottom-6 right-6 z-40"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 25,
+        }}
+      >
+        <FeedbackDialog
+          trigger={
+            <motion.div
+              className="bg-magellan-coral backdrop-blur-md rounded-full p-4 shadow-xl hover:shadow-2xl transition-all duration-300 group cursor-pointer border-2 border-white/20"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <MessageSquare className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-200" />
+            </motion.div>
+          }
+        />
+      </motion.div>
       {/* Hero Section - AI Magellan 海洋探险主题 */}
       <section className="relative py-24 px-4 bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
         {/* 海洋装饰背景元素 - 专业级低调版本 */}
@@ -666,135 +620,254 @@ export default function SimplifiedHomePage({
         />
       </div>
 
-      {/* Value Proposition Section - 探索价值主张 */}
-      <section className="py-20 px-4 relative bg-gradient-to-br from-primary/3 via-background to-magellan-teal/2">
-        {/* 海域背景效果 */}
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-magellan-coral/4 to-transparent rounded-full blur-3xl ocean-float"></div>
-          <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-tl from-magellan-mint/4 to-transparent rounded-full blur-2xl" style={{animationDelay: '2s'}}></div>
+      {/* AM.md Optimized Expert Navigation Section - 专业航海探索指南 */}
+      <section className="py-24 px-4 relative overflow-hidden" style={{backgroundColor: 'var(--magellan-depth-50)'}}>
+        {/* AM.md 专业级海洋背景装饰 - 6-8%透明度标准 */}
+        <div className="absolute inset-0 opacity-6 pointer-events-none professional-decoration">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl professional-float" 
+               style={{background: 'linear-gradient(135deg, var(--magellan-teal) 0%, var(--magellan-mint) 50%, var(--magellan-primary) 100%)'}}></div>
+          <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-gradient-to-bl from-magellan-gold/4 to-transparent rounded-full blur-2xl"></div>
+          <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-gradient-to-tr from-magellan-coral/3 to-transparent rounded-full blur-3xl professional-decoration active"></div>
         </div>
         
         <div className="container mx-auto relative z-10">
-          {/* 章节标题 - 航海日志风格 */}
+          {/* AM.md 航海探索标题区域 */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
-              duration: 0.6,
-              ease: [0.15, 1, 0.3, 1]
+              duration: 0.4,
+              ease: [0.15, 1, 0.3, 1] // AM.md 专业级缓动
             }}
             className="text-center mb-16"
           >
-            <div className="inline-flex items-center gap-3 mb-6 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-magellan-teal/10 border border-primary/20">
-              <Map className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium text-primary">{tLanding('sections.value_props.badge')}</span>
-              <div className="w-2 h-2 rounded-full bg-magellan-coral animate-pulse"></div>
-            </div>
-            <h2 className="text-atlassian-h2 font-semibold mb-4 flex items-center justify-center gap-3">
-              ⚓ {tLanding('sections.value_props.title')}
-            </h2>
-            <p className="text-atlassian-body-large text-muted-foreground max-w-4xl mx-auto">
+            {/* 航海探索徽章 */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ 
+                duration: 0.3,
+                delay: 0.1,
+                ease: [0.15, 1, 0.3, 1]
+              }}
+              className={cn(
+                "inline-flex items-center gap-3 mb-6 px-4 py-2 rounded-full",
+                "bg-gradient-to-r from-magellan-teal/10 to-magellan-mint/10",
+                "border border-magellan-teal/20 backdrop-blur-sm",
+                "professional-glow"
+              )}
+            >
+              <div className="relative">
+                <Compass className="h-4 w-4 text-magellan-teal professional-compass" />
+                <div className="absolute inset-0 rounded-full bg-magellan-teal/20 professional-glow"></div>
+              </div>
+              <span className="text-sm font-medium text-magellan-teal">
+                🧭 {tLanding('sections.value_props.badge')}
+              </span>
+              <div className="w-2 h-2 rounded-full bg-magellan-mint professional-glow"></div>
+            </motion.div>
+
+            {/* 航海主题标题 */}
+            <motion.h2 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.6, 
+                delay: 0.2,
+                ease: [0.15, 1, 0.3, 1]
+              }}
+              className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-magellan-depth-900 mb-4"
+            >
+              <span className="inline-flex items-center gap-2">
+                ⚓ {tLanding('sections.value_props.title')}
+              </span>
+            </motion.h2>
+
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.5, 
+                delay: 0.3
+              }}
+              className="text-lg text-magellan-depth-600 max-w-3xl mx-auto leading-relaxed"
+            >
               🌊 {tLanding('sections.value_props.description')}
-            </p>
+            </motion.p>
           </motion.div>
 
-          {/* 价值主张网格 - 探索能力 */}
+          {/* AM.md 专业级航海能力网格 */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {valueProps.map((prop, index) => (
-              <ValuePropCard
-                key={index}
-                icon={prop.icon}
-                title={prop.title}
-                description={prop.description}
-                index={index}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section - 航海指南 */}
-      <section className="py-20 px-4 relative">
-        {/* 背景装饰 */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-1/4 w-72 h-72 bg-gradient-to-br from-magellan-teal/5 to-transparent rounded-full blur-2xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-tl from-primary/5 to-transparent rounded-full blur-3xl"></div>
-        </div>
-        
-        <div className="container mx-auto relative z-10">
-          {/* 标题区域 - 导航员指南 */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: 0.6,
-              ease: [0.15, 1, 0.3, 1]
-            }}
-            className="text-center mb-16"
-          >
-            <div className="inline-flex items-center gap-3 mb-6 px-4 py-2 rounded-full bg-gradient-to-r from-magellan-gold/10 to-magellan-coral/10 border border-magellan-gold/20">
-              <Compass className="h-5 w-5 text-magellan-gold professional-compass" />
-              <span className="text-sm font-medium text-magellan-gold">{tLanding('sections.faq.badge')}</span>
-              <div className="w-2 h-2 rounded-full bg-magellan-mint professional-glow"></div>
-            </div>
-            <h2 className="text-atlassian-h2 font-semibold mb-4 flex items-center justify-center gap-3">
-              🧭 {tLanding('sections.faq.title')}
-            </h2>
-            <p className="text-atlassian-body-large text-muted-foreground max-w-3xl mx-auto">
-              {tLanding('sections.faq.description')}
-            </p>
-          </motion.div>
-
-          {/* FAQ列表 - 航海问答 */}
-          <div className="max-w-4xl mx-auto space-y-4">
-            {faqs.map((faq, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ 
                   duration: 0.4, 
                   delay: index * 0.1,
                   ease: [0.15, 1, 0.3, 1]
                 }}
+                className="group"
               >
-                <Card className={cn(
-                  "group overflow-hidden relative",
-                  "bg-card/95 backdrop-blur-sm border border-primary/10",
-                  "rounded-2xl shadow-lg hover:shadow-xl",
-                  "transition-all duration-300",
-                  "hover:border-primary/30"
+                <ValuePropCard
+                  icon={prop.icon}
+                  title={prop.title}
+                  description={prop.description}
+                  index={index}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* AM.md 航海探索统计 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.4, 
+              delay: 0.8
+            }}
+            className="mt-16 flex justify-center gap-8 flex-wrap"
+          >
+           
+          </motion.div>
+        </div>
+      </section>
+
+      {/* AM.md Optimized FAQ Section - 专业航海探索指南 */}
+      <div className="bg-muted/30">
+        <section className="py-24 px-4 relative overflow-hidden">
+        {/* AM.md 专业级背景装饰 - 6-8%透明度标准 */}
+        <div className="absolute inset-0 opacity-6 pointer-events-none professional-decoration">
+          <div className="absolute top-1/4 left-1/4 w-80 h-80 rounded-full blur-3xl professional-float" 
+               style={{background: 'linear-gradient(135deg, var(--magellan-coral) 0%, var(--magellan-gold) 100%)'}}></div>
+          <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-gradient-to-tr from-magellan-mint/4 to-transparent rounded-full blur-2xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-magellan-primary/3 to-transparent rounded-full blur-3xl professional-decoration active"></div>
+        </div>
+        
+        <div className="container mx-auto relative z-10">
+          {/* AM.md 航海问答标题区域 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.4,
+              ease: [0.15, 1, 0.3, 1] // AM.md 专业级缓动
+            }}
+            className="text-center mb-16"
+          >
+            {/* 航海问答徽章 */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ 
+                duration: 0.3,
+                delay: 0.1,
+                ease: [0.15, 1, 0.3, 1]
+              }}
+              className={cn(
+                "inline-flex items-center gap-3 mb-6 px-4 py-2 rounded-full",
+                "bg-gradient-to-r from-magellan-coral/10 to-magellan-gold/10",
+                "border border-magellan-coral/20 backdrop-blur-sm",
+                "professional-glow"
+              )}
+            >
+              <div className="relative">
+                <MessageSquare className="h-4 w-4 text-magellan-coral professional-compass" />
+                <div className="absolute inset-0 rounded-full bg-magellan-coral/20 professional-glow"></div>
+              </div>
+              <span className="text-sm font-medium text-magellan-coral">
+                💬 {tLanding('sections.faq.badge')}
+              </span>
+              <div className="w-2 h-2 rounded-full bg-magellan-gold professional-glow"></div>
+            </motion.div>
+
+            {/* 航海问答标题 */}
+            <motion.h2 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.6, 
+                delay: 0.2,
+                ease: [0.15, 1, 0.3, 1]
+              }}
+              className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-magellan-depth-900 mb-4"
+            >
+              <span className="inline-flex items-center gap-2">
+                🗣️ {tLanding('sections.faq.title')}
+              </span>
+            </motion.h2>
+
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.5, 
+                delay: 0.3
+              }}
+              className="text-lg text-magellan-depth-600 max-w-3xl mx-auto leading-relaxed"
+            >
+              🧭 {tLanding('sections.faq.description')}
+            </motion.p>
+          </motion.div>
+
+          {/* AM.md 专业级问答列表 */}
+          <div className="max-w-4xl mx-auto space-y-4">
+            {faqs.map((faq, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  duration: 0.3, 
+                  delay: index * 0.08,
+                  ease: [0.15, 1, 0.3, 1] // AM.md 专业级缓动
+                }}
+              >
+                <div className={cn(
+                  "group overflow-hidden transition-all duration-300",
+                  "bg-magellan-depth-50 hover:bg-white",
+                  "border border-magellan-primary/15 hover:border-magellan-primary/30",
+                  "rounded-xl shadow-sm hover:shadow-md",
+                  "professional-glow"
                 )}>
-                  {/* 背景波纹效果 */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/2 via-transparent to-magellan-teal/2 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                  
-                  <CardContent className="p-0 relative z-10">
+                  <div className="p-0">
                     <button
                       onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                      className={cn(
-                        "w-full text-left p-6 transition-all duration-300",
-                        "hover:bg-primary/5 flex items-center justify-between group/btn"
-                      )}
+                      className="w-full text-left p-6 flex items-center justify-between group/btn transition-all duration-300"
                     >
                       <div className="flex items-center gap-4 flex-1">
+                        {/* 航海序号指示器 */}
                         <div className={cn(
-                          "p-2 rounded-xl transition-all duration-300",
-                          "bg-gradient-to-br from-primary/15 to-magellan-teal/10",
-                          "border border-primary/20",
-                          "group-hover/btn:scale-105 group-hover/btn:rotate-3 professional-scale"
+                          "p-3 rounded-xl transition-all duration-300 flex items-center justify-center",
+                          "bg-gradient-to-br from-magellan-primary/10 to-magellan-teal/10",
+                          "border border-magellan-primary/20 group-hover/btn:border-magellan-primary/40",
+                          "group-hover/btn:bg-gradient-to-br group-hover/btn:from-magellan-primary/15 group-hover/btn:to-magellan-teal/15",
+                          "min-w-[48px] h-12"
                         )}>
-                          <Map className="h-4 w-4 text-primary" />
+                          <span className="font-bold text-magellan-primary text-sm">
+                            {(index + 1).toString().padStart(2, '0')}
+                          </span>
                         </div>
-                        <h3 className="text-atlassian-h6 font-semibold text-foreground group-hover/btn:text-primary transition-colors duration-300">
+
+                        {/* 问题标题 */}
+                        <h3 className={cn(
+                          "font-semibold text-magellan-depth-900 transition-colors duration-300",
+                          "group-hover/btn:text-magellan-primary text-base md:text-lg"
+                        )}>
                           {faq.question}
                         </h3>
                       </div>
+
+                      {/* 展开指示器 */}
                       <div className={cn(
                         "flex-shrink-0 p-2 rounded-lg transition-all duration-300",
-                        "bg-primary/10 group-hover/btn:bg-primary/20",
-                        openFaqIndex === index ? "rotate-180" : "rotate-0"
+                        "bg-magellan-depth-100 group-hover/btn:bg-magellan-primary/10",
+                        "border border-magellan-primary/10 group-hover/btn:border-magellan-primary/20",
+                        openFaqIndex === index ? 'rotate-180' : 'rotate-0'
                       )}>
-                        <ChevronDown className="h-4 w-4 text-primary" />
+                        <ChevronDown className="h-5 w-5 text-magellan-depth-600 group-hover/btn:text-magellan-primary transition-colors" />
                       </div>
                     </button>
                     
@@ -806,14 +879,18 @@ export default function SimplifiedHomePage({
                           exit={{ height: 0, opacity: 0 }}
                           transition={{ 
                             duration: 0.3,
-                            ease: [0.25, 0.1, 0.25, 1]
+                            ease: [0.15, 1, 0.3, 1] // AM.md 专业级缓动
                           }}
                           className="overflow-hidden"
                         >
                           <div className="px-6 pb-6">
-                            <div className="pl-12">
-                              <div className="border-l-2 border-primary/20 pl-4">
-                                <p className="text-atlassian-body text-muted-foreground leading-relaxed">
+                            <div className="pl-16"> {/* 调整左边距以适配序号 */}
+                              <div className={cn(
+                                "pl-4 py-4 rounded-lg",
+                                "bg-gradient-to-r from-magellan-primary/5 to-magellan-teal/5",
+                                "border-l-4 border-magellan-primary/30"
+                              )}>
+                                <p className="text-magellan-depth-700 leading-relaxed">
                                   {faq.answer}
                                 </p>
                               </div>
@@ -822,138 +899,221 @@ export default function SimplifiedHomePage({
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Final CTA Section - 启程远航 */}
-      <section className="py-24 px-4 relative bg-gradient-to-br from-primary/5 via-background to-magellan-coral/3">
-        {/* 最终航海背景 */}
-        <div className="absolute inset-0 opacity-25">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-primary/3 to-transparent"></div>
-          <div className="absolute top-10 right-10 w-96 h-96 bg-gradient-to-bl from-magellan-teal/5 to-transparent rounded-full blur-3xl ocean-float"></div>
-          <div className="absolute bottom-10 left-10 w-80 h-80 bg-gradient-to-tr from-magellan-coral/5 to-transparent rounded-full blur-2xl" style={{animationDelay: '3s'}}></div>
-        </div>
-        
-        <div className="max-w-5xl mx-auto text-center relative z-10">
+          {/* AM.md 底部航海支持信息 */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ 
-              duration: 0.8,
-              ease: [0.15, 1, 0.3, 1]
+              duration: 0.4, 
+              delay: 0.8
+            }}
+            className="mt-16 text-center"
+          >
+          </motion.div>
+        </div>
+      </section>
+      </div>
+
+      {/* AM.md Optimized CTA/GTA Section - 专业级行动号召区域 */}
+      <section className="py-24 px-4 relative overflow-hidden" style={{backgroundColor: 'var(--magellan-depth-50)'}}>
+        {/* AM.md 专业级背景装饰 - 遵循6-8%透明度标准 */}
+        <div className="absolute inset-0 opacity-6 pointer-events-none professional-decoration">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl professional-float" 
+               style={{background: 'linear-gradient(135deg, var(--magellan-primary) 0%, var(--magellan-teal) 50%, var(--magellan-coral) 100%)'}}></div>
+          <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-gradient-to-bl from-magellan-mint/4 to-transparent rounded-full blur-2xl"></div>
+          <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-gradient-to-tr from-magellan-gold/3 to-transparent rounded-full blur-3xl professional-decoration active"></div>
+        </div>
+        
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.4,
+              ease: [0.15, 1, 0.3, 1] // AM.md 专业级缓动
             }}
             className="space-y-8"
           >
-            {/* 最终徽章 */}
-            <div className="inline-flex items-center gap-3 mb-8 px-6 py-3 rounded-full bg-gradient-to-r from-primary/15 to-magellan-coral/10 border border-primary/30 shadow-lg">
-              <Rocket className="h-5 w-5 text-primary" />
-              <span className="text-sm font-semibold text-primary">{tLanding('sections.final_cta.badge')}</span>
-              <div className="w-2 h-2 rounded-full bg-magellan-mint animate-pulse"></div>
-            </div>
+            {/* AM.md 航海探索徽章 */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ 
+                duration: 0.3,
+                delay: 0.1,
+                ease: [0.15, 1, 0.3, 1]
+              }}
+              className={cn(
+                "inline-flex items-center gap-3 mb-6 px-4 py-2 rounded-full",
+                "bg-gradient-to-r from-magellan-primary/10 to-magellan-teal/10",
+                "border border-magellan-primary/20 backdrop-blur-sm",
+                "professional-glow"
+              )}
+            >
+              <div className="relative">
+                <Compass className="h-4 w-4 text-magellan-primary professional-compass" />
+                <div className="absolute inset-0 rounded-full bg-magellan-primary/20 professional-glow"></div>
+              </div>
+              <span className="text-sm font-medium text-magellan-primary">
+                🚀 {tLanding('sections.final_cta.badge')}
+              </span>
+              <div className="w-2 h-2 rounded-full bg-magellan-mint professional-glow"></div>
+            </motion.div>
             
-            {/* 启程标题 */}
+            {/* AM.md 航海主题标题系统 */}
             <div className="space-y-6">
-              <h2 className="text-atlassian-h1 font-bold leading-tight flex items-center justify-center gap-4 flex-wrap">
-                <span>⚓</span>
-                {tLanding('sections.final_cta.title')}
-                <span>🗺️</span>
-              </h2>
-              <p className="text-atlassian-body-large text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              <motion.h2 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  duration: 0.6, 
+                  delay: 0.2,
+                  ease: [0.15, 1, 0.3, 1]
+                }}
+                className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-magellan-depth-900"
+              >
+                <span className="inline-flex items-center gap-2">
+                  ⚓ {tLanding('sections.final_cta.title')}
+                </span>
+              </motion.h2>
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  duration: 0.5, 
+                  delay: 0.3
+                }}
+                className="text-lg md:text-xl text-magellan-depth-600 max-w-2xl mx-auto leading-relaxed"
+              >
                 🌊 {tLanding('sections.final_cta.description')}
-              </p>
+              </motion.p>
             </div>
             
-            {/* 航海统计 */}
+            {/* AM.md 航海统计指示器 - 探索数据 */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex justify-center gap-12 text-sm text-muted-foreground flex-wrap my-8"
+              transition={{ 
+                duration: 0.4, 
+                delay: 0.4
+              }}
+              className="flex justify-center gap-8 flex-wrap my-12"
             >
-              <div className="flex items-center gap-2 group">
-                <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                  <Users className="h-4 w-4 text-primary" />
+              <div className="flex items-center gap-3 group">
+                <div className={cn(
+                  "p-2 rounded-full transition-all duration-300",
+                  "bg-gradient-to-br from-magellan-mint/10 to-magellan-mint/5",
+                  "border border-magellan-mint/20 group-hover:border-magellan-mint/40",
+                  "group-hover:bg-magellan-mint/15"
+                )}>
+                  <Users className="h-4 w-4 text-magellan-mint" />
                 </div>
-                <span className="font-medium">{tLanding('sections.final_cta.stats.active_explorers')}</span>
+                <span className="font-semibold text-magellan-depth-700">
+                  {tLanding('sections.final_cta.stats.active_explorers')}
+                </span>
               </div>
-              <div className="flex items-center gap-2 group">
-                <div className="p-2 rounded-full bg-magellan-teal/10 group-hover:bg-magellan-teal/20 transition-colors">
-                  <Star className="h-4 w-4 text-magellan-teal" />
-                </div>
-                <span className="font-medium">{tLanding('sections.final_cta.stats.discoveries_made')}</span>
-              </div>
-              <div className="flex items-center gap-2 group">
-                <div className="p-2 rounded-full bg-magellan-gold/10 group-hover:bg-magellan-gold/20 transition-colors">
+              <div className="flex items-center gap-3 group">
+                <div className={cn(
+                  "p-2 rounded-full transition-all duration-300",
+                  "bg-gradient-to-br from-magellan-gold/10 to-magellan-gold/5",
+                  "border border-magellan-gold/20 group-hover:border-magellan-gold/40",
+                  "group-hover:bg-magellan-gold/15"
+                )}>
                   <Crown className="h-4 w-4 text-magellan-gold" />
                 </div>
-                <span className="font-medium">{tLanding('sections.final_cta.stats.verified_treasures')}</span>
+                <span className="font-semibold text-magellan-depth-700">
+                  {tLanding('sections.final_cta.stats.discoveries_made')}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 group">
+                <div className={cn(
+                  "p-2 rounded-full transition-all duration-300",
+                  "bg-gradient-to-br from-magellan-coral/10 to-magellan-coral/5",
+                  "border border-magellan-coral/20 group-hover:border-magellan-coral/40",
+                  "group-hover:bg-magellan-coral/15"
+                )}>
+                  <Shield className="h-4 w-4 text-magellan-coral" />
+                </div>
+                <span className="font-semibold text-magellan-depth-700">
+                  {tLanding('sections.final_cta.stats.verified_treasures')}
+                </span>
               </div>
             </motion.div>
             
-            {/* 行动按钮 */}
+            {/* AM.md 专业级航海行动按钮系统 */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ 
-                duration: 0.6, 
-                delay: 0.4,
-                ease: [0.25, 0.1, 0.25, 1]
+                duration: 0.4, 
+                delay: 0.5
               }}
-              className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto"
             >
-              <Link href="/submit">
+              {/* 主要行动按钮 - 标记发现 */}
+              <Link href="/submit" className="w-full sm:w-auto">
                 <Button 
-                  size="lg" 
+                  size="lg"
                   className={cn(
-                    "group relative overflow-hidden",
-                    "bg-gradient-to-r from-primary via-magellan-teal to-primary",
-                    "hover:from-primary/90 hover:via-magellan-teal/90 hover:to-primary/90",
-                    "text-white rounded-2xl px-8 py-4 text-lg font-semibold",
-                    "shadow-2xl hover:shadow-3xl",
-                    "transition-all duration-500 professional-scale",
-                    "border border-primary/20"
+                    "w-full group min-h-[48px] relative overflow-hidden",
+                    "bg-gradient-to-r from-magellan-primary to-magellan-teal",
+                    "hover:from-magellan-primary/90 hover:to-magellan-teal/90",
+                    "text-white rounded-xl px-8 py-4 font-semibold",
+                    "shadow-lg hover:shadow-xl transition-all duration-300",
+                    "border border-magellan-primary/20 hover:border-magellan-primary/40",
+                    "subtle-scale professional-glow"
                   )}
-                  style={{
-                    backgroundSize: '200% 100%',
-                    animation: 'gradient-shift 3s ease infinite'
-                  }}
                 >
-                  {/* 按钮背景效果 */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-magellan-coral/20 via-transparent to-magellan-gold/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  
-                  <div className="relative flex items-center gap-3">
-                    <Map className="h-6 w-6 group-hover:rotate-6 transition-transform duration-300 professional-rotate" />
-                    ⚓ {tLanding('sections.final_cta.chart_discovery')}
-                    <ExternalLink className="h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
+                  ⚓ {tLanding('sections.final_cta.chart_discovery')}
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                 </Button>
               </Link>
               
-              <Link href="/categories">
+              {/* 次要行动按钮 - 探索海域 */}
+              <Link href="/categories" className="w-full sm:w-auto">
                 <Button 
-                  size="lg" 
-                  variant="outline" 
+                  size="lg"
+                  variant="outline"
                   className={cn(
-                    "group",
-                    "border-2 border-primary/30 hover:border-primary/60",
-                    "bg-background/80 hover:bg-primary/5 backdrop-blur-sm",
-                    "rounded-2xl px-8 py-4 text-lg font-semibold",
-                    "shadow-lg hover:shadow-xl",
+                    "w-full group min-h-[48px] relative",
+                    "bg-magellan-depth-50 hover:bg-magellan-depth-100",
+                    "border-2 border-magellan-primary/30 hover:border-magellan-primary",
+                    "text-magellan-primary hover:text-magellan-primary",
+                    "rounded-xl px-8 py-4 font-semibold",
+                    "shadow-md hover:shadow-lg transition-all duration-300",
                     "subtle-hover"
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    <Compass className="h-6 w-6 text-primary group-hover:rotate-12 transition-transform duration-500 professional-rotate" />
-                    🗺️ {tLanding('sections.final_cta.explore_territories')}
-                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-                  </div>
+                  <Search className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
+                  🗺️ {tLanding('sections.final_cta.explore_territories')}
+                  <ExternalLink className="h-4 w-4 ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
                 </Button>
               </Link>
+            </motion.div>
+
+            {/* AM.md 底部航海装饰线 */}
+            <motion.div
+              initial={{ opacity: 0, scaleX: 0 }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              transition={{ 
+                duration: 0.8, 
+                delay: 0.6,
+                ease: [0.25, 0.1, 0.25, 1]
+              }}
+              className="mt-16 flex justify-center"
+            >
+              <div className={cn(
+                "h-0.5 w-32 rounded-full",
+                "bg-gradient-to-r from-transparent via-magellan-primary/30 to-transparent"
+              )}></div>
             </motion.div>
           </motion.div>
         </div>

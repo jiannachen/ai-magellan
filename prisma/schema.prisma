@@ -7,6 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Feedback {
+  id        String   @id @default(cuid())
+  name      String?
+  content   String
+  source    String?
+  createdAt DateTime @default(now())
+  status    String   @default("new")
+
+  @@map("feedbacks")
+}
+
 model User {
   id        String            @id
   name      String?

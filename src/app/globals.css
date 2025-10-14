@@ -2,6 +2,130 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== ATLASSIAN DESIGN SYSTEM TOKENS ===== */
+/* 基于 ATL.md 的专业级 AI 导航站设计系统 */
+
+:root {
+  /* 主要专业色彩 (80%使用) - Atlassian基础 */
+  --ds-background-brand-bold: #0052CC;           /* 主品牌色 */
+  --ds-background-brand-bold-hovered: #0747A6;   /* 悬停状态 */
+  --ds-background-brand-bold-pressed: #092E5C;   /* 按下状态 */
+  
+  /* 中性色系统 - 专业背景 */
+  --ds-background-neutral: #FFFFFF;              /* 主背景 */
+  --ds-background-neutral-subtle: #F7F8F9;       /* 次背景 */
+  --ds-background-neutral-subtle-hovered: #F1F2F4; /* 悬停背景 */
+  --ds-background-neutral-subtle-pressed: #DCDFE4; /* 按下背景 */
+  
+  /* 文本色彩层级 */
+  --ds-text: #172B4D;                           /* 主文本 */
+  --ds-text-subtle: #626F86;                    /* 次要文本 */
+  --ds-text-subtlest: #758195;                  /* 最淡文本 */
+  --ds-text-disabled: #091E424F;                /* 禁用文本 */
+  
+  /* AI主题点缀色 (20%使用) - 品牌差异化 */
+  --ai-discovery: #00C7E6;                      /* AI发现高亮 */
+  --ai-success: #36B37E;                        /* 工具验证成功 */
+  --ai-innovation: #6554C0;                     /* 创新标记 */
+  --ai-premium: #FFAB00;                        /* 付费工具标识 */
+  
+  /* 功能状态色 */
+  --ds-background-success: #1F845A;             /* 成功状态 */
+  --ds-background-warning: #974F0C;             /* 警告状态 */
+  --ds-background-danger: #C9372C;              /* 错误状态 */
+  --ds-background-information: #0052CC;         /* 信息状态 */
+  
+  /* AI工具类型标识色 */
+  --tool-free: #36B37E;                         /* 免费工具 */
+  --tool-freemium: #6554C0;                     /* 免费增值 */
+  --tool-paid: #FFAB00;                         /* 付费工具 */
+  --tool-enterprise: #172B4D;                   /* 企业级 */
+
+  /* 字体系统 */
+  --ds-font-family-sans: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+  --ds-font-family-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', 'Roboto Mono', monospace;
+  
+  /* 字重系统 */
+  --ds-font-weight-regular: 400;
+  --ds-font-weight-medium: 500;
+  --ds-font-weight-semibold: 600;
+  --ds-font-weight-bold: 700;
+
+  /* 间距系统（8px网格） */
+  --ds-space-0: 0px;
+  --ds-space-025: 2px;    /* 细节间距 */
+  --ds-space-050: 4px;    /* 最小间距 */
+  --ds-space-075: 6px;    /* 紧密间距 */
+  --ds-space-100: 8px;    /* 基础间距 */
+  --ds-space-150: 12px;   /* 小间距 */
+  --ds-space-200: 16px;   /* 标准间距 */
+  --ds-space-250: 20px;   /* 中等间距 */
+  --ds-space-300: 24px;   /* 大间距 */
+  --ds-space-400: 32px;   /* 区块间距 */
+  --ds-space-500: 40px;   /* 章节间距 */
+  --ds-space-600: 48px;   /* 页面区域间距 */
+  --ds-space-800: 64px;   /* 大型区域间距 */
+  --ds-space-1000: 80px;  /* 页面级间距 */
+
+  /* 圆角系统 */
+  --ds-border-radius-050: 2px;    /* 小元素 */
+  --ds-border-radius-100: 4px;    /* 默认圆角 */
+  --ds-border-radius-200: 8px;    /* 卡片、按钮 */
+  --ds-border-radius-300: 12px;   /* 大容器 */
+  --ds-border-radius-400: 16px;   /* 模态框 */
+  --ds-border-radius-500: 20px;   /* 特大容器 */
+  --ds-border-radius-round: 50%;  /* 圆形 */
+
+  /* 阴影系统 */
+  --ds-elevation-shadow-raised: 0px 1px 3px rgba(9, 30, 66, 0.12), 0px 1px 2px rgba(9, 30, 66, 0.08);
+  --ds-elevation-shadow-card: 0px 2px 6px rgba(9, 30, 66, 0.08), 0px 0px 1px rgba(9, 30, 66, 0.12);
+  --ds-elevation-shadow-overlay: 0px 4px 12px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.12);
+  --ds-elevation-shadow-modal: 0px 12px 24px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.12);
+
+  /* 动效系统 */
+  --ds-motion-easing-entrance: cubic-bezier(0.15, 1, 0.3, 1);      /* 入场动画 */
+  --ds-motion-easing-exit: cubic-bezier(0.6, 0, 0.85, 0.15);      /* 退场动画 */
+  --ds-motion-easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);    /* 标准动画 */
+  --ds-motion-easing-professional: cubic-bezier(0.25, 0.1, 0.25, 1); /* 专业动画 */
+  
+  /* 动效时长 */
+  --ds-motion-duration-instant: 0ms;     /* 即时反馈 */
+  --ds-motion-duration-fast: 100ms;      /* 快速交互 */
+  --ds-motion-duration-medium: 200ms;    /* 标准交互 */
+  --ds-motion-duration-slow: 300ms;      /* 复杂动画 */
+}
+
+/* 暗色模式支持 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ds-background-neutral: #0D1117;
+    --ds-background-neutral-subtle: #161B22;
+    --ds-text: #E6EDF3;
+    --ds-text-subtle: #7D8590;
+    --ai-discovery: #58A6FF;
+    --ai-success: #3FB950;
+  }
+}
+
+/* 减少动画支持 - 可访问性优先 */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ds-motion-duration-instant: 0ms;
+    --ds-motion-duration-fast: 0ms;
+    --ds-motion-duration-medium: 0ms;
+    --ds-motion-duration-slow: 0ms;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ===== AI MAGELLAN 专业级海洋主题动画 ===== */
 /* 核心原则：微妙、专业、有意义的动画效果 */
 /* 更新：进一步优化hover效果，避免视觉过载 */

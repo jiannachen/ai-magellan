@@ -34,11 +34,21 @@ function toast({ title, description, variant = "default" }: ToastProps) {
   }
 }
 
+// 兼容方法，支持 toast.success() 和 toast.error() 调用
+const toastWithMethods = Object.assign(toast, {
+  success: (title: string, description?: string) => 
+    toast({ title, description, variant: "success" }),
+  error: (title: string, description?: string) => 
+    toast({ title, description, variant: "destructive" }),
+  warning: (title: string, description?: string) => 
+    toast({ title, description, variant: "warning" }),
+});
+
 function useToast() {
   return {
-    toast,
+    toast: toastWithMethods,
     dismiss: sonnerToast.dismiss,
   };
 }
 
-export { useToast, toast };
+export { useToast, toastWithMethods as toast };

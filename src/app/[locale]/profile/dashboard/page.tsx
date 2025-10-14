@@ -32,7 +32,7 @@ import { Button } from '@/ui/common/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Badge } from '@/ui/common/badge'
 import { ProfileLayout } from '@/components/profile/profile-layout'
-import { toast } from 'sonner'
+import { toast } from '@/hooks/use-toast'
 import { StatCard } from '@/components/ui/stat-card'
 import { ActionCard } from '@/components/ui/action-card'
 
@@ -66,7 +66,7 @@ export default function DashboardPage() {
     totalLikes: 0
   })
   const [loading, setLoading] = useState(true)
-  const t = useTranslations()
+  const t = useTranslations('common')
   const tProfile = useTranslations('profile')
 
   useEffect(() => {
@@ -78,10 +78,21 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
-      await Promise.all([
+      const results = await Promise.allSettled([
         fetchFavorites(),
         fetchStats()
       ])
+      
+      // 检查是否有失败的请求
+      const failedRequests = results.filter(result => result.status === 'rejected')
+      if (failedRequests.length > 0) {
+        failedRequests.forEach((result, index) => {
+          if (result.status === 'rejected') {
+            console.error(`Request ${index} failed:`, result.reason)
+          }
+        })
+        toast.error('Some data failed to load')
+      }
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
       toast.error('Failed to load dashboard data')
@@ -91,31 +102,25 @@ export default function DashboardPage() {
   }
 
   const fetchFavorites = async () => {
-    try {
-      const response = await fetch('/api/user/favorites')
-      if (response.ok) {
-        const data = await response.json()
-        setFavorites(data.data?.slice(0, 6) || [])
-      }
-    } catch (error) {
-      console.error('Error fetching favorites:', error)
+    const response = await fetch('/api/user/favorites')
+    if (!response.ok) {
+      throw new Error(`Failed to fetch favorites: ${response.status}`)
     }
+    const data = await response.json()
+    setFavorites(data.data?.slice(0, 6) || [])
   }
 
   const fetchStats = async () => {
-    try {
-      const response = await fetch('/api/user/stats')
-      if (response.ok) {
-        const data = await response.json()
-        setStats(data.data || {
-          totalFavorites: 0,
-          totalSubmissions: 0,
-          totalLikes: 0
-        })
-      }
-    } catch (error) {
-      console.error('Error fetching stats:', error)
+    const response = await fetch('/api/user/stats')
+    if (!response.ok) {
+      throw new Error(`Failed to fetch stats: ${response.status}`)
     }
+    const data = await response.json()
+    setStats(data.data || {
+      totalFavorites: 0,
+      totalSubmissions: 0,
+      totalLikes: 0
+    })
   }
 
   const removeFavorite = async (websiteId: number) => {

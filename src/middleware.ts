@@ -25,7 +25,6 @@ export default clerkMiddleware((auth, req) => {
   
   // Skip internationalization for API routes but not admin routes
   if (pathname.startsWith('/api/')) {
-    console.log(`Skipping intl middleware for: ${pathname}`);
     return;
   }
 

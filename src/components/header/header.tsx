@@ -17,12 +17,14 @@ import { useAtom } from 'jotai';
 import { categoriesAtom } from '@/lib/atoms';
 import { useEffect } from 'react';
 import { cn } from "@/lib/utils/utils";
+import { useContainerCollisionPadding } from "@/lib/hooks/useContainerCollisionPadding";
 
 export default function Header() {
   const t = useTranslations();
   const tRank = useTranslations('pages.rankings');
   const tCat = useTranslations('pages.categories');
   const [categories, setCategories] = useAtom(categoriesAtom);
+  const collisionPadding = useContainerCollisionPadding(8);
 
   // 分类图标映射 - 根据slug选择合适的图标
   const getCategoryIcon = (slug: string) => {
@@ -117,6 +119,8 @@ export default function Header() {
               <DropdownMenuContent 
                 align="start" 
                 className="w-52 p-1 rounded-lg border bg-popover"
+                avoidCollisions
+                collisionPadding={collisionPadding}
               >
                 <DropdownMenuItem asChild>
                   <Link 
@@ -161,6 +165,8 @@ export default function Header() {
               <DropdownMenuContent 
                 align="start" 
                 className="w-52 p-1 rounded-lg border bg-popover"
+                avoidCollisions
+                collisionPadding={collisionPadding}
               >
                 <DropdownMenuItem asChild>
                   <Link 

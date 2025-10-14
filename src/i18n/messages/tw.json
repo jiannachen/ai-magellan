@@ -1,4 +1,5 @@
 {
+  "loading": "載入中...",
   "common": {
     "loading": "載入中...",
     "error": "發生錯誤",
@@ -289,18 +290,55 @@
       "cta_chart_discovery": "繪製你的發現"
     },
     "about": {
-      "title": "關於AI導航",
-      "description": "AI導航是一個專業的AI工具導航站",
-      "content": {
-        "intro": "AI導航致力於為用戶提供最優質的人工智能工具和資源導航服務。",
-        "mission": "我們的使命是幫助用戶發現、分享和收藏最新最好用的AI產品。",
-        "features": [
-          "精選優質AI工具",
-          "智能分類和標籤",
-          "用戶評價和反饋",
-          "定期更新和維護",
-          "免費開放使用"
-        ]
+      "title": "關於AI麥哲倫",
+      "subtitle": "開創你的AI之旅",
+      "description": "用專業指引探索AI前沿",
+      "hero": {
+        "title": "航行AI海洋，發現隱藏寶藏",
+        "subtitle": "就像麥哲倫探索未知海域一樣，AI麥哲倫幫助你在浩瀚的AI工具海洋中發現珍貴寶藏。每個工具都是等待發現的島嶼，每次搜索都是一場航海冒險。"
+      },
+      "mission": {
+        "title": "我們的航海使命",
+        "description": "我們是你在AI海洋中值得信賴的領航員，致力於幫助探險者發現、繪製和珍藏最優質的AI工具與資源。"
+      },
+      "features": {
+        "title": "導航功能",
+        "discover": {
+          "title": "發現AI島嶼",
+          "description": "精選優質AI工具與資源，幫助你找到最適合的AI解決方案"
+        },
+        "collect": {
+          "title": "寶藏收藏",
+          "description": "發現好用的AI工具？與同伴探險者分享，收藏你喜愛的發現"
+        },
+        "rankings": {
+          "title": "探險海圖",
+          "description": "即時更新的AI工具排行榜，發現最受歡迎和有價值的AI產品"
+        },
+        "search": {
+          "title": "導航羅盤",
+          "description": "強大的搜索功能，快速找到你需要的AI工具"
+        }
+      },
+      "journey": {
+        "title": "你的探索之旅",
+        "submit": {
+          "title": "提交新領域",
+          "description": "發現了有價值的AI工具？點擊提交或使用助手快速分享新領域",
+          "button": "提交工具"
+        },
+        "explore": {
+          "title": "導航與發現",
+          "description": "通過搜索、分類、排行榜探索並使用優質AI工具",
+          "button": "開始探索"
+        }
+      },
+      "community": {
+        "title": "加入探險隊",
+        "description": "我們歡迎各種形式的貢獻，無論是提交新的AI工具、改進網站功能，還是提供建議和回饋。讓我們一起繪製AI前沿版圖。",
+        "feedback": "航海建議反饋",
+        "discord": "加入Discord",
+        "twitter": "關注 X"
       }
     }
   },
@@ -317,8 +355,17 @@
     "description_placeholder": "請簡要描述這個網站的功能和特點",
     "category_required": "分類 *",
     "category_placeholder": "請選擇分類",
+    "parent_category": "上級分類",
+    "select_parent_category": "選擇上級分類",
+    "subcategory": "子分類",
+    "select_subcategory": "選擇子分類",
+    "no_subcategories_found": "未找到子分類",
+    "use_parent_category": "使用上級分類",
     "tags": "標籤",
     "tags_placeholder": "用逗號分隔多個標籤",
+    "tags_input_placeholder": "輸入關鍵詞並按Enter鍵添加標籤",
+    "tags_limit_reached": "最多只能添加5個標籤",
+    "tag_already_exists": "標籤已存在",
     "thumbnail_url": "縮圖連結",
     "thumbnail_placeholder": "https://example.com/image.jpg",
     "thumbnail_preview": "縮圖預覽",
@@ -572,7 +619,14 @@
   },
   "footer": {
     "description": "發現優質AI工具與資源的最佳平台",
+    "brand": {
+      "tagline": "開創你的AI之旅",
+      "subtitle": "發現你的下一個AI寶藏。"
+    },
     "sections": {
+      "navigation_routes": "導航航線",
+      "expedition_rankings": "探險排行榜",
+      "expedition_support": "探險支援",
       "quick_links": "快速連結",
       "rankings": "排行榜",
       "useful_links": "實用連結",
@@ -689,5 +743,23 @@
     "site_description": "專業的AI工具導航站，精選優質的人工智能工具和資源",
     "ai_tools_list": "AI工具推薦清單",
     "curated_list_description": "精選的AI工具和資源清單"
+  },
+  "feedback": {
+    "trigger": "提供意見",
+    "messages": {
+      "feedback_required": "請輸入您的意見",
+      "submit_success": "感謝！您的反饋已提交",
+      "submit_error": "提交失敗，請稍後再試"
+    },
+    "dialog": {
+      "title": "航海建議反饋",
+      "description": "分享您的想法，幫助我們改進 AI Magellan",
+      "name_label": "姓名（選填）",
+      "name_placeholder": "您的姓名或暱稱",
+      "feedback_label": "反饋內容",
+      "feedback_placeholder": "告訴我們做得好的地方或需要改進之處",
+      "submit_button": "提交",
+      "submitting": "提交中..."
+    }
   }
 }

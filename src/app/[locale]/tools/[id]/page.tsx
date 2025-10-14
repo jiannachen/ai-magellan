@@ -51,7 +51,7 @@ import { Button } from '@/ui/common/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Badge } from '@/ui/common/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/common/avatar'
-import { toast } from 'sonner'
+import { toast } from '@/hooks/use-toast'
 import { useUser } from '@clerk/nextjs'
 import { Reviews } from '@/components/reviews/reviews'
 import { useTranslations } from 'next-intl'
@@ -66,6 +66,12 @@ interface Website {
     id: number
     name: string
     slug: string
+    parent_id?: number
+    parent?: {
+      id: number
+      name: string
+      slug: string
+    }
   }
   thumbnail: string | null
   status: string
@@ -649,7 +655,17 @@ export default function ToolDetailPage() {
                         </div>
                         <div>
                           <h4 className="font-semibold text-foreground">{t('profile.tools.detail.sections.category')}</h4>
-                          <p className="text-sm text-muted-foreground">{website.category?.name}</p>
+                          <div className="text-sm text-muted-foreground">
+                            {website.category?.parent ? (
+                              <div className="flex items-center gap-1">
+                                <span>{website.category.parent.name}</span>
+                                <ArrowRight className="h-3 w-3" />
+                                <span className="font-medium">{website.category.name}</span>
+                              </div>
+                            ) : (
+                              <span>{website.category?.name}</span>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="flex-shrink-0">

@@ -6,16 +6,13 @@ import { usePathname, useRouter, Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { 
-  LayoutDashboard, 
-  Bookmark, 
-  Upload,
   LogOut, 
-  Settings,
   ChevronRight
 } from 'lucide-react'
 import { Button } from '@/ui/common/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/common/avatar'
 import { cn } from '@/lib/utils/utils'
+import { profileNavigationConfig } from '@/lib/config/profile-navigation'
 
 interface ProfileLayoutProps {
   children: React.ReactNode
@@ -30,36 +27,12 @@ export function ProfileLayout({ children }: ProfileLayoutProps) {
   const tProfile = useTranslations('profile.navigation')
   const tAuth = useTranslations('auth')
 
-  const navigation = [
-    {
-      name: 'Dashboard',
-      label: tProfile('dashboard'),
-      href: '/profile/dashboard',
-      icon: LayoutDashboard,
-      description: tProfile('dashboard_desc')
-    },
-    {
-      name: 'Favorites',
-      label: tProfile('favorites'),
-      href: '/profile/favorites',
-      icon: Bookmark,
-      description: tProfile('favorites_desc')
-    },
-    {
-      name: 'Submissions',
-      label: tProfile('submissions'),
-      href: '/profile/submissions',
-      icon: Upload,
-      description: tProfile('submissions_desc')
-    },
-    {
-      name: 'Settings',
-      label: tProfile('settings'),
-      href: '/profile/info',
-      icon: Settings,
-      description: tProfile('settings_desc')
-    }
-  ]
+  // 使用共享的导航配置
+  const navigation = profileNavigationConfig.map(item => ({
+    ...item,
+    label: tProfile(item.labelKey),
+    description: tProfile(item.descriptionKey)
+  }))
 
   const handleSignOut = () => {
     signOut(() => router.push('/'))

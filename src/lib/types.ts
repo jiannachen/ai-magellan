@@ -90,9 +90,13 @@ export interface Category {
   slug: string;
   name_en?: string;
   name_zh?: string;
+  parent_id?: number | null;
+  sort_order?: number;
   created_at?: Date | string;
   updated_at?: Date | string;
   websites?: Website[];
+  parent?: Category | null;
+  children?: Category[];
 }
 
 export interface FormInputs {

@@ -1,6 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/db/db'
+
+// Helper function to ensure user exists in database
+async function ensureUserExists(userId: string) {
+  const user = await currentUser()
+  if (!user) return false
+
+  // Check if user exists in database
+  const existingUser = await prisma.user.findUnique({
+    where: { id: userId }
+  })
+
+  if (!existingUser) {
+    // Create user if doesn't exist
+    await prisma.user.create({
+      data: {
+        id: userId,
+        email: user.emailAddresses[0]?.emailAddress || '',
+        name: user.firstName || user.username || 'User',
+        image: user.imageUrl,
+      }
+    })
+  }
+  
+  return true
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -64,7 +89,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error fetching user favorites:', error)
     return NextResponse.json(
       { error: 'Internal server error' }, 
       { status: 500 }
@@ -80,6 +104,15 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       return NextResponse.json(
         { error: 'Unauthorized' }, 
+        { status: 401 }
+      )
+    }
+
+    // Ensure user exists in database
+    const userExists = await ensureUserExists(userId)
+    if (!userExists) {
+      return NextResponse.json(
+        { error: 'Failed to authenticate user' }, 
         { status: 401 }
       )
     }
@@ -133,7 +166,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, favorite })
 
   } catch (error) {
-    console.error('Error adding favorite:', error)
     return NextResponse.json(
       { error: 'Internal server error' }, 
       { status: 500 }
@@ -174,7 +206,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true })
 
   } catch (error) {
-    console.error('Error removing favorite:', error)
     return NextResponse.json(
       { error: 'Internal server error' }, 
       { status: 500 }

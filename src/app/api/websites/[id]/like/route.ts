@@ -1,9 +1,32 @@
 import { NextResponse } from "next/server";
-import { auth } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { AjaxResponse } from "@/lib/utils";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/db/db";
 
-const prisma = new PrismaClient();
+// Helper function to ensure user exists in database
+async function ensureUserExists(userId: string) {
+  const user = await currentUser();
+  if (!user) return false;
+
+  // Check if user exists in database
+  const existingUser = await prisma.user.findUnique({
+    where: { id: userId }
+  });
+
+  if (!existingUser) {
+    // Create user if doesn't exist
+    await prisma.user.create({
+      data: {
+        id: userId,
+        email: user.emailAddresses[0]?.emailAddress || '',
+        name: user.firstName || user.username || 'User',
+        image: user.imageUrl,
+      }
+    });
+  }
+  
+  return true;
+}
 
 // POST /api/websites/[id]/like - Add like
 export async function POST(
@@ -15,6 +38,14 @@ export async function POST(
     
     if (!userId) {
       return NextResponse.json(AjaxResponse.fail("Please login first"), {
+        status: 401,
+      });
+    }
+
+    // Ensure user exists in database
+    const userExists = await ensureUserExists(userId);
+    if (!userExists) {
+      return NextResponse.json(AjaxResponse.fail("Failed to authenticate user"), {
         status: 401,
       });
     }
@@ -58,7 +89,6 @@ export async function POST(
 
     return NextResponse.json(AjaxResponse.ok({ likes: updatedWebsite?.likes || 0 }));
   } catch (error) {
-    console.error("Failed to like website:", error);
     return NextResponse.json(AjaxResponse.fail("Failed to like website"), {
       status: 500,
     });
@@ -75,6 +105,14 @@ export async function DELETE(
     
     if (!userId) {
       return NextResponse.json(AjaxResponse.fail("Please login first"), {
+        status: 401,
+      });
+    }
+
+    // Ensure user exists in database
+    const userExists = await ensureUserExists(userId);
+    if (!userExists) {
+      return NextResponse.json(AjaxResponse.fail("Failed to authenticate user"), {
         status: 401,
       });
     }
@@ -120,7 +158,6 @@ export async function DELETE(
 
     return NextResponse.json(AjaxResponse.ok({ likes: updatedWebsite?.likes || 0 }));
   } catch (error) {
-    console.error("Failed to unlike website:", error);
     return NextResponse.json(AjaxResponse.fail("Failed to unlike website"), {
       status: 500,
     });

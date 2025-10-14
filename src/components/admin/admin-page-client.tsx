@@ -13,7 +13,7 @@ import {
 } from "@/ui/common/select";
 import type { Website } from "@/lib/types";
 import { motion } from "framer-motion";
-import { ListFilter, Users } from "lucide-react";
+import { ListFilter, Users, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 
 export function AdminPageClient({
@@ -75,7 +75,7 @@ export function AdminPageClient({
           </p>
         </div>
         <div className="w-full sm:w-auto">
-          <div className="grid w-full sm:w-auto grid-cols-2 bg-background/50 rounded-lg p-1">
+          <div className="grid w-full sm:w-auto grid-cols-3 bg-background/50 rounded-lg p-1">
             <div className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-background/60 text-foreground">
               <ListFilter className="w-4 h-4" />
               网站管理
@@ -86,6 +86,13 @@ export function AdminPageClient({
             >
               <Users className="w-4 h-4" />
               用户管理
+            </a>
+            <a
+              href="/admin/feedback"
+              className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-background/60"
+            >
+              <MessageSquare className="w-4 h-4" />
+              反馈管理
             </a>
           </div>
         </div>

@@ -3,7 +3,7 @@ import { UserManagementClient } from "@/components/admin/user-management-client"
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db/db";
-import { ListFilter, Users } from "lucide-react";
+import { ListFilter, Users, MessageSquare } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "用户管理 - AI Magellan Admin",
@@ -165,7 +165,7 @@ export default async function AdminUsersPage() {
           </p>
         </div>
         <div className="w-full sm:w-auto">
-          <div className="grid w-full sm:w-auto grid-cols-2 bg-background/50 rounded-lg p-1">
+          <div className="grid w-full sm:w-auto grid-cols-3 bg-background/50 rounded-lg p-1">
             <a
               href="/admin"
               className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-background/60"
@@ -177,6 +177,13 @@ export default async function AdminUsersPage() {
               <Users className="w-4 h-4" />
               用户管理
             </div>
+            <a
+              href="/admin/feedback"
+              className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-background/60"
+            >
+              <MessageSquare className="w-4 h-4" />
+              反馈管理
+            </a>
           </div>
         </div>
       </div>

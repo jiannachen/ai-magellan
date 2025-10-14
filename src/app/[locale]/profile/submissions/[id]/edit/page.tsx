@@ -18,6 +18,7 @@ import { Input } from '@/ui/common/input'
 import { Textarea } from '@/ui/common/textarea'
 import { Label } from '@/ui/common/label'
 import { RequiredLabel, FormFieldWrapper } from '@/ui/common/required-label'
+import { Badge } from '@/ui/common/badge'
 import {
   Select,
   SelectContent,
@@ -26,7 +27,7 @@ import {
   SelectValue,
 } from '@/ui/common/select'
 import { Checkbox } from '@/ui/common/checkbox'
-import { toast } from 'sonner'
+import { toast } from '@/hooks/use-toast'
 import GlobalLoading from '@/components/loading/global-loading'
 import { 
   Map,
@@ -104,7 +105,7 @@ interface Website {
   pricing_model: string
   has_free_version: boolean
   api_available: boolean
-  tags: string | null
+  tags: string[] | null
   twitter_url: string | null
   linkedin_url: string | null
   facebook_url: string | null
@@ -134,6 +135,9 @@ export default function EditWebsitePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isFetching, setIsFetching] = useState(false)
   const [categories, setCategories] = useAtom(categoriesAtom)
+  const [selectedParentCategory, setSelectedParentCategory] = useState<number | null>(null)
+  const [subcategories, setSubcategories] = useState<any[]>([])
+  const [currentTagInput, setCurrentTagInput] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [website, setWebsite] = useState<Website | null>(null)
@@ -163,7 +167,7 @@ export default function EditWebsitePage() {
       email: '',
       title: '',
       category_id: '',
-      tags: '',
+      tags: [],
       tagline: '',
       description: '',
       features: [{ name: '', description: '' }],
@@ -217,14 +221,16 @@ export default function EditWebsitePage() {
     name: "pricing_plans"
   })
 
-  // Load categories
+  // Load categories with hierarchy support
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const response = await fetch('/api/categories')
+        const response = await fetch('/api/categories?includeSubcategories=true')
         if (!response.ok) throw new Error('Failed to load categories')
         const data = await response.json()
-        setCategories(data.data)
+        // 只显示父分类（没有parent_id的分类）
+        const parentCategories = data.data.filter((cat: any) => !cat.parent_id)
+        setCategories(parentCategories)
       } catch (error) {
         toast.error(tMessages('load_categories_error'))
       }
@@ -234,6 +240,47 @@ export default function EditWebsitePage() {
       loadCategories()
     }
   }, [categories.length, setCategories])
+
+  // Load subcategories when parent category changes
+  useEffect(() => {
+    const loadSubcategories = async () => {
+      if (!selectedParentCategory) {
+        setSubcategories([])
+        return
+      }
+
+      try {
+        const response = await fetch(`/api/categories?includeSubcategories=true&parentId=${selectedParentCategory}`)
+        if (!response.ok) throw new Error('Failed to load subcategories')
+        const data = await response.json()
+        setSubcategories(data.data)
+      } catch (error) {
+        console.error('Error loading subcategories:', error)
+        setSubcategories([])
+      }
+    }
+
+    loadSubcategories()
+  }, [selectedParentCategory])
+
+  // Set parent category when website data is loaded
+  useEffect(() => {
+    if (website && categories.length > 0) {
+      // 找到当前分类的父分类
+      const allCategories = categories.flatMap(cat => [cat, ...(cat.children || [])])
+      const currentCategory = allCategories.find(cat => cat.id === website.category_id)
+      
+      if (currentCategory) {
+        if (currentCategory.parent_id) {
+          // 如果当前分类有父分类，设置父分类并加载子分类
+          setSelectedParentCategory(currentCategory.parent_id)
+        } else {
+          // 如果当前分类就是父分类
+          setSelectedParentCategory(currentCategory.id)
+        }
+      }
+    }
+  }, [website, categories])
 
   // Load website data for editing
   useEffect(() => {
@@ -294,7 +341,11 @@ export default function EditWebsitePage() {
         description: websiteData.description,
         category_id: websiteData.category_id.toString(),
         tagline: websiteData.tagline || '',
-        tags: websiteData.tags || '',
+        tags: websiteData.tags ? 
+          (typeof websiteData.tags === 'string' ? 
+            websiteData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : 
+            websiteData.tags
+          ) : [],
         features: processFeatures(websiteData.features),
         use_cases: websiteData.use_cases || [],
         target_audience: websiteData.target_audience || [],
@@ -411,6 +462,64 @@ export default function EditWebsitePage() {
     setValue(fieldName, current.filter(item => item !== value) as any)
   }
 
+  // Tag handling functions
+  const addTag = (tag: string) => {
+    const trimmedTag = tag.trim()
+    const currentTags = watch('tags')
+    
+    console.log('Adding tag:', { tag, trimmedTag, currentTags, length: currentTags.length })
+    
+    // 检查是否有内容
+    if (!trimmedTag) {
+      console.log('Tag is empty after trim')
+      return
+    }
+    
+    // 检查标签数量限制
+    if (currentTags.length >= 5) {
+      toast.error(tForm('tags_limit_reached'))
+      return
+    }
+    
+    // 检查是否重复
+    if (currentTags.includes(trimmedTag)) {
+      toast.error(tForm('tag_already_exists'))
+      return
+    }
+    
+    // 添加标签
+    const newTags = [...currentTags, trimmedTag]
+    console.log('Setting new tags:', newTags)
+    setValue('tags', newTags)
+    setCurrentTagInput('')
+  }
+
+  const removeTag = (tagToRemove: string) => {
+    setValue('tags', watch('tags').filter(tag => tag !== tagToRemove))
+  }
+
+  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      addTag(currentTagInput)
+    } else if (e.key === 'Backspace' && currentTagInput === '' && watch('tags').length > 0) {
+      // 如果输入为空且按退格键，删除最后一个标签
+      const tags = watch('tags')
+      setValue('tags', tags.slice(0, -1))
+    }
+  }
+
+  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      addTag(currentTagInput)
+    } else if (e.key === 'Backspace' && currentTagInput === '' && watch('tags').length > 0) {
+      // 如果输入为空且按退格键，删除最后一个标签
+      const tags = watch('tags')
+      setValue('tags', tags.slice(0, -1))
+    }
+  }
+
   // Form submission
   const onSubmit = async (data: WebsiteEditData) => {
     setIsSubmitting(true)
@@ -421,10 +530,16 @@ export default function EditWebsitePage() {
     try {
       console.log('Submitting data:', data) // 调试用
       
+      // Convert tags array to string for API
+      const submissionData = {
+        ...data,
+        tags: Array.isArray(data.tags) ? data.tags.join(', ') : data.tags
+      }
+      
       const response = await fetch(`/api/websites/${websiteId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(submissionData)
       })
 
       console.log('Response status:', response.status) // 调试用
@@ -720,30 +835,88 @@ export default function EditWebsitePage() {
                     </div>
 
                     {/* Category Selection */}
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Compass className="h-4 w-4 text-primary" />
                         {tSubmit('simple_form.category_required')}
                         <span className="text-destructive ml-1">*</span>
                       </Label>
-                      <Select 
-                        onValueChange={(value) => {
-                          setValue('category_id', value)
-                          form.clearErrors('category_id')
-                        }}
-                        value={watch('category_id') || ''}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder={tSubmit('simple_form.category_placeholder')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map((category: { id: number; name: string }) => (
-                            <SelectItem key={category.id} value={category.id.toString()}>
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      
+                      {/* Category Selection Grid - PC端2列，移动端1列 */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Parent Category Selection */}
+                        <div className="space-y-2">
+                          <Label className="text-sm text-muted-foreground">
+                            {tForm('parent_category')}
+                          </Label>
+                          <Select 
+                            onValueChange={(value) => {
+                              const parentId = parseInt(value)
+                              setSelectedParentCategory(parentId)
+                              // 如果选择了父分类，清空子分类选择
+                              setValue('category_id', '')
+                              form.clearErrors('category_id')
+                            }}
+                            value={selectedParentCategory?.toString() || ''}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={tForm('select_parent_category')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {categories.map((category: { id: number; name: string }) => (
+                                <SelectItem key={category.id} value={category.id.toString()}>
+                                  {category.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Subcategory Selection */}
+                        <div className="space-y-2">
+                          <Label className="text-sm text-muted-foreground">
+                            {tForm('subcategory')}
+                          </Label>
+                          {selectedParentCategory && subcategories.length > 0 ? (
+                            <Select 
+                              onValueChange={(value) => {
+                                setValue('category_id', value)
+                                form.clearErrors('category_id')
+                              }}
+                              value={watch('category_id') || ''}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder={tForm('select_subcategory')} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {subcategories.map((subcategory: { id: number; name: string }) => (
+                                  <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
+                                    {subcategory.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : selectedParentCategory && subcategories.length === 0 ? (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => {
+                                setValue('category_id', selectedParentCategory.toString())
+                                form.clearErrors('category_id')
+                              }}
+                              className="w-full justify-start"
+                            >
+                              {tForm('use_parent_category')}
+                            </Button>
+                          ) : (
+                            <div className="h-10 flex items-center px-3 py-2 text-sm text-muted-foreground bg-muted rounded-md border border-input">
+                              {tForm('select_parent_category')}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Error Message */}
                       {form.formState.errors.category_id && (
                         <p className="text-sm text-destructive">
                           {form.formState.errors.category_id.message}
@@ -797,12 +970,58 @@ export default function EditWebsitePage() {
                         <Star className="h-4 w-4 text-primary" />
                         {tSubmit('simple_form.tags')}
                       </Label>
-                      <Input
-                        id="tags"
-                        placeholder={tForm('tags_placeholder')}
-                        {...form.register('tags')}
-                      />
-                      <p className="text-xs text-muted-foreground">{tSubmit('simple_form.tags_help')}</p>
+                      
+                      {/* Tags Display and Input */}
+                      <div className="space-y-3">
+                        {/* Current Tags */}
+                        {watch('tags').length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {watch('tags').map((tag, index) => (
+                              <Badge
+                                key={index}
+                                variant="secondary"
+                                className="flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 transition-colors"
+                              >
+                                <span>{tag}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => removeTag(tag)}
+                                  className="ml-1 text-primary/70 hover:text-primary transition-colors"
+                                  aria-label={`Remove tag ${tag}`}
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {/* Tag Input */}
+                        <div className="relative">
+                          <Input
+                            id="tags"
+                            value={currentTagInput}
+                            onChange={(e) => setCurrentTagInput(e.target.value)}
+                            onKeyDown={handleTagInputKeyDown}
+                            placeholder={tForm('tags_input_placeholder')}
+                            className="pr-10"
+                          />
+                          {currentTagInput.trim() && (
+                            <button
+                              type="button"
+                              onClick={() => addTag(currentTagInput)}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-primary-hover transition-colors"
+                              aria-label="Add tag"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <p className="text-xs text-muted-foreground">
+                        {tForm('tags_input_placeholder')} ({watch('tags').length}/5)
+                      </p>
                     </div>
                   </CardContent>
                 </Card>

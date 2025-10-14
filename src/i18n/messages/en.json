@@ -1,4 +1,5 @@
 {
+  "loading": "Loading...",
   "common": {
     "loading": "Loading...",
     "error": "Error occurred",
@@ -289,18 +290,55 @@
       }
     },
     "about": {
-      "title": "About AI Navigation",
-      "description": "AI Navigation is a professional AI tools navigation platform",
-      "content": {
-        "intro": "AI Navigation is dedicated to providing users with the highest quality artificial intelligence tools and resource navigation services.",
-        "mission": "Our mission is to help users discover, share, and bookmark the latest and best AI products.",
-        "features": [
-          "Curated quality AI tools",
-          "Smart categorization and tagging",
-          "User reviews and feedback",
-          "Regular updates and maintenance",
-          "Free and open access"
-        ]
+      "title": "About AI Magellan",
+      "subtitle": "Chart Your AI Journey",
+      "description": "Navigate the AI frontier with expert guidance",
+      "hero": {
+        "title": "Navigate the AI Ocean, Discover Hidden Treasures",
+        "subtitle": "Like Magellan exploring uncharted seas, AI Magellan helps you discover valuable treasures in the vast ocean of AI tools. Every tool is an island waiting to be discovered, every search is a voyage of adventure."
+      },
+      "mission": {
+        "title": "Our Navigation Mission",
+        "description": "We are your trusted navigator in the AI ocean, committed to helping explorers discover, chart, and treasure the finest AI tools and resources."
+      },
+      "features": {
+        "title": "Navigation Features",
+        "discover": {
+          "title": "Discover AI Islands",
+          "description": "Curated premium AI tools and resources to help you find the most suitable AI solutions"
+        },
+        "collect": {
+          "title": "Treasure Collection",
+          "description": "Found a great AI tool? Share it with fellow explorers and bookmark your favorite discoveries"
+        },
+        "rankings": {
+          "title": "Expedition Charts",
+          "description": "Real-time AI tool rankings to discover the most popular and valuable AI products"
+        },
+        "search": {
+          "title": "Navigation Compass",
+          "description": "Powerful search functionality to quickly find the AI tools you need"
+        }
+      },
+      "journey": {
+        "title": "Your Exploration Journey",
+        "submit": {
+          "title": "Submit New Territories",
+          "description": "Discovered a valuable AI tool? Click submit or use our assistant to quickly share new territories",
+          "button": "Submit Tool"
+        },
+        "explore": {
+          "title": "Navigate & Discover",
+          "description": "Explore through search, categories, and rankings to discover and use premium AI tools",
+          "button": "Start Exploring"
+        }
+      },
+      "community": {
+        "title": "Join the Expedition",
+        "description": "We welcome all forms of contribution, whether submitting new AI tools, improving website functionality, or providing suggestions and feedback. Together, let's chart the AI frontier.",
+        "feedback": "Navigation Feedback",
+        "discord": "Join Discord",
+        "twitter": "Follow X"
       }
     }
   },
@@ -317,8 +355,17 @@
     "description_placeholder": "Please briefly describe the website's features and characteristics",
     "category_required": "Category *",
     "category_placeholder": "Please select category",
+    "parent_category": "Parent Category",
+    "select_parent_category": "Select parent category",
+    "subcategory": "Subcategory",
+    "select_subcategory": "Select subcategory",
+    "no_subcategories_found": "No subcategories found",
+    "use_parent_category": "Use parent category",
     "tags": "Tags",
     "tags_placeholder": "Separate multiple tags with commas",
+    "tags_input_placeholder": "Type keywords and press Enter to add tags",
+    "tags_limit_reached": "Maximum 5 tags allowed",
+    "tag_already_exists": "Tag already exists",
     "thumbnail_url": "Thumbnail URL",
     "thumbnail_placeholder": "https://example.com/image.jpg",
     "thumbnail_preview": "Thumbnail Preview",
@@ -672,7 +719,14 @@
   },
   "footer": {
     "description": "The best platform to discover quality AI tools and resources",
+    "brand": {
+      "tagline": "Chart Your AI Journey",
+      "subtitle": "Discover your next AI treasure."
+    },
     "sections": {
+      "navigation_routes": "Navigation Routes",
+      "expedition_rankings": "Expedition Rankings", 
+      "expedition_support": "Expedition Support",
       "quick_links": "Quick Links",
       "rankings": "Rankings",
       "useful_links": "Useful Links",
@@ -788,5 +842,23 @@
     "site_description": "Professional AI tools navigation platform, featuring quality artificial intelligence tools and resources",
     "ai_tools_list": "AI Tools Recommendation List",
     "curated_list_description": "Curated list of AI tools and resources"
+  },
+  "feedback": {
+    "trigger": "Give Feedback",
+    "messages": {
+      "feedback_required": "Please enter your feedback",
+      "submit_success": "Thanks! Your feedback has been submitted",
+      "submit_error": "Submission failed. Please try again later"
+    },
+    "dialog": {
+      "title": "Navigation Feedback",
+      "description": "Share your ideas to help us improve AI Magellan",
+      "name_label": "Name (optional)",
+      "name_placeholder": "Your name or nickname",
+      "feedback_label": "Feedback",
+      "feedback_placeholder": "Tell us what's working well or what could be better",
+      "submit_button": "Submit",
+      "submitting": "Submitting..."
+    }
   }
 }
