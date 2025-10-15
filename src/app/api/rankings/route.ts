@@ -91,9 +91,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Build where condition
-    let whereCondition: any = {
+    const whereCondition: any = {
       status: 'approved',
-      ...config.where
+      ...('where' in config ? config.where : {})
     };
 
     // Add time range filter if specified
@@ -103,11 +103,23 @@ export async function GET(request: NextRequest) {
 
     // Add category filter if specified
     if (category) {
-      const categoryRecord = await prisma.category.findUnique({
-        where: { slug: category }
+      const allCategories = await prisma.category.findMany({
+        include: { children: true }
       });
+
+      const categoryRecord = allCategories.find(cat => cat.slug === category);
       if (categoryRecord) {
-        whereCondition.category_id = categoryRecord.id;
+        // 如果是一级分类，包含该分类及其所有子分类
+        if (!categoryRecord.parent_id) {
+          const categoryIds = [categoryRecord.id];
+          if (categoryRecord.children) {
+            categoryIds.push(...categoryRecord.children.map((child: any) => child.id));
+          }
+          whereCondition.category_id = { in: categoryIds };
+        } else {
+          // 如果是二级分类，只筛选该分类
+          whereCondition.category_id = categoryRecord.id;
+        }
       }
     }
 
@@ -119,7 +131,7 @@ export async function GET(request: NextRequest) {
             where: whereCondition,
             include: {
               category: true,
-              submittedBy: {
+              submitter: {
                 select: {
                   id: true,
                   name: true,
@@ -171,7 +183,7 @@ export async function GET(request: NextRequest) {
       where: whereCondition,
       include: {
         category: true,
-        submittedBy: {
+        submitter: {
           select: {
             id: true,
             name: true,

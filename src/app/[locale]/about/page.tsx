@@ -107,14 +107,18 @@ export default function AboutPage() {
             transition={{ duration: 0.8, ease: [0.15, 1, 0.3, 1] }}
             className="relative inline-flex flex-col items-center"
           >
-            {/* 航海罗盘 */}
+            {/* Logo */}
             <div className="relative mb-8">
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 className="relative"
               >
-                <Compass className="h-16 w-16 text-primary opacity-80" />
+                <img
+                  src="/logo.png"
+                  alt="AI Magellan Logo"
+                  className="h-16 w-16 rounded-xl opacity-80"
+                />
               </motion.div>
               <div className="absolute inset-0 bg-primary/15 blur-xl -z-10 animate-pulse [animation-duration:4s]" />
             </div>
@@ -299,7 +303,7 @@ export default function AboutPage() {
                 <Button
                   variant="outline"
                   className={cn(
-                    "group border-magellan-coral/30 hover:border-magellan-coral",
+                    "border-magellan-coral/30 hover:border-magellan-coral",
                     "hover:bg-magellan-coral/5 transition-all duration-300"
                   )}
                 >

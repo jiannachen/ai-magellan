@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/ui/common/tabs";
 import { ListFilter, Users, MessageSquare } from "lucide-react";
-import { cn } from "@/lib/utils/utils";
 
 export function AdminHeader() {
   const pathname = usePathname();

@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { UserManagementClient } from "@/components/admin/user-management-client";
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/db/db";
 import { ListFilter, Users, MessageSquare } from "lucide-react";
 
@@ -41,8 +42,13 @@ async function getUsers() {
       createdAt: 'desc'
     }
   });
-  
-  return users;
+
+  // Convert Date objects to strings for client component
+  return users.map(user => ({
+    ...user,
+    createdAt: user.createdAt.toISOString(),
+    updatedAt: user.updatedAt.toISOString()
+  }));
 }
 
 export default async function AdminUsersPage() {
@@ -66,12 +72,12 @@ export default async function AdminUsersPage() {
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-semibold text-foreground">认证服务错误</h1>
           <p className="text-muted-foreground">无法连接到认证服务</p>
-          <a 
-            href="/" 
+          <Link
+            href="/"
             className="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
           >
             返回首页
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -83,12 +89,12 @@ export default async function AdminUsersPage() {
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-semibold text-foreground">访问受限</h1>
           <p className="text-muted-foreground">无法获取用户邮箱信息</p>
-          <a 
-            href="/" 
+          <Link
+            href="/"
             className="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
           >
             返回首页
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -107,12 +113,12 @@ export default async function AdminUsersPage() {
             邮箱: {userEmail}<br/>
             如需管理员权限，请联系系统管理员
           </p>
-          <a 
-            href="/" 
+          <Link
+            href="/"
             className="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
           >
             返回首页
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -132,14 +138,14 @@ export default async function AdminUsersPage() {
         update: {
           role: 'admin',
           status: 'active',
-          name: clerkUser.fullName || clerkUser.firstName || 'Admin',
-          image: clerkUser.imageUrl,
+          name: clerkUser?.fullName || clerkUser?.firstName || 'Admin',
+          image: clerkUser?.imageUrl,
         },
         create: {
           id: userId,
           email: userEmail,
-          name: clerkUser.fullName || clerkUser.firstName || 'Admin',
-          image: clerkUser.imageUrl,
+          name: clerkUser?.fullName || clerkUser?.firstName || 'Admin',
+          image: clerkUser?.imageUrl,
           role: 'admin',
           status: 'active',
         },
@@ -166,24 +172,24 @@ export default async function AdminUsersPage() {
         </div>
         <div className="w-full sm:w-auto">
           <div className="grid w-full sm:w-auto grid-cols-3 bg-background/50 rounded-lg p-1">
-            <a
+            <Link
               href="/admin"
               className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-background/60"
             >
               <ListFilter className="w-4 h-4" />
               网站管理
-            </a>
+            </Link>
             <div className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-background/60 text-foreground">
               <Users className="w-4 h-4" />
               用户管理
             </div>
-            <a
+            <Link
               href="/admin/feedback"
               className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-background/60"
             >
               <MessageSquare className="w-4 h-4" />
               反馈管理
-            </a>
+            </Link>
           </div>
         </div>
       </div>

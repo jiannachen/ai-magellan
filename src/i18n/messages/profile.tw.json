@@ -148,7 +148,7 @@
   "navigation": {
     "overview": "總覽",
     "overview_desc": "數據總覽和快速操作",
-    "dashboard": "控制面板",
+    "dashboard": "仪表盘",
     "dashboard_desc": "數據總覽和快速操作",
     "favorites": "收藏",
     "favorites_desc": "已收藏的AI工具",
@@ -359,6 +359,11 @@
   },
   "submit": {
     "title": "提交AI工具",
+    "page_title": "提交您的AI工具",
+    "page_description": "與社群分享您的AI工具",
+    "submit_tool": "提交工具",
+    "submit_button": "提交工具",
+    "fill_information": "填寫您的工具資訊",
     "description": "分享您發現的優質AI工具",
     "basic_info": "基本資訊",
     "basic_info_desc": "輸入您的AI工具的基本詳細資訊",
@@ -425,15 +430,17 @@
     }
   },
   "edit": {
-    "title": "編輯網站",
+    "page_title": "編輯工具提交",
+    "page_description": "更新您的AI工具資訊",
+    "edit_tool": "編輯工具",
+    "update_information": "更新工具資訊",
+    "return_to_submissions": "返回提交列表",
     "back_to_submissions": "返回我的提交",
-    "saving": "儲存中...",
     "save_changes": "儲存變更",
     "sign_in_required": "🔐 需要登入",
     "navigation_error": "⚠️ 導航錯誤",
     "sign_in_description": "您需要登入才能編輯工具提交",
     "errors": {
-      "required_fields": "請填寫所有必填欄位",
       "update_failed": "更新失敗",
       "fetch_failed": "取得網站資訊失敗",
       "website_not_found": "網站不存在",
@@ -443,11 +450,6 @@
     "success": {
       "updated": "網站資訊已更新"
     },
-    "loading": "載入中...",
-    "error": "錯誤",
-    "login_required": "需要登入",
-    "login_description": "請先登入以編輯網站資訊。",
-    "login_now": "立即登入",
     "retry": "重試"
   }
 }

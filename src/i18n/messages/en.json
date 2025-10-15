@@ -192,11 +192,13 @@
       },
       "sidebar": {
         "navigation_title": "Navigation Control",
-        "categories": "Categories"
+        "categories": "Categories",
+        "total_categories": "Total Categories"
       },
       "main": {
         "treasure_list_title": "Treasure Discovery List",
-        "showing_count": "Showing {current} of {total} tools"
+        "showing_count": "Showing {current} of {total} tools",
+        "reset_filters": "Reset Filters"
       },
       "search_placeholder": "Search tools...",
       "loading": "Loading rankings...",
@@ -357,9 +359,10 @@
     "category_placeholder": "Please select category",
     "parent_category": "Parent Category",
     "select_parent_category": "Select parent category",
+    "select_parent_category_first": "Please select parent category first",
     "subcategory": "Subcategory",
     "select_subcategory": "Select subcategory",
-    "no_subcategories_found": "No subcategories found",
+    "no_subcategories_found": "No subcategories available",
     "use_parent_category": "Use parent category",
     "tags": "Tags",
     "tags_placeholder": "Separate multiple tags with commas",
@@ -404,6 +407,7 @@
     "plan_name_placeholder": "e.g., Basic",
     "billing_cycle": "Billing Cycle",
     "billing_cycle_placeholder": "e.g., Monthly",
+    "please_select": "Please select",
     "price": "Price",
     "price_placeholder": "e.g., $9.99",
     "plan_features": "Plan Features",

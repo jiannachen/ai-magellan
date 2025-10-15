@@ -192,11 +192,13 @@
       },
       "sidebar": {
         "navigation_title": "導航控制",
-        "categories": "分類"
+        "categories": "分類",
+        "total_categories": "總分類數"
       },
       "main": {
         "treasure_list_title": "寶藏發現列表",
-        "showing_count": "顯示 {current} / {total} 工具"
+        "showing_count": "顯示 {current} / {total} 工具",
+        "reset_filters": "重置篩選"
       },
       "search_placeholder": "搜尋工具...",
       "loading": "排行榜載入中...",
@@ -357,9 +359,10 @@
     "category_placeholder": "請選擇分類",
     "parent_category": "上級分類",
     "select_parent_category": "選擇上級分類",
+    "select_parent_category_first": "請先選擇上級分類",
     "subcategory": "子分類",
     "select_subcategory": "選擇子分類",
-    "no_subcategories_found": "未找到子分類",
+    "no_subcategories_found": "該分類下沒有子分類",
     "use_parent_category": "使用上級分類",
     "tags": "標籤",
     "tags_placeholder": "用逗號分隔多個標籤",
@@ -404,6 +407,7 @@
     "plan_name_placeholder": "例如，基本",
     "billing_cycle": "計費週期",
     "billing_cycle_placeholder": "例如每月",
+    "please_select": "請選擇",
     "price": "價格",
     "price_placeholder": "例如，9.99美元",
     "plan_features": "方案功能",

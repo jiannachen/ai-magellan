@@ -7,10 +7,11 @@ import Header from "@/components/header/header";
 import Footer from "@/components/footer/index";
 import BottomNavigation from "@/components/navigation/bottom-nav";
 import { HrefLang } from "@/components/seo/hreflang";
+import FloatingFeedbackButton from "@/components/feedback/floating-feedback-button";
 
 interface LocaleLayoutProps {
   children: ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }
 
 export default async function LocaleLayout({
@@ -43,6 +44,8 @@ export default async function LocaleLayout({
         </div>
         {/* 底部导航 - 固定在底部，仅移动端显示 */}
         <BottomNavigation />
+        {/* 浮动反馈按钮 */}
+        <FloatingFeedbackButton />
       </div>
     </NextIntlClientProvider>
   );

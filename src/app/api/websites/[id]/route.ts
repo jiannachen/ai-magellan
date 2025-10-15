@@ -115,7 +115,7 @@ export async function PUT(
         field: issue.path.join('.'),
         message: issue.message
       }));
-      
+
       return NextResponse.json(
         AjaxResponse.fail("Form validation failed", { errors }),
         { status: 400 }

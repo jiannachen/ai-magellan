@@ -36,7 +36,7 @@ const RANKING_TYPES = {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { type: string } }
+  { params }: { params: Promise<{ type: string }> }
 ) {
   try {
     const { type } = await params;
@@ -68,7 +68,7 @@ export async function GET(
     }
 
     // Add pricing filter for free tools
-    if (rankingType.filter === 'free') {
+    if ('filter' in rankingType && rankingType.filter === 'free') {
       whereCondition.OR = [
         { pricing_model: 'free' },
         { has_free_version: true }

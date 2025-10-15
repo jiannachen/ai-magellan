@@ -1,12 +1,13 @@
 import { setRequestLocale } from 'next-intl/server';
 
 interface PrivacyPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
-export default async function PrivacyPage({ params: { locale } }: PrivacyPageProps) {
+export default async function PrivacyPage({ params }: PrivacyPageProps) {
+  const { locale } = await params;
   setRequestLocale(locale);
   
   // 动态导入对应语言的隐私政策翻译文件
@@ -116,7 +117,8 @@ export default async function PrivacyPage({ params: { locale } }: PrivacyPagePro
   );
 }
 
-export async function generateMetadata({ params: { locale } }: PrivacyPageProps) {
+export async function generateMetadata({ params }: PrivacyPageProps) {
+  const { locale } = await params;
   return {
     title: locale === 'en' ? 'Privacy Policy | AI Magellan' : '隱私政策 | AI Magellan',
     description: locale === 'en' 

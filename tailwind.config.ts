@@ -60,6 +60,7 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
 
+
         // Atlassian 2024 Design System Tokens
         "ds-background-brand-bold": "#0052CC",
         "ds-background-brand-bold-hovered": "#0747A6", 
@@ -270,7 +271,7 @@ export default {
   },
   plugins: [
     // Atlassian Design System Plugin for Reduced Motion
-    function({ addUtilities, theme, addBase }) {
+    function({ addUtilities, theme, addBase }: any) {
       addBase({
         '@media (prefers-reduced-motion: reduce)': {
           '*, *::before, *::after': {

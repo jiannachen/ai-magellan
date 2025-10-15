@@ -1,17 +1,18 @@
 import { Metadata } from 'next';
 import { prisma } from '@/lib/db/db';
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
 interface CategoryPageProps {
-  params: {
+  params: Promise<{
     slug: string;
     locale: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  const { slug } = await params;
   const category = await prisma.category.findUnique({
-    where: { slug: params.slug }
+    where: { slug }
   });
 
   if (!category) {
@@ -31,6 +32,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
+  const { slug } = await params;
   // Redirect to the main categories page with anchor
-  redirect(`/categories#${params.slug}`);
+  redirect(`/categories#${slug}`);
 }

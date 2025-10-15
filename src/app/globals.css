@@ -1177,9 +1177,29 @@
         box-shadow: 0 2px 4px rgba(9, 30, 66, 0.4);
       }
     }
-    
+
     &:active {
       transform: translateY(0px);
       transition: all var(--duration-micro) var(--ease-exit);
     }
   }
+
+  /* ===== Radix UI Dropdown Menu 防溢出全局样式 ===== */
+  /* 确保所有 Radix UI dropdown 永远不会溢出视口 */
+  [data-radix-popper-content-wrapper] {
+    max-width: calc(100vw - 16px) !important;
+    z-index: 9999 !important;
+  }
+
+  [role="menu"],
+  [role="dialog"] {
+    max-width: calc(100vw - 16px) !important;
+  }
+
+  /* 确保 header 不会限制 dropdown */
+  header,
+  header nav,
+  header .container {
+    overflow: visible !important;
+  }
+

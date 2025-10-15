@@ -4,7 +4,7 @@ export interface Website {
   url: string;
   description: string;
   category_id: number;
-  thumbnail: string | null;
+  thumbnail?: string;
   active: number;
   status: "pending" | "approved" | "rejected"; // 修复为联合类型，移除"all"
   visits: number;
@@ -14,13 +14,13 @@ export interface Website {
   is_trusted?: boolean;
   is_featured?: boolean;
   weight?: number;
-  tags?: string | null;
+  tags?: string;
   domain_authority?: number;
-  last_checked?: string;
+  last_checked?: Date | string;
   response_time?: number;
   ssl_enabled?: boolean;
   created_at?: Date | string;
-  updated_at?: string;
+  updated_at?: Date | string;
   
   // 增强表单字段
   email?: string;

@@ -24,13 +24,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
           cancelButton:
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground group-[.toast]:rounded group-[.toast]:px-3 group-[.toast]:py-2",
           success:
-            "group-[.toast]:bg-atlassian-green-500/10 group-[.toast]:border-atlassian-green-500/20 group-[.toast]:text-atlassian-green-600",
+            "group-[.toast]:bg-atlassian-success-50 group-[.toast]:border-atlassian-success-500 group-[.toast]:text-atlassian-success-700 dark:group-[.toast]:bg-atlassian-success-900 dark:group-[.toast]:text-atlassian-success-100",
           error:
-            "group-[.toast]:bg-atlassian-red-300/10 group-[.toast]:border-atlassian-red-300/20 group-[.toast]:text-atlassian-red-400",
+            "group-[.toast]:bg-atlassian-error-50 group-[.toast]:border-atlassian-error-500 group-[.toast]:text-atlassian-error-700 dark:group-[.toast]:bg-atlassian-error-900 dark:group-[.toast]:text-atlassian-error-100",
           warning:
-            "group-[.toast]:bg-atlassian-yellow-300/10 group-[.toast]:border-atlassian-yellow-300/20 group-[.toast]:text-atlassian-yellow-600",
+            "group-[.toast]:bg-atlassian-warning-50 group-[.toast]:border-atlassian-warning-500 group-[.toast]:text-atlassian-warning-700 dark:group-[.toast]:bg-atlassian-warning-900 dark:group-[.toast]:text-atlassian-warning-100",
           info:
-            "group-[.toast]:bg-atlassian-blue-400/10 group-[.toast]:border-atlassian-blue-400/20 group-[.toast]:text-atlassian-blue-600",
+            "group-[.toast]:bg-atlassian-blue-50 group-[.toast]:border-atlassian-blue-500 group-[.toast]:text-atlassian-blue-700 dark:group-[.toast]:bg-atlassian-blue-900 dark:group-[.toast]:text-atlassian-blue-100",
         },
       }}
       {...props}

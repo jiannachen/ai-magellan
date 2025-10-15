@@ -27,7 +27,7 @@ export const websiteSubmitSchema = z.object({
     .max(1000, 'Description cannot exceed 1000 characters'),
 
   // 可选基本字段
-  tags: z.string().optional(),
+  tags: z.array(z.string()).max(5, 'Maximum 5 tags allowed').default([]),
 
   // 功能特性（至少要有一个特性）
   features: z.array(z.object({
@@ -36,10 +36,10 @@ export const websiteSubmitSchema = z.object({
   })).min(1, 'At least one feature is required'),
   
   // 使用场景（可选）
-  use_cases: z.array(z.string().min(1, 'Use case cannot be empty')).default([]).transform(arr => arr.filter(item => item.trim() !== '')),
-  
+  use_cases: z.array(z.string()).default([]).transform(arr => arr.filter(item => item.trim() !== '')),
+
   // 目标受众（可选）
-  target_audience: z.array(z.string().min(1, 'Target audience cannot be empty')).default([]).transform(arr => arr.filter(item => item.trim() !== '')),
+  target_audience: z.array(z.string()).default([]).transform(arr => arr.filter(item => item.trim() !== '')),
   
   // FAQ（可选，但如果有则必须完整）
   faq: z.array(z.object({
@@ -49,17 +49,17 @@ export const websiteSubmitSchema = z.object({
   
   // 定价信息
   pricing_model: z.string()
-    .min(1, 'Please select a pricing model')
+    .default('free')
     .refine((val) => [
-      'free', 
-      'freemium', 
-      'subscription', 
-      'tiered', 
-      'custom', 
-      'one_time', 
-      'tiered_subscription', 
-      'usage_based', 
-      'pay_as_you_go', 
+      'free',
+      'freemium',
+      'subscription',
+      'tiered',
+      'custom',
+      'one_time',
+      'tiered_subscription',
+      'usage_based',
+      'pay_as_you_go',
       'open_source'
     ].includes(val), {
       message: 'Please select a valid pricing model'

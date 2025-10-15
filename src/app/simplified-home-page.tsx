@@ -7,12 +7,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { websitesAtom, categoriesAtom } from "@/lib/atoms";
 import { CompactCard } from "@/components/website/compact-card";
 import { Button } from "@/ui/common/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/common/card";
 import { Input } from "@/ui/common/input";
 import { cn } from "@/lib/utils/utils";
-import { 
-  Search, 
-  TrendingUp, 
+import {
+  Search,
+  TrendingUp,
   Users,
   ExternalLink,
   ArrowRight,
@@ -33,8 +32,6 @@ import type { Website, Category } from "@/lib/types";
 import { useTranslations } from 'next-intl';
 import Link from "next/link";
 import { ValuePropCard } from "@/components/ui/value-prop-card";
-import { useUser } from '@clerk/nextjs';
-import FeedbackDialog from "@/components/feedback/feedback-dialog";
 
 interface SimplifiedHomePageProps {
   initialWebsites: Website[];
@@ -47,7 +44,6 @@ export default function SimplifiedHomePage({
 }: SimplifiedHomePageProps) {
   const tLanding = useTranslations('landing');
   const router = useRouter();
-  const { user } = useUser();
   const [websites, setWebsites] = useAtom(websitesAtom);
   const [categories, setCategories] = useAtom(categoriesAtom);
   const [searchQuery, setSearchQuery] = useState('');
@@ -134,62 +130,26 @@ export default function SimplifiedHomePage({
     setCategories(initialCategories);
   }, [initialWebsites, initialCategories, setWebsites, setCategories]);
 
-  // Load user interactions if logged in - 暂时移除，当前页面不需要
-  // useEffect(() => {
-  //   if (user) {
-  //     Promise.all([
-  //       fetch('/api/user/likes/check').then(res => res.ok ? res.json() : { data: [] }),
-  //       fetch('/api/user/favorites/check').then(res => res.ok ? res.json() : { data: [] })
-  //     ]).then(([likesRes, favoritesRes]) => {
-  //       if (likesRes.data) {
-  //         setUserLikes(new Set(likesRes.data.map((item: any) => item.websiteId)));
-  //       }
-  //       if (favoritesRes.data) {
-  //         setUserFavorites(new Set(favoritesRes.data.map((item: any) => item.websiteId)));
-  //       }
-  //     }).catch(console.error);
-  //   }
-  // }, [user]);
-
   // Process websites for different rankings
   useEffect(() => {
-    // 直接使用传入的websites，因为在page.tsx中已经过滤了approved状态
     const approvedWebsites = websites;
-    console.log('=== DEBUGGING WEBSITE DATA ===');
-    console.log('Processing websites - total:', websites.length);
-    console.log('Sample website data:', websites[0]);
-    
-    // 检查数据质量
-    const hasQualityScore = websites.filter(w => w.quality_score != null && w.quality_score > 0);
-    const hasVisits = websites.filter(w => w.visits > 0);
-    const hasCreatedAt = websites.filter(w => w.created_at != null);
-    const hasPricingModel = websites.filter(w => w.pricing_model != null);
-    
-    console.log('Data quality check:');
-    console.log('- With quality_score > 0:', hasQualityScore.length);
-    console.log('- With visits > 0:', hasVisits.length); 
-    console.log('- With created_at:', hasCreatedAt.length);
-    console.log('- With pricing_model:', hasPricingModel.length);
 
     // Top rated by quality score
     const topRated = [...approvedWebsites]
       .sort((a, b) => (b.quality_score ?? 50) - (a.quality_score ?? 50))
       .slice(0, 12);
-    console.log('Top rated websites:', topRated.length, topRated.map(w => `${w.title}: ${w.quality_score}`));
     setTopRatedWebsites(topRated);
 
     // Most popular by visits
     const mostPopular = [...approvedWebsites]
       .sort((a, b) => b.visits - a.visits)
       .slice(0, 12);
-    console.log('Most popular websites:', mostPopular.length, mostPopular.map(w => `${w.title}: ${w.visits} visits`));
     setMostPopularWebsites(mostPopular);
 
     // Recent websites
     const recent = [...approvedWebsites]
       .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
       .slice(0, 12);
-    console.log('Recent websites:', recent.length, recent.map(w => `${w.title}: ${w.created_at}`));
     setRecentWebsites(recent);
 
     // Top free tools
@@ -197,16 +157,7 @@ export default function SimplifiedHomePage({
       .filter(w => w.pricing_model === 'free' || w.has_free_version)
       .sort((a, b) => (b.quality_score ?? 50) - (a.quality_score ?? 50))
       .slice(0, 12);
-    console.log('Top free websites:', topFree.length, 'filtered from', approvedWebsites.length);
     setTopFreeWebsites(topFree);
-
-    // Top paid tools - 暂时移除，未在页面中使用
-    // const topPaid = approvedWebsites
-    //   .filter(w => w.pricing_model !== 'free' && !w.has_free_version)
-    //   .sort((a, b) => (b.quality_score ?? 50) - (a.quality_score ?? 50))
-    //   .slice(0, 12);
-    // console.log('Top paid websites:', topPaid.length);
-    // setTopPaidWebsites(topPaid);
   }, [websites]);
 
   const handleVisit = async (website: Website) => {
@@ -351,29 +302,6 @@ export default function SimplifiedHomePage({
 
   return (
     <div className="min-h-screen bg-background mobile-safe-bottom">
-      {/* 浮动反馈按钮 - FAB 风格 */}
-      <motion.div
-        className="fixed bottom-6 right-6 z-40"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          type: "spring",
-          stiffness: 300,
-          damping: 25,
-        }}
-      >
-        <FeedbackDialog
-          trigger={
-            <motion.div
-              className="bg-magellan-coral backdrop-blur-md rounded-full p-4 shadow-xl hover:shadow-2xl transition-all duration-300 group cursor-pointer border-2 border-white/20"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <MessageSquare className="h-6 w-6 text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-200" />
-            </motion.div>
-          }
-        />
-      </motion.div>
       {/* Hero Section - AI Magellan 海洋探险主题 */}
       <section className="relative py-24 px-4 bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
         {/* 海洋装饰背景元素 - 专业级低调版本 */}

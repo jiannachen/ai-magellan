@@ -1,5 +1,6 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/db/db";
 import { FeedbackList } from "@/components/admin/feedback-list";
 import { ListFilter, Users, MessageSquare } from "lucide-react";
@@ -37,7 +38,7 @@ export default async function AdminFeedbackPage() {
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-semibold text-foreground">认证服务错误</h1>
           <p className="text-muted-foreground">无法连接到认证服务</p>
-          <a href="/" className="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">返回首页</a>
+          <Link href="/" className="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">返回首页</Link>
         </div>
       </div>
     );
@@ -49,7 +50,7 @@ export default async function AdminFeedbackPage() {
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-semibold text-foreground">访问受限</h1>
           <p className="text-muted-foreground">您需要管理员权限才能访问此页面</p>
-          <a href="/" className="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">返回首页</a>
+          <Link href="/" className="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">返回首页</Link>
         </div>
       </div>
     );
@@ -66,20 +67,20 @@ export default async function AdminFeedbackPage() {
         </div>
         <div className="w-full sm:w-auto">
           <div className="grid w-full sm:w-auto grid-cols-3 bg-background/50 rounded-lg p-1">
-            <a 
-              href="/admin" 
+            <Link
+              href="/admin"
               className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-background/60"
             >
               <ListFilter className="w-4 h-4" />
               网站管理
-            </a>
-            <a 
-              href="/admin/users" 
+            </Link>
+            <Link
+              href="/admin/users"
               className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-background/60"
             >
               <Users className="w-4 h-4" />
               用户管理
-            </a>
+            </Link>
             <div className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-background/60 text-foreground">
               <MessageSquare className="w-4 h-4" />
               反馈管理

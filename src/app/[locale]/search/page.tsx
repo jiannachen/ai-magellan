@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import SearchResults from './search-results';
 import SearchSkeleton from './search-skeleton';
-import { searchWebsites } from '@/lib/search/search-service';
+import { searchWebsites, type SearchResult } from '@/lib/search/search-service';
 import { getTranslations } from 'next-intl/server';
 
 interface SearchPageProps {
@@ -24,7 +24,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const query = params.q || '';
   
-  let initialData = null;
+  let initialData: SearchResult | null = null;
 
   // 仅在有搜索查询时才获取初始数据
   if (query) {
@@ -49,7 +49,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       // 直接调用搜索服务，不通过API
       const result = await searchWebsites(searchOptions);
       
-      if (result.success) {
+      if (result.success && result.data) {
         initialData = result.data;
       }
     } catch (error) {

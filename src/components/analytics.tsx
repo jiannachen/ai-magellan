@@ -5,32 +5,32 @@ import { useEffect, useState, useCallback } from 'react';
 
 interface AnalyticsProps {
   googleAnalyticsId?: string;
-  baiduAnalyticsId?: string;
+  clarityProjectId?: string;
   enableDebug?: boolean;
-  onError?: (error: Error, service: 'google' | 'baidu') => void;
-  onLoad?: (service: 'google' | 'baidu') => void;
+  onError?: (error: Error, service: 'google' | 'clarity') => void;
+  onLoad?: (service: 'google' | 'clarity') => void;
 }
 
 interface AnalyticsState {
   googleLoaded: boolean;
-  baiduLoaded: boolean;
-  errors: Array<{ service: 'google' | 'baidu'; error: Error; timestamp: number }>;
+  clarityLoaded: boolean;
+  errors: Array<{ service: 'google' | 'clarity'; error: Error; timestamp: number }>;
 }
 
 export function Analytics({ 
-  googleAnalyticsId, 
-  baiduAnalyticsId, 
+  googleAnalyticsId,
+  clarityProjectId, 
   enableDebug = false,
   onError,
   onLoad 
 }: AnalyticsProps) {
   const [state, setState] = useState<AnalyticsState>({
     googleLoaded: false,
-    baiduLoaded: false,
+    clarityLoaded: false,
     errors: []
   });
 
-  const handleError = useCallback((error: Error, service: 'google' | 'baidu') => {
+  const handleError = useCallback((error: Error, service: 'google' | 'clarity') => {
     setState(prev => ({
       ...prev,
       errors: [...prev.errors, { service, error, timestamp: Date.now() }]
@@ -41,7 +41,7 @@ export function Analytics({
     }
   }, [onError, enableDebug]);
 
-  const handleLoad = useCallback((service: 'google' | 'baidu') => {
+  const handleLoad = useCallback((service: 'google' | 'clarity') => {
     setState(prev => ({
       ...prev,
       [`${service}Loaded`]: true
@@ -51,47 +51,40 @@ export function Analytics({
       console.log(`[Analytics] ${service} loaded successfully`);
     }
   }, [onLoad, enableDebug]);
-  // 百度统计 - Enhanced with error handling and loading states
+
+  // Microsoft Clarity - Enhanced with error handling and loading states
   useEffect(() => {
-    if (!baiduAnalyticsId) return;
+    if (!clarityProjectId) return;
 
     try {
-      window._hmt = window._hmt || [];
-      
-      const loadBaiduAnalytics = () => {
-        const hm = document.createElement("script");
-        hm.src = `https://hm.baidu.com/hm.js?${baiduAnalyticsId}`;
-        hm.async = true;
-        hm.defer = true;
-        
-        // Add error handling
-        hm.onerror = () => {
-          handleError(new Error('Failed to load Baidu Analytics script'), 'baidu');
-        };
-        
-        // Add load success handling
-        hm.onload = () => {
-          handleLoad('baidu');
-        };
-        
-        const firstScript = document.getElementsByTagName("script")[0];
-        if (firstScript && firstScript.parentNode) {
-          firstScript.parentNode.insertBefore(hm, firstScript);
-        } else {
-          document.head.appendChild(hm);
-        }
+      const loadClarity = () => {
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            
+            // Add load success handling
+            t.onload = () => {
+              handleLoad('clarity');
+            };
+            
+            // Add error handling
+            t.onerror = () => {
+              handleError(new Error('Failed to load Clarity script'), 'clarity');
+            };
+        })(window,document,"clarity","script",clarityProjectId);
       };
       
       // Load with slight delay to avoid blocking initial render
-      const timeoutId = setTimeout(loadBaiduAnalytics, 100);
+      const timeoutId = setTimeout(loadClarity, 100);
       
       return () => clearTimeout(timeoutId);
     } catch (error) {
-      handleError(error as Error, 'baidu');
+      handleError(error as Error, 'clarity');
     }
-  }, [baiduAnalyticsId, handleError, handleLoad]);
+  }, [clarityProjectId, handleError, handleLoad]);
 
-  if (!googleAnalyticsId && !baiduAnalyticsId) return null;
+  if (!googleAnalyticsId && !clarityProjectId) return null;
 
   return (
     <>
@@ -154,7 +147,7 @@ export function Analytics({
             fontFamily: 'monospace'
           }}
         >
-          Analytics: GA={state.googleLoaded ? '✓' : '○'} BD={state.baiduLoaded ? '✓' : '○'}
+          Analytics: GA={state.googleLoaded ? '✓' : '○'} CL={state.clarityLoaded ? '✓' : '○'}
           {state.errors.length > 0 && (
             <div style={{ color: '#ff6b6b', marginTop: '4px' }}>
               Errors: {state.errors.length}
@@ -169,9 +162,9 @@ export function Analytics({
 // Enhanced TypeScript declarations for analytics services
 declare global {
   interface Window {
-    _hmt: any[];
     gtag: (...args: any[]) => void;
     dataLayer: any[];
+    clarity: (...args: any[]) => void;
   }
 }
 
@@ -186,9 +179,9 @@ export const trackEvent = (eventName: string, parameters?: Record<string, any>) 
       window.gtag('event', eventName, parameters);
     }
     
-    // Baidu Analytics tracking
-    if (window._hmt) {
-      window._hmt.push(['_trackEvent', eventName, JSON.stringify(parameters)]);
+    // Microsoft Clarity tracking
+    if (window.clarity) {
+      window.clarity('event', eventName);
     }
   }
 };
@@ -203,9 +196,32 @@ export const trackPageView = (pagePath: string, pageTitle?: string) => {
       });
     }
     
-    // Baidu Analytics page view
-    if (window._hmt) {
-      window._hmt.push(['_trackPageview', pagePath]);
+    // Microsoft Clarity automatically tracks page views
+    // But we can use identify to set custom data
+    if (window.clarity) {
+      window.clarity('set', 'page_path', pagePath);
+      if (pageTitle) {
+        window.clarity('set', 'page_title', pageTitle);
+      }
     }
+  }
+};
+
+// Clarity-specific utility functions
+export const identifyUser = (userId: string, userProperties?: Record<string, any>) => {
+  if (typeof window !== 'undefined' && window.clarity) {
+    window.clarity('identify', userId, userProperties);
+  }
+};
+
+export const setClarityTag = (key: string, value: string) => {
+  if (typeof window !== 'undefined' && window.clarity) {
+    window.clarity('set', key, value);
+  }
+};
+
+export const trackClarityEvent = (eventName: string) => {
+  if (typeof window !== 'undefined' && window.clarity) {
+    window.clarity('event', eventName);
   }
 }; 

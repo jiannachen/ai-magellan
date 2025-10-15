@@ -6,12 +6,12 @@ import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     type: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     category?: string;
-  };
+  }>;
 }
 
 // Valid ranking types - 融入 Magellan 探索主题
@@ -75,28 +75,40 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 async function getRankingData(type: string, categorySlug?: string) {
   const rankingType = RANKING_TYPES[type as keyof typeof RANKING_TYPES];
-  
+
   if (!rankingType) {
     return null;
   }
 
   // Build where condition
-  let whereCondition: any = {
+  const whereCondition: { status: string; category_id?: number | { in: number[] }; OR?: Array<{ pricing_model?: string; has_free_version?: boolean }> } = {
     status: 'approved'
   };
 
   // Add category filter if specified
   if (categorySlug) {
-    const category = await prisma.category.findUnique({
-      where: { slug: categorySlug }
+    const allCategories = await prisma.category.findMany({
+      include: { children: true }
     });
-    if (category) {
-      whereCondition.category_id = category.id;
+
+    const selectedCategory = allCategories.find(cat => cat.slug === categorySlug);
+    if (selectedCategory) {
+      // 如果是一级分类，包含该分类及其所有子分类
+      if (!selectedCategory.parent_id) {
+        const categoryIds = [selectedCategory.id];
+        if (selectedCategory.children) {
+          categoryIds.push(...selectedCategory.children.map(child => child.id));
+        }
+        whereCondition.category_id = { in: categoryIds };
+      } else {
+        // 如果是二级分类，只筛选该分类
+        whereCondition.category_id = selectedCategory.id;
+      }
     }
   }
 
   // Add pricing filter for free tools
-  if (rankingType.filter === 'free') {
+  if ('filter' in rankingType && rankingType.filter === 'free') {
     whereCondition.OR = [
       { pricing_model: 'free' },
       { has_free_version: true }
@@ -125,9 +137,19 @@ async function getRankingData(type: string, categorySlug?: string) {
 }
 
 async function getCategories() {
-  return await prisma.category.findMany({
-    orderBy: { name: 'asc' }
+  // 获取所有分类，包括父子关系
+  const allCategories = await prisma.category.findMany({
+    include: {
+      children: true
+    },
+    orderBy: [
+      { sort_order: 'asc' },
+      { name: 'asc' }
+    ]
   });
+
+  // 只返回一级分类（parent_id为null），它们的children已经通过include自动包含
+  return allCategories.filter(cat => !cat.parent_id);
 }
 
 export default async function RankingTypePage({ params, searchParams }: PageProps) {

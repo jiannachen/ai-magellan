@@ -53,10 +53,7 @@ export const metadata: Metadata = {
   // 验证标签
   verification: {
     google: process.env.GOOGLE_SITE_VERIFICATION,
-    yandex: process.env.YANDEX_VERIFICATION,
-    other: {
-      "baidu-site-verification": process.env.BAIDU_SITE_VERIFICATION || ""
-    }
+    yandex: process.env.YANDEX_VERIFICATION
   },
   
   // 其他元数据
@@ -119,6 +116,7 @@ export default async function RootLayout({
         
         {/* DNS预解析 */}
         <link rel="dns-prefetch" href="//www.google-analytics.com" />
+        <link rel="dns-prefetch" href="//www.clarity.ms" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
@@ -149,7 +147,10 @@ export default async function RootLayout({
           </ThemeProvider>
         </ClerkProvider>
         <VercelAnalytics />
-        <OtherAnalytics googleAnalyticsId="G-9MNGY82H1J" />
+        <OtherAnalytics 
+          googleAnalyticsId="G-9MNGY82H1J"
+          clarityProjectId={process.env.CLARITY_PROJECT_ID}
+        />
       </body>
     </html>
   );

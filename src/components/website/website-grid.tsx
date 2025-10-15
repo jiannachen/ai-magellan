@@ -2,25 +2,21 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useAtom } from "jotai";
 import { websitesAtom } from "@/lib/atoms";
-import { useToast } from "@/hooks/use-toast";
 import { CompactCard } from "./compact-card";
 import { cn } from "@/lib/utils/utils";
-import type { Website, Category } from "@/lib/types";
+import type { Website } from "@/lib/types";
 import { Globe } from "lucide-react";
 
 interface WebsiteGridProps {
   websites: Website[];
-  categories: Category[];
   // onVisit: (website: Website) => void;
   className?: string;
 }
 
 export default function WebsiteGrid({
   websites,
-  categories,
   className,
 }: WebsiteGridProps) {
-  const { toast } = useToast();
   const [, setWebsites] = useAtom(websitesAtom);
 
   const handleVisit = async (website: Website) => {

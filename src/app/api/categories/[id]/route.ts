@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import type { Category } from "@/lib/types";
 import { AjaxResponse } from "@/lib/utils";
 import { prisma } from "@/lib/db/db";
 
@@ -44,7 +43,7 @@ export async function PUT(
 
 // DELETE: 删除分类
 export async function DELETE(
-  request: Request,
+  _request: Request,
   props: { params: Promise<{ id: string }> }
 ) {
   const params = await props.params;

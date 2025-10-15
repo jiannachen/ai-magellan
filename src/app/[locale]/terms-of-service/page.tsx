@@ -1,12 +1,13 @@
 import { setRequestLocale } from 'next-intl/server';
 
 interface TermsPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
-export default async function TermsPage({ params: { locale } }: TermsPageProps) {
+export default async function TermsPage({ params }: TermsPageProps) {
+  const { locale } = await params;
   setRequestLocale(locale);
   
   // 动态导入对应语言的服务条款翻译文件
@@ -157,7 +158,8 @@ export default async function TermsPage({ params: { locale } }: TermsPageProps) 
   );
 }
 
-export async function generateMetadata({ params: { locale } }: TermsPageProps) {
+export async function generateMetadata({ params }: TermsPageProps) {
+  const { locale } = await params;
   return {
     title: locale === 'en' ? 'Terms of Service | AI Magellan' : '服務條款 | AI Magellan',
     description: locale === 'en' 

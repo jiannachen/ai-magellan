@@ -1,25 +1,23 @@
 'use client'
-import { useState, useEffect } from 'react'
 import { useUser, useClerk } from '@clerk/nextjs'
 import { useTranslations } from 'next-intl'
 import { useRouter, usePathname, Link } from '@/i18n/navigation'
 import { Button } from '@/ui/common/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/common/avatar'
-import { 
+import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/ui/common/dropdown-menu'
-import { 
-  LogIn, 
-  LogOut, 
-  User
+import {
+  LogIn,
+  LogOut
 } from 'lucide-react'
 import { cn } from '@/lib/utils/utils'
 import { profileNavigationConfig } from '@/lib/config/profile-navigation'
+import { UserNavDropdownWrapper } from './user-nav-dropdown-wrapper'
 
 export function UserNav() {
   const { isLoaded, isSignedIn, user } = useUser()
@@ -85,15 +83,8 @@ export function UserNav() {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      
-      <DropdownMenuContent 
-        className="w-56" 
-        align="end" 
-        alignOffset={-8}
-        sideOffset={8}
-        avoidCollisions
-        collisionPadding={16}
-      >
+
+      <UserNavDropdownWrapper className="w-[calc(100vw-40px)] sm:w-60 max-w-[260px]">
         {/* 用户信息头部 */}
         <DropdownMenuLabel className="font-normal">
           <div className="flex items-center gap-3 p-2">
@@ -144,7 +135,7 @@ export function UserNav() {
           <LogOut className="h-4 w-4 mr-2" />
           {t('signout')}
         </DropdownMenuItem>
-      </DropdownMenuContent>
+      </UserNavDropdownWrapper>
     </DropdownMenu>
   )
 }

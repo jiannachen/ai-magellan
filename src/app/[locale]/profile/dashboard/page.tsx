@@ -1,40 +1,31 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { 
-  Bookmark, 
-  Upload, 
-  Heart, 
-  TrendingUp, 
-  Plus,
-  ExternalLink,
+import {
+  Bookmark,
+  Heart,
   ArrowUpRight,
   Sparkles,
-  Trash2,
   Map,
   Compass,
   Star,
-  Eye,
   Route,
-  Users,
   Ship,
   Telescope,
   Flag,
-  Waves,
-  Home,
-  ArrowRight
+  Waves
 } from 'lucide-react'
 import { Button } from '@/ui/common/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
-import { Badge } from '@/ui/common/badge'
 import { ProfileLayout } from '@/components/profile/profile-layout'
 import { toast } from '@/hooks/use-toast'
 import { StatCard } from '@/components/ui/stat-card'
 import { ActionCard } from '@/components/ui/action-card'
+import { FavoriteCard } from '@/components/favorites/favorite-card'
 
 interface Website {
   id: number
@@ -69,20 +60,36 @@ export default function DashboardPage() {
   const t = useTranslations('common')
   const tProfile = useTranslations('profile')
 
-  useEffect(() => {
-    if (isSignedIn) {
-      fetchDashboardData()
+  const fetchFavorites = useCallback(async () => {
+    const response = await fetch('/api/user/favorites?limit=6')
+    if (!response.ok) {
+      throw new Error(`Failed to fetch favorites: ${response.status}`)
     }
-  }, [isSignedIn])
+    const data = await response.json()
+    setFavorites(data.websites || [])
+  }, [])
 
-  const fetchDashboardData = async () => {
+  const fetchStats = useCallback(async () => {
+    const response = await fetch('/api/user/stats')
+    if (!response.ok) {
+      throw new Error(`Failed to fetch stats: ${response.status}`)
+    }
+    const data = await response.json()
+    setStats(data.data || {
+      totalFavorites: 0,
+      totalSubmissions: 0,
+      totalLikes: 0
+    })
+  }, [])
+
+  const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true)
       const results = await Promise.allSettled([
         fetchFavorites(),
         fetchStats()
       ])
-      
+
       // 检查是否有失败的请求
       const failedRequests = results.filter(result => result.status === 'rejected')
       if (failedRequests.length > 0) {
@@ -99,29 +106,13 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [fetchFavorites, fetchStats])
 
-  const fetchFavorites = async () => {
-    const response = await fetch('/api/user/favorites')
-    if (!response.ok) {
-      throw new Error(`Failed to fetch favorites: ${response.status}`)
+  useEffect(() => {
+    if (isSignedIn) {
+      fetchDashboardData()
     }
-    const data = await response.json()
-    setFavorites(data.data?.slice(0, 6) || [])
-  }
-
-  const fetchStats = async () => {
-    const response = await fetch('/api/user/stats')
-    if (!response.ok) {
-      throw new Error(`Failed to fetch stats: ${response.status}`)
-    }
-    const data = await response.json()
-    setStats(data.data || {
-      totalFavorites: 0,
-      totalSubmissions: 0,
-      totalLikes: 0
-    })
-  }
+  }, [isSignedIn, fetchDashboardData])
 
   const removeFavorite = async (websiteId: number) => {
     try {
@@ -132,11 +123,11 @@ export default function DashboardPage() {
       if (response.ok) {
         setFavorites(prev => prev.filter(website => website.id !== websiteId))
         setStats(prev => ({ ...prev, totalFavorites: prev.totalFavorites - 1 }))
-        toast.success(tProfile('unfavorite_success'))
+        toast.success(tProfile('dashboard.unfavorite_success'))
       }
     } catch (error) {
       console.error('Error removing favorite:', error)
-      toast.error(tProfile('unfavorite_error'))
+      toast.error(tProfile('dashboard.unfavorite_error'))
     }
   }
 
@@ -308,79 +299,21 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {favorites.map((website) => (
-                      <Card key={website.id} className="group hover:shadow-md transition-all duration-200 border border-border hover:border-primary/30">
-                        <CardContent className="p-4">
-                          <div className="space-y-3">
-                            {/* Tool Image */}
-                            <div className="aspect-video rounded-lg bg-gradient-to-br from-primary/5 to-magellan-teal/5 border border-primary/10 flex items-center justify-center overflow-hidden">
-                              {website.thumbnail ? (
-                                <img 
-                                  src={website.thumbnail} 
-                                  alt={website.title}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <Map className="h-8 w-8 text-primary" />
-                              )}
-                            </div>
-
-                            {/* Tool Info */}
-                            <div className="space-y-2">
-                              <div className="flex items-start justify-between gap-2">
-                                <h3 className="font-semibold text-sm line-clamp-1 group-hover:text-primary transition-colors">
-                                  {website.title}
-                                </h3>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 w-6 p-0 text-muted-foreground hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                                  onClick={() => removeFavorite(website.id)}
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              </div>
-                              <p className="text-xs text-muted-foreground line-clamp-2">
-                                {website.description}
-                              </p>
-                              <div className="flex items-center justify-between">
-                                <Badge variant="secondary" className="text-xs">
-                                  {website.category.name}
-                                </Badge>
-                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                  <div className="flex items-center gap-1">
-                                    <Heart className="h-3 w-3" />
-                                    {website._count.websiteLikes}
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    <Bookmark className="h-3 w-3" />
-                                    {website._count.websiteFavorites}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="flex gap-2 pt-2">
-                              <Link href={`/tools/${website.id}`} className="flex-1">
-                                <Button variant="outline" size="sm" className="w-full">
-                                  <Eye className="h-3 w-3 mr-1" />
-                                  {tProfile('dashboard.actions.browse')}
-                                </Button>
-                              </Link>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className=""
-                                onClick={() => window.open(website.url, '_blank')}
-                              >
-                                <ExternalLink className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                    {favorites.map((website, index) => (
+                      <motion.div
+                        key={website.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.03 }}
+                      >
+                        <FavoriteCard
+                          website={website}
+                          onRemove={removeFavorite}
+                          visitLabel={tProfile('dashboard.actions.browse')}
+                          removeLabel={tProfile('favorites.actions.remove')}
+                        />
+                      </motion.div>
                     ))}
                   </div>
                 )}

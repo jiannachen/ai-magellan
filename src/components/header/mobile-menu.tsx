@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/ui/common/button";
 import { LanguageSwitcher } from "@/components/language/language-switcher";
-import { UserNav } from "@/components/auth/user-nav";
+import { useUser } from '@clerk/nextjs'
 import { useTranslations } from 'next-intl';
 import { useAtom } from 'jotai';
 import { categoriesAtom } from '@/lib/atoms';
@@ -44,6 +44,7 @@ export default function MobileMenu() {
   const tRank = useTranslations('pages.rankings');
   const tCat = useTranslations('pages.categories');
   const [categories, setCategories] = useAtom(categoriesAtom);
+  const { isSignedIn } = useUser();
 
   // 分类图标映射 - 与桌面版保持一致
   const getCategoryIcon = (slug: string) => {
@@ -138,25 +139,26 @@ export default function MobileMenu() {
                   
                   {categoriesOpen && (
                     <div className="mt-2 pl-6 sm:pl-8 space-y-1">
-                      <Link href="/categories" className="block" onClick={() => setIsOpen(false)}>
+                      <Link href="/categories" className="block">
                         <Button
                           variant="ghost"
                           className="w-full justify-start hover:bg-accent text-sm rounded-lg h-10 min-h-[40px] px-3"
+                          onClick={() => setIsOpen(false)}
                         >
                           <Map className="h-4 w-4 mr-2 text-primary" />
                           {t('filters.all_categories')}
                         </Button>
                       </Link>
                       {categories.slice(0, 6).map((category: { id: number; name: string; slug: string }) => (
-                        <Link 
-                          key={category.id} 
-                          href={`/categories#${category.slug}`} 
-                          className="block" 
-                          onClick={() => setIsOpen(false)}
+                        <Link
+                          key={category.id}
+                          href={`/categories#${category.slug}`}
+                          className="block"
                         >
                           <Button
                             variant="ghost"
                             className="w-full justify-start hover:bg-accent text-sm rounded-lg h-9"
+                            onClick={() => setIsOpen(false)}
                           >
                             {getCategoryIcon(category.slug)}
                             <span className="ml-2">
@@ -188,25 +190,26 @@ export default function MobileMenu() {
                   
                   {rankingsOpen && (
                     <div className="mt-2 pl-6 sm:pl-8 space-y-1">
-                      <Link href="/rankings" className="block" onClick={() => setIsOpen(false)}>
+                      <Link href="/rankings" className="block">
                         <Button
                           variant="ghost"
                           className="w-full justify-start hover:bg-accent text-sm rounded-lg h-10 min-h-[40px] px-3"
+                          onClick={() => setIsOpen(false)}
                         >
                           <Trophy className="h-4 w-4 mr-2 text-primary" />
                           {tRank('view_all')}
                         </Button>
                       </Link>
                       {rankingLinks.map((link) => (
-                        <Link 
-                          key={link.href} 
-                          href={link.href} 
-                          className="block" 
-                          onClick={() => setIsOpen(false)}
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className="block"
                         >
                           <Button
                             variant="ghost"
                             className="w-full justify-start hover:bg-accent text-sm rounded-lg h-9"
+                            onClick={() => setIsOpen(false)}
                           >
                             <link.icon className="h-4 w-4 mr-2 text-muted-foreground" />
                             {link.title}
@@ -220,18 +223,25 @@ export default function MobileMenu() {
                 {/* 分隔线 */}
                 <div className="h-px bg-border/50" />
 
-                {/* 用户导航区域 */}
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-sm text-muted-foreground font-medium">
-                    {t('auth.account', 'Account')}
-                  </span>
-                  <div className="flex-shrink-0">
-                    <UserNav />
-                  </div>
-                </div>
-
-                {/* 分隔线 */}
-                <div className="h-px bg-border/50" />
+                {/* 用户导航区域（仅未登录时显示） */}
+                {!isSignedIn && (
+                  <>
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-sm text-muted-foreground font-medium">
+                        {t('auth.account', 'Account')}
+                      </span>
+                      <div className="flex-shrink-0">
+                        <Link href="/auth/signin" onClick={() => setIsOpen(false)}>
+                          <Button size="sm" variant="outline" className="min-w-[96px]">
+                            {t('auth.signin', 'Sign in')}
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                    {/* 分隔线 */}
+                    <div className="h-px bg-border/50" />
+                  </>
+                )}
 
                 {/* 控制面板 - 追随桌面版风格 */}
                 <div className="flex items-center justify-between">

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 }
 
 // 获取健康检查统计信息
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const { prisma } = await import('@/lib/db/db');
     

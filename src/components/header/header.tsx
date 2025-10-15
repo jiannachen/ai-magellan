@@ -73,10 +73,11 @@ export default function Header() {
       "sticky top-0 z-50 w-full",
       "bg-background/95 backdrop-blur-xl",
       "border-b border-border",
-      "shadow-sm"
+      "shadow-sm",
+      "overflow-visible"
     )}>
-      <nav className="container mx-auto px-4 h-[60px] sm:h-[65px]">
-        <div className="flex h-full items-center justify-between">
+      <nav className="container mx-auto px-4 h-[60px] sm:h-[65px] overflow-visible">
+        <div className="flex h-full items-center justify-between overflow-visible">
           {/* Logo and Title - 船舵风格 */}
           <Link
             href="/"
@@ -116,9 +117,9 @@ export default function Header() {
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="start" 
-                className="w-52 p-1 rounded-lg border bg-popover"
+              <DropdownMenuContent
+                align="start"
+                className="w-52 p-1 rounded-lg border bg-background border-opacity-100 shadow-lg z-[9999]"
                 avoidCollisions
                 collisionPadding={collisionPadding}
               >
@@ -162,9 +163,9 @@ export default function Header() {
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="start" 
-                className="w-52 p-1 rounded-lg border bg-popover"
+              <DropdownMenuContent
+                align="start"
+                className="w-52 p-1 rounded-lg border bg-background border-opacity-100 shadow-lg z-[9999]"
                 avoidCollisions
                 collisionPadding={collisionPadding}
               >

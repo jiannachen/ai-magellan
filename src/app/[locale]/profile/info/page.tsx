@@ -2,32 +2,24 @@
 
 import { useUser } from '@clerk/nextjs'
 import { useTranslations } from 'next-intl'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/ui/common/avatar'
 import { Badge } from '@/ui/common/badge'
-import { Button } from '@/ui/common/button'
 import { Separator } from '@/ui/common/separator'
 import { ProfileLayout } from '@/components/profile/profile-layout'
-import { 
-  User, 
-  Mail, 
+import {
+  User,
+  Mail,
   Calendar,
   Shield,
-  Map,
-  Compass,
   Anchor,
   Ship,
   Crown,
   Star,
   Eye,
-  Telescope,
-  Route,
-  Flag,
   Waves,
-  Home,
-  ArrowRight
+  Flag
 } from 'lucide-react'
 import { format } from 'date-fns'
 

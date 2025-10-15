@@ -12,8 +12,9 @@ function isAdminEmail(email: string): boolean {
 // GET /api/admin/users/[id] - 获取特定用户详情
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     // 验证管理员权限
     const { userId } = await auth();
@@ -48,7 +49,7 @@ export async function GET(
 
     // 获取用户详情，包含提交的网站列表
     const user = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         websites: {
           select: {
@@ -99,8 +100,9 @@ export async function GET(
 // PUT /api/admin/users/[id] - 更新用户信息
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     // 验证管理员权限
     const { userId } = await auth();
@@ -155,7 +157,7 @@ export async function PUT(
     }
 
     // 防止管理员修改自己的角色或状态
-    if (params.id === userId) {
+    if (id === userId) {
       return NextResponse.json(
         AjaxResponse.fail("Cannot modify your own account"),
         { status: 400 }
@@ -164,7 +166,7 @@ export async function PUT(
 
     // 更新用户
     const updatedUser = await prisma.user.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(role && { role }),
         ...(status && { status }),

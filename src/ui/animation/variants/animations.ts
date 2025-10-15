@@ -10,11 +10,11 @@ const ATLASSIAN_DURATIONS = {
 } as const;
 
 const ATLASSIAN_EASINGS = {
-  entrance: [0.15, 1, 0.3, 1],        // Elements entering
-  exit: [0.6, 0, 0.85, 0.15],         // Elements exiting
-  standard: [0.25, 0.1, 0.25, 1],     // Standard interactions
-  decelerate: [0, 0, 0.3, 1],         // Slow ending
-  accelerate: [0.7, 0, 1, 0.5],       // Fast start
+  entrance: [0.15, 1, 0.3, 1] as [number, number, number, number],        // Elements entering
+  exit: [0.6, 0, 0.85, 0.15] as [number, number, number, number],         // Elements exiting
+  standard: [0.25, 0.1, 0.25, 1] as [number, number, number, number],     // Standard interactions
+  decelerate: [0, 0, 0.3, 1] as [number, number, number, number],         // Slow ending
+  accelerate: [0.7, 0, 1, 0.5] as [number, number, number, number],       // Fast start
 } as const;
 
 // Reduced motion transition for accessibility
@@ -83,7 +83,7 @@ export const backgroundPatternVariants: Variants = {
 
 // Icon animations - reduced complexity for accessibility
 export const floatingIconVariants: Variants = {
-  hidden: (i: number) => ({
+  hidden: (_i: number) => ({
     opacity: 0,
     scale: 0.8,
     y: 8,

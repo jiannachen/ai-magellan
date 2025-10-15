@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { WebsiteList } from "@/components/admin/website-list";
 import { Button } from "@/ui/common/button";
 import { Badge } from "@/ui/common/badge";
@@ -80,20 +81,20 @@ export function AdminPageClient({
               <ListFilter className="w-4 h-4" />
               网站管理
             </div>
-            <a
+            <Link
               href="/admin/users"
               className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-background/60"
             >
               <Users className="w-4 h-4" />
               用户管理
-            </a>
-            <a
+            </Link>
+            <Link
               href="/admin/feedback"
               className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-background/60"
             >
               <MessageSquare className="w-4 h-4" />
               反馈管理
-            </a>
+            </Link>
           </div>
         </div>
       </div>

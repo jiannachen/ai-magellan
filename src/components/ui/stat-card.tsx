@@ -1,6 +1,5 @@
 "use client";
 
-import { ReactNode } from "react";
 import { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/ui/common/card";
 import { cn } from "@/lib/utils/utils";

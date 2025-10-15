@@ -1,41 +1,36 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import GlobalLoading from '@/components/loading/global-loading'
-import { 
-  Edit, 
-  ExternalLink, 
-  Heart, 
-  Bookmark, 
-  Calendar, 
-  Globe, 
-  ArrowLeft, 
-  CheckCircle, 
-  Clock, 
+import {
+  Edit,
+  ExternalLink,
+  Heart,
+  Bookmark,
+  Calendar,
+  CheckCircle,
+  Clock,
   Upload,
   Map,
   Compass,
   Anchor,
   Ship,
-  Flag,
   Crown,
   Telescope,
   Route,
   Eye,
   Star,
   Waves,
-  Home,
   ArrowRight
 } from 'lucide-react'
 import { Button } from '@/ui/common/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Badge } from '@/ui/common/badge'
 import { ProfileLayout } from '@/components/profile/profile-layout'
-import { PageHeader } from '@/components/ui/page-header'
 import { StatCard } from '@/components/ui/stat-card'
 
 interface Website {
@@ -87,17 +82,11 @@ export default function MySubmissionsPage() {
   const tProfile = useTranslations('profile')
   const tWebsite = useTranslations('website')
 
-  useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      fetchSubmissions()
-    }
-  }, [isLoaded, isSignedIn])
-
-  const fetchSubmissions = async (page = 1) => {
+  const fetchSubmissions = useCallback(async (page = 1) => {
     try {
       setLoading(true)
       const response = await fetch(`/api/user/submissions?page=${page}&limit=10`)
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch submissions')
       }
@@ -115,7 +104,13 @@ export default function MySubmissionsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [tProfile])
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      fetchSubmissions()
+    }
+  }, [isLoaded, isSignedIn, fetchSubmissions])
 
   const getStatusBadge = (status: string) => {
     const statusMap = {

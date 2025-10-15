@@ -27,8 +27,8 @@ export class AjaxResponse<T> {
     return new AjaxResponse<T>(true, data, "", 200);
   }
 
-  static fail<T>(message: string, code: number = 500): AjaxResponse<T> {
-    return new AjaxResponse<T>(false, null, message, code);
+  static fail<T>(message: string, data: T | null = null, code: number = 500): AjaxResponse<T> {
+    return new AjaxResponse<T>(false, data, message, code);
   }
 }
 

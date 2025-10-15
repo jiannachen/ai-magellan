@@ -9,6 +9,8 @@ import { Input } from '@/ui/common/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/common/select';
 import { CompactCard } from '@/components/website/compact-card';
 import { WebsiteThumbnail } from '@/components/website/website-thumbnail';
+import CategoryFilterSidebar from '@/components/rankings/category-filter-sidebar';
+import MobileCategoryFilter from '@/components/rankings/mobile-category-filter';
 import { useTranslations } from 'next-intl';
 import {
   ArrowLeft,
@@ -130,9 +132,24 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
 
     // Apply category filter
     if (categoryFilter !== 'all') {
-      const categoryId = categories.find(c => c.slug === categoryFilter)?.id;
-      if (categoryId) {
-        filtered = filtered.filter(website => website.category_id === categoryId);
+      // 扁平化所有分类（包括子分类）
+      const allCategories = categories.flatMap(cat =>
+        cat.children ? [cat, ...cat.children] : [cat]
+      );
+      const selectedCat = allCategories.find(c => c.slug === categoryFilter);
+
+      if (selectedCat) {
+        // 如果选中的是一级分类，包含该分类及其所有子分类的网站
+        if (!selectedCat.parent_id) {
+          const categoryIds = [selectedCat.id];
+          if (selectedCat.children) {
+            categoryIds.push(...selectedCat.children.map((child: any) => child.id));
+          }
+          filtered = filtered.filter(website => categoryIds.includes(website.category_id));
+        } else {
+          // 如果选中的是二级分类，只显示该分类的网站
+          filtered = filtered.filter(website => website.category_id === selectedCat.id);
+        }
       }
     }
 
@@ -218,129 +235,22 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row">
           {/* Left Maritime Navigation Sidebar - 桌面端显示，移动端隐藏 */}
-          <aside className="hidden lg:flex w-80 bg-white/90 backdrop-blur-sm border-r border-magellan-primary/20 sticky top-4 self-start h-[calc(100vh-2rem)] flex-col shadow-lg">
-          {/* Fixed Navigation Header */}
-          <div className="p-6 pb-4 border-b border-magellan-primary/10">
-            <h3 className="text-lg font-semibold text-magellan-depth-900 mb-4 flex items-center gap-2">
-              <Navigation className="h-5 w-5 text-magellan-primary professional-compass" />
-              {tRanking('sidebar.navigation_title')}
-            </h3>
-            
-            {/* Professional Compass Search */}
-            <div className="relative">
-              <Compass className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-magellan-depth-600 professional-compass" />
-              <Input
-                placeholder={tRanking('search_placeholder')}
-                className="pl-10 border-magellan-primary/20 focus:border-magellan-primary bg-white/80"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Scrollable categories */}
-          <div className="flex-1 overflow-y-auto p-6 pt-4">
-            <div className="space-y-6">
-              <div className="space-y-2">
-                {/* All categories option */}
-                <button
-                  onClick={() => setCategoryFilter('all')}
-                  className={cn(
-                    "w-full text-left p-3 rounded-lg transition-all duration-300 group",
-                    "border border-magellan-primary/10 hover:border-magellan-primary/30",
-                    categoryFilter === 'all' 
-                      ? "bg-gradient-to-r from-magellan-primary/10 to-magellan-teal/5 border-magellan-primary/30 shadow-sm"
-                      : "hover:bg-magellan-primary/5"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={cn(
-                      "w-2 h-2 rounded-full transition-colors duration-300",
-                      categoryFilter === 'all' ? "bg-magellan-primary" : "bg-magellan-depth-300 group-hover:bg-magellan-primary/50"
-                    )} />
-                    <span className={cn(
-                      "text-sm font-medium transition-colors duration-300",
-                      categoryFilter === 'all' ? "text-magellan-primary" : "text-magellan-depth-700 group-hover:text-magellan-primary"
-                    )}>
-                      {tRanking('filters.category_all')}
-                    </span>
-                  </div>
-                </button>
-
-                {/* Individual categories */}
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => setCategoryFilter(category.slug)}
-                    className={cn(
-                      "w-full text-left p-3 rounded-lg transition-all duration-300 group",
-                      "border border-magellan-primary/10 hover:border-magellan-primary/30",
-                      categoryFilter === category.slug
-                        ? "bg-gradient-to-r from-magellan-primary/10 to-magellan-teal/5 border-magellan-primary/30 shadow-sm"
-                        : "hover:bg-magellan-primary/5"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "w-2 h-2 rounded-full transition-colors duration-300",
-                        categoryFilter === category.slug ? "bg-magellan-primary" : "bg-magellan-depth-300 group-hover:bg-magellan-primary/50"
-                      )} />
-                      <span className={cn(
-                        "text-sm font-medium transition-colors duration-300",
-                        categoryFilter === category.slug ? "text-magellan-primary" : "text-magellan-depth-700 group-hover:text-magellan-primary"
-                      )}>
-                        {category.name}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </aside>
+          <CategoryFilterSidebar
+            categories={categories}
+            selectedCategory={categoryFilter}
+            onCategoryChange={setCategoryFilter}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+          />
 
         {/* 移动端筛选区域 - 只在移动端显示 */}
-        <div className="lg:hidden p-4 bg-white border-b border-magellan-primary/20">
-          <div className="space-y-4">
-            <div className="relative">
-              <Compass className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-magellan-depth-600" />
-              <Input
-                placeholder={tRanking('search_placeholder')}
-                className="pl-10 border-magellan-primary/20 focus:border-magellan-primary"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setCategoryFilter('all')}
-                className={cn(
-                  "px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-                  categoryFilter === 'all' 
-                    ? "bg-magellan-primary text-white"
-                    : "bg-magellan-primary/10 text-magellan-primary hover:bg-magellan-primary/20"
-                )}
-              >
-                {tRanking('filters.category_all')}
-              </button>
-              {categories.slice(0, 3).map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setCategoryFilter(category.slug)}
-                  className={cn(
-                    "px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-                    categoryFilter === category.slug
-                      ? "bg-magellan-primary text-white"
-                      : "bg-magellan-primary/10 text-magellan-primary hover:bg-magellan-primary/20"
-                  )}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <MobileCategoryFilter
+          categories={categories}
+          selectedCategory={categoryFilter}
+          onCategoryChange={setCategoryFilter}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
 
         {/* Main Content Area */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8">
@@ -358,32 +268,35 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-                className="bg-white/90 backdrop-blur-sm border border-magellan-primary/20 rounded-xl p-6 shadow-lg"
+                className="bg-white/90 backdrop-blur-sm border border-magellan-primary/20 rounded-xl p-4 sm:p-6 shadow-lg"
               >
-                <div className="flex items-center gap-4 mb-6">
-                  <h2 className="text-xl font-bold text-magellan-depth-900 flex items-center gap-3">
-                    <Ship className="h-6 w-6 text-magellan-teal" />
-                    {tRanking('main.treasure_list_title')}
+                {/* 标题区域 - 移动端优化 */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                  <h2 className="text-lg sm:text-xl font-bold text-magellan-depth-900 flex items-center gap-2 sm:gap-3">
+                    <Ship className="h-5 w-5 sm:h-6 sm:w-6 text-magellan-teal flex-shrink-0" />
+                    <span className="line-clamp-1">{tRanking('main.treasure_list_title')}</span>
                   </h2>
-                  <div className="bg-magellan-primary/5 px-4 py-2 rounded-lg border border-magellan-primary/10">
-                    <span className="text-sm font-medium text-magellan-depth-700">
-                      {tRanking('main.showing_count', { 
-                        current: Math.min(filteredWebsites.length, 100), 
-                        total: filteredWebsites.length 
+                  <div className="bg-magellan-primary/5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-magellan-primary/10 w-fit">
+                    <span className="text-xs sm:text-sm font-medium text-magellan-depth-700 whitespace-nowrap">
+                      {tRanking('main.showing_count', {
+                        current: Math.min(filteredWebsites.length, 100),
+                        total: filteredWebsites.length
                       })}
                     </span>
                   </div>
                 </div>
 
-                {/* Filter Controls */}
-                <div className="flex flex-wrap items-center gap-6">
+                {/* Filter Controls - PC端一行显示，移动端垂直排列 */}
+                <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-6">
                   {/* Time Range Filter */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <Anchor className="h-4 w-4 text-magellan-gold" />
-                      <span className="text-sm font-medium text-magellan-depth-800">{tRanking('filters.time_range')}</span>
+                      <span className="text-xs sm:text-sm font-medium text-magellan-depth-800">
+                        {tRanking('filters.time_range')}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 flex-wrap">
                       {[
                         { value: 'all', short: tRanking('filters.time_ranges.all_time') },
                         { value: 'today', short: tRanking('filters.time_ranges.today') },
@@ -394,7 +307,8 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                           key={timeOption.value}
                           onClick={() => setTimeRange(timeOption.value)}
                           className={cn(
-                            "px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
+                            "px-2.5 sm:px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
+                            "whitespace-nowrap",
                             timeRange === timeOption.value
                               ? "bg-magellan-primary text-white shadow-sm"
                               : "bg-magellan-depth-50 text-magellan-depth-700 hover:bg-magellan-primary/10 hover:text-magellan-primary border border-magellan-primary/20"
@@ -406,15 +320,18 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                     </div>
                   </div>
 
-                  <div className="h-6 w-px bg-magellan-primary/20"></div>
+                  {/* 分隔线 - PC端显示 */}
+                  <div className="hidden lg:block h-6 w-px bg-magellan-primary/20"></div>
 
                   {/* Price Filter */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <Navigation className="h-4 w-4 text-magellan-teal" />
-                      <span className="text-sm font-medium text-magellan-depth-800">{tRanking('filters.pricing')}</span>
+                      <span className="text-xs sm:text-sm font-medium text-magellan-depth-800">
+                        {tRanking('filters.pricing')}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 flex-wrap">
                       {[
                         { value: 'all', short: tRanking('filters.pricing_all') },
                         { value: 'free', short: tRanking('filters.pricing_free') },
@@ -425,7 +342,8 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                           key={priceOption.value}
                           onClick={() => setPriceFilter(priceOption.value as FilterOption)}
                           className={cn(
-                            "px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
+                            "px-2.5 sm:px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
+                            "whitespace-nowrap",
                             priceFilter === priceOption.value
                               ? "bg-magellan-teal text-white shadow-sm"
                               : "bg-magellan-depth-50 text-magellan-depth-700 hover:bg-magellan-teal/10 hover:text-magellan-teal border border-magellan-teal/20"
@@ -441,7 +359,7 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
 
               {/* Ranking List */}
               {filteredWebsites.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-2 sm:space-y-3">
                   {filteredWebsites.slice(0, 100).map((website, index) => (
                     <motion.div
                       key={website.id}
@@ -450,9 +368,9 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                       transition={{ duration: 0.3, delay: index * 0.02 }}
                       className="group"
                     >
-                      <div 
+                      <div
                         className={cn(
-                          "flex items-center gap-4 p-4 rounded-xl bg-white border border-magellan-primary/10",
+                          "flex items-center gap-2 sm:gap-4 p-3 sm:p-4 rounded-xl bg-white border border-magellan-primary/10",
                           "hover:border-magellan-primary/20 hover:bg-magellan-primary/2",
                           "transition-all duration-300 cursor-pointer"
                         )}
@@ -461,16 +379,16 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                           router.push(`/tools/${website.id}`);
                         }}
                       >
-                        {/* Premium Ranking Badge - Atlassian Design System Compliant */}
-                        <div className="relative">
+                        {/* Premium Ranking Badge - 移动端优化 */}
+                        <div className="relative flex-shrink-0">
                           <div className={cn(
-                            "flex items-center justify-center w-12 h-12 rounded-xl font-bold text-sm",
+                            "flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm",
                             "border-2 transition-all duration-300"
                           )}>
                             {/* 背景渐变徽章 */}
-                            <div 
+                            <div
                               className={cn(
-                                "absolute inset-0 rounded-xl flex items-center justify-center",
+                                "absolute inset-0 rounded-lg sm:rounded-xl flex items-center justify-center",
                                 "text-xs font-medium transition-all",
                                 // Atlassian 设计规范：使用语义化颜色和正确的 tokens
                                 index === 0 ? [
@@ -482,7 +400,7 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                                 ] :
                                 index === 1 ? [
                                   // 第二名：成功色
-                                  "bg-[#22A06B] text-white border-[#1F845A]", 
+                                  "bg-[#22A06B] text-white border-[#1F845A]",
                                   "shadow-[0px_1px_1px_rgba(9,30,66,0.25),0px_0px_1px_rgba(9,30,66,0.31)]",
                                   "hover:shadow-[0px_4px_8px_rgba(9,30,66,0.25),0px_0px_1px_rgba(9,30,66,0.31)]",
                                   "hover:bg-[#1F845A]"
@@ -490,7 +408,7 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                                 index === 2 ? [
                                   // 第三名：警告色
                                   "bg-[#E56910] text-white border-[#974F0C]",
-                                  "shadow-[0px_1px_1px_rgba(9,30,66,0.25),0px_0px_1px_rgba(9,30,66,0.31)]", 
+                                  "shadow-[0px_1px_1px_rgba(9,30,66,0.25),0px_0px_1px_rgba(9,30,66,0.31)]",
                                   "hover:shadow-[0px_4px_8px_rgba(9,30,66,0.25),0px_0px_1px_rgba(9,30,66,0.31)]",
                                   "hover:bg-[#974F0C]"
                                 ] :
@@ -502,7 +420,7 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                                   "hover:bg-[#F1F2F4]"
                                 ],
                                 // Atlassian 标准：圆角，200ms 标准过渡，2px 边框
-                                "rounded-xl border-2",
+                                "rounded-lg sm:rounded-xl border-2",
                                 "duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
                               )}
                               style={{
@@ -511,64 +429,64 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                               }}
                             >
                               {index <= 2 ? (
-                                index === 0 ? <Crown className="w-5 h-5" /> :
-                                index === 1 ? <Trophy className="w-5 h-5" /> :
-                                <Star className="w-5 h-5 fill-current" />
+                                index === 0 ? <Crown className="w-4 h-4 sm:w-5 sm:h-5" /> :
+                                index === 1 ? <Trophy className="w-4 h-4 sm:w-5 sm:h-5" /> :
+                                <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
                               ) : (
-                                <span className="font-semibold">#{index + 1}</span>
+                                <span className="font-semibold text-xs sm:text-sm">#{index + 1}</span>
                               )}
                             </div>
                           </div>
-                          
+
                           {/* 发现标记 - 宝藏效果 */}
                           {index <= 2 && (
                             <div className={cn(
-                              "absolute -top-1 -right-1 z-10 w-4 h-4 rounded-full",
+                              "absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 z-10 w-3 h-3 sm:w-4 sm:h-4 rounded-full",
                               "bg-gradient-to-br from-magellan-gold to-magellan-coral",
                               "animate-pulse shadow-lg",
                               index === 0 ? 'professional-glow' : ''
                             )}>
-                              <Star className="h-2 w-2 text-white m-1" />
+                              <Star className="h-1.5 w-1.5 sm:h-2 sm:w-2 text-white m-0.5 sm:m-1" />
                             </div>
                           )}
                         </div>
 
-                        {/* Tool Thumbnail */}
-                        <div className="relative">
+                        {/* Tool Thumbnail - 移动端优化 */}
+                        <div className="relative flex-shrink-0">
                           <WebsiteThumbnail
                             url={website.url}
                             thumbnail={website.thumbnail}
                             title={website.title}
-                            className="w-16 h-16 rounded-lg border border-magellan-primary/10"
+                            className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg border border-magellan-primary/10"
                           />
                         </div>
 
-                        {/* Tool Information */}
+                        {/* Tool Information - 移动端优化 */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between">
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-0">
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-magellan-depth-900 group-hover:text-magellan-primary transition-colors line-clamp-1">
+                              <h3 className="text-sm sm:text-base font-semibold text-magellan-depth-900 group-hover:text-magellan-primary transition-colors line-clamp-1">
                                 {website.title || 'Unnamed Island'}
                               </h3>
-                              <p className="text-sm text-magellan-depth-600 line-clamp-2 mt-1">
+                              <p className="text-xs sm:text-sm text-magellan-depth-600 line-clamp-1 sm:line-clamp-2 mt-0.5 sm:mt-1">
                                 {website.description || 'A mysterious treasure awaiting discovery...'}
                               </p>
-                              <div className="flex items-center gap-2 mt-2">
+                              <div className="flex items-center gap-1.5 sm:gap-2 mt-1 sm:mt-2">
                                 {website.pricing_model === 'free' && (
-                                  <Badge className="text-xs bg-magellan-mint/10 text-magellan-mint border-magellan-mint/30">
+                                  <Badge className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 bg-magellan-mint/10 text-magellan-mint border-magellan-mint/30">
                                     {tRanking('filters.pricing_free')}
                                   </Badge>
                                 )}
                                 {website.pricing_model && website.pricing_model !== 'free' && (
-                                  <Badge variant="outline" className="text-xs bg-magellan-primary/5 text-magellan-primary border-magellan-primary/30">
+                                  <Badge variant="outline" className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 bg-magellan-primary/5 text-magellan-primary border-magellan-primary/30">
                                     {website.pricing_model}
                                   </Badge>
                                 )}
                               </div>
                             </div>
-                            
-                            {/* Action Buttons */}
-                            <div className="flex items-center gap-2 ml-4">
+
+                            {/* Action Buttons - 移动端优化 */}
+                            <div className="hidden sm:flex items-center gap-2 ml-4">
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -582,6 +500,11 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                               </Button>
                             </div>
                           </div>
+                        </div>
+
+                        {/* 移动端访问图标 */}
+                        <div className="sm:hidden flex-shrink-0">
+                          <ExternalLink className="h-4 w-4 text-magellan-depth-400" />
                         </div>
                       </div>
                     </motion.div>

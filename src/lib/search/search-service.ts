@@ -21,7 +21,7 @@ export interface SearchResult {
     url: string;
     description: string;
     category_id: number;
-    thumbnail: string | null;
+    thumbnail?: string;
     visits: number;
     likes: number;
     quality_score: number;
@@ -30,7 +30,9 @@ export interface SearchResult {
     created_at: Date;
     pricing_model: string;
     has_free_version: boolean;
-    tags: string | null;
+    tags?: string;
+    active: number;
+    status: "pending" | "approved" | "rejected";
   }[];
   pagination: {
     page: number;
@@ -172,7 +174,9 @@ export async function searchWebsites(params: SearchParams): Promise<{
           created_at: true,
           pricing_model: true,
           has_free_version: true,
-          tags: true
+          tags: true,
+          active: true,
+          status: true
         }
       }),
       prisma.website.count({ where })

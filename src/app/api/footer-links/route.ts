@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     // 验证 URL 格式
     try {
       new URL(url);
-    } catch (e) {
+    } catch (_e) {
       return NextResponse.json(AjaxResponse.fail("请输入有效的URL地址"));
     }
 
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(AjaxResponse.ok(link));
   } catch (error) {
-    if ((error as any).code === "P2002") {
+    if ((error as unknown as { code: string }).code === "P2002") {
       return NextResponse.json(AjaxResponse.fail("该URL已存在"));
     }
     return NextResponse.json(AjaxResponse.fail("创建页脚链接失败"));
@@ -71,7 +71,7 @@ export async function PUT(request: Request) {
 
     return NextResponse.json(AjaxResponse.ok(link));
   } catch (error) {
-    if ((error as any).code === "P2025") {
+    if ((error as unknown as { code: string }).code === "P2025") {
       return NextResponse.json(AjaxResponse.fail("链接不存在"));
     }
     return NextResponse.json(AjaxResponse.fail("更新页脚链接失败"));
@@ -94,7 +94,7 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json(AjaxResponse.ok("success"));
   } catch (error) {
-    if ((error as any).code === "P2025") {
+    if ((error as unknown as { code: string }).code === "P2025") {
       return NextResponse.json(AjaxResponse.fail("链接不存在"));
     }
     return NextResponse.json(AjaxResponse.fail("删除页脚链接失败"));

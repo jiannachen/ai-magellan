@@ -2,22 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { CompactCard } from '@/components/website/compact-card';
 import { AdvancedSearch, SearchFilters } from '@/components/search/advanced-search';
 import { Button } from '@/ui/common/button';
-import { Input } from '@/ui/common/input';
 import { Badge } from '@/ui/common/badge';
-import { cn } from '@/lib/utils/utils';
-import { 
-  Search, 
-  ArrowLeft, 
-  Filter,
-  SlidersHorizontal,
+import {
+  Search,
+  ArrowLeft,
   Compass,
   Map,
-  Grid3X3,
   ChevronLeft,
   ChevronRight,
   Loader2
@@ -28,7 +23,7 @@ import Link from 'next/link';
 
 interface SearchResultsProps {
   initialData: SearchResult | null;
-  initialSearchParams: any;
+  initialSearchParams: Record<string, string | string[] | undefined>;
 }
 
 export default function SearchResults({ initialData, initialSearchParams }: SearchResultsProps) {
@@ -36,11 +31,12 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
   const searchParams = useSearchParams();
   const [data, setData] = useState<SearchResult | null>(initialData);
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(initialSearchParams.q || '');
-  
+  const [searchQuery, setSearchQuery] = useState(
+    Array.isArray(initialSearchParams.q) ? initialSearchParams.q[0] : (initialSearchParams.q || '')
+  );
+
   // 翻译hooks
   const t = useTranslations('search');
-  const tCommon = useTranslations('common');
 
   // 搜索函数
   const performSearch = async (params: URLSearchParams) => {
