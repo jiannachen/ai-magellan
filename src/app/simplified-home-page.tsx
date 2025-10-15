@@ -699,24 +699,13 @@ export default function SimplifiedHomePage({
           {/* AM.md 专业级航海能力网格 */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {valueProps.map((prop, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ 
-                  duration: 0.4, 
-                  delay: index * 0.1,
-                  ease: [0.15, 1, 0.3, 1]
-                }}
-                className="group"
-              >
+              <div key={index} className="group">
                 <ValuePropCard
                   icon={prop.icon}
                   title={prop.title}
                   description={prop.description}
-                  index={index}
                 />
-              </motion.div>
+              </div>
             ))}
           </div>
 

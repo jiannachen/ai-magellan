@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from "framer-motion"
 import { cn } from "@/lib/utils/utils"
 import { LucideIcon } from "lucide-react"
 import { Anchor, Waves } from "lucide-react"
@@ -9,21 +8,11 @@ interface ValuePropCardProps {
   icon: LucideIcon
   title: string
   description: string
-  index: number
 }
 
-export function ValuePropCard({ icon: Icon, title, description, index }: ValuePropCardProps) {
+export function ValuePropCard({ icon: Icon, title, description }: ValuePropCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ 
-        duration: 0.4, 
-        delay: index * 0.1,
-        ease: [0.15, 1, 0.3, 1] // AM.md 专业级缓动
-      }}
-      className="group h-full"
-    >
+    <div className="group h-full">
       {/* AM.md 航海探索卡片容器 */}
       <div 
         className={cn(
@@ -44,14 +33,7 @@ export function ValuePropCard({ icon: Icon, title, description, index }: ValuePr
         <div className="relative z-10 flex flex-col h-full p-6">
           {/* AM.md 航海图标容器 - 罗盘风格 */}
           <div className="mb-6 flex justify-center">
-            <motion.div 
-              initial={{ rotate: 0 }}
-              animate={{ rotate: 360 }}
-              transition={{
-                duration: 20, // 专业级慢速旋转
-                repeat: Infinity,
-                ease: "linear"
-              }}
+            <div 
               className={cn(
                 "relative p-4 rounded-xl transition-all duration-300",
                 "bg-gradient-to-br from-magellan-primary/10 to-magellan-teal/10",
@@ -70,7 +52,7 @@ export function ValuePropCard({ icon: Icon, title, description, index }: ValuePr
               {/* 航海指针装饰 */}
               <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-magellan-coral rounded-full opacity-60"></div>
               <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-magellan-mint rounded-full opacity-60"></div>
-            </motion.div>
+            </div>
           </div>
           
           {/* AM.md 航海标题 */}
@@ -91,16 +73,7 @@ export function ValuePropCard({ icon: Icon, title, description, index }: ValuePr
           </p>
           
           {/* AM.md 底部航海装饰线 */}
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{
-              duration: 0.6,
-              delay: index * 0.1 + 0.3,
-              ease: [0.25, 0.1, 0.25, 1]
-            }}
-            className="mt-4 h-0.5 w-16 mx-auto rounded-full bg-gradient-to-r from-magellan-primary/30 via-magellan-teal/50 to-magellan-primary/30"
-          ></motion.div>
+          <div className="mt-4 h-0.5 w-16 mx-auto rounded-full bg-gradient-to-r from-magellan-primary/30 via-magellan-teal/50 to-magellan-primary/30"></div>
         </div>
         
         {/* AM.md 航海悬停波纹效果 */}
@@ -111,6 +84,6 @@ export function ValuePropCard({ icon: Icon, title, description, index }: ValuePr
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

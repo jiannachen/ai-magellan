@@ -317,7 +317,7 @@ export default function AboutPage() {
                 "hover:bg-magellan-teal/5 transition-all duration-300"
               )}
             >
-              <a href="#" target="_blank" rel="noopener noreferrer">
+              <a href="https://discord.gg/vC4zmKypbK" target="_blank" rel="noopener noreferrer">
                 <Users className="h-4 w-4 mr-2 text-magellan-teal" />
                 {t('pages.about.community.discord')}
               </a>
@@ -331,7 +331,7 @@ export default function AboutPage() {
                 "hover:bg-magellan-gold/5 transition-all duration-300"
               )}
             >
-              <a href="#" target="_blank" rel="noopener noreferrer">
+              <a href="https://x.com/SuitaoC40798" target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-4 w-4 mr-2 text-magellan-gold" />
                 {t('pages.about.community.twitter')}
               </a>
