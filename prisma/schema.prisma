@@ -51,7 +51,7 @@ model Website {
   is_trusted           Boolean           @default(false)
   is_featured          Boolean           @default(false)
   weight               Int               @default(1)
-  tags                 String?
+  tags                 String[]          @default([])
   email                String?
   tagline              String?
   features             Json?             @default("[]")

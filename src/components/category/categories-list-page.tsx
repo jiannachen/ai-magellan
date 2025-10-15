@@ -114,6 +114,7 @@ const SubcategoryCard = ({ subcategory }: {
 export default function CategoriesListPage({ categories }: CategoriesListPageProps) {
   const tCategories = useTranslations('pages.categories_list');
   const [activeCategory, setActiveCategory] = useState(categories[0]?.slug || '');
+  const [showAllCategories, setShowAllCategories] = useState(false);
 
   const getIconComponent = (slug: string) => {
     return categoryIcons[slug] || Brain;
@@ -259,17 +260,17 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                 快速导航
               </h2>
               <div className="flex flex-wrap gap-2">
-                {categories.slice(0, 6).map((category) => {
+                {(showAllCategories ? categories : categories.slice(0, 6)).map((category) => {
                   const IconComponent = getIconComponent(category.slug);
                   const isActive = activeCategory === category.slug;
-                  
+
                   return (
                     <button
                       key={category.id}
                       onClick={() => scrollToCategory(category.slug)}
                       className={cn(
                         "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-200",
-                        isActive 
+                        isActive
                           ? "bg-primary text-primary-foreground"
                           : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
                       )}
@@ -279,8 +280,11 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                     </button>
                   );
                 })}
-                {categories.length > 6 && (
-                  <button className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-muted text-muted-foreground">
+                {categories.length > 6 && !showAllCategories && (
+                  <button
+                    onClick={() => setShowAllCategories(true)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 font-medium"
+                  >
                     <span>+{categories.length - 6}</span>
                   </button>
                 )}

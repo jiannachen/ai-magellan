@@ -177,7 +177,7 @@ export async function PUT(
         
         // 标签和描述
         tagline: validatedData.tagline?.trim() || null,
-        tags: validatedData.tags?.trim() || null,
+        tags: validatedData.tags,
         
         // 功能特性
         features: validatedData.features || [],

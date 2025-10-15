@@ -107,7 +107,7 @@ export async function POST(request: Request) {
         submittedBy: userId,
         
         // 标签和描述
-        tags: validatedData.tags?.trim() || null,
+        tags: validatedData.tags,
         tagline: validatedData.tagline?.trim() || null,
         description: validatedData.description?.trim() || "",
         
