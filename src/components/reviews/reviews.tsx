@@ -141,7 +141,8 @@ export function Reviews({ websiteId, websiteTitle }: ReviewsProps) {
     if (!confirm(t('reviews.delete_confirmation'))) return
 
     try {
-      const response = await fetch(`/api/websites/${websiteId}/reviews/${reviewId}`, {
+      // 后端删除接口为 DELETE /api/websites/[id]/reviews，基于 userId + websiteId
+      const response = await fetch(`/api/websites/${websiteId}/reviews`, {
         method: 'DELETE'
       })
 

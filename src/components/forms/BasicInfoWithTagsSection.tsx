@@ -12,7 +12,7 @@ import { Button } from '@/ui/common/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { toast } from '@/hooks/use-toast'
 import { WebsiteEditData } from '@/lib/validations/website'
-import { fetchMetadata } from '@/lib/utils'
+import { fetchMetadata } from '@/lib/utils/utils'
 import GlobalLoading from '@/components/loading/global-loading'
 import {
   Map,

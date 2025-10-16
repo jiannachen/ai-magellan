@@ -214,14 +214,19 @@ export default function ToolDetailPage() {
     }
 
     try {
+      // 点赞只能增加，不能取消；已点赞则不再重复请求
+      if (isLiked) {
+        return
+      }
+
       const response = await fetch(`/api/websites/${website.id}/like`, {
-        method: isLiked ? 'DELETE' : 'POST'
+        method: 'POST'
       })
 
       if (response.ok) {
-        setIsLiked(!isLiked)
-        setLikesCount(prev => isLiked ? prev - 1 : prev + 1)
-        toast.success(isLiked ? t('profile.tools.detail.messages.removed_from_likes') : t('profile.tools.detail.messages.added_to_likes'))
+        setIsLiked(true)
+        setLikesCount(prev => prev + 1)
+        toast.success(t('profile.tools.detail.messages.added_to_likes'))
       }
     } catch (error) {
       console.error('Error toggling like:', error)
@@ -488,6 +493,7 @@ export default function ToolDetailPage() {
                     <Button 
                       variant="outline" 
                       onClick={handleLike}
+                      disabled={isLiked}
                       className="border-magellan-primary/20 hover:bg-magellan-primary/5 hover:border-magellan-primary/30"
                     >
                       <Heart className={cn("h-4 w-4 mr-2", isLiked && "fill-magellan-coral text-magellan-coral")} />

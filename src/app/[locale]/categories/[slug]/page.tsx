@@ -3,6 +3,10 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db/db';
 import CategoryPage from '@/components/category/category-page';
 
+// 此页面依赖运行时数据库查询，强制动态渲染避免构建期静态化导致的 DYNAMIC_SERVER_USAGE 错误
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function generateStaticParams() {
   try {
     const categories = await prisma.category.findMany({
