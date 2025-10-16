@@ -4,13 +4,19 @@ import { prisma } from '@/lib/db/db';
 import CategoryPage from '@/components/category/category-page';
 
 export async function generateStaticParams() {
-  const categories = await prisma.category.findMany({
-    select: { slug: true }
-  });
+  try {
+    const categories = await prisma.category.findMany({
+      select: { slug: true }
+    });
 
-  return categories.map((category) => ({
-    slug: category.slug,
-  }));
+    return categories.map((category) => ({
+      slug: category.slug,
+    }));
+  } catch (error) {
+    console.warn('Failed to generate static params for categories:', error);
+    // Return empty array to allow dynamic rendering
+    return [];
+  }
 }
 
 export async function generateMetadata({
