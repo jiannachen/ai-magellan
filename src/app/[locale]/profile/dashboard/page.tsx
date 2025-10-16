@@ -30,6 +30,7 @@ import { FavoriteCard } from '@/components/favorites/favorite-card'
 interface Website {
   id: number
   title: string
+  slug: string
   url: string
   description: string
   thumbnail: string | null

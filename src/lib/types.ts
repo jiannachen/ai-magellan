@@ -1,6 +1,7 @@
 export interface Website {
   id: number;
   title: string;
+  slug: string;
   url: string;
   description: string;
   category_id: number;

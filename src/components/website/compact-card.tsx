@@ -42,7 +42,7 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
         <div className="absolute inset-0 bg-gradient-to-br from-magellan-primary/[0.06] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"></div>
 
         {/* 整个卡片的点击区域 - 跳转到详情页 */}
-        <Link href={`/tools/${website.id}`} className="absolute inset-0 z-[1]" />
+        <Link href={`/tools/${website.slug}`} className="absolute inset-0 z-[1]" />
 
         {/* 专业级宝藏探索按钮 - 符合AM.md航海主题，商业可用性优先 */}
         <div className="absolute top-3 right-3 z-[2] opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-200">

@@ -1,5 +1,16 @@
 {
   "loading": "Loading...",
+  "metadata": {
+    "title": "AI Magellan - Navigate the AI Frontier",
+    "site_name": "AI Magellan",
+    "description": "AI Magellan is your AI tool exploration companion. Discover, evaluate, and use the best artificial intelligence tools and resources curated by experts.",
+    "author": "AI Magellan Team",
+    "og_title": "AI Magellan - Navigate the AI Frontier",
+    "og_description": "AI Magellan is your AI tool exploration companion. Discover curated artificial intelligence tools and resources.",
+    "og_image_alt": "AI Magellan - Navigate the AI Frontier",
+    "twitter_title": "AI Magellan - Navigate the AI Frontier",
+    "twitter_description": "AI Magellan is your AI tool exploration companion. Discover curated AI tools and resources."
+  },
   "common": {
     "loading": "Loading...",
     "error": "Error occurred",
@@ -159,6 +170,10 @@
       "browse_all_tools": "Browse all {count} curated tools",
       "explore_now": "Explore Now",
       "tools_unit": "Tools",
+      "subcategories_unit": "Subcategories",
+      "territories_count": "{count} territory seas",
+      "tools_available": "{count} tools available",
+      "explore_category": "Explore {category}",
       "subcategories_count": ", {count} subcategories",
       "badge_title": "Territory Explorer",
       "hero_title": "AI Territory Map",

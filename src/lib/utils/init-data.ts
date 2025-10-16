@@ -1,5 +1,6 @@
 import { prisma } from '../db/db';
 import type { Prisma, PrismaClient, Category } from '@prisma/client';
+import { generateSlug } from './utils';
 
 
 
@@ -172,19 +173,35 @@ export async function initializeData() {
       defaultWebsites.map(async website => {
         const { category_slug, ...websiteData } = website;
         const category_id = allCategoryMap.get(category_slug);
-        
+
         if (category_id) {
+          // Generate slug from title
+          let slug = generateSlug(website.title);
+          let slugCounter = 1;
+
+          // Check if slug already exists and make it unique
+          const existingWebsiteWithSlug = await prisma.website.findUnique({
+            where: { slug }
+          });
+
+          while (existingWebsiteWithSlug && existingWebsiteWithSlug.url !== website.url) {
+            slug = `${generateSlug(website.title)}-${slugCounter}`;
+            slugCounter++;
+          }
+
           const createData: Prisma.WebsiteCreateInput = {
             ...websiteData,
-            category: { 
-              connect: { id: Number(category_id) } 
+            slug,
+            category: {
+              connect: { id: Number(category_id) }
             }
           };
 
           const updateData: Prisma.WebsiteUpdateInput = {
             ...websiteData,
-            category: { 
-              connect: { id: Number(category_id) } 
+            slug,
+            category: {
+              connect: { id: Number(category_id) }
             }
           };
 

@@ -11,52 +11,15 @@ import { getLocale } from 'next-intl/server';
 import { CriticalResources } from "@/components/performance/critical-resources";
 import ErrorDeduplicationProvider from "@/components/providers/error-deduplication-provider";
 
-// 全局SEO配置
+// 全局配置 - 仅保留与语言无关的设置
 export const metadata: Metadata = {
-  title: {
-    default: "AI Magellan - 探索发现优质AI工具的导航专家",
-    template: "%s | AI Magellan"
-  },
-  description: "AI Magellan 是您的AI工具探索伙伴，如同麦哲伦开启环球航海一样，我们为您开启AI工具的发现之旅。精选验证优质的人工智能工具和资源，帮助专业人士发现、评估和使用最适合的AI产品。",
-  keywords: ["AI Magellan", "AI工具导航", "人工智能工具", "AI工具发现", "AI资源探索", "专业AI工具", "ChatGPT", "AI产品评测"],
-  authors: [{ name: "AI Magellan 团队" }],
-  creator: "AI Magellan",
-  publisher: "AI Magellan",
-  
-  // Open Graph
-  openGraph: {
-    type: "website",
-    locale: "zh",
-    url: process.env.NEXT_PUBLIC_BASE_URL || "https://aimagellan.com",
-    siteName: "AI Magellan",
-    title: "AI Magellan - 探索发现优质AI工具的导航专家",
-    description: "AI Magellan 是您的AI工具探索伙伴，精选验证优质的人工智能工具和资源",
-    images: [
-      {
-        url: "/images/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "AI Magellan - 探索发现优质AI工具的导航专家"
-      }
-    ]
-  },
-  
-  // Twitter Card
-  twitter: {
-    card: "summary_large_image",
-    title: "AI Magellan - 探索发现优质AI工具的导航专家",
-    description: "AI Magellan 是您的AI工具探索伙伴，精选验证优质的人工智能工具和资源",
-    images: ["/images/twitter-image.png"],
-    creator: "@aimagellan"
-  },
-  
   // 验证标签
   verification: {
     google: process.env.GOOGLE_SITE_VERIFICATION,
     yandex: process.env.YANDEX_VERIFICATION
   },
-  
-  // 其他元数据
+
+  // 爬虫规则
   robots: {
     index: true,
     follow: true,
@@ -68,11 +31,7 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  
-  alternates: {
-    canonical: process.env.NEXT_PUBLIC_BASE_URL || "https://aimagellan.com",
-  },
-  
+
   category: "Technology",
 };
 
@@ -111,7 +70,7 @@ export default async function RootLayout({
         {/* 网站图标 */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         
         {/* DNS预解析 */}
@@ -124,10 +83,10 @@ export default async function RootLayout({
         suppressHydrationWarning
         className="min-h-screen flex flex-col bg-background"
       >
-        <CriticalResources 
+        <CriticalResources
           images={[
-            '/images/og-image.png',
-            '/images/logo.png'
+            '/images/og-image.avif',
+            '/logo.png'
           ]}
         />
         <ClerkProvider>

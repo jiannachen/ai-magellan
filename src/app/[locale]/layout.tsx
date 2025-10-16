@@ -1,5 +1,5 @@
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 import { locales } from '@/i18n';
@@ -8,10 +8,68 @@ import Footer from "@/components/footer/index";
 import BottomNavigation from "@/components/navigation/bottom-nav";
 import { HrefLang } from "@/components/seo/hreflang";
 import FloatingFeedbackButton from "@/components/feedback/floating-feedback-button";
+import { Metadata } from 'next';
 
 interface LocaleLayoutProps {
   children: ReactNode;
   params: Promise<{ locale: string }>;
+}
+
+// 动态生成 metadata 根据语言
+export async function generateMetadata({
+  params
+}: LocaleLayoutProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'metadata' });
+
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://aimagellan.com";
+  const localePrefix = locale === 'en' ? '' : `/${locale}`;
+
+  return {
+    title: {
+      default: t('title'),
+      template: `%s | ${t('site_name')}`
+    },
+    description: t('description'),
+    authors: [{ name: t('author') }],
+    creator: t('site_name'),
+    publisher: t('site_name'),
+
+    openGraph: {
+      type: "website",
+      locale: locale === 'tw' ? 'zh_TW' : 'en_US',
+      url: `${baseUrl}${localePrefix}`,
+      siteName: t('site_name'),
+      title: t('og_title'),
+      description: t('og_description'),
+      images: [
+        {
+          url: "/images/og-image.avif",
+          width: 1200,
+          height: 630,
+          alt: t('og_image_alt')
+        }
+      ]
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: t('twitter_title'),
+      description: t('twitter_description'),
+      images: ["/images/twitter-image.avif"],
+      creator: "@aimagellan"
+    },
+
+    alternates: {
+      canonical: `${baseUrl}${localePrefix}`,
+      languages: {
+        'en': `${baseUrl}`,
+        'zh-TW': `${baseUrl}/tw`
+      }
+    },
+
+    category: "Technology",
+  };
 }
 
 export default async function LocaleLayout({

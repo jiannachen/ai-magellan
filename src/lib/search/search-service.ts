@@ -18,10 +18,12 @@ export interface SearchResult {
   websites: {
     id: number;
     title: string;
+    slug: string;
     url: string;
     description: string;
     category_id: number;
     thumbnail?: string;
+    logo_url?: string;
     visits: number;
     likes: number;
     quality_score: number;
@@ -162,10 +164,12 @@ export async function searchWebsites(params: SearchParams): Promise<{
         select: {
           id: true,
           title: true,
+          slug: true,
           url: true,
           description: true,
           category_id: true,
           thumbnail: true,
+          logo_url: true,
           visits: true,
           likes: true,
           quality_score: true,
@@ -193,6 +197,7 @@ export async function searchWebsites(params: SearchParams): Promise<{
         websites: websites.map(website => ({
           ...website,
           thumbnail: website.thumbnail ?? undefined,
+          logo_url: website.logo_url ?? undefined,
           status: website.status as "pending" | "approved" | "rejected"
         })),
         pagination: {

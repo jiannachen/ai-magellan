@@ -37,6 +37,7 @@ import { WebsiteThumbnail } from '@/components/website/website-thumbnail'
 interface Website {
   id: number
   title: string
+  slug: string
   url: string
   description: string
   thumbnail: string | null
@@ -366,7 +367,7 @@ export default function MySubmissionsPage() {
                           
                           {/* Action Buttons */}
                           <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-                            <Link href={`/tools/${website.id}`}>
+                            <Link href={`/tools/${website.slug}`}>
                               <Button variant="outline" size="sm">
                                 <Eye className="h-3 w-3 mr-1" />
                                 {t('view')}

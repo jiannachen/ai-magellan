@@ -138,10 +138,10 @@ export default function ToolDetailPage() {
   ]
 
   useEffect(() => {
-    if (params.id) {
+    if (params.slug) {
       fetchToolDetails()
     }
-  }, [params.id])
+  }, [params.slug])
 
   useEffect(() => {
     if (website && isSignedIn) {
@@ -152,8 +152,8 @@ export default function ToolDetailPage() {
   const fetchToolDetails = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/websites/${params.id}`)
-      
+      const response = await fetch(`/api/websites/${params.slug}`)
+
       if (!response.ok) {
         if (response.status === 404) {
           notFound()
@@ -389,13 +389,13 @@ export default function ToolDetailPage() {
   if (!website) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center pb-24 md:pb-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-foreground">Tool not found</h1>
-          <p className="text-muted-foreground">The tool you're looking for doesn't exist.</p>
+        <div className="text-center space-y-6">
+          <h1 className="text-2xl font-bold text-foreground">{t('profile.tools.detail.tool_not_found')}</h1>
+          <p className="text-muted-foreground">{t('profile.tools.detail.tool_not_found_desc')}</p>
           <Link href="/">
             <Button>
               <Compass className="h-4 w-4 mr-2" />
-              Return to exploration
+              {t('common.back')}
             </Button>
           </Link>
         </div>

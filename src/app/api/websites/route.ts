@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from '@clerk/nextjs/server';
 import type { Website } from "@/lib/types";
-import { AjaxResponse } from "@/lib/utils";
+import { AjaxResponse, generateSlug } from "@/lib/utils";
 import { prisma } from "@/lib/db/db";
 import { validateWebsiteSubmit } from "@/lib/validations/website";
 
@@ -96,10 +96,21 @@ export async function POST(request: Request) {
       });
     }
 
+    // 生成唯一的slug
+    let slug = generateSlug(validatedData.title);
+    let slugCounter = 1;
+
+    // 确保slug唯一
+    while (await prisma.website.findUnique({ where: { slug } })) {
+      slug = `${generateSlug(validatedData.title)}-${slugCounter}`;
+      slugCounter++;
+    }
+
     const website = await prisma.website.create({
       data: {
         // 基本信息
         title: validatedData.title.trim(),
+        slug: slug,
         url: validatedData.url.trim(),
         email: validatedData.email?.trim() || null,
         category_id: Number(validatedData.category_id),

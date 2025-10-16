@@ -1,18 +1,21 @@
 import { NextResponse } from "next/server";
 import { auth } from '@clerk/nextjs/server';
-import { AjaxResponse } from "@/lib/utils";
+import { AjaxResponse, generateSlug } from "@/lib/utils";
 import { prisma } from "@/lib/db/db";
 import { validateWebsiteEdit } from "@/lib/validations/website";
 
 // GET /api/websites/[id]
-// 获取单个网站详细信息
+// 获取单个网站详细信息 - 支持通过ID或slug查询
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const websiteId = parseInt(id);
+
+    // 尝试解析为数字，如果失败则认为是slug
+    const isNumericId = !isNaN(Number(id));
+
     const website = await prisma.website.findUnique({
-      where: { id: websiteId },
-      include: { 
+      where: isNumericId ? { id: parseInt(id) } : { slug: id },
+      include: {
         category: {
           include: {
             parent: true
@@ -165,11 +168,30 @@ export async function PUT(
       });
     }
 
+    // 如果标题改变，重新生成slug
+    let slug = existingWebsite.slug;
+    if (validatedData.title.trim() !== existingWebsite.title) {
+      slug = generateSlug(validatedData.title);
+      let slugCounter = 1;
+
+      // 确保slug唯一（排除当前网站）
+      while (await prisma.website.findFirst({
+        where: {
+          slug,
+          id: { not: websiteId }
+        }
+      })) {
+        slug = `${generateSlug(validatedData.title)}-${slugCounter}`;
+        slugCounter++;
+      }
+    }
+
     const website = await prisma.website.update({
       where: { id: websiteId },
       data: {
         // 基本信息
         title: validatedData.title.trim(),
+        slug: slug,
         url: validatedData.url.trim(),
         email: validatedData.email?.trim() || null,
         description: validatedData.description?.trim() || "",

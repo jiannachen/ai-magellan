@@ -200,7 +200,7 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                   {tCategories('main_categories')}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {categories.length} 个分类海域
+                  {tCategories('territories_count', { count: categories.length })}
                 </p>
               </div>
               
@@ -233,9 +233,9 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                               "text-sm transition-colors",
                               isActive ? "text-primary/70" : "text-muted-foreground"
                             )}>
-                              {category.toolCount} 工具
+                              {category.toolCount} {tCategories('tools_unit')}
                               {category.subcategories && category.subcategories.length > 0 && (
-                                <span className="ml-1">• {category.subcategories.length} 子分类</span>
+                                <span className="ml-1">• {category.subcategories.length} {tCategories('subcategories_unit')}</span>
                               )}
                             </div>
                           </div>
@@ -257,7 +257,7 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
             <div className="bg-background rounded-lg border border-border p-4">
               <h2 className="font-semibold text-foreground flex items-center gap-2 mb-4">
                 <Layers className="h-5 w-5 text-primary" />
-                快速导航
+                {tCategories('main_categories')}
               </h2>
               <div className="flex flex-wrap gap-2">
                 {(showAllCategories ? categories : categories.slice(0, 6)).map((category) => {
@@ -312,12 +312,12 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                         <p className="text-muted-foreground flex items-center gap-4">
                           <span className="flex items-center gap-1">
                             <Grid className="h-4 w-4" />
-                            {category.toolCount} 工具
+                            {category.toolCount} {tCategories('tools_unit')}
                           </span>
                           {category.subcategories && category.subcategories.length > 0 && (
                             <span className="flex items-center gap-1">
                               <Layers className="h-4 w-4" />
-                              {category.subcategories.length} 子分类
+                              {category.subcategories.length} {tCategories('subcategories_unit')}
                             </span>
                           )}
                         </p>
@@ -354,10 +354,10 @@ export default function CategoriesListPage({ categories }: CategoriesListPagePro
                               
                               <div className="flex-1 min-w-0">
                                 <h3 className="font-medium text-foreground group-hover:text-primary transition-colors truncate mb-1">
-                                  探索 {category.name}
+                                  {tCategories('explore_category', { category: category.name })}
                                 </h3>
                                 <p className="text-sm text-muted-foreground">
-                                  {category.toolCount} 个工具可用
+                                  {tCategories('tools_available', { count: category.toolCount })}
                                 </p>
                               </div>
                               

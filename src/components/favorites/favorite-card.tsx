@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils/utils'
 interface Website {
   id: number
   title: string
+  slug: string
   url: string
   description: string
   thumbnail: string | null
@@ -49,7 +50,7 @@ export function FavoriteCard({
   showRemoveButton = true
 }: FavoriteCardProps) {
   const handleCardClick = () => {
-    window.open(`/tools/${website.id}`, '_blank')
+    window.open(`/tools/${website.slug}`, '_blank')
   }
 
   const handleVisit = (e: React.MouseEvent) => {

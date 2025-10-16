@@ -6,20 +6,24 @@ Allow: /
 Allow: /about
 Allow: /categories
 Allow: /rankings
-Allow: /submit
 Allow: /tools
+Allow: /privacy-policy
+Allow: /terms-of-service
+
 
 # 禁止访问API和管理页面
 Disallow: /api/
+Disallow: /submit
 Disallow: /admin/
 Disallow: /_next/
 Disallow: /.*\?
+Disallow: /scripts/
 
 # 允许访问静态资源
 Allow: /favicon.ico
 Allow: /images/
 Allow: /icons/
-Allow: /scripts/
+
 
 # 网站地图
 Sitemap: https://aimagellan.com/sitemap.xml

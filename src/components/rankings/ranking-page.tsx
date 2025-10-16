@@ -376,7 +376,7 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                         )}
                         onClick={() => {
                           // 跳转到工具详情页
-                          router.push(`/tools/${website.id}`);
+                          router.push(`/tools/${website.slug}`);
                         }}
                       >
                         {/* Premium Ranking Badge - 移动端优化 */}

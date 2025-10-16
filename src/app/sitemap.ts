@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const websites = await prisma.website.findMany({
       where: { status: 'approved' },
       select: {
-        id: true,
+        slug: true,
         updated_at: true,
       },
     })
@@ -92,7 +92,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // 工具详情页面
     const toolPages = websites.map(website => ({
-      url: `${baseUrl}/tools/${website.id}`,
+      url: `${baseUrl}/tools/${website.slug}`,
       lastModified: website.updated_at || new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.6,

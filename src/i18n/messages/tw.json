@@ -1,5 +1,16 @@
 {
   "loading": "載入中...",
+  "metadata": {
+    "title": "AI Magellan - 探索发现优质AI工具的导航专家",
+    "site_name": "AI Magellan",
+    "description": "AI Magellan 是您的AI工具探索伙伴，如同麦哲伦开启环球航海一样，我们为您开启AI工具的发现之旅。精选验证优质的人工智能工具和资源，帮助专业人士发现、评估和使用最适合的AI产品。",
+    "author": "AI Magellan 团队",
+    "og_title": "AI Magellan - 探索发现优质AI工具的导航专家",
+    "og_description": "AI Magellan 是您的AI工具探索伙伴，精选验证优质的人工智能工具和资源",
+    "og_image_alt": "AI Magellan - 探索发现优质AI工具的导航专家",
+    "twitter_title": "AI Magellan - 探索发现优质AI工具的导航专家",
+    "twitter_description": "AI Magellan 是您的AI工具探索伙伴，精选验证优质的人工智能工具和资源"
+  },
   "common": {
     "loading": "載入中...",
     "error": "發生錯誤",
@@ -159,6 +170,10 @@
       "browse_all_tools": "瀏覽所有 {count} 個精選工具",
       "explore_now": "立即查看",
       "tools_unit": "工具",
+      "subcategories_unit": "子分類",
+      "territories_count": "{count} 個分類海域",
+      "tools_available": "{count} 個工具可用",
+      "explore_category": "探索 {category}",
       "subcategories_count": "，{count} 個子分類",
       "badge_title": "領域探險家",
       "hero_title": "AI領域地圖",

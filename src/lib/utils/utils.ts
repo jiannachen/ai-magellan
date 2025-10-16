@@ -84,3 +84,25 @@ function decodeHTMLEntities(text: string): string {
     (entity) => entities[entity as keyof typeof entities] || entity
   );
 }
+
+/**
+ * 生成SEO友好的slug
+ * @param title - 标题
+ * @returns slug字符串
+ */
+export function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    // 移除特殊字符，只保留字母、数字、中文、连字符和空格
+    .replace(/[^\w\s\u4e00-\u9fa5-]/g, '')
+    // 将空格替换为连字符
+    .replace(/\s+/g, '-')
+    // 移除多余的连字符
+    .replace(/-+/g, '-')
+    // 移除开头和结尾的连字符
+    .replace(/^-+|-+$/g, '')
+    // 限制长度
+    .substring(0, 100);
+}
+

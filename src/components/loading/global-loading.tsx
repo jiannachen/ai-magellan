@@ -10,17 +10,30 @@ interface GlobalLoadingProps {
   size?: "sm" | "md" | "lg";
 }
 
-export default function GlobalLoading({ 
-  className = "", 
-  message, 
+export default function GlobalLoading({
+  className = "",
+  message,
   variant = "default",
   size = "md"
 }: GlobalLoadingProps) {
-  const t = useTranslations('common');
-  
+  // 尝试获取翻译，如果失败则使用默认值
+  let t: any;
+  try {
+    t = useTranslations('common');
+  } catch {
+    // 如果没有 NextIntlClientProvider 上下文，使用默认翻译
+    t = (key: string) => {
+      const defaults: Record<string, string> = {
+        'loading': 'Loading...',
+        'loading_content': 'Loading content...'
+      };
+      return defaults[key] || 'Loading...';
+    };
+  }
+
   const sizeClasses = {
     sm: "h-4 w-4 border",
-    md: "h-8 w-8 border-2", 
+    md: "h-8 w-8 border-2",
     lg: "h-12 w-12 border-2"
   };
 
