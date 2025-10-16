@@ -63,7 +63,7 @@
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.468.0",
     "negotiator": "^1.0.0",
-    "next": "15.1.2",
+    "next": "^15.2.3",
     "next-intl": "^4.3.11",
     "next-themes": "^0.4.4",
     "node-fetch": "^3.3.2",
