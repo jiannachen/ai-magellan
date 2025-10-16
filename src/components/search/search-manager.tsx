@@ -43,7 +43,7 @@ export function SearchManager({
       results = results.filter(website =>
         website.title.toLowerCase().includes(query) ||
         website.description.toLowerCase().includes(query) ||
-        (website.tags && website.tags.toLowerCase().includes(query))
+        (website.tags && website.tags.some(tag => tag.toLowerCase().includes(query)))
       )
     }
 
@@ -56,8 +56,8 @@ export function SearchManager({
 
     // 高级过滤
     if (filters.pricingModel && filters.pricingModel.length > 0) {
-      results = results.filter(website => 
-        filters.pricingModel!.includes(website.pricing_model)
+      results = results.filter(website =>
+        website.pricing_model && filters.pricingModel!.includes(website.pricing_model)
       )
     }
 

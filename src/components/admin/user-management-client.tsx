@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Users, 
@@ -90,7 +90,7 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
   };
 
   // 当搜索或过滤条件改变时更新结果
-  useState(() => {
+  useEffect(() => {
     filterUsers();
   }, [searchTerm, roleFilter, statusFilter, users]);
 

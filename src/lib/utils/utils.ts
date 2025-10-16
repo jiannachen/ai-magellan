@@ -34,90 +34,38 @@ export class AjaxResponse<T> {
 
 export async function fetchMetadata(url: string) {
   try {
-    const response = await fetch(url);
+    // 调用我们的元数据提取API
+    const response = await fetch('/api/metadata/extract', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url }),
+    });
+
     if (!response.ok) {
-      throw new Error("无法访问该网站");
-    }
-    const html = await response.text();
-
-    // 解析网页标题 - 优先使用 og:title，其次是 title 标签
-    let title = "";
-    const ogTitleMatch = html.match(
-      /<meta[^>]*property="og:title"[^>]*content="([^"]*)"[^>]*>/i
-    );
-    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-    if (ogTitleMatch) {
-      title = ogTitleMatch[1].trim();
-    } else if (titleMatch) {
-      title = titleMatch[1].trim();
+      const error = await response.json();
+      throw new Error(error.message || '无法获取网站信息');
     }
 
-    // 解析网页描述 - 尝试多种 meta 描述标签
-    let description = "";
-    const ogDescMatch = html.match(
-      /<meta[^>]*property="og:description"[^>]*content="([^"]*)"[^>]*>/i
-    );
-    const descMatch = html.match(
-      /<meta[^>]*name="description"[^>]*content="([^"]*)"[^>]*>/i
-    );
-    const twitterDescMatch = html.match(
-      /<meta[^>]*name="twitter:description"[^>]*content="([^"]*)"[^>]*>/i
-    );
-    if (ogDescMatch) {
-      description = ogDescMatch[1].trim();
-    } else if (descMatch) {
-      description = descMatch[1].trim();
-    } else if (twitterDescMatch) {
-      description = twitterDescMatch[1].trim();
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.message || '无法获取网站信息');
     }
 
-    // 解析网页图片 - 尝试多种图片meta标签
-    let image = "";
-    const ogImageMatch = html.match(
-      /<meta[^>]*property="og:image"[^>]*content="([^"]*)"[^>]*>/i
-    );
-    const twitterImageMatch = html.match(
-      /<meta[^>]*name="twitter:image"[^>]*content="([^"]*)"[^>]*>/i
-    );
-    const msImageMatch = html.match(
-      /<meta[^>]*name="msapplication-TileImage"[^>]*content="([^"]*)"[^>]*>/i
-    );
-    const iconMatch = html.match(
-      /<link[^>]*rel="icon"[^>]*href="([^"]*)"[^>]*>/i
-    );
-    const appleTouchIconMatch = html.match(
-      /<link[^>]*rel="apple-touch-icon"[^>]*href="([^"]*)"[^>]*>/i
-    );
-
-    if (ogImageMatch) {
-      image = ogImageMatch[1].trim();
-    } else if (twitterImageMatch) {
-      image = twitterImageMatch[1].trim();
-    } else if (msImageMatch) {
-      image = msImageMatch[1].trim();
-    } else if (appleTouchIconMatch) {
-      image = appleTouchIconMatch[1].trim();
-    } else if (iconMatch) {
-      image = iconMatch[1].trim();
-    }
-
-    // 如果图片URL是相对路径，转换为绝对路径
-    if (image && !image.startsWith("http")) {
-      const urlObj = new URL(url);
-      if (image.startsWith("/")) {
-        image = `${urlObj.protocol}//${urlObj.host}${image}`;
-      } else {
-        image = `${urlObj.protocol}//${urlObj.host}/${image}`;
-      }
-    }
-
+    // 返回提取的元数据
     return {
-      title: decodeHTMLEntities(title),
-      description: decodeHTMLEntities(description),
-      image,
+      title: result.data.title || '',
+      description: result.data.description || '',
+      tagline: result.data.tagline || '',
+      logo: result.data.logo || '',
+      thumbnail: result.data.thumbnail || '',
     };
   } catch (error) {
-    throw new Error("获取网站信息失败");
+    // This is an expected error for websites that don't support metadata extraction
+    // Don't log to console as it's a normal use case
+    throw new Error(error instanceof Error ? error.message : 'Failed to fetch website metadata');
   }
 }
 

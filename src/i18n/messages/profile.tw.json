@@ -411,7 +411,7 @@
       "description_max_length": "描述不能超過1000個字符"
     },
     "messages": {
-      "load_categories_error": "載入分類失敗，請刷新頁面重試",
+      "load_categories_error": "載入分類失敗,請刷新頁面重試",
       "auto_fill_success": "資訊獲取成功，網站資訊已自動填充",
       "auto_fill_error": "獲取失敗，請手動填寫網站資訊",
       "submit_success": "提交成功！您的AI工具已提交審核，我們將在24-48小時內處理。",
@@ -426,7 +426,10 @@
       "enter_valid_name": "請輸入有效的工具名稱",
       "enter_valid_tagline": "請輸入有效的標語",
       "enter_valid_description": "請輸入有效的描述",
-      "complete_all_features": "請完善所有功能的名稱和描述"
+      "complete_all_features": "請完善所有功能的名稱和描述",
+      "url_already_exists": "此網址已被提交",
+      "url_exists_pending": "目前正在審核中",
+      "url_exists_approved": "已通過審核並上線"
     }
   },
   "edit": {

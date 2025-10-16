@@ -79,6 +79,7 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
               <WebsiteThumbnail
                 url={website.url}
                 thumbnail={website.thumbnail}
+                logoUrl={website.logo_url}
                 title={website.title}
                 className={cn(
                   "relative w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-lg flex-shrink-0",
@@ -97,42 +98,40 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
               )}>
                 {website.title || tLanding('island.unnamed_island')}
               </h3>
-              
+
+              {/* 定价标签 - 紧贴标题下方 */}
+              <div className="flex items-center gap-1 mt-1">
+                {/* 免费标签 */}
+                {website.pricing_model === 'free' && (
+                  <Badge
+                    variant="secondary"
+                    className={cn(
+                      "text-[10px] px-1.5 py-0.5 h-5 bg-magellan-mint/8 text-magellan-mint border-magellan-mint/30",
+                      "rounded font-medium"
+                    )}
+                  >
+                    免费
+                  </Badge>
+                )}
+                {/* 定价模式标签 */}
+                {website.pricing_model && website.pricing_model !== 'free' && (
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "text-[10px] px-1.5 py-0.5 h-5 bg-magellan-primary/6 text-magellan-primary border-magellan-primary/30",
+                      "hover:bg-magellan-primary/8 transition-colors duration-200",
+                      "rounded font-medium"
+                    )}
+                  >
+                    {website.pricing_model}
+                  </Badge>
+                )}
+              </div>
+
               {/* 专业级描述 - 严格限制为两行，优化行间距 */}
               <p className="text-sm text-muted-foreground line-clamp-2 leading-[1.4] flex-1 max-h-[2.8rem] overflow-hidden">
                 {website.description || tLanding('island.mysterious_island')}
               </p>
-            </div>
-          </div>
-
-          {/* 底部标签区域 - 超紧凑设计 */}
-          <div className="flex items-center justify-between pt-1.5 border-t border-border/20">
-            <div className="flex items-center gap-1">
-              {/* 安全港标签 - 超简约设计 */}
-              {website.pricing_model === 'free' && (
-                <Badge 
-                  variant="secondary" 
-                  className={cn(
-                    "text-[10px] px-1.5 py-0.5 h-5 bg-magellan-mint/8 text-magellan-mint border-magellan-mint/30",
-                    "rounded font-medium"
-                  )}
-                >
-                  免费
-                </Badge>
-              )}
-              {/* 定价模式标签 - 超简约设计 */}
-              {website.pricing_model && website.pricing_model !== 'free' && (
-                <Badge 
-                  variant="outline" 
-                  className={cn(
-                    "text-[10px] px-1.5 py-0.5 h-5 bg-magellan-primary/6 text-magellan-primary border-magellan-primary/30",
-                    "hover:bg-magellan-primary/8 transition-colors duration-200",
-                    "rounded font-medium"
-                  )}
-                >
-                  {website.pricing_model}
-                </Badge>
-              )}
             </div>
           </div>
         </div>

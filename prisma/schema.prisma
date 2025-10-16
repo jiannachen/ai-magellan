@@ -150,17 +150,17 @@ model WebsiteReview {
 }
 
 model Category {
-  id         Int       @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   name       String
-  slug       String    @unique
+  slug       String     @unique
   name_en    String?
   name_zh    String?
   parent_id  Int?
-  sort_order Int       @default(0)
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
+  sort_order Int        @default(0)
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
   websites   Website[]
-  parent     Category? @relation("CategoryHierarchy", fields: [parent_id], references: [id], onDelete: Cascade)
+  parent     Category?  @relation("CategoryHierarchy", fields: [parent_id], references: [id], onDelete: Cascade)
   children   Category[] @relation("CategoryHierarchy")
 
   @@index([slug])

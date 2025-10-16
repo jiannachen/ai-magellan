@@ -14,7 +14,7 @@ export interface Website {
   is_trusted?: boolean;
   is_featured?: boolean;
   weight?: number;
-  tags?: string;
+  tags?: string[];
   domain_authority?: number;
   last_checked?: Date | string;
   response_time?: number;

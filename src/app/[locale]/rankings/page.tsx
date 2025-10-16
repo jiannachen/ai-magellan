@@ -26,12 +26,24 @@ async function getRankingsData() {
     }
   });
 
-  // Get categories with tool counts (只获取一级分类)
+  // Get categories with tool counts (只获取一级分类，并包含子分类)
   const categories = await prisma.category.findMany({
     where: {
       parent_id: null
     },
     include: {
+      children: {
+        include: {
+          _count: {
+            select: {
+              websites: {
+                where: { status: 'approved' }
+              }
+            }
+          }
+        },
+        orderBy: { sort_order: 'asc' }
+      },
       _count: {
         select: {
           websites: {

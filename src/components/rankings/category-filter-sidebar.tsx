@@ -72,7 +72,7 @@ export default function CategoryFilterSidebar({
     return (
       <div key={category.id}>
         <button
-          onClick={() => handleCategoryClick(category.slug, category.id, hasChildren)}
+          onClick={() => handleCategoryClick(category.slug, category.id, !!hasChildren)}
           className={cn(
             "w-full text-left rounded-lg transition-all duration-200 group",
             "border border-transparent hover:border-magellan-primary/30",

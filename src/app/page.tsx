@@ -20,6 +20,7 @@ export default async function Home() {
             description: true,
             category_id: true,
             thumbnail: true,
+            logo_url: true,
             status: true,
             visits: true,
             likes: true,
@@ -38,11 +39,31 @@ export default async function Home() {
       "all-categories",
       () =>
         prisma.category.findMany({
+          where: {
+            parent_id: null // 只获取一级分类
+          },
           select: {
             id: true,
             name: true,
             slug: true,
+            parent_id: true,
+            sort_order: true,
+            children: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                parent_id: true,
+                sort_order: true,
+              },
+              orderBy: {
+                sort_order: 'asc'
+              }
+            }
           },
+          orderBy: {
+            sort_order: 'asc'
+          }
         }),
       { ttl: 1 } // 1周缓存
     ),
@@ -51,6 +72,9 @@ export default async function Home() {
   // 预处理数据，减少客户端计算
   const preFilteredWebsites = websitesData.map((website) => ({
     ...website,
+    thumbnail: website.thumbnail ?? undefined,
+    logo_url: website.logo_url ?? undefined,
+    status: website.status as "approved" | "pending" | "rejected",
     searchText: `${website.title.toLowerCase()} ${website.description.toLowerCase()}`,
   }));
 

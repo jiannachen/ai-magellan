@@ -44,12 +44,6 @@ export default function EditWebsitePage() {
     pricingPlansFields,
     appendPricingPlan,
     removePricingPlan,
-    useCasesFields,
-    appendUseCase,
-    removeUseCase,
-    targetAudienceFields,
-    appendTargetAudience,
-    removeTargetAudience,
     addToArray,
     removeFromArray,
     handleFormSubmit
@@ -149,6 +143,7 @@ export default function EditWebsitePage() {
                 selectedParentCategory={selectedParentCategory}
                 setSelectedParentCategory={setSelectedParentCategory}
                 subcategories={subcategories}
+                websiteId={websiteId}
               />
 
               <FeaturesSection
@@ -169,12 +164,6 @@ export default function EditWebsitePage() {
                 faqFields={faqFields}
                 appendFaq={appendFaq}
                 removeFaq={removeFaq}
-                useCasesFields={useCasesFields}
-                appendUseCase={appendUseCase}
-                removeUseCase={removeUseCase}
-                targetAudienceFields={targetAudienceFields}
-                appendTargetAudience={appendTargetAudience}
-                removeTargetAudience={removeTargetAudience}
               />
 
               <PricingSection
@@ -230,7 +219,7 @@ export default function EditWebsitePage() {
               className="bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90 !text-white [&_*]:!text-white flex-1 sm:flex-none sm:min-w-[200px] h-9 sm:h-10"
             >
               {isSubmitting ? (
-                <GlobalLoading variant="inline" size="sm" />
+                <GlobalLoading variant="inline" size="sm" message={t('feedback.dialog.submitting')} />
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />

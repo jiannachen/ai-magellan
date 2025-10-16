@@ -174,27 +174,31 @@ export async function PUT(
         email: validatedData.email?.trim() || null,
         description: validatedData.description?.trim() || "",
         category_id: Number(validatedData.category_id),
-        
+
+        // 图片资源
+        logo_url: validatedData.logo_url?.trim() || null,
+        thumbnail: validatedData.thumbnail?.trim() || null,
+
         // 标签和描述
         tagline: validatedData.tagline?.trim() || null,
         tags: validatedData.tags,
-        
+
         // 功能特性
         features: validatedData.features || [],
-        
+
         // 使用场景和目标受众
         use_cases: validatedData.use_cases || [],
         target_audience: validatedData.target_audience || [],
-        
+
         // 常见问题
         faq: validatedData.faq || [],
-        
+
         // 定价信息
         pricing_model: validatedData.pricing_model || 'free',
         has_free_version: Boolean(validatedData.has_free_version),
         api_available: Boolean(validatedData.api_available),
         pricing_plans: validatedData.pricing_plans || [],
-        
+
         // 社交媒体链接
         twitter_url: validatedData.twitter_url?.trim() || null,
         linkedin_url: validatedData.linkedin_url?.trim() || null,
@@ -202,16 +206,16 @@ export async function PUT(
         instagram_url: validatedData.instagram_url?.trim() || null,
         youtube_url: validatedData.youtube_url?.trim() || null,
         discord_url: validatedData.discord_url?.trim() || null,
-        
+
         // 集成
         integrations: validatedData.integrations || [],
-        
+
         // 平台支持
         ios_app_url: validatedData.ios_app_url?.trim() || null,
         android_app_url: validatedData.android_app_url?.trim() || null,
         web_app_url: validatedData.web_app_url?.trim() || null,
         desktop_platforms: validatedData.desktop_platforms || [],
-        
+
         // 保持原状态或根据需要重置为待审核
         status: existingWebsite.status,
       },

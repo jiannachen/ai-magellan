@@ -456,6 +456,7 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                           <WebsiteThumbnail
                             url={website.url}
                             thumbnail={website.thumbnail}
+                            logoUrl={website.logo_url}
                             title={website.title}
                             className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg border border-magellan-primary/10"
                           />

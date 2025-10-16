@@ -198,7 +198,7 @@ export default function FeedbackDialog({ trigger, triggerClassName }: FeedbackDi
                   placeholder={t('feedback.dialog.feedback_placeholder')}
                   className={cn(
                     "rounded-lg border-border",
-                    "focus:border-magellan-coral focus:ring-magellan-coral/20",
+                    "focus:border-primary focus:ring-primary/20",
                     "transition-colors duration-200",
                     "min-h-[120px] sm:min-h-[140px]",
                     "resize-none",

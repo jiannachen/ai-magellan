@@ -75,10 +75,15 @@ export default function MobileMenu() {
     const loadCategories = async () => {
       if (categories.length === 0) {
         try {
-          const response = await fetch('/api/categories');
+          const response = await fetch('/api/categories?includeSubcategories=true');
           if (response.ok) {
             const data = await response.json();
-            setCategories(data.data || []);
+            // Filter to ensure we only have parent categories
+            const allCategories = Array.isArray(data.data) ? data.data : [];
+            const parentCategories = allCategories.filter(
+              (cat: any) => cat.parent_id === null || cat.parent_id === undefined
+            );
+            setCategories(parentCategories);
           }
         } catch (error) {
           console.error('Failed to load categories:', error);
@@ -228,12 +233,12 @@ export default function MobileMenu() {
                   <>
                     <div className="flex items-center justify-between py-2">
                       <span className="text-sm text-muted-foreground font-medium">
-                        {t('auth.account', 'Account')}
+                        {t('auth.account')}
                       </span>
                       <div className="flex-shrink-0">
                         <Link href="/auth/signin" onClick={() => setIsOpen(false)}>
                           <Button size="sm" variant="outline" className="min-w-[96px]">
-                            {t('auth.signin', 'Sign in')}
+                            {t('auth.signin')}
                           </Button>
                         </Link>
                       </div>
@@ -246,7 +251,7 @@ export default function MobileMenu() {
                 {/* 控制面板 - 追随桌面版风格 */}
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground font-medium">
-                    {t('common.settings', 'Settings')}
+                    {t('common.settings')}
                   </span>
                   <div className="flex-shrink-0">
                     <LanguageSwitcher />

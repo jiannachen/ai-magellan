@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Control, UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue, UseFormClearErrors } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils/utils'
@@ -24,7 +24,10 @@ import {
   Star,
   Plus,
   X,
-  Telescope
+  Telescope,
+  AlertCircle,
+  Loader2,
+  CheckCircle2
 } from 'lucide-react'
 
 interface Category {
@@ -44,6 +47,7 @@ interface BasicInfoWithTagsSectionProps {
   selectedParentCategory: number | null
   setSelectedParentCategory: (id: number | null) => void
   subcategories: Category[]
+  websiteId?: string // 编辑模式下传入当前网站 ID
 }
 
 export function BasicInfoWithTagsSection({
@@ -55,14 +59,76 @@ export function BasicInfoWithTagsSection({
   categories,
   selectedParentCategory,
   setSelectedParentCategory,
-  subcategories
+  subcategories,
+  websiteId
 }: BasicInfoWithTagsSectionProps) {
   const [isFetching, setIsFetching] = useState(false)
   const [currentTagInput, setCurrentTagInput] = useState('')
+  const [isCheckingUrl, setIsCheckingUrl] = useState(false)
+  const [urlError, setUrlError] = useState<string | null>(null)
 
   const tSubmit = useTranslations('profile.submit')
   const tForm = useTranslations('form')
   const tMessages = useTranslations('profile.submit.messages')
+
+  // Check if URL already exists
+  const checkUrlAvailability = useCallback(async (url: string) => {
+    if (!url || !url.startsWith('http')) {
+      setUrlError(null)
+      return
+    }
+
+    setIsCheckingUrl(true)
+    setUrlError(null)
+
+    try {
+      // 编辑模式下，排除当前网站 ID
+      const apiUrl = websiteId
+        ? `/api/websites/check-url?url=${encodeURIComponent(url)}&excludeId=${websiteId}`
+        : `/api/websites/check-url?url=${encodeURIComponent(url)}`
+
+      const response = await fetch(apiUrl)
+      const data = await response.json()
+
+      if (data.data?.exists) {
+        const existingWebsite = data.data.website
+        let errorMsg = tMessages('url_already_exists')
+
+        if (existingWebsite?.title) {
+          errorMsg += ` (${existingWebsite.title})`
+        }
+
+        if (existingWebsite?.status === 'pending') {
+          errorMsg += ` - ${tMessages('url_exists_pending')}`
+        } else if (existingWebsite?.status === 'approved') {
+          errorMsg += ` - ${tMessages('url_exists_approved')}`
+        }
+
+        setUrlError(errorMsg)
+      } else {
+        setUrlError(null)
+      }
+    } catch (error) {
+      console.error('Error checking URL:', error)
+    } finally {
+      setIsCheckingUrl(false)
+    }
+  }, [tMessages, websiteId])
+
+  // Debounced URL check
+  useEffect(() => {
+    const url = watch('url')
+    if (!url) {
+      setUrlError(null)
+      return
+    }
+
+    const timer = setTimeout(() => {
+      checkUrlAvailability(url)
+    }, 800) // 800ms debounce
+
+    return () => clearTimeout(timer)
+  }, [watch('url'), checkUrlAvailability, watch])
 
   // Auto fetch website info
   const fetchWebsiteInfo = useCallback(async () => {
@@ -72,11 +138,18 @@ export function BasicInfoWithTagsSection({
     setIsFetching(true)
     try {
       const metadata = await fetchMetadata(url)
-      if (metadata.title) setValue('title', metadata.title)
+
+      // 填充表单字段（不填充 title，由用户自己填写）
+      // if (metadata.title) setValue('title', metadata.title)
+      if (metadata.tagline) setValue('tagline', metadata.tagline)
       if (metadata.description) setValue('description', metadata.description)
+      if (metadata.logo) setValue('logo_url', metadata.logo)
+      if (metadata.thumbnail) setValue('thumbnail', metadata.thumbnail)
 
       toast.success(tMessages('auto_fill_success'))
     } catch (error) {
+      // This is an expected error when metadata cannot be fetched
+      // Just show user-friendly message without logging to console
       toast.error(tMessages('auto_fill_error'))
     } finally {
       setIsFetching(false)
@@ -136,17 +209,35 @@ export function BasicInfoWithTagsSection({
             <span className="text-destructive ml-1">*</span>
           </Label>
           <div className="flex gap-3">
-            <Input
-              id="url"
-              placeholder={tSubmit('simple_form.tool_url_placeholder')}
-              {...register('url')}
-              className="flex-1"
-            />
+            <div className="flex-1 relative">
+              <Input
+                id="url"
+                placeholder={tSubmit('simple_form.tool_url_placeholder')}
+                {...register('url')}
+                className={cn(
+                  "pr-10",
+                  urlError && "border-destructive focus-visible:ring-destructive",
+                  !urlError && watch('url') && watch('url').startsWith('http') && !isCheckingUrl && "border-green-500"
+                )}
+              />
+              {/* URL validation status icon */}
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                {isCheckingUrl && (
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                )}
+                {!isCheckingUrl && urlError && (
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                )}
+                {!isCheckingUrl && !urlError && watch('url') && watch('url').startsWith('http') && (
+                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                )}
+              </div>
+            </div>
             <Button
               type="button"
               variant="outline"
               onClick={fetchWebsiteInfo}
-              disabled={isFetching}
+              disabled={isFetching || isCheckingUrl || !!urlError}
             >
               <Telescope className="h-4 w-4 mr-2" />
               {isFetching ? (
@@ -156,7 +247,14 @@ export function BasicInfoWithTagsSection({
               )}
             </Button>
           </div>
-          {errors.url && (
+          {/* Show URL availability error first, then validation errors */}
+          {urlError && (
+            <div className="flex items-start gap-2 p-3 rounded-md bg-destructive/10 border border-destructive/20">
+              <AlertCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-destructive">{urlError}</p>
+            </div>
+          )}
+          {!urlError && errors.url && (
             <p className="text-sm text-destructive">
               {errors.url.message}
             </p>
@@ -340,6 +438,70 @@ export function BasicInfoWithTagsSection({
               {errors.description.message}
             </p>
           )}
+        </div>
+
+        {/* Logo URL输入和预览 */}
+        <div className="space-y-3">
+          <Label htmlFor="logo_url" className="text-sm font-medium flex items-center gap-2">
+            <Ship className="h-4 w-4 text-primary" />
+            Logo URL (Optional)
+          </Label>
+          <Input
+            id="logo_url"
+            placeholder="https://example.com/logo.png"
+            {...register('logo_url')}
+          />
+          {watch('logo_url') && (
+            <div className="p-3 rounded-lg bg-muted/30 border border-magellan-primary/10">
+              <Label className="text-xs text-muted-foreground mb-2 block">Logo Preview</Label>
+              <div className="relative aspect-square max-w-[150px] rounded-lg overflow-hidden bg-white border border-border">
+                <img
+                  src={watch('logo_url') || ''}
+                  alt="Logo preview"
+                  className="w-full h-full object-contain p-3"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                />
+              </div>
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            The logo will be automatically extracted when you click "Auto Fill", or you can enter it manually
+          </p>
+        </div>
+
+        {/* Thumbnail URL输入和预览 */}
+        <div className="space-y-3">
+          <Label htmlFor="thumbnail" className="text-sm font-medium flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-primary" />
+            Preview Image URL (Optional)
+          </Label>
+          <Input
+            id="thumbnail"
+            placeholder="https://example.com/preview.jpg"
+            {...register('thumbnail')}
+          />
+          {watch('thumbnail') && (
+            <div className="p-3 rounded-lg bg-muted/30 border border-magellan-primary/10">
+              <Label className="text-xs text-muted-foreground mb-2 block">Preview Image</Label>
+              <div className="relative aspect-video max-w-[300px] rounded-lg overflow-hidden bg-muted border border-border">
+                <img
+                  src={watch('thumbnail') || ''}
+                  alt="Thumbnail preview"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                />
+              </div>
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            The preview image will be automatically extracted when you click "Auto Fill", or you can enter it manually
+          </p>
         </div>
 
         {/* Tags */}

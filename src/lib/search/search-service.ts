@@ -30,7 +30,7 @@ export interface SearchResult {
     created_at: Date;
     pricing_model: string;
     has_free_version: boolean;
-    tags?: string;
+    tags: string[];
     active: number;
     status: "pending" | "approved" | "rejected";
   }[];
@@ -190,7 +190,11 @@ export async function searchWebsites(params: SearchParams): Promise<{
     return {
       success: true,
       data: {
-        websites,
+        websites: websites.map(website => ({
+          ...website,
+          thumbnail: website.thumbnail ?? undefined,
+          status: website.status as "pending" | "approved" | "rejected"
+        })),
         pagination: {
           page: searchParams.page,
           limit: searchParams.limit,

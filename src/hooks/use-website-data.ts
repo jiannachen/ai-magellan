@@ -11,6 +11,7 @@ interface Website {
   description: string
   category_id: number
   thumbnail: string | null
+  logo_url: string | null
   status: string
   submittedBy: string
   tagline: string | null
@@ -98,11 +99,9 @@ export function useWebsiteData(websiteId: string | undefined, reset: UseFormRese
         description: websiteData.description,
         category_id: websiteData.category_id.toString(),
         tagline: websiteData.tagline || '',
-        tags: websiteData.tags ?
-          (typeof websiteData.tags === 'string' ?
-            websiteData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) :
-            websiteData.tags
-          ) : [],
+        thumbnail: websiteData.thumbnail || '',
+        logo_url: websiteData.logo_url || '',
+        tags: websiteData.tags || [],
         features: processFeatures(websiteData.features),
         use_cases: websiteData.use_cases || [],
         target_audience: websiteData.target_audience || [],

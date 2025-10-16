@@ -32,6 +32,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Badge } from '@/ui/common/badge'
 import { ProfileLayout } from '@/components/profile/profile-layout'
 import { StatCard } from '@/components/ui/stat-card'
+import { WebsiteThumbnail } from '@/components/website/website-thumbnail'
 
 interface Website {
   id: number
@@ -39,6 +40,7 @@ interface Website {
   url: string
   description: string
   thumbnail: string | null
+  logo_url: string | null
   status: string
   visits: number
   likes: number
@@ -307,18 +309,14 @@ export default function MySubmissionsPage() {
                         className="group"
                       >
                         <div className="flex items-center space-x-4 p-4 border border-border rounded-lg hover:border-primary/30 hover:bg-muted/30 transition-all duration-200">
-                          {/* Tool Image */}
-                          <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-primary/5 to-magellan-teal/5 border border-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
-                            {website.thumbnail ? (
-                              <img 
-                                src={website.thumbnail} 
-                                alt={website.title}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <Map className="h-6 w-6 text-primary" />
-                            )}
-                          </div>
+                          {/* Tool Image - 使用 WebsiteThumbnail 组件 */}
+                          <WebsiteThumbnail
+                            url={website.url}
+                            thumbnail={website.thumbnail}
+                            logoUrl={website.logo_url}
+                            title={website.title}
+                            className="w-16 h-16 rounded-lg flex-shrink-0"
+                          />
 
                           {/* Tool Info */}
                           <div className="flex-1 min-w-0">

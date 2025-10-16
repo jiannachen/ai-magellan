@@ -29,6 +29,10 @@ export const websiteSubmitSchema = z.object({
   // 可选基本字段
   tags: z.array(z.string()).max(5, 'Maximum 5 tags allowed').default([]),
 
+  // 图片字段（可选）
+  logo_url: z.string().optional(),
+  thumbnail: z.string().optional(),
+
   // 功能特性（至少要有一个特性）
   features: z.array(z.object({
     name: z.string().min(1, 'Feature name cannot be empty'),
@@ -36,16 +40,16 @@ export const websiteSubmitSchema = z.object({
   })).min(1, 'At least one feature is required'),
   
   // 使用场景（可选）
-  use_cases: z.array(z.string()).default([]).transform(arr => arr.filter(item => item.trim() !== '')),
+  use_cases: z.array(z.string()).default([]),
 
   // 目标受众（可选）
-  target_audience: z.array(z.string()).default([]).transform(arr => arr.filter(item => item.trim() !== '')),
+  target_audience: z.array(z.string()).default([]),
   
   // FAQ（可选，但如果有则必须完整）
   faq: z.array(z.object({
     question: z.string().min(1, 'Question cannot be empty'),
     answer: z.string().min(1, 'Answer cannot be empty')
-  })).default([]).transform(arr => arr.filter(item => item.question.trim() !== '' && item.answer.trim() !== '')),
+  })).default([]),
   
   // 定价信息
   pricing_model: z.string()
@@ -73,42 +77,24 @@ export const websiteSubmitSchema = z.object({
     name: z.string().min(1, 'Plan name cannot be empty'),
     billing_cycle: z.string().min(1, 'Billing cycle cannot be empty'),
     price: z.string().min(1, 'Price cannot be empty'),
-    features: z.array(z.string()).max(5, 'Maximum 5 features per plan').transform(arr => arr.filter(item => item.trim() !== ''))
-  })).max(6, 'Maximum 6 pricing plans').default([]).transform(arr => arr.filter(plan => plan.name.trim() !== '' && plan.billing_cycle.trim() !== '' && plan.price.trim() !== '')),
+    features: z.array(z.string()).max(5, 'Maximum 5 features per plan')
+  })).max(6, 'Maximum 6 pricing plans').default([]),
   
   // 社交媒体（可选）
-  twitter_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
-    message: 'Please enter a valid URL'
-  }),
-  linkedin_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
-    message: 'Please enter a valid URL'
-  }),
-  facebook_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
-    message: 'Please enter a valid URL'
-  }),
-  instagram_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
-    message: 'Please enter a valid URL'
-  }),
-  youtube_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
-    message: 'Please enter a valid URL'
-  }),
-  discord_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
-    message: 'Please enter a valid URL'
-  }),
+  twitter_url: z.string().optional(),
+  linkedin_url: z.string().optional(),
+  facebook_url: z.string().optional(),
+  instagram_url: z.string().optional(),
+  youtube_url: z.string().optional(),
+  discord_url: z.string().optional(),
   
   // 集成（可选）
-  integrations: z.array(z.string()).default([]).transform(arr => arr.filter(item => item.trim() !== '')),
+  integrations: z.array(z.string()).default([]),
   
   // 平台支持（可选）
-  ios_app_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
-    message: 'Please enter a valid URL'
-  }),
-  android_app_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
-    message: 'Please enter a valid URL'
-  }),
-  web_app_url: z.string().optional().transform(val => val?.trim() || '').refine(val => val === '' || z.string().url().safeParse(val).success, {
-    message: 'Please enter a valid URL'
-  }),
+  ios_app_url: z.string().optional(),
+  android_app_url: z.string().optional(),
+  web_app_url: z.string().optional(),
   desktop_platforms: z.array(z.enum(['mac', 'windows', 'linux'])).default([])
 })
 

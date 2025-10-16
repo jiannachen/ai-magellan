@@ -5,7 +5,7 @@ import { Toaster as Sonner } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
-// Atlassian Toast Configuration
+// Magellan Toast Configuration - 航海主题通知系统
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme();
 
@@ -17,20 +17,20 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast:
-            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-atlassian-300 group-[.toaster]:rounded-lg",
+            "group toast group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:shadow-lg group-[.toaster]:rounded-lg",
           description: "group-[.toast]:text-muted-foreground",
           actionButton:
             "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground group-[.toast]:rounded group-[.toast]:px-3 group-[.toast]:py-2",
           cancelButton:
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground group-[.toast]:rounded group-[.toast]:px-3 group-[.toast]:py-2",
           success:
-            "group-[.toast]:bg-atlassian-success-50 group-[.toast]:border-atlassian-success-500 group-[.toast]:text-atlassian-success-700 dark:group-[.toast]:bg-atlassian-success-900 dark:group-[.toast]:text-atlassian-success-100",
+            "!bg-[hsl(var(--magellan-mint)/0.1)] !border-[hsl(var(--magellan-mint))] !text-[hsl(var(--magellan-mint))] dark:!bg-[hsl(var(--magellan-mint)/0.2)] dark:!border-[hsl(var(--magellan-mint))] dark:!text-[hsl(var(--magellan-mint))]",
           error:
-            "group-[.toast]:bg-atlassian-error-50 group-[.toast]:border-atlassian-error-500 group-[.toast]:text-atlassian-error-700 dark:group-[.toast]:bg-atlassian-error-900 dark:group-[.toast]:text-atlassian-error-100",
+            "!bg-red-50 !border-red-500 !text-red-700 dark:!bg-red-900/20 dark:!border-red-500 dark:!text-red-100",
           warning:
-            "group-[.toast]:bg-atlassian-warning-50 group-[.toast]:border-atlassian-warning-500 group-[.toast]:text-atlassian-warning-700 dark:group-[.toast]:bg-atlassian-warning-900 dark:group-[.toast]:text-atlassian-warning-100",
+            "!bg-orange-50 !border-orange-500 !text-orange-700 dark:!bg-orange-900/20 dark:!border-orange-500 dark:!text-orange-100",
           info:
-            "group-[.toast]:bg-atlassian-blue-50 group-[.toast]:border-atlassian-blue-500 group-[.toast]:text-atlassian-blue-700 dark:group-[.toast]:bg-atlassian-blue-900 dark:group-[.toast]:text-atlassian-blue-100",
+            "!bg-blue-50 !border-blue-500 !text-blue-700 dark:!bg-blue-900/20 dark:!border-blue-500 dark:!text-blue-100",
         },
       }}
       {...props}

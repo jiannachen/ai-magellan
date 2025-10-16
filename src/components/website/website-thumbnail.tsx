@@ -7,9 +7,10 @@ import Image from "next/image";
 
 interface WebsiteThumbnailProps {
   url: string;
-  thumbnail: string | null;
+  thumbnail: string | null | undefined;
   title: string;
   className?: string;
+  logoUrl?: string | null;
 }
 
 export function WebsiteThumbnail({
@@ -17,17 +18,45 @@ export function WebsiteThumbnail({
   thumbnail,
   title,
   className,
+  logoUrl,
 }: WebsiteThumbnailProps) {
-  const [imageError, setImageError] = useState(false);
+  const [logoError, setLogoError] = useState(false);
+  const [faviconError, setFaviconError] = useState(false);
   const hostname = new URL(url).hostname;
   const faviconUrl = `https://icon.horse/icon/${hostname}`;
-  const thumbnailSrc = thumbnail || "";
 
-  if (!thumbnail || imageError) {
+  // 优先级：logo_url > favicon > thumbnail
+  // 如果 logo 存在且未出错，显示 logo
+  if (logoUrl && !logoError) {
     return (
       <div
         className={cn(
-          "relative w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center", // 响应式尺寸
+          "rounded-lg overflow-hidden bg-white dark:bg-gray-800 p-2",
+          "group-hover:ring-2 ring-primary/20 transition-all duration-300",
+          className
+        )}
+      >
+        <div className="relative w-full h-full">
+          <Image
+            src={logoUrl}
+            alt={title}
+            fill
+            sizes="(max-width: 640px) 64px, (max-width: 768px) 72px, 80px"
+            className="object-contain"
+            unoptimized
+            onError={() => setLogoError(true)}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // 如果 logo 不存在或出错，尝试 favicon
+  if (!faviconError) {
+    return (
+      <div
+        className={cn(
+          "relative rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center",
           "group-hover:bg-gray-200 dark:group-hover:bg-gray-600 transition-colors duration-300",
           className
         )}
@@ -35,39 +64,56 @@ export function WebsiteThumbnail({
         <Image
           src={faviconUrl}
           alt={title}
-          width={32}
-          height={32}
-          className="w-6 h-6 sm:w-8 sm:h-8" // 响应式图标尺寸
+          width={64}
+          height={64}
+          className="w-full h-full object-contain p-2"
           unoptimized
           onError={(e) => {
-            // @ts-ignore - nextjs Image 组件的 error 事件类型定义问题
+            setFaviconError(true);
+            // @ts-ignore
             e.target.style.display = "none";
             // @ts-ignore
             e.target.nextElementSibling?.classList.remove("hidden");
           }}
         />
-        <Globe className="h-6 w-6 sm:h-8 sm:w-8 text-gray-500 dark:text-gray-400 hidden" />
+        <Globe className="w-1/2 h-1/2 text-gray-500 dark:text-gray-400 hidden" />
       </div>
     );
   }
 
+  // 最后才使用 thumbnail（如果有的话）
+  if (thumbnail) {
+    return (
+      <div
+        className={cn(
+          "relative rounded-lg overflow-hidden",
+          "group-hover:ring-2 ring-primary/20 transition-all duration-300",
+          className
+        )}
+      >
+        <Image
+          src={thumbnail}
+          alt={title}
+          fill
+          sizes="(max-width: 640px) 64px, (max-width: 768px) 72px, 80px"
+          className="object-cover"
+          unoptimized
+          onError={() => {}}
+        />
+      </div>
+    );
+  }
+
+  // 如果什么都没有，显示 Globe 图标
   return (
     <div
       className={cn(
-        "relative w-10 h-10 sm:w-12 sm:h-12 rounded-lg overflow-hidden", // 响应式尺寸
-        "group-hover:ring-2 ring-primary/20 transition-all duration-300",
+        "relative rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center",
+        "group-hover:bg-gray-200 dark:group-hover:bg-gray-600 transition-colors duration-300",
         className
       )}
     >
-      <Image
-        src={thumbnailSrc}
-        alt={title}
-        fill
-        sizes="(max-width: 640px) 40px, 48px" // 响应式sizes
-        className="object-cover"
-        unoptimized
-        onError={() => setImageError(true)}
-      />
+      <Globe className="w-1/2 h-1/2 text-gray-500 dark:text-gray-400" />
     </div>
   );
 }

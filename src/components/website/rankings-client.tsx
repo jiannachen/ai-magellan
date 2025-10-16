@@ -3,8 +3,11 @@
 import { Rankings } from "@/components/website/rankings";
 import { Website } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
+import { useTranslations } from "next-intl";
 
 export function RankingsClient({ websites }: { websites: Website[] }) {
+  const t = useTranslations();
+
   const handleVisit = async (website: Website) => {
     try {
       fetch(`/api/websites/${website.id}/visit`, {
@@ -15,9 +18,9 @@ export function RankingsClient({ websites }: { websites: Website[] }) {
     } catch (error) {
       console.error("Failed to record visit:", error);
       toast({
+        title: t('common.error'),
+        description: t('messages.network_error'),
         variant: "destructive",
-        title: "记录访问失败",
-        description: "请稍后重试",
       });
     }
   };

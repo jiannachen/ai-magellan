@@ -55,10 +55,15 @@ export default function Header() {
     const loadCategories = async () => {
       if (categories.length === 0) {
         try {
-          const response = await fetch('/api/categories');
+          const response = await fetch('/api/categories?includeSubcategories=true');
           if (response.ok) {
             const data = await response.json();
-            setCategories(data.data || []);
+            // Filter to ensure we only have parent categories
+            const allCategories = Array.isArray(data.data) ? data.data : [];
+            const parentCategories = allCategories.filter(
+              (cat: any) => cat.parent_id === null || cat.parent_id === undefined
+            );
+            setCategories(parentCategories);
           }
         } catch (error) {
           console.error('Failed to load categories:', error);

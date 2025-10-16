@@ -79,8 +79,8 @@ export function OptimizedImage({
     ),
     quality,
     priority,
-    loading: priority ? 'eager' : loading,
-    placeholder: placeholder === 'blur' ? 'blur' : 'empty',
+    loading: priority ? ('eager' as const) : loading,
+    placeholder: (placeholder === 'blur' ? 'blur' : 'empty') as 'blur' | 'empty',
     ...(placeholder === 'blur' && {
       blurDataURL: blurDataURL || generateBlurDataURL(width, height)
     }),

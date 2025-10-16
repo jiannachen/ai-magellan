@@ -19,28 +19,42 @@ interface AudienceUseCasesSectionProps {
   faqFields: any[]
   appendFaq: (faq: { question: string; answer: string }) => void
   removeFaq: (index: number) => void
-  useCasesFields: any[]
-  appendUseCase: any
-  removeUseCase: (index: number) => void
-  targetAudienceFields: any[]
-  appendTargetAudience: any
-  removeTargetAudience: (index: number) => void
 }
 
 export function AudienceUseCasesSection({
   register,
+  watch,
+  setValue,
   faqFields,
   appendFaq,
-  removeFaq,
-  useCasesFields,
-  appendUseCase,
-  removeUseCase,
-  targetAudienceFields,
-  appendTargetAudience,
-  removeTargetAudience
+  removeFaq
 }: AudienceUseCasesSectionProps) {
   const tSubmit = useTranslations('profile.submit')
   const tForm = useTranslations('form')
+
+  // 直接从表单获取数组值
+  const useCases = watch('use_cases') || []
+  const targetAudience = watch('target_audience') || []
+
+  // 添加用例
+  const addUseCase = () => {
+    setValue('use_cases', [...useCases, ''])
+  }
+
+  // 删除用例
+  const removeUseCase = (index: number) => {
+    setValue('use_cases', useCases.filter((_, i) => i !== index))
+  }
+
+  // 添加目标受众
+  const addTargetAudience = () => {
+    setValue('target_audience', [...targetAudience, ''])
+  }
+
+  // 删除目标受众
+  const removeTargetAudience = (index: number) => {
+    setValue('target_audience', targetAudience.filter((_, i) => i !== index))
+  }
 
   return (
     <Card id="audience" className="p-6">
@@ -60,12 +74,12 @@ export function AudienceUseCasesSection({
             </div>
             <p className="text-sm text-muted-foreground mb-3">{tSubmit('use_cases_help')}</p>
             <div className="space-y-3">
-              {useCasesFields.length === 0 ? (
+              {useCases.length === 0 ? (
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => appendUseCase('')}
+                  onClick={addUseCase}
                   className="w-full"
                 >
                   <Plus className="h-4 w-4 mr-2" />
@@ -73,8 +87,8 @@ export function AudienceUseCasesSection({
                 </Button>
               ) : (
                 <>
-                  {useCasesFields.map((field, index) => (
-                    <div key={field.id} className="flex gap-2">
+                  {useCases.map((_, index) => (
+                    <div key={index} className="flex gap-2">
                       <Input
                         placeholder={tForm('use_case_placeholder')}
                         {...register(`use_cases.${index}` as const)}
@@ -95,7 +109,7 @@ export function AudienceUseCasesSection({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => appendUseCase('')}
+                    onClick={addUseCase}
                     className="w-full"
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -114,12 +128,12 @@ export function AudienceUseCasesSection({
             </div>
             <p className="text-sm text-muted-foreground mb-3">{tSubmit('target_audience_help')}</p>
             <div className="space-y-3">
-              {targetAudienceFields.length === 0 ? (
+              {targetAudience.length === 0 ? (
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => appendTargetAudience('')}
+                  onClick={addTargetAudience}
                   className="w-full"
                 >
                   <Plus className="h-4 w-4 mr-2" />
@@ -127,8 +141,8 @@ export function AudienceUseCasesSection({
                 </Button>
               ) : (
                 <>
-                  {targetAudienceFields.map((field, index) => (
-                    <div key={field.id} className="flex gap-2">
+                  {targetAudience.map((_, index) => (
+                    <div key={index} className="flex gap-2">
                       <Input
                         placeholder={tForm('target_audience_placeholder')}
                         {...register(`target_audience.${index}` as const)}
@@ -149,7 +163,7 @@ export function AudienceUseCasesSection({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => appendTargetAudience('')}
+                    onClick={addTargetAudience}
                     className="w-full"
                   >
                     <Plus className="h-4 w-4 mr-2" />

@@ -24,12 +24,12 @@ export function useWebsiteForm({ websiteId, isEdit = false }: UseWebsiteFormProp
       email: '',
       title: '',
       category_id: '',
-      tags: [],
+      tags: [] as string[],
       tagline: '',
       description: '',
       features: [{ name: '', description: '' }],
-      use_cases: [],
-      target_audience: [],
+      use_cases: [] as string[],
+      target_audience: [] as string[],
       faq: [],
       pricing_model: '',
       has_free_version: false,
@@ -41,7 +41,7 @@ export function useWebsiteForm({ websiteId, isEdit = false }: UseWebsiteFormProp
       instagram_url: '',
       youtube_url: '',
       discord_url: '',
-      integrations: [],
+      integrations: [] as string[],
       ios_app_url: '',
       android_app_url: '',
       web_app_url: '',
@@ -74,24 +74,6 @@ export function useWebsiteForm({ websiteId, isEdit = false }: UseWebsiteFormProp
   } = useFieldArray({
     control: form.control,
     name: "pricing_plans"
-  })
-
-  const {
-    fields: useCasesFields,
-    append: appendUseCase,
-    remove: removeUseCase
-  } = useFieldArray({
-    control: form.control,
-    name: "use_cases"
-  })
-
-  const {
-    fields: targetAudienceFields,
-    append: appendTargetAudience,
-    remove: removeTargetAudience
-  } = useFieldArray({
-    control: form.control,
-    name: "target_audience"
   })
 
   // Array manipulation helpers
@@ -138,8 +120,7 @@ export function useWebsiteForm({ websiteId, isEdit = false }: UseWebsiteFormProp
 
     try {
       const submissionData = {
-        ...data,
-        tags: Array.isArray(data.tags) ? data.tags.join(', ') : data.tags
+        ...data
       }
 
       const url = isEdit && websiteId ? `/api/websites/${websiteId}` : '/api/websites'
@@ -210,20 +191,20 @@ export function useWebsiteForm({ websiteId, isEdit = false }: UseWebsiteFormProp
       let errorMessage = tMessages('fill_required_fields')
       let errorDetails: string[] = []
 
-      // Helper function to extract error message from nested errors
-      const getErrorMessage = (error: any, path: string = ''): string | null => {
+      // Helper function to extract error message from nested errors (without path prefix)
+      const getErrorMessage = (error: any): string | null => {
         if (error?.message) {
           return error.message
         }
         if (Array.isArray(error)) {
           for (let i = 0; i < error.length; i++) {
-            const msg = getErrorMessage(error[i], `${path}[${i}]`)
-            if (msg) return `${path}[${i}]: ${msg}`
+            const msg = getErrorMessage(error[i])
+            if (msg) return msg
           }
         }
         if (typeof error === 'object' && error !== null) {
           for (const key in error) {
-            const msg = getErrorMessage(error[key], path ? `${path}.${key}` : key)
+            const msg = getErrorMessage(error[key])
             if (msg) return msg
           }
         }
@@ -232,7 +213,7 @@ export function useWebsiteForm({ websiteId, isEdit = false }: UseWebsiteFormProp
 
       // Collect all error messages
       for (const [field, error] of Object.entries(errors)) {
-        const msg = getErrorMessage(error, field)
+        const msg = getErrorMessage(error)
         if (msg) {
           errorDetails.push(msg)
         }
@@ -262,12 +243,6 @@ export function useWebsiteForm({ websiteId, isEdit = false }: UseWebsiteFormProp
     pricingPlansFields,
     appendPricingPlan,
     removePricingPlan,
-    useCasesFields,
-    appendUseCase,
-    removeUseCase,
-    targetAudienceFields,
-    appendTargetAudience,
-    removeTargetAudience,
     addToArray,
     removeFromArray,
     handleFormSubmit

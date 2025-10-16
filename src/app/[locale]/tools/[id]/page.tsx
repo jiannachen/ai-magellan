@@ -74,13 +74,14 @@ interface Website {
     }
   }
   thumbnail: string | null
+  logo_url: string | null
   status: string
   visits: number
   likes: number
   quality_score: number
   is_trusted: boolean
   is_featured: boolean
-  tags: string | null
+  tags: string[] | null
   tagline: string | null
   email: string | null
   features: any
@@ -418,41 +419,59 @@ export default function ToolDetailPage() {
               {/* Left Side - Tool Info and Actions */}
               <div className="space-y-6">
                 {/* Tool Header */}
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-xl bg-magellan-primary/8 border border-magellan-primary/15 shadow-sm">
-                      <Map className="h-8 w-8 text-magellan-primary" />
+                <div className="space-y-5">
+                  {/* Logo and Title */}
+                  <div className="flex items-center gap-4">
+                    {/* Logo */}
+                    {website.logo_url && (
+                      <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-white border border-magellan-primary/10 p-2 shadow-sm">
+                        <img
+                          src={website.logo_url}
+                          alt={`${website.title} logo`}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    {/* Title and Badges */}
+                    <div className="flex-1 space-y-3">
+                      <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight">
+                        {website.title}
+                      </h1>
+
+                      {/* Status Badges - 使用 AM.md 中定义的海洋色彩 */}
+                      <div className="flex flex-wrap gap-2">
+                        {website.is_featured && (
+                          <Badge className="bg-magellan-gold/10 text-magellan-gold border-magellan-gold/20 hover:bg-magellan-gold/15">
+                            <Crown className="h-3 w-3 mr-1" />
+                            {t('profile.tools.detail.badges.featured')}
+                          </Badge>
+                        )}
+                        {website.is_trusted && (
+                          <Badge className="bg-magellan-mint/10 text-magellan-mint border-magellan-mint/20 hover:bg-magellan-mint/15">
+                            <Shield className="h-3 w-3 mr-1" />
+                            {t('profile.tools.detail.badges.verified')}
+                          </Badge>
+                        )}
+                        {website.pricing_model === 'free' && (
+                          <Badge className="bg-magellan-mint/10 text-magellan-mint border-magellan-mint/20 hover:bg-magellan-mint/15">
+                            {t('profile.tools.detail.badges.free')}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h1 className="text-3xl font-bold text-foreground">{website.title}</h1>
-                    </div>
                   </div>
-                  
-                  {/* Tagline/Description */}
-                  <div className="pl-16">
-                    <p className="text-muted-foreground text-lg leading-relaxed">{website.tagline}</p>
-                  </div>
-                  
-                  {/* Status Badges - 使用 AM.md 中定义的海洋色彩 */}
-                  <div className="flex flex-wrap gap-2">
-                    {website.is_featured && (
-                      <Badge className="bg-magellan-gold/10 text-magellan-gold border-magellan-gold/20 hover:bg-magellan-gold/15">
-                        <Crown className="h-3 w-3 mr-1" />
-                        {t('profile.tools.detail.badges.featured')}
-                      </Badge>
-                    )}
-                    {website.is_trusted && (
-                      <Badge className="bg-magellan-mint/10 text-magellan-mint border-magellan-mint/20 hover:bg-magellan-mint/15">
-                        <Shield className="h-3 w-3 mr-1" />
-                        {t('profile.tools.detail.badges.verified')}
-                      </Badge>
-                    )}
-                    {website.pricing_model === 'free' && (
-                      <Badge className="bg-magellan-mint/10 text-magellan-mint border-magellan-mint/20 hover:bg-magellan-mint/15">
-                        {t('profile.tools.detail.badges.free')}
-                      </Badge>
-                    )}
-                  </div>
+
+                  {/* Tagline优先，如果没有则显示Description */}
+                  {(website.tagline || website.description) && (
+                    <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
+                      {website.tagline || website.description}
+                    </p>
+                  )}
                 </div>
                 
                 {/* Action Buttons - 主按钮使用深海蓝，符合AM.md设计 */}
@@ -521,7 +540,7 @@ export default function ToolDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Left Navigation Sidebar */}
           <div className="lg:col-span-1">
-            <div className="sticky top-8">
+            <div className="sticky top-[80px] sm:top-[85px]">
               <Card className="p-6">
                 <div className="space-y-1 mb-6">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -541,7 +560,12 @@ export default function ToolDetailPage() {
                         type="button"
                         onClick={() => {
                           const element = document.getElementById(section.id)
-                          element?.scrollIntoView({ behavior: 'smooth' })
+                          if (element) {
+                            const headerHeight = window.innerWidth >= 640 ? 85 : 80
+                            const yOffset = -headerHeight
+                            const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
+                            window.scrollTo({ top: y, behavior: 'smooth' })
+                          }
                         }}
                         className="w-full text-left p-3 rounded-lg transition-all duration-200 border hover:bg-muted/50 border-transparent text-muted-foreground hover:text-foreground"
                       >
@@ -630,16 +654,16 @@ export default function ToolDetailPage() {
 
 
                   {/* Tags */}
-                  {website.tags && (
+                  {website.tags && Array.isArray(website.tags) && website.tags.length > 0 && (
                     <div className="space-y-3">
                       <h3 className="font-semibold text-foreground flex items-center gap-2">
                         <Star className="h-5 w-5 text-primary" />
                         {t('profile.tools.detail.sections.tags')}
                       </h3>
                       <div className="flex flex-wrap gap-2">
-                        {website.tags.split(',').map((tag: string, index: number) => (
+                        {website.tags && Array.isArray(website.tags) && website.tags.map((tag: string, index: number) => (
                           <Badge key={index} variant="secondary" className="bg-magellan-primary/10 text-magellan-primary border-magellan-primary/20">
-                            {tag.trim()}
+                            {tag}
                           </Badge>
                         ))}
                       </div>

@@ -514,7 +514,10 @@
       "enter_valid_name": "Please enter a valid tool name",
       "enter_valid_tagline": "Please enter a valid tagline",
       "enter_valid_description": "Please enter a valid description",
-      "complete_all_features": "Please complete all feature names and descriptions"
+      "complete_all_features": "Please complete all feature names and descriptions",
+      "url_already_exists": "This URL has already been submitted",
+      "url_exists_pending": "currently pending review",
+      "url_exists_approved": "already approved and listed"
     }
   }
 }

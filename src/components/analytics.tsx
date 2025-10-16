@@ -58,17 +58,29 @@ export function Analytics({
 
     try {
       const loadClarity = () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - Clarity inline script with dynamic typing
         (function(c,l,a,r,i,t,y){
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            
+
             // Add load success handling
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             t.onload = () => {
               handleLoad('clarity');
             };
-            
+
             // Add error handling
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             t.onerror = () => {
               handleError(new Error('Failed to load Clarity script'), 'clarity');
             };
@@ -162,9 +174,9 @@ export function Analytics({
 // Enhanced TypeScript declarations for analytics services
 declare global {
   interface Window {
-    gtag: (...args: any[]) => void;
-    dataLayer: any[];
-    clarity: (...args: any[]) => void;
+    gtag?: (...args: any[]) => void;
+    dataLayer?: any[];
+    clarity?: (...args: any[]) => void;
   }
 }
 
