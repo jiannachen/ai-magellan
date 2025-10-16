@@ -98,17 +98,11 @@ export default function SignInPage() {
             </CardContent>
             <div className="border-t border-gray-100 px-6 py-4 bg-gradient-to-r from-blue-50/50 to-teal-50/50">
               <div className="text-center">
-                <p className="text-sm text-gray-600">
-                  {t('auth.harbor.new_explorer')}{' '}
-                  <Link href="/auth/signup" className="font-medium text-[#0B4F8C] hover:text-[#083A6B] transition-colors">
-                    {t('auth.harbor.start_expedition')}
-                  </Link>
-                </p>
-                <Link 
-                  href="/" 
+                <Link
+                  href="/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors text-sm mt-2"
+                  className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors text-sm"
                 >
                   <Compass className="h-3 w-3" />
                   {t('auth.harbor.return_to_base')}

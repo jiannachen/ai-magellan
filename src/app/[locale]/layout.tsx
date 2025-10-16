@@ -20,42 +20,42 @@ export async function generateMetadata({
   params
 }: LocaleLayoutProps): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'metadata' });
+  const t = await getTranslations({ locale });
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://aimagellan.com";
   const localePrefix = locale === 'en' ? '' : `/${locale}`;
 
   return {
     title: {
-      default: t('title'),
-      template: `%s | ${t('site_name')}`
+      default: t('metadata.title'),
+      template: `%s | ${t('metadata.site_name')}`
     },
-    description: t('description'),
-    authors: [{ name: t('author') }],
-    creator: t('site_name'),
-    publisher: t('site_name'),
+    description: t('metadata.description'),
+    authors: [{ name: t('metadata.author') }],
+    creator: t('metadata.site_name'),
+    publisher: t('metadata.site_name'),
 
     openGraph: {
       type: "website",
       locale: locale === 'tw' ? 'zh_TW' : 'en_US',
       url: `${baseUrl}${localePrefix}`,
-      siteName: t('site_name'),
-      title: t('og_title'),
-      description: t('og_description'),
+      siteName: t('metadata.site_name'),
+      title: t('metadata.og_title'),
+      description: t('metadata.og_description'),
       images: [
         {
           url: "/images/og-image.avif",
           width: 1200,
           height: 630,
-          alt: t('og_image_alt')
+          alt: t('metadata.og_image_alt')
         }
       ]
     },
 
     twitter: {
       card: "summary_large_image",
-      title: t('twitter_title'),
-      description: t('twitter_description'),
+      title: t('metadata.twitter_title'),
+      description: t('metadata.twitter_description'),
       images: ["/images/twitter-image.avif"],
       creator: "@aimagellan"
     },

@@ -1,31 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth, currentUser } from '@clerk/nextjs/server'
+import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/db/db'
-
-// Helper function to ensure user exists in database
-async function ensureUserExists(userId: string) {
-  const user = await currentUser()
-  if (!user) return false
-
-  // Check if user exists in database
-  const existingUser = await prisma.user.findUnique({
-    where: { id: userId }
-  })
-
-  if (!existingUser) {
-    // Create user if doesn't exist
-    await prisma.user.create({
-      data: {
-        id: userId,
-        email: user.emailAddresses[0]?.emailAddress || '',
-        name: user.firstName || user.username || 'User',
-        image: user.imageUrl,
-      }
-    })
-  }
-  
-  return true
-}
+import { ensureUserExists } from '@/lib/utils'
 
 export async function GET(request: NextRequest) {
   try {
@@ -177,10 +153,19 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const { userId } = await auth()
-    
+
     if (!userId) {
       return NextResponse.json(
-        { error: 'Unauthorized' }, 
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    // 确保用户在数据库中存在（兜底机制）
+    const userExists = await ensureUserExists(userId)
+    if (!userExists) {
+      return NextResponse.json(
+        { error: 'Failed to authenticate user' },
         { status: 401 }
       )
     }

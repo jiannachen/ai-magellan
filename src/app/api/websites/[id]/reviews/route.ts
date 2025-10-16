@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/db/db'
+import { ensureUserExists } from '@/lib/utils'
 
 // GET /api/websites/[id]/reviews
 // 获取工具的评论列表
@@ -52,9 +53,15 @@ export async function POST(
 ) {
   try {
     const { userId } = await auth()
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'Please login first' }, { status: 401 })
+    }
+
+    // 确保用户在数据库中存在（兜底机制）
+    const userExists = await ensureUserExists(userId)
+    if (!userExists) {
+      return NextResponse.json({ error: 'Failed to authenticate user' }, { status: 401 })
     }
 
     const websiteId = parseInt((await params).id)
@@ -136,9 +143,15 @@ export async function DELETE(
 ) {
   try {
     const { userId } = await auth()
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'Please login first' }, { status: 401 })
+    }
+
+    // 确保用户在数据库中存在（兜底机制）
+    const userExists = await ensureUserExists(userId)
+    if (!userExists) {
+      return NextResponse.json({ error: 'Failed to authenticate user' }, { status: 401 })
     }
 
     const websiteId = parseInt((await params).id)

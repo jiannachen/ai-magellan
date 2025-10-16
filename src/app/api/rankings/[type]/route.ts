@@ -94,9 +94,10 @@ export async function GET(
     });
 
     return NextResponse.json({
-      websites,
+      websites: websites || [],
       type,
-      rankingType
+      rankingType,
+      total: websites.length
     });
   } catch (error) {
     console.error('Error fetching ranking data:', error);

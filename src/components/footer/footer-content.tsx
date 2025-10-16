@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useAtom } from "jotai";
 import { motion } from "framer-motion";
 import { Button } from "@/ui/common/button";
-import { Plus, Compass, Anchor, Map, Route, Star, TrendingUp, Shield, Info, FileText, ExternalLink, Copyright, Heart, Zap } from "lucide-react";
+import { Plus, Compass, Anchor, Map, Route, Star, TrendingUp, Shield, Info, FileText, ExternalLink, Copyright, Heart, Zap, Github } from "lucide-react";
 import { isAdminModeAtom, footerSettingsAtom } from "@/lib/atoms";
 import { useTranslations, useLocale } from 'next-intl';
 import Link from "next/link";
@@ -341,7 +341,24 @@ export default function FooterContent({
                   {isAdmin ? "🔧 " + t('footer.admin.add_link_tooltip') : "🌊 " + t('footer.admin.no_links_message')}
                 </li>
               )}
-              
+
+              {/* GitHub 链接 */}
+              <motion.li
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.4 }}
+              >
+                <Link
+                  href="https://github.com/icstmcf/AI-Magellan"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
+                >
+                  <Github className="h-3 w-3" />
+                  GitHub
+                </Link>
+              </motion.li>
+
               {/* 法律信息 - 按照AM.md专业级标准优化 */}
               <motion.li
                 initial={{ opacity: 0, x: -10 }}

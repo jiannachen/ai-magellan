@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from '@clerk/nextjs/server';
-import type { Website } from "@/lib/types";
-import { AjaxResponse, generateSlug } from "@/lib/utils";
+import { AjaxResponse, generateSlug, ensureUserExists } from "@/lib/utils";
 import { prisma } from "@/lib/db/db";
 import { validateWebsiteSubmit } from "@/lib/validations/website";
 
@@ -29,7 +28,7 @@ export async function POST(request: Request) {
     // 获取当前用户信息
     const { userId } = await auth();
     const user = await currentUser();
-    
+
     // 检查用户是否已登录
     if (!userId || !user) {
       return NextResponse.json(
@@ -37,23 +36,16 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
-    
-    // 确保用户在数据库中存在
-    const dbUser = await prisma.user.upsert({
-      where: { id: userId },
-      update: {
-        name: user.fullName || user.firstName || 'User',
-        email: user.emailAddresses[0]?.emailAddress || '',
-        image: user.imageUrl,
-      },
-      create: {
-        id: userId,
-        name: user.fullName || user.firstName || 'User',
-        email: user.emailAddresses[0]?.emailAddress || '',
-        image: user.imageUrl,
-      }
-    });
-    
+
+    // 确保用户在数据库中存在（用于外键关系）
+    const userExists = await ensureUserExists(userId);
+    if (!userExists) {
+      return NextResponse.json(
+        AjaxResponse.fail("Failed to authenticate user"),
+        { status: 401 }
+      );
+    }
+
     const data = await request.json();
 
     // 统一表单验证
