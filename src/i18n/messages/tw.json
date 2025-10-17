@@ -663,10 +663,6 @@
       "privacy": "隱私政策",
       "terms": "使用條款"
     },
-    "admin": {
-      "add_link_tooltip": "點擊右側加號添加連結",
-      "no_links_message": "暫無連結"
-    },
     "dialog": {
       "add_link_title": "添加實用連結",
       "add_link_description": "請填寫連結的名稱和地址",

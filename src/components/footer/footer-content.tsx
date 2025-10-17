@@ -306,58 +306,35 @@ export default function FooterContent({
               )}
             </div>
             <ul className="space-y-3">
-              {settings.links.length > 0 ? (
-                settings.links.map((link, index) => (
-                  <motion.li 
-                    key={index} 
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: 0.1 * index }}
-                    className="flex items-center gap-2"
-                  >
-                    <Link
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-muted-foreground hover:text-magellan-coral transition-colors duration-300 flex-1"
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                      {link.title}
-                    </Link>
-                    {isAdmin && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-4 w-4 p-0 rounded-full hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
-                        onClick={() => handleRemoveLink(index)}
-                      >
-                        ×
-                      </Button>
-                    )}
-                  </motion.li>
-                ))
-              ) : (
-                <li className="text-sm text-muted-foreground/60 italic p-2">
-                  {isAdmin ? "🔧 " + t('footer.admin.add_link_tooltip') : "🌊 " + t('footer.admin.no_links_message')}
-                </li>
-              )}
-
-              {/* GitHub 链接 */}
-              <motion.li
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: 0.4 }}
-              >
-                <Link
-                  href="https://github.com/icstmcf/AI-Magellan"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
+              {settings.links.map((link, index) => (
+                <motion.li
+                  key={index}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 * index }}
+                  className="flex items-center gap-2"
                 >
-                  <Github className="h-3 w-3" />
-                  GitHub
-                </Link>
-              </motion.li>
+                  <Link
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-magellan-coral transition-colors duration-300 flex-1"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    {link.title}
+                  </Link>
+                  {isAdmin && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-4 w-4 p-0 rounded-full hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
+                      onClick={() => handleRemoveLink(index)}
+                    >
+                      ×
+                    </Button>
+                  )}
+                </motion.li>
+              ))}
 
               {/* 法律信息 - 按照AM.md专业级标准优化 */}
               <motion.li

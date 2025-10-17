@@ -763,10 +763,6 @@
       "privacy": "Privacy Policy",
       "terms": "Terms of Service"
     },
-    "admin": {
-      "add_link_tooltip": "Click the plus sign to add links",
-      "no_links_message": "No links available"
-    },
     "dialog": {
       "add_link_title": "Add Useful Link",
       "add_link_description": "Please fill in the link name and address",
