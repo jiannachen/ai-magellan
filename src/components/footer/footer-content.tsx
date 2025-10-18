@@ -226,7 +226,7 @@ export default function FooterContent({
                 >
                   <Link
                     href={getLocalizedPath(link.href)}
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
+                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
                   >
                     <link.icon className="h-3 w-3" />
                     {link.label}
@@ -240,7 +240,7 @@ export default function FooterContent({
               >
                 <Link
                   href={getLocalizedPath("/about")}
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
                 >
                   <Info className="h-3 w-3" />
                   {t('navigation.about')}
@@ -269,7 +269,7 @@ export default function FooterContent({
                 >
                   <Link
                     href={getLocalizedPath(link.href)}
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-magellan-gold transition-colors duration-300"
+                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-magellan-gold transition-colors duration-300"
                   >
                     <link.icon className="h-3 w-3" />
                     {link.label}
@@ -318,7 +318,7 @@ export default function FooterContent({
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-magellan-coral transition-colors duration-300 flex-1"
+                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-magellan-coral transition-colors duration-300"
                   >
                     <ExternalLink className="h-3 w-3" />
                     {link.title}
@@ -344,7 +344,7 @@ export default function FooterContent({
               >
                 <Link
                   href={getLocalizedPath("/privacy-policy")}
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
                 >
                   <Shield className="h-3 w-3" />
                   {t('footer.legal.privacy')}
@@ -357,7 +357,7 @@ export default function FooterContent({
               >
                 <Link
                   href={getLocalizedPath("/terms-of-service")}
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
                 >
                   <FileText className="h-3 w-3" />
                   {t('footer.legal.terms')}
@@ -373,7 +373,7 @@ export default function FooterContent({
                     href="https://beian.miit.gov.cn/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
+                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors duration-300"
                   >
                     <FileText className="h-3 w-3" />
                     {settings.icpBeian}
