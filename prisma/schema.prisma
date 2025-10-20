@@ -42,7 +42,7 @@ model Website {
   slug                 String            @unique
   url                  String            @unique
   description          String
-  category_id          Int
+  category_id          Int // 保留旧字段，系统不再使用
   thumbnail            String?
   status               String            @default("pending")
   visits               Int               @default(0)
@@ -95,6 +95,7 @@ model Website {
   websiteFavorites     WebsiteFavorite[]
   websiteLikes         WebsiteLike[]
   websiteReviews       WebsiteReview[]
+  websiteCategories    WebsiteCategory[] // 新增：多对多关系
   category             Category          @relation(fields: [category_id], references: [id])
   submitter            User?             @relation(fields: [submittedBy], references: [id])
 
@@ -152,22 +153,40 @@ model WebsiteReview {
 }
 
 model Category {
-  id         Int        @id @default(autoincrement())
-  name       String
-  slug       String     @unique
-  name_en    String?
-  name_zh    String?
-  parent_id  Int?
-  sort_order Int        @default(0)
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  websites   Website[]
-  parent     Category?  @relation("CategoryHierarchy", fields: [parent_id], references: [id], onDelete: Cascade)
-  children   Category[] @relation("CategoryHierarchy")
+  id                Int               @id @default(autoincrement())
+  name              String
+  slug              String            @unique
+  name_en           String?
+  name_zh           String?
+  parent_id         Int?
+  sort_order        Int               @default(0)
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+  websites          Website[]
+  websiteCategories WebsiteCategory[] // 新增：多对多关系
+  parent            Category?         @relation("CategoryHierarchy", fields: [parent_id], references: [id], onDelete: Cascade)
+  children          Category[]        @relation("CategoryHierarchy")
 
   @@index([slug])
   @@index([parent_id])
   @@map("categories")
+}
+
+// 新增：多对多关系中间表
+model WebsiteCategory {
+  id         Int      @id @default(autoincrement())
+  websiteId  Int
+  categoryId Int
+  isPrimary  Boolean  @default(false) // 标记主分类
+  createdAt  DateTime @default(now())
+  website    Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([websiteId, categoryId])
+  @@index([websiteId])
+  @@index([categoryId])
+  @@index([isPrimary])
+  @@map("website_categories")
 }
 
 model FooterLink {

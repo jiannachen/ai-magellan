@@ -12,8 +12,8 @@ export const metadata: Metadata = {
 };
 
 export default async function CategoriesPage() {
-  // Get all categories with their subcategories and website counts
-  const categoriesWithCounts = await prisma.category.findMany({
+  // 优化：使用单次查询获取所有分类及其网站数量统计
+  const categories = await prisma.category.findMany({
     where: {
       parent_id: null  // 只获取一级分类
     },
@@ -24,9 +24,11 @@ export default async function CategoriesPage() {
       sort_order: true,
       _count: {
         select: {
-          websites: {
+          websiteCategories: {
             where: {
-              status: 'approved'
+              website: {
+                status: 'approved'
+              }
             }
           }
         }
@@ -39,9 +41,11 @@ export default async function CategoriesPage() {
           sort_order: true,
           _count: {
             select: {
-              websites: {
+              websiteCategories: {
                 where: {
-                  status: 'approved'
+                  website: {
+                    status: 'approved'
+                  }
                 }
               }
             }
@@ -57,18 +61,21 @@ export default async function CategoriesPage() {
     }
   });
 
-  // Transform to match component structure
-  const categoriesWithSubcategories = categoriesWithCounts.map(category => ({
-    ...category,
-    toolCount: category._count.websites,
+  // 转换数据结构以匹配组件需求
+  const categoriesWithCounts = categories.map(category => ({
+    id: category.id,
+    name: category.name,
+    slug: category.slug,
+    sort_order: category.sort_order,
+    toolCount: category._count.websiteCategories,
     subcategories: category.children.map(child => ({
       id: child.id,
       name: child.name,
       slug: child.slug,
-      toolCount: child._count.websites,
+      toolCount: child._count.websiteCategories,
       description: `${child.name}相关的AI工具`
     }))
   }));
 
-  return <CategoriesListPage categories={categoriesWithSubcategories} />;
+  return <CategoriesListPage categories={categoriesWithCounts} />;
 }

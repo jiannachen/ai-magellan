@@ -21,6 +21,30 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             parent: true
           }
         },
+        websiteCategories: {
+          include: {
+            category: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                name_en: true,
+                name_zh: true,
+                parent_id: true,
+                parent: {
+                  select: {
+                    id: true,
+                    name: true,
+                    slug: true
+                  }
+                }
+              }
+            }
+          },
+          orderBy: {
+            isPrimary: 'desc' // 主分类排在前面
+          }
+        },
         _count: {
           select: {
             websiteLikes: true,

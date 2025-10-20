@@ -5,13 +5,43 @@ import { prisma } from "@/lib/db/db";
 import { validateWebsiteSubmit } from "@/lib/validations/website";
 
 // GET /api/websites
-// 获取所有指定分类的网站
+// 获取所有指定分类的网站（支持多分类）
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const statusParam = searchParams.get("status");
+  const categoryId = searchParams.get("categoryId");
+
   const websites = await prisma.website.findMany({
-    where: statusParam && statusParam !== "all" ? { status: statusParam as any } : {},
+    where: {
+      ...(statusParam && statusParam !== "all" ? { status: statusParam as any } : {}),
+      ...(categoryId ? {
+        websiteCategories: {
+          some: {
+            categoryId: parseInt(categoryId)
+          }
+        }
+      } : {})
+    },
+    include: {
+      websiteCategories: {
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              name_en: true,
+              name_zh: true
+            }
+          }
+        },
+        orderBy: {
+          isPrimary: 'desc' // 主分类排在前面
+        }
+      }
+    }
   });
+
   return NextResponse.json(AjaxResponse.ok(websites));
 }
 
@@ -66,13 +96,18 @@ export async function POST(request: Request) {
 
     const validatedData = validationResult.data;
 
-    // Check if category exists
-    const category = await prisma.category.findUnique({
-      where: { id: Number(validatedData.category_id) },
+    // Check if at least one category is provided
+    const categoryIds: number[] = Array.isArray(validatedData.category_id)
+      ? validatedData.category_id.map(Number)
+      : [Number(validatedData.category_id)];
+
+    // 验证所有分类是否存在
+    const categories = await prisma.category.findMany({
+      where: { id: { in: categoryIds } }
     });
 
-    if (!category) {
-      return NextResponse.json(AjaxResponse.fail("Category does not exist"), {
+    if (categories.length !== categoryIds.length) {
+      return NextResponse.json(AjaxResponse.fail("One or more categories do not exist"), {
         status: 400,
       });
     }
@@ -105,7 +140,7 @@ export async function POST(request: Request) {
         slug: slug,
         url: validatedData.url.trim(),
         email: validatedData.email?.trim() || null,
-        category_id: Number(validatedData.category_id),
+        category_id: Number(categoryIds[0]), // 保留旧字段为主分类
         status: "pending", // 默认为待审核状态
         submittedBy: userId,
 
@@ -150,7 +185,22 @@ export async function POST(request: Request) {
         android_app_url: validatedData.android_app_url?.trim() || null,
         web_app_url: validatedData.web_app_url?.trim() || null,
         desktop_platforms: validatedData.desktop_platforms || [],
+
+        // 创建多分类关联
+        websiteCategories: {
+          create: categoryIds.map((catId, index) => ({
+            categoryId: catId,
+            isPrimary: index === 0 // 第一个为主分类
+          }))
+        }
       },
+      include: {
+        websiteCategories: {
+          include: {
+            category: true
+          }
+        }
+      }
     });
 
     return NextResponse.json(AjaxResponse.ok(website));

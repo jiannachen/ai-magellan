@@ -74,10 +74,14 @@ export default async function CategoryPageRoute({
     redirect(`/categories#${slug}`);
   }
 
-  // 获取该分类下的网站
+  // 获取该分类下的网站（使用多分类关系）
   const websites = await prisma.website.findMany({
     where: {
-      category_id: category.id,
+      websiteCategories: {
+        some: {
+          categoryId: category.id
+        }
+      },
       status: 'approved'
     },
     orderBy: [
@@ -86,8 +90,8 @@ export default async function CategoryPageRoute({
     ]
   });
 
-  // 获取所有分类（用于导航）
-  const allCategories = await prisma.category.findMany({
+  // 获取所有分类（用于导航）- 优化：使用 _count 避免 N+1 查询
+  const allCategoriesData = await prisma.category.findMany({
     select: {
       id: true,
       name: true,
@@ -95,9 +99,11 @@ export default async function CategoryPageRoute({
       parent_id: true,
       _count: {
         select: {
-          websites: {
+          websiteCategories: {
             where: {
-              status: 'approved'
+              website: {
+                status: 'approved'
+              }
             }
           }
         }
@@ -108,10 +114,18 @@ export default async function CategoryPageRoute({
     }
   });
 
-  // 如果是子分类，获取父分类信息
+  // 转换数据结构以匹配组件需求
+  const categoriesWithCounts = allCategoriesData.map(cat => ({
+    ...cat,
+    _count: {
+      websites: cat._count.websiteCategories
+    }
+  }));
+
+  // 如果是子分类，获取父分类信息 - 优化：使用 _count 避免 N+1 查询
   let parentCategory = null;
   if (category.parent_id) {
-    parentCategory = await prisma.category.findUnique({
+    const parentCat = await prisma.category.findUnique({
       where: { id: category.parent_id },
       select: {
         id: true,
@@ -124,9 +138,11 @@ export default async function CategoryPageRoute({
             slug: true,
             _count: {
               select: {
-                websites: {
+                websiteCategories: {
                   where: {
-                    status: 'approved'
+                    website: {
+                      status: 'approved'
+                    }
                   }
                 }
               }
@@ -138,13 +154,28 @@ export default async function CategoryPageRoute({
         }
       }
     });
+
+    if (parentCat) {
+      // 转换数据结构以匹配组件需求
+      const childrenWithCounts = parentCat.children.map(child => ({
+        ...child,
+        _count: {
+          websites: child._count.websiteCategories
+        }
+      }));
+
+      parentCategory = {
+        ...parentCat,
+        children: childrenWithCounts
+      };
+    }
   }
 
   return (
-    <CategoryPage 
+    <CategoryPage
       category={category}
       websites={websites}
-      allCategories={allCategories}
+      allCategories={categoriesWithCounts}
       parentCategory={parentCategory}
     />
   );

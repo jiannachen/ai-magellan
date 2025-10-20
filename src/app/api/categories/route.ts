@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
 import { prisma } from "@/lib/db/db";
 
-// GET: 查询所有分类
+// GET: 查询所有分类（支持多分类统计）
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const includeSubcategories = searchParams.get('includeSubcategories') === 'true';
     const parentId = searchParams.get('parentId');
-    
+
     if (includeSubcategories) {
       // 返回分级结构的分类数据
       const categories = await prisma.category.findMany({
@@ -21,19 +21,36 @@ export async function GET(request: Request) {
           },
           _count: {
             select: {
-              websites: {
-                where: { status: 'approved' }
+              websiteCategories: {
+                where: {
+                  website: {
+                    status: 'approved'
+                  }
+                }
               }
             }
           }
         },
         orderBy: { sort_order: 'asc' }
       });
-      
+
       return NextResponse.json(AjaxResponse.ok(categories));
     } else {
       // 返回扁平的分类列表
       const categories = await prisma.category.findMany({
+        include: {
+          _count: {
+            select: {
+              websiteCategories: {
+                where: {
+                  website: {
+                    status: 'approved'
+                  }
+                }
+              }
+            }
+          }
+        },
         orderBy: { sort_order: 'asc' }
       });
       return NextResponse.json(AjaxResponse.ok(categories));

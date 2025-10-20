@@ -73,6 +73,22 @@ interface Website {
       slug: string
     }
   }
+  websiteCategories?: Array<{
+    isPrimary: boolean
+    category: {
+      id: number
+      name: string
+      slug: string
+      name_en?: string
+      name_zh?: string
+      parent_id?: number
+      parent?: {
+        id: number
+        name: string
+        slug: string
+      }
+    }
+  }>
   thumbnail: string | null
   logo_url: string | null
   status: string
@@ -676,36 +692,78 @@ export default function ToolDetailPage() {
                     </div>
                   )}
 
-                  {/* Category Info */}
+                  {/* Category Info - Multiple Categories Support */}
                   <div className="p-4 rounded-lg bg-muted/50 border border-primary/10">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="space-y-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 rounded-lg bg-primary/10">
                           <Map className="h-5 w-5 text-primary" />
                         </div>
-                        <div>
-                          <h4 className="font-semibold text-foreground">{t('profile.tools.detail.sections.category')}</h4>
+                        <h4 className="font-semibold text-foreground">
+                          {website.websiteCategories && website.websiteCategories.length > 1
+                            ? t('profile.tools.detail.sections.categories')
+                            : t('profile.tools.detail.sections.category')}
+                        </h4>
+                      </div>
+
+                      {/* Display multiple categories if available */}
+                      {website.websiteCategories && website.websiteCategories.length > 0 ? (
+                        <div className="space-y-3">
+                          {website.websiteCategories.map((wc, index) => (
+                            <div key={wc.category.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 rounded-lg bg-background/50 border border-primary/5">
+                              <div className="flex items-center gap-2">
+                                {wc.isPrimary && (
+                                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-xs">
+                                    {t('profile.tools.detail.badges.primary')}
+                                  </Badge>
+                                )}
+                                <div className="text-sm text-muted-foreground">
+                                  {wc.category.parent ? (
+                                    <div className="flex items-center gap-1">
+                                      <span>{wc.category.parent.name}</span>
+                                      <ArrowRight className="h-3 w-3" />
+                                      <span className="font-medium text-foreground">{wc.category.name}</span>
+                                    </div>
+                                  ) : (
+                                    <span className="font-medium text-foreground">{wc.category.name}</span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <Link href={`/categories/${wc.category.slug}`}>
+                                  <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs">
+                                    <Route className="h-3 w-3 mr-1" />
+                                    {t('profile.tools.detail.actions.explore')}
+                                  </Button>
+                                </Link>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        /* Fallback to old single category if websiteCategories is empty */
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                           <div className="text-sm text-muted-foreground">
                             {website.category?.parent ? (
                               <div className="flex items-center gap-1">
                                 <span>{website.category.parent.name}</span>
                                 <ArrowRight className="h-3 w-3" />
-                                <span className="font-medium">{website.category.name}</span>
+                                <span className="font-medium text-foreground">{website.category.name}</span>
                               </div>
                             ) : (
-                              <span>{website.category?.name}</span>
+                              <span className="font-medium text-foreground">{website.category?.name}</span>
                             )}
                           </div>
+                          <div className="flex-shrink-0">
+                            <Link href={`/categories/${website.category?.slug || ''}`}>
+                              <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                                <Route className="h-4 w-4 mr-2" />
+                                {t('profile.tools.detail.actions.explore_category')}
+                              </Button>
+                            </Link>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex-shrink-0">
-                        <Link href={`/categories/${website.category?.slug || ''}`}>
-                          <Button variant="outline" size="sm" className="w-full sm:w-auto">
-                            <Route className="h-4 w-4 mr-2" />
-                            {t('profile.tools.detail.actions.explore_category')}
-                          </Button>
-                        </Link>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
