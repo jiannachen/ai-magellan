@@ -42,7 +42,7 @@ model Website {
   slug                 String            @unique
   url                  String            @unique
   description          String
-  category_id          Int // 保留旧字段，系统不再使用
+  category_id          Int? // 保留旧字段，系统不再使用
   thumbnail            String?
   status               String            @default("pending")
   visits               Int               @default(0)
@@ -96,7 +96,7 @@ model Website {
   websiteLikes         WebsiteLike[]
   websiteReviews       WebsiteReview[]
   websiteCategories    WebsiteCategory[] // 新增：多对多关系
-  category             Category          @relation(fields: [category_id], references: [id])
+  category             Category?         @relation(fields: [category_id], references: [id])
   submitter            User?             @relation(fields: [submittedBy], references: [id])
 
   @@index([category_id])

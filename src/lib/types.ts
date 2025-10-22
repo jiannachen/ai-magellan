@@ -4,7 +4,7 @@ export interface Website {
   slug: string;
   url: string;
   description: string;
-  category_id: number;
+  category_id: number | null;
   thumbnail?: string;
   active: number;
   status: "pending" | "approved" | "rejected"; // 修复为联合类型，移除"all"

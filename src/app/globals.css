@@ -2,781 +2,346 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== ATLASSIAN DESIGN SYSTEM TOKENS ===== */
-/* 基于 ATL.md 的专业级 AI 导航站设计系统 */
+/* ===== AI MAGELLAN 海洋主题设计系统 ===== */
+/* 专业、简洁、品牌一致的视觉规范 */
 
 :root {
-  /* 主要专业色彩 (80%使用) - Atlassian基础 */
-  --ds-background-brand-bold: #0052CC;           /* 主品牌色 */
-  --ds-background-brand-bold-hovered: #0747A6;   /* 悬停状态 */
-  --ds-background-brand-bold-pressed: #092E5C;   /* 按下状态 */
-  
-  /* 中性色系统 - 专业背景 */
-  --ds-background-neutral: #FFFFFF;              /* 主背景 */
-  --ds-background-neutral-subtle: #F7F8F9;       /* 次背景 */
-  --ds-background-neutral-subtle-hovered: #F1F2F4; /* 悬停背景 */
-  --ds-background-neutral-subtle-pressed: #DCDFE4; /* 按下背景 */
-  
-  /* 文本色彩层级 */
-  --ds-text: #172B4D;                           /* 主文本 */
-  --ds-text-subtle: #626F86;                    /* 次要文本 */
-  --ds-text-subtlest: #758195;                  /* 最淡文本 */
-  --ds-text-disabled: #091E424F;                /* 禁用文本 */
-  
-  /* AI主题点缀色 (20%使用) - 品牌差异化 */
-  --ai-discovery: #00C7E6;                      /* AI发现高亮 */
-  --ai-success: #36B37E;                        /* 工具验证成功 */
-  --ai-innovation: #6554C0;                     /* 创新标记 */
-  --ai-premium: #FFAB00;                        /* 付费工具标识 */
-  
-  /* 功能状态色 */
-  --ds-background-success: #1F845A;             /* 成功状态 */
-  --ds-background-warning: #974F0C;             /* 警告状态 */
-  --ds-background-danger: #C9372C;              /* 错误状态 */
-  --ds-background-information: #0052CC;         /* 信息状态 */
-  
-  /* AI工具类型标识色 */
-  --tool-free: #36B37E;                         /* 免费工具 */
-  --tool-freemium: #6554C0;                     /* 免费增值 */
-  --tool-paid: #FFAB00;                         /* 付费工具 */
-  --tool-enterprise: #172B4D;                   /* 企业级 */
+  /* ===== 核心海洋主题颜色系统 (5色方案) ===== */
 
-  /* 字体系统 */
-  --ds-font-family-sans: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
-  --ds-font-family-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', 'Roboto Mono', monospace;
-  
-  /* 字重系统 */
-  --ds-font-weight-regular: 400;
-  --ds-font-weight-medium: 500;
-  --ds-font-weight-semibold: 600;
-  --ds-font-weight-bold: 700;
+  /* 主品牌色 - 深海蓝 */
+  --ocean-primary: 214 79% 30%;           /* #0B4F8C - 主色调 */
+  --ocean-primary-hover: 214 79% 26%;     /* #083A6B - 悬停态 */
+  --ocean-primary-light: 213 62% 58%;     /* #4A90E2 - 浅色版 */
 
-  /* 间距系统（8px网格） */
-  --ds-space-0: 0px;
-  --ds-space-025: 2px;    /* 细节间距 */
-  --ds-space-050: 4px;    /* 最小间距 */
-  --ds-space-075: 6px;    /* 紧密间距 */
-  --ds-space-100: 8px;    /* 基础间距 */
-  --ds-space-150: 12px;   /* 小间距 */
-  --ds-space-200: 16px;   /* 标准间距 */
-  --ds-space-250: 20px;   /* 中等间距 */
-  --ds-space-300: 24px;   /* 大间距 */
-  --ds-space-400: 32px;   /* 区块间距 */
-  --ds-space-500: 40px;   /* 章节间距 */
-  --ds-space-600: 48px;   /* 页面区域间距 */
-  --ds-space-800: 64px;   /* 大型区域间距 */
-  --ds-space-1000: 80px;  /* 页面级间距 */
+  /* 功能色彩 */
+  --ocean-success: 161 84% 39%;           /* #10B981 - 成功/免费 */
+  --ocean-warning: 27 94% 54%;            /* #F97316 - 警告/热门 */
+  --ocean-accent: 170 97% 27%;            /* #0F766E - 强调色 */
+  --ocean-neutral: 221 43% 20%;           /* #172B4D - 深色文字 */
 
-  /* 圆角系统 */
-  --ds-border-radius-050: 2px;    /* 小元素 */
-  --ds-border-radius-100: 4px;    /* 默认圆角 */
-  --ds-border-radius-200: 8px;    /* 卡片、按钮 */
-  --ds-border-radius-300: 12px;   /* 大容器 */
-  --ds-border-radius-400: 16px;   /* 模态框 */
-  --ds-border-radius-500: 20px;   /* 特大容器 */
-  --ds-border-radius-round: 50%;  /* 圆形 */
+  /* 中性灰度系统 */
+  --neutral-50: 210 20% 98%;              /* #F8FAFC - 最浅 */
+  --neutral-100: 216 33% 97%;             /* #F1F5F9 */
+  --neutral-200: 219 12% 89%;             /* #DFE1E6 */
+  --neutral-300: 221 14% 78%;             /* #C1C7D0 */
+  --neutral-400: 221 13% 63%;             /* #8993A4 */
+  --neutral-500: 221 14% 54%;             /* #6B778C */
+  --neutral-600: 220 15% 51%;             /* #5E6C84 */
+  --neutral-700: 221 39% 35%;             /* #42526E */
+  --neutral-800: 221 43% 20%;             /* #172B4D */
+  --neutral-900: 224 71% 14%;             /* #091E42 */
 
-  /* 阴影系统 */
-  --ds-elevation-shadow-raised: 0px 1px 3px rgba(9, 30, 66, 0.12), 0px 1px 2px rgba(9, 30, 66, 0.08);
-  --ds-elevation-shadow-card: 0px 2px 6px rgba(9, 30, 66, 0.08), 0px 0px 1px rgba(9, 30, 66, 0.12);
-  --ds-elevation-shadow-overlay: 0px 4px 12px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.12);
-  --ds-elevation-shadow-modal: 0px 12px 24px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.12);
+  /* ===== 语义化颜色映射 ===== */
+  --primary: var(--ocean-primary);
+  --primary-foreground: 0 0% 100%;
 
-  /* 动效系统 */
-  --ds-motion-easing-entrance: cubic-bezier(0.15, 1, 0.3, 1);      /* 入场动画 */
-  --ds-motion-easing-exit: cubic-bezier(0.6, 0, 0.85, 0.15);      /* 退场动画 */
-  --ds-motion-easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);    /* 标准动画 */
-  --ds-motion-easing-professional: cubic-bezier(0.25, 0.1, 0.25, 1); /* 专业动画 */
-  
-  /* 动效时长 */
-  --ds-motion-duration-instant: 0ms;     /* 即时反馈 */
-  --ds-motion-duration-fast: 100ms;      /* 快速交互 */
-  --ds-motion-duration-medium: 200ms;    /* 标准交互 */
-  --ds-motion-duration-slow: 300ms;      /* 复杂动画 */
+  --background: 0 0% 100%;
+  --foreground: var(--neutral-900);
+
+  --card: 0 0% 100%;
+  --card-foreground: var(--neutral-900);
+
+  --popover: 0 0% 100%;
+  --popover-foreground: var(--neutral-900);
+
+  --secondary: var(--neutral-100);
+  --secondary-foreground: var(--neutral-800);
+
+  --muted: var(--neutral-100);
+  --muted-foreground: var(--neutral-500);
+
+  --accent: var(--neutral-100);
+  --accent-foreground: var(--neutral-800);
+
+  --border: var(--neutral-200);
+  --input: var(--neutral-200);
+  --ring: var(--ocean-primary);
+
+  --destructive: 0 84% 60%;               /* #DC2626 */
+  --destructive-foreground: 0 0% 100%;
+
+  --success: var(--ocean-success);
+  --success-foreground: 0 0% 100%;
+
+  --warning: var(--ocean-warning);
+  --warning-foreground: var(--neutral-900);
+
+  /* ===== 统一设计标准 ===== */
+
+  /* 圆角系统 - 统一为8px */
+  --radius: 8px;
+
+  /* 间距系统 - 8px网格 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+
+  /* 动画时长 */
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+
+  /* 动画曲线 */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
 }
 
-/* 暗色模式支持 */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ds-background-neutral: #0D1117;
-    --ds-background-neutral-subtle: #161B22;
-    --ds-text: #E6EDF3;
-    --ds-text-subtle: #7D8590;
-    --ai-discovery: #58A6FF;
-    --ai-success: #3FB950;
-  }
+/* 暗色模式 */
+.dark {
+  --background: 224 71% 4%;               /* #0D1117 */
+  --foreground: 0 0% 100%;
+
+  --card: 220 13% 9%;                     /* #161B22 */
+  --card-foreground: 0 0% 100%;
+
+  --popover: 224 71% 4%;
+  --popover-foreground: 0 0% 100%;
+
+  --secondary: 219 11% 15%;               /* #21262D */
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 219 11% 15%;
+  --muted-foreground: 220 9% 55%;
+
+  --accent: 219 11% 15%;
+  --accent-foreground: 0 0% 100%;
+
+  --border: 221 12% 31%;                  /* #484F58 */
+  --input: 221 12% 31%;
+
+  --ocean-primary: 216 87% 65%;           /* 亮蓝色适配暗色模式 */
+  --ocean-success: 148 58% 58%;
+  --ocean-warning: 48 100% 55%;
 }
 
-/* 减少动画支持 - 可访问性优先 */
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --ds-motion-duration-instant: 0ms;
-    --ds-motion-duration-fast: 0ms;
-    --ds-motion-duration-medium: 0ms;
-    --ds-motion-duration-slow: 0ms;
-  }
-  
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
+/* ===== 核心动画 (仅保留2个) ===== */
 
-/* ===== AI MAGELLAN 专业级海洋主题动画 ===== */
-/* 核心原则：微妙、专业、有意义的动画效果 */
-/* 更新：进一步优化hover效果，避免视觉过载 */
-
-/* 基础浮动动画 - 减少幅度，增加专业感 */
-@keyframes gentle-float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-1px); }  /* 从-2px进一步减少到-1px */
-  100% { transform: translateY(0px); }
-}
-
-/* 微妙的渐变效果 */
-@keyframes subtle-gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* 专业级罗盘旋转 - 慢速、稳定 */
-@keyframes professional-compass-rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* 质感波纹效果 - 低调专业 */
-@keyframes professional-ripple {
-  0% { transform: scale(0.8); opacity: 0.6; }
-  50% { transform: scale(1); opacity: 0.3; }
-  100% { transform: scale(1.2); opacity: 0; }
-}
-
-/* 微妙的高光效果 - 仅在交互时显示 */
-@keyframes subtle-glow {
-  0% { box-shadow: 0 0 3px rgba(59, 130, 246, 0.1); }  /* 进一步减弱 */
-  50% { box-shadow: 0 0 8px rgba(59, 130, 246, 0.15); }
-  100% { box-shadow: 0 0 3px rgba(59, 130, 246, 0.1); }
-}
-
-/* 专业级淡入动画 */
-@keyframes professional-fade-in {
-  0% { 
-    opacity: 0;
-    transform: translateY(4px);  /* 从8px减少到4px */
-  }
-  100% { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 品质感的缩放效果 - 极其微妙 */
-@keyframes quality-scale {
-  0% { 
-    opacity: 0;
-    transform: scale(0.99);  /* 从0.98改为0.99 */
-  }
-  100% { 
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* 专业级海洋背景效果 - 降低强度 */
-@keyframes professional-ocean-wave {
-  0% { 
-    transform: translateY(0) scale(1);
-    border-radius: 50% 48% 52% 46%;
-  }
-  50% { 
-    transform: translateY(-1px) scale(1.005);  /* 进一步减小 */
-    border-radius: 48% 52% 50% 48%;
-  }
-  100% { 
-    transform: translateY(0) scale(1);
-    border-radius: 50% 48% 52% 46%;
-  }
-}
-
-/* 专业微妙流动效果 */
-@keyframes professional-current {
-  0% { 
-    transform: translateX(0) rotate(0deg) scale(1);
-    opacity: 0.15;  /* 进一步降低 */
-  }
-  50% { 
-    transform: translateX(5px) rotate(1deg) scale(1.01);  /* 减小移动和旋转 */
-    opacity: 0.2;
-  }
-  100% { 
-    transform: translateX(0) rotate(0deg) scale(1);
-    opacity: 0.15;
-  }
-}
-
-/* 质感发现动画 - 专业级 */
-@keyframes professional-discovery {
-  0% { 
-    transform: scale(0.98) translateY(5px);  /* 减小初始偏移 */
-    opacity: 0;
-    filter: blur(1px);  /* 减少模糊 */
-  }
-  100% { 
-    transform: scale(1) translateY(0);
-    opacity: 1;
-    filter: blur(0px);
-  }
-}
-
-/* Atlassian-compliant keyframe animations */
-@keyframes atlassian-float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-@keyframes atlassian-pulse {
-  0% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 0.8;
-  }
-  100% {
-    opacity: 0.6;
-  }
-}
-
-@keyframes atlassian-fade-in {
-  0% {
+@keyframes fade-in {
+  from {
     opacity: 0;
     transform: translateY(8px);
   }
-  100% {
+  to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-@keyframes atlassian-fade-out {
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
 }
 
-@keyframes atlassian-scale-in {
-  0% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* 
-  定义全局 CSS 变量
-  使用 HSL 颜色格式：hsl(色相 饱和度 亮度)
-  例如：--primary: 0 0% 9% 表示：
-  - 色相：0 (红色)
-  - 饱和度：0% (灰度)
-  - 亮度：9% (接近黑色)
-*/
-@layer base {
-  :root {
-    /* ===== AI MAGELLAN 海洋主题色彩系统 ===== */
-    /* 主品牌色 - 深海蓝 */
-    --magellan-primary: 214 79% 30%; /* #0B4F8C - 深海主蓝 */
-    --magellan-primary-hover: 214 79% 26%; /* #083A6B - 深海蓝悬停 */
-    --magellan-primary-light: 213 62% 58%; /* #4A90E2 - 浅海蓝 */
-    --magellan-primary-subtle: 214 79% 30% / 0.08; /* 主蓝透明版 */
-
-    /* 辅助色 - 海洋光谱 */
-    --magellan-navy: 229 80% 32%; /* #1E3A8A - 海军蓝 */
-    --magellan-teal: 170 97% 27%; /* #0F766E - 青绿 */
-    --magellan-coral: 27 94% 54%; /* #F97316 - 珊瑚橙 */
-    --magellan-gold: 32 91% 43%; /* #D97706 - 金色 */
-    --magellan-mint: 161 84% 39%; /* #10B981 - 薄荷绿 */
-
-    /* 中性色 - 海洋深度 */
-    --magellan-depth-900: 218 54% 11%; /* #0C1B2A - 深海黑 */
-    --magellan-depth-800: 220 14% 22%; /* #1F2937 - 深水灰 */
-    --magellan-depth-700: 219 12% 30%; /* #374151 - 中水灰 */
-    --magellan-depth-600: 219 10% 40%; /* #4B5563 - 浅水灰 */
-    --magellan-depth-100: 216 33% 97%; /* #F1F5F9 - 浅海泡沫 */
-    --magellan-depth-50: 210 20% 98%; /* #F8FAFC - 海面白 */
-
-    /* 语义化色彩 - 航海信号 */
-    --magellan-success: var(--magellan-mint); /* 安全到港 */
-    --magellan-warning: var(--magellan-coral); /* 注意信号 */
-    --magellan-danger: 0 84% 60%; /* #DC2626 - 危险信号 */
-    --magellan-info: var(--magellan-teal); /* 信息浮标 */
-
-    /* 交互色 - 探索状态 */
-    --magellan-discovered: var(--magellan-gold); /* 已发现 */
-    --magellan-bookmarked: var(--magellan-coral); /* 已标记 */
-    --magellan-trending: var(--magellan-mint); /* 热门航线 */
-
-    /* 渐变系统 */
-    --ocean-surface: linear-gradient(135deg, hsl(var(--magellan-primary)) 0%, hsl(var(--magellan-primary-light)) 100%);
-    --deep-sea: linear-gradient(180deg, hsl(var(--magellan-navy)) 0%, hsl(var(--magellan-primary)) 100%);
-    --treasure-glow: radial-gradient(circle, hsl(var(--magellan-coral)) 0%, transparent 70%);
-    --safe-harbor: linear-gradient(45deg, hsl(var(--magellan-mint)) 0%, hsl(var(--magellan-teal)) 100%);
-
-    /* Atlassian Brand Colors */
-    --atlassian-blue-50: 233 242 255;    /* #E9F2FF */
-    --atlassian-blue-100: 204 224 255;   /* #CCE0FF */
-    --atlassian-blue-200: 133 184 255;   /* #85B8FF */
-    --atlassian-blue-300: 74 144 226;    /* #4A90E2 */
-    --atlassian-blue-400: 38 132 255;    /* #2684FF Primary Blue */
-    --atlassian-blue-500: 0 101 255;     /* #0065FF */
-    --atlassian-blue-600: 0 82 204;      /* #0052CC */
-    --atlassian-blue-700: 0 67 163;      /* #0043A3 */
-    --atlassian-blue-800: 0 48 128;      /* #003080 */
-    --atlassian-blue-900: 0 33 89;       /* #002159 */
-
-    /* Atlassian Success - Green */
-    --atlassian-success-50: 232 245 232; /* #E8F5E8 */
-    --atlassian-success-100: 211 241 216;/* #D3F1D8 */
-    --atlassian-success-200: 157 217 175;/* #9DD9AF */
-    --atlassian-success-300: 110 192 113;/* #6EC071 */
-    --atlassian-success-400: 75 206 71;  /* #4BCE47 */
-    --atlassian-success-500: 54 179 126; /* #36B37E */
-    --atlassian-success-600: 43 157 95;  /* #2B9D5F */
-    --atlassian-success-700: 34 128 79;  /* #22804F */
-    --atlassian-success-800: 26 99 63;   /* #1A633F */
-    --atlassian-success-900: 19 71 47;   /* #13472F */
-
-    /* Atlassian Warning - Yellow */
-    --atlassian-warning-50: 255 247 230; /* #FFF7E6 */
-    --atlassian-warning-100: 255 236 179;/* #FFECB3 */
-    --atlassian-warning-200: 255 214 102;/* #FFD666 */
-    --atlassian-warning-300: 255 196 0;  /* #FFC400 */
-    --atlassian-warning-400: 255 171 0;  /* #FFAB00 */
-    --atlassian-warning-500: 255 153 31; /* #FF991F */
-    --atlassian-warning-600: 255 139 0;  /* #FF8B00 */
-    --atlassian-warning-700: 255 122 0;  /* #FF7A00 */
-    --atlassian-warning-800: 230 90 0;   /* #E65A00 */
-    --atlassian-warning-900: 191 74 0;   /* #BF4A00 */
-
-    /* Atlassian Error - Red */
-    --atlassian-error-50: 255 233 230;   /* #FFE9E6 */
-    --atlassian-error-100: 255 189 186;  /* #FFBDBA */
-    --atlassian-error-200: 255 143 130;  /* #FF8F82 */
-    --atlassian-error-300: 255 86 48;    /* #FF5630 */
-    --atlassian-error-400: 222 53 11;    /* #DE350B */
-    --atlassian-error-500: 196 41 20;    /* #C42914 */
-    --atlassian-error-600: 174 31 12;    /* #AE1F0C */
-    --atlassian-error-700: 152 22 17;    /* #981611 */
-    --atlassian-error-800: 122 14 10;    /* #7A0E0A */
-    --atlassian-error-900: 93 15 8;      /* #5D0F08 */
-
-    /* Atlassian Neutral Colors */
-    --atlassian-neutral-0: 0 0% 100%;    /* #FFFFFF */
-    --atlassian-neutral-50: 219 14% 98%; /* #FAFBFC */
-    --atlassian-neutral-100: 216 12% 96%;/* #F4F5F7 */
-    --atlassian-neutral-200: 218 11% 93%;/* #EBECF0 */
-    --atlassian-neutral-300: 219 12% 89%;/* #DFE1E6 */
-    --atlassian-neutral-400: 221 14% 78%;/* #C1C7D0 */
-    --atlassian-neutral-500: 221 13% 63%;/* #8993A4 Body Text */
-    --atlassian-neutral-600: 221 14% 54%;/* #6B778C */
-    --atlassian-neutral-700: 220 15% 51%;/* #5E6C84 */
-    --atlassian-neutral-800: 221 39% 35%;/* #42526E Heading Text */
-    --atlassian-neutral-900: 221 43% 20%;/* #172B4D Dark Text */
-    --atlassian-neutral-1000: 224 71% 14%;/* #091E42 Darkest */
-    
-    /* 融合主色调 - 采用海洋主题但保持专业性 */
-    --primary: var(--magellan-primary); /* 使用海洋深蓝作为主色 */
-    --primary-foreground: 0 0% 100%; /* White */
-    
-    /* System Semantic Colors */
-    --foreground: 224 71% 14%; /* #091E42 - Darkest */
-    --muted-foreground: 221 13% 63%; /* #8993A4 - Body Text */
-    --card: 0 0% 100%; /* #FFFFFF */
-    --card-foreground: 224 71% 14%; /* #091E42 */
-    --popover: 0 0% 100%; /* #FFFFFF */
-    --popover-foreground: 224 71% 14%; /* #091E42 */
-    --secondary: 216 12% 96%; /* #F4F5F7 */
-    --secondary-foreground: 221 39% 35%; /* #42526E */
-    --muted: 216 12% 96%; /* #F4F5F7 */
-    --accent: 216 12% 96%; /* #F4F5F7 */
-    --accent-foreground: 221 39% 35%; /* #42526E */
-    --border: 219 12% 89%; /* #DFE1E6 */
-    --input: 219 12% 89%; /* #DFE1E6 */
-    --ring: var(--primary); /* Primary */
-    --background: 0 0% 100%; /* #FFFFFF */
-    --destructive: 11 82% 59%; /* #FF5630 */
-    --destructive-foreground: 0 0% 100%; /* White */
-    --success: var(--magellan-success); /* 使用海洋薄荷绿 */
-    --success-foreground: 0 0% 100%; /* White */
-    --warning: var(--magellan-warning); /* 使用海洋珊瑚橙 */
-    --warning-foreground: 224 71% 14%; /* Dark text */
-    
-    /* Atlassian Border Radius System */
-    --radius-2: 2px;
-    --radius-4: 4px;      /* Small elements */
-    --radius-8: 8px;      /* Medium elements */
-    --radius-12: 12px;    /* Large elements */
-    --radius-16: 16px;    /* Extra large */
-    --radius-full: 50%;   /* Circular */
-    --radius: var(--radius-4);
-    
-    /* Atlassian Motion System - Duration Variables */
-    --duration-micro: 100ms;        /* Micro interactions */
-    --duration-short: 200ms;        /* Standard interactions */
-    --duration-medium: 300ms;       /* Page elements */
-    --duration-long: 500ms;         /* Page transitions */
-    
-    /* Atlassian Easing Variables */
-    --ease-entrance: cubic-bezier(0.15, 1, 0.3, 1);      /* Elements entering */
-    --ease-exit: cubic-bezier(0.6, 0, 0.85, 0.15);       /* Elements exiting */
-    --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);   /* Standard interactions */
-    --ease-decelerate: cubic-bezier(0, 0, 0.3, 1);       /* Slow ending */
-    --ease-accelerate: cubic-bezier(0.7, 0, 1, 0.5);     /* Fast ending */
-    
-    /* Atlassian Spacing System - 8px Grid */
-    --space-0: 0;
-    --space-2: 2px;       /* 0.25 * 8px */
-    --space-4: 4px;       /* 0.5 * 8px */
-    --space-8: 8px;       /* 1 * 8px */
-    --space-12: 12px;     /* 1.5 * 8px */
-    --space-16: 16px;     /* 2 * 8px */
-    --space-20: 20px;     /* 2.5 * 8px */
-    --space-24: 24px;     /* 3 * 8px */
-    --space-32: 32px;     /* 4 * 8px */
-    --space-40: 40px;     /* 5 * 8px */
-    --space-48: 48px;     /* 6 * 8px */
-    --space-56: 56px;     /* 7 * 8px */
-    --space-64: 64px;     /* 8 * 8px */
-    --space-80: 80px;     /* 10 * 8px */
-    --space-96: 96px;     /* 12 * 8px */
-    --space-128: 128px;   /* 16 * 8px */
-  }
-
-  .dark {
-    /* Atlassian Dark Mode Colors */
-    --atlassian-neutral-0: 224 71% 4%;   /* #0D1117 */
-    --atlassian-neutral-50: 220 13% 9%;  /* #161B22 */
-    --atlassian-neutral-100: 219 11% 15%;/* #21262D */
-    --atlassian-neutral-200: 218 11% 20%;/* #30363D */
-    --atlassian-neutral-300: 221 12% 31%;/* #484F58 */
-    --atlassian-neutral-400: 220 9% 43%; /* #6E7681 */
-    --atlassian-neutral-500: 220 9% 55%; /* #8B949E */
-    --atlassian-neutral-600: 218 9% 69%; /* #B1BAC4 */
-    --atlassian-neutral-700: 218 10% 79%;/* #C9D1D9 */
-    --atlassian-neutral-800: 218 17% 95%;/* #F0F6FC */
-    --atlassian-neutral-900: 218 17% 95%;/* #F0F6FC */
-    --atlassian-neutral-1000: 0 0% 100%; /* #FFFFFF */
-
-    /* Adjusted brand colors for dark mode */
-    --atlassian-blue-400: 211 100% 65%; /* Brighter for dark */
-    --atlassian-success-500: 148 58% 58%; /* Brighter for dark */
-    --atlassian-warning-300: 48 100% 55%; /* Brighter for dark */
-    --atlassian-error-300: 11 82% 65%;   /* Brighter for dark */
-    
-    /* Primary Color - Dark Mode - Atlassian Official Blue */
-    --primary: 216 87% 65%; /* Brighter for dark mode */
-    --primary-foreground: 0 0% 100%; /* White */
-    
-    /* System Semantic Colors for Dark Mode */
-    --foreground: 0 0% 100%; /* #FFFFFF */
-    --muted-foreground: 218 10% 79%; /* #C9D1D9 */
-    --card: 220 13% 9%; /* #161B22 */
-    --card-foreground: 0 0% 100%; /* #FFFFFF */
-    --popover: 224 71% 4%; /* #0D1117 */
-    --popover-foreground: 0 0% 100%; /* #FFFFFF */
-    --secondary: 219 11% 15%; /* #21262D */
-    --secondary-foreground: 0 0% 100%; /* #FFFFFF */
-    --muted: 219 11% 15%; /* #21262D */
-    --accent: 219 11% 15%; /* #21262D */
-    --accent-foreground: 0 0% 100%; /* #FFFFFF */
-    --border: 221 12% 31%; /* #484F58 */
-    --input: 221 12% 31%; /* #484F58 */
-    --ring: 216 87% 65%; /* Primary */
-    --background: 224 71% 4%; /* #0D1117 */
-    --destructive: 11 82% 65%; /* Brighter for dark */
-    --destructive-foreground: 0 0% 100%; /* #FFFFFF */
-    --success: 148 58% 58%; /* Brighter for dark */
-    --success-foreground: 0 0% 100%; /* #FFFFFF */
-    --warning: 48 100% 55%; /* Brighter for dark */
-    --warning-foreground: 0 0% 100%; /* #FFFFFF */
-  }
-}
+/* ===== 基础样式 ===== */
 
 @layer base {
+  * {
+    @apply border-border;
+  }
+
   html {
     -webkit-tap-highlight-color: transparent;
-    /* Atlassian Typography - Charlie Text font family */
-    font-family: 'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
     /* 修复移动端viewport高度问题 */
     height: 100%;
-    /* 修复iOS Safari的100vh问题 */
     height: 100dvh;
-    /* 回退支持 */
     height: -webkit-fill-available;
   }
 
   body {
-    @apply bg-background text-foreground antialiased overflow-x-hidden;
-    font-feature-settings: "rlig" 1, "calt" 1;
-    /* Atlassian body text styling */
+    @apply bg-background text-foreground antialiased;
     font-size: 14px;
-    line-height: 20px;
-    letter-spacing: 0;
-    /* 修复移动端宽度溢出和优化触摸体验 */
-    max-width: 100vw;
-    /* 修复移动端高度问题 */
-    min-height: 100%;
+    line-height: 1.6;
+
+    /* 移动端高度适配 */
+    min-height: 100vh;
     min-height: 100dvh;
     min-height: -webkit-fill-available;
-    /* 优化移动端滚动体验 */
+
+    /* 移动端宽度和滚动优化 */
+    max-width: 100vw;
     -webkit-overflow-scrolling: touch;
-    /* 防止横向滚动 */
     overscroll-behavior-x: none;
-    /* 优化文本渲染 */
+
+    /* 文本渲染优化 */
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* 确保移动端正确的触摸行为 */
+
+    /* 触摸行为优化 */
     touch-action: manipulation;
   }
 
-  /* Atlassian Typography Scale */
-  .text-display {
-    font-size: 48px;
-    font-weight: 500;
-    line-height: 56px;
-    letter-spacing: -0.02em;
+  /* 统一排版系统 */
+  h1 { @apply text-2xl font-semibold leading-tight; }
+  h2 { @apply text-xl font-semibold leading-tight; }
+  h3 { @apply text-lg font-semibold leading-tight; }
+  h4 { @apply text-base font-medium leading-tight; }
+
+  p { @apply text-sm leading-relaxed; }
+
+  /* 选择文本样式 */
+  ::selection {
+    @apply bg-primary/20;
   }
-
-  .text-h1 {
-    font-size: 40px;
-    font-weight: 500;
-    line-height: 48px;
-    letter-spacing: -0.02em;
-  }
-
-  .text-h2 {
-    font-size: 32px;
-    font-weight: 500;
-    line-height: 40px;
-    letter-spacing: -0.01em;
-  }
-
-  .text-h3 {
-    font-size: 24px;
-    font-weight: 500;
-    line-height: 32px;
-    letter-spacing: -0.01em;
-  }
-
-  .text-h4 {
-    font-size: 20px;
-    font-weight: 500;
-    line-height: 28px;
-    letter-spacing: -0.01em;
-  }
-
-  .text-h5 {
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 24px;
-    letter-spacing: 0;
-  }
-
-  .text-h6 {
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 20px;
-    letter-spacing: 0;
-    text-transform: uppercase;
-  }
-
-  .text-body-large {
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 24px;
-    letter-spacing: 0;
-  }
-
-  .text-body {
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 20px;
-    letter-spacing: 0;
-  }
-
-  .text-body-small {
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 16px;
-    letter-spacing: 0;
-  }
-
-  .text-caption {
-    font-size: 11px;
-    font-weight: 400;
-    line-height: 16px;
-    letter-spacing: 0.5px;
-  }
-
-  /* Atlassian specific aliases for easier migration */
-  .text-atlassian-display { @apply text-display; }
-  .text-atlassian-h1 { @apply text-h1; }
-  .text-atlassian-h2 { @apply text-h2; }
-  .text-atlassian-h3 { @apply text-h3; }
-  .text-atlassian-h4 { @apply text-h4; }
-  .text-atlassian-h5 { @apply text-h5; }
-  .text-atlassian-h6 { @apply text-h6; }
-  .text-atlassian-body-large { @apply text-body-large; }
-  .text-atlassian-body { @apply text-body; }
-  .text-atlassian-body-small { @apply text-body-small; }
-  .text-atlassian-caption { @apply text-caption; }
-
-  /* Atlassian Shadow Aliases */
-  .shadow-atlassian-100 { @apply elevation-100; }
-  .shadow-atlassian-200 { @apply elevation-200; }
-  .shadow-atlassian-300 { @apply elevation-300; }
 }
+
+/* ===== 实用工具类 ===== */
+
 @layer utilities {
-  /* ===== 最终版本：极其克制的专业动画 ===== */
-  
-  /* 替代所有过度hover效果的统一类 */
-  .subtle-hover {
-    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .subtle-hover:hover {
-    transform: translateY(-0.5px);  /* 极微小的上移 */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);  /* 微妙阴影 */
-  }
-  
-  /* 替代所有过度缩放的统一类 */
-  .subtle-scale {
-    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .subtle-scale:hover {
-    transform: scale(1.005);  /* 几乎不可见的缩放 */
-  }
-  
-  /* 替代所有过度旋转的统一类 */
-  .subtle-rotate {
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .subtle-rotate:hover {
-    transform: rotate(1deg);  /* 微小旋转 */
-  }
-  
-  /* 替代所有过度发光的统一类 */
-  .subtle-glow {
-    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .subtle-glow:hover {
-    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.1);  /* 微妙边框发光 */
+  /* ===== 海洋主题颜色类 ===== */
+
+  .text-ocean-primary { color: hsl(var(--ocean-primary)); }
+  .text-ocean-success { color: hsl(var(--ocean-success)); }
+  .text-ocean-warning { color: hsl(var(--ocean-warning)); }
+  .text-ocean-accent { color: hsl(var(--ocean-accent)); }
+
+  .bg-ocean-primary { background-color: hsl(var(--ocean-primary)); }
+  .bg-ocean-success { background-color: hsl(var(--ocean-success)); }
+  .bg-ocean-warning { background-color: hsl(var(--ocean-warning)); }
+  .bg-ocean-accent { background-color: hsl(var(--ocean-accent)); }
+
+  .border-ocean-primary { border-color: hsl(var(--ocean-primary)); }
+  .border-ocean-success { border-color: hsl(var(--ocean-success)); }
+  .border-ocean-warning { border-color: hsl(var(--ocean-warning)); }
+  .border-ocean-accent { border-color: hsl(var(--ocean-accent)); }
+
+  /* ===== 向后兼容：旧的magellan-*类名映射 ===== */
+
+  /* 文本颜色兼容 */
+  .text-magellan-primary { color: hsl(var(--ocean-primary)); }
+  .text-magellan-coral { color: hsl(var(--ocean-warning)); }
+  .text-magellan-gold { color: hsl(var(--ocean-warning)); }
+  .text-magellan-teal { color: hsl(var(--ocean-accent)); }
+  .text-magellan-mint { color: hsl(var(--ocean-success)); }
+  .text-magellan-navy { color: hsl(var(--ocean-primary)); }
+
+  /* 背景颜色兼容 */
+  .bg-magellan-primary { background-color: hsl(var(--ocean-primary)); }
+  .bg-magellan-coral { background-color: hsl(var(--ocean-warning)); }
+  .bg-magellan-gold { background-color: hsl(var(--ocean-warning)); }
+  .bg-magellan-teal { background-color: hsl(var(--ocean-accent)); }
+  .bg-magellan-mint { background-color: hsl(var(--ocean-success)); }
+  .bg-magellan-navy { background-color: hsl(var(--ocean-primary)); }
+  .bg-magellan-depth-50 { background-color: hsl(var(--neutral-50)); }
+  .bg-magellan-depth-100 { background-color: hsl(var(--neutral-100)); }
+
+  /* 边框颜色兼容 */
+  .border-magellan-primary { border-color: hsl(var(--ocean-primary)); }
+  .border-magellan-coral { border-color: hsl(var(--ocean-warning)); }
+  .border-magellan-gold { border-color: hsl(var(--ocean-warning)); }
+  .border-magellan-teal { border-color: hsl(var(--ocean-accent)); }
+  .border-magellan-mint { border-color: hsl(var(--ocean-success)); }
+  .border-magellan-navy { border-color: hsl(var(--ocean-primary)); }
+
+  /* ===== Atlassian文本类兼容 ===== */
+
+  .text-atlassian-h3 { @apply text-lg font-semibold leading-tight; }
+  .text-atlassian-h4 { @apply text-base font-medium leading-tight; }
+  .text-atlassian-body { @apply text-sm leading-relaxed; }
+  .text-atlassian-body-large { @apply text-base leading-relaxed; }
+  .text-atlassian-body-small { @apply text-xs leading-normal; }
+
+  /* ===== 统一的卡片样式 ===== */
+
+  .ocean-card {
+    @apply rounded-lg bg-card border border-border/40;
+    @apply hover:border-ocean-primary/30 hover:shadow-md;
+    @apply transition-all duration-200;
   }
 
   /* ===== 移动端优化工具类 ===== */
-  
-  /* 触摸友好的点击目标 */
+
+  /* 触摸友好的点击目标 - Apple HIG推荐44px */
   .touch-target {
-    min-height: 44px; /* Apple HIG推荐的最小触摸目标 */
-    min-width: 44px;
+    @apply min-h-[44px] min-w-[44px];
   }
-  
-  /* 移动端优化的按钮 */
+
+  /* 移动端优化按钮 */
   .mobile-button {
     min-height: 44px;
     padding: 12px 16px;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
-  
+
   /* 移动端安全区域适配 */
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  
+
   .safe-area-top {
     padding-top: env(safe-area-inset-top, 0px);
   }
-  
+
   /* 防止移动端缩放 */
   .prevent-zoom {
     touch-action: manipulation;
   }
-  
-  /* 移动端隐藏滚动条 */
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  
+
   /* 移动端响应式文本 */
   .text-mobile-sm {
     font-size: 12px;
     line-height: 1.4;
   }
-  
+
   .text-mobile-base {
     font-size: 14px;
     line-height: 1.5;
   }
-  
+
   .text-mobile-lg {
     font-size: 16px;
     line-height: 1.5;
   }
-  
+
   /* 移动端间距优化 */
   .mobile-spacing-sm {
     gap: 8px;
     padding: 8px;
   }
-  
+
   .mobile-spacing-md {
     gap: 12px;
     padding: 12px;
   }
-  
+
   .mobile-spacing-lg {
     gap: 16px;
     padding: 16px;
   }
-  
-  /* ===== 移动端布局修复 ===== */
-  
-  /* 确保移动端页面不会被底部导航遮挡 */
+
+  /* 动画类 */
+  .animate-fade-in {
+    animation: fade-in 200ms var(--ease-smooth);
+  }
+
+  .animate-float {
+    animation: gentle-float 3s ease-in-out infinite;
+  }
+
+  /* 隐藏滚动条 */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 移动端固定定位修复 */
   @media (max-width: 768px) {
-    /* 为移动端页面内容添加底部安全间距 */
+    /* 移动端页面内容底部安全间距 - 避免被底部导航遮挡 */
     .mobile-safe-bottom {
       padding-bottom: calc(80px + env(safe-area-inset-bottom, 8px));
     }
-    
+
     /* 确保固定定位元素正确显示 */
     .mobile-fixed-bottom {
       position: fixed !important;
@@ -789,7 +354,7 @@
       will-change: transform;
       contain: layout style paint;
     }
-    
+
     /* 修复viewport高度变化问题 */
     .mobile-viewport-fix {
       height: 100vh;
@@ -797,409 +362,49 @@
       height: -webkit-fill-available;
     }
   }
-  
-  /* 海洋主题文字颜色 */
-  .text-magellan-primary {
-    color: hsl(var(--magellan-primary));
-  }
-  
-  .text-magellan-coral {
-    color: hsl(var(--magellan-coral));
-  }
-  
-  .text-magellan-gold {
-    color: hsl(var(--magellan-gold));
-  }
-  
-  .text-magellan-teal {
-    color: hsl(var(--magellan-teal));
-  }
-  
-  .text-magellan-mint {
-    color: hsl(var(--magellan-mint));
-  }
+}
 
-  .text-magellan-navy {
-    color: hsl(var(--magellan-navy));
-  }
+/* ===== 阴影系统 ===== */
 
-  /* 海洋深度文字颜色 */
-  .text-magellan-depth-900 {
-    color: hsl(var(--magellan-depth-900));
-  }
+.shadow-ocean-sm {
+  box-shadow: 0 1px 2px rgba(9, 30, 66, 0.08);
+}
 
-  .text-magellan-depth-800 {
-    color: hsl(var(--magellan-depth-800));
-  }
+.shadow-ocean-md {
+  box-shadow: 0 2px 4px rgba(9, 30, 66, 0.12);
+}
 
-  .text-magellan-depth-700 {
-    color: hsl(var(--magellan-depth-700));
-  }
+.shadow-ocean-lg {
+  box-shadow: 0 4px 8px rgba(9, 30, 66, 0.15);
+}
 
-  .text-magellan-depth-600 {
-    color: hsl(var(--magellan-depth-600));
-  }
-  
-  /* 海洋主题边框 */
-  .border-magellan-primary {
-    border-color: hsl(var(--magellan-primary));
-  }
-  
-  .border-magellan-coral {
-    border-color: hsl(var(--magellan-coral));
-  }
-  
-  .border-magellan-gold {
-    border-color: hsl(var(--magellan-gold));
-  }
+/* ===== 可访问性 ===== */
 
-  .border-magellan-teal {
-    border-color: hsl(var(--magellan-teal));
-  }
-
-  .border-magellan-mint {
-    border-color: hsl(var(--magellan-mint));
-  }
-
-  .border-magellan-navy {
-    border-color: hsl(var(--magellan-navy));
-  }
-  
-  /* 海洋主题背景色 */
-  .bg-magellan-primary {
-    background-color: hsl(var(--magellan-primary));
-  }
-
-  .bg-magellan-navy {
-    background-color: hsl(var(--magellan-navy));
-  }
-
-  .bg-magellan-teal {
-    background-color: hsl(var(--magellan-teal));
-  }
-  
-  .bg-magellan-coral {
-    background-color: hsl(var(--magellan-coral));
-  }
-  
-  .bg-magellan-gold {
-    background-color: hsl(var(--magellan-gold));
-  }
-  
-  .bg-magellan-mint {
-    background-color: hsl(var(--magellan-mint));
-  }
-
-  /* 海洋深度背景色 */
-  .bg-magellan-depth-50 {
-    background-color: hsl(var(--magellan-depth-50));
-  }
-
-  .bg-magellan-depth-100 {
-    background-color: hsl(var(--magellan-depth-100));
-  }
-  
-  /* 岛屿卡片效果 */
-  .island-card {
-    @apply transition-all duration-300 ease-out hover:scale-[1.02] hover:-translate-y-1;
-    @apply bg-card/95 backdrop-blur-sm border border-primary/10;
-    @apply hover:border-primary/30 hover:shadow-xl;
-    @apply relative overflow-hidden;
-  }
-  
-  .island-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, 
-      hsl(var(--magellan-primary) / 0.03) 0%, 
-      transparent 50%, 
-      hsl(var(--magellan-coral) / 0.03) 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-  }
-  
-  .island-card:hover::before {
-    opacity: 1;
-  }
-  
-  /* 专业级罗盘搜索框效果 */
-  .professional-compass-search {
-    position: relative;
-  }
-  
-  .professional-compass-search::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    background: linear-gradient(90deg, 
-      transparent 0deg, 
-      hsl(var(--primary) / 0.08) 90deg, 
-      transparent 180deg);
-    border-radius: inherit;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-  }
-  
-  .professional-compass-search:focus-within::before {
-    opacity: 1;
-  }
-
-  /* Atlassian 8px Grid Spacing System */
-  .atlassian-space-0 { @apply p-0; }                /* 0px */
-  .atlassian-space-2 { padding: var(--space-2); }   /* 2px */
-  .atlassian-space-4 { padding: var(--space-4); }   /* 4px */
-  .atlassian-space-8 { padding: var(--space-8); }   /* 8px */
-  .atlassian-space-12 { padding: var(--space-12); } /* 12px */
-  .atlassian-space-16 { padding: var(--space-16); } /* 16px */
-  .atlassian-space-20 { padding: var(--space-20); } /* 20px */
-  .atlassian-space-24 { padding: var(--space-24); } /* 24px */
-  .atlassian-space-32 { padding: var(--space-32); } /* 32px */
-  .atlassian-space-40 { padding: var(--space-40); } /* 40px */
-  .atlassian-space-48 { padding: var(--space-48); } /* 48px */
-  .atlassian-space-56 { padding: var(--space-56); } /* 56px */
-  .atlassian-space-64 { padding: var(--space-64); } /* 64px */
-  .atlassian-space-80 { padding: var(--space-80); } /* 80px */
-  .atlassian-space-96 { padding: var(--space-96); } /* 96px */
-  .atlassian-space-128 { padding: var(--space-128); } /* 128px */
-
-  /* Atlassian Margin Utilities */
-  .atlassian-m-0 { margin: var(--space-0); }
-  .atlassian-m-2 { margin: var(--space-2); }
-  .atlassian-m-4 { margin: var(--space-4); }
-  .atlassian-m-8 { margin: var(--space-8); }
-  .atlassian-m-12 { margin: var(--space-12); }
-  .atlassian-m-16 { margin: var(--space-16); }
-  .atlassian-m-24 { margin: var(--space-24); }
-  .atlassian-m-32 { margin: var(--space-32); }
-
-  /* Atlassian Gap Utilities */
-  .atlassian-gap-4 { gap: var(--space-4); }
-  .atlassian-gap-8 { gap: var(--space-8); }
-  .atlassian-gap-12 { gap: var(--space-12); }
-  .atlassian-gap-16 { gap: var(--space-16); }
-  .atlassian-gap-24 { gap: var(--space-24); }
-
-  /* Atlassian Animation Utility Classes */
-  .atlassian-float {
-    animation: atlassian-float 3s var(--ease-decelerate) infinite;
-  }
-  
-  .atlassian-pulse {
-    animation: atlassian-pulse 2s var(--ease-standard) infinite;
-  }
-  
-  .atlassian-fade-in {
-    animation: atlassian-fade-in var(--duration-medium) var(--ease-entrance) forwards;
-  }
-  
-  .atlassian-fade-out {
-    animation: atlassian-fade-out var(--duration-short) var(--ease-exit) forwards;
-  }
-  
-  .atlassian-scale-in {
-    animation: atlassian-scale-in var(--duration-medium) var(--ease-entrance) forwards;
-  }
-
-  /* Transition Aliases - Remove circular dependencies */
-  .transition-atlassian-alias-standard { 
-    transition-timing-function: var(--ease-standard);
-    transition-duration: var(--duration-short);
-  }
-  .transition-atlassian-alias-entrance { 
-    transition-timing-function: var(--ease-entrance);
-    transition-duration: var(--duration-medium);
-  }
-  .transition-atlassian-alias-exit { 
-    transition-timing-function: var(--ease-exit);
-    transition-duration: var(--duration-short);
-  }
-  .transition-atlassian-alias-decelerate { 
-    transition-timing-function: var(--ease-decelerate);
-    transition-duration: var(--duration-medium);
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-  /* Atlassian Shadow System */
-  .elevation-100 {
-    box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25);
-  }
+/* ===== Radix UI 防溢出 ===== */
 
-  .elevation-200 {
-    box-shadow: 0 2px 4px rgba(9, 30, 66, 0.25);
-  }
+[data-radix-popper-content-wrapper] {
+  max-width: calc(100vw - 16px) !important;
+  z-index: 9999 !important;
+}
 
-  .elevation-300 {
-    box-shadow: 0 4px 8px rgba(9, 30, 66, 0.25);
-  }
+[role="menu"],
+[role="dialog"] {
+  max-width: calc(100vw - 16px) !important;
+}
 
-  .elevation-400 {
-    box-shadow: 0 8px 16px rgba(9, 30, 66, 0.25);
-  }
-
-  .elevation-500 {
-    box-shadow: 0 12px 24px rgba(9, 30, 66, 0.25);
-  }
-
-  .elevation-600 {
-    box-shadow: 0 20px 32px rgba(9, 30, 66, 0.25);
-  }
-
-  /* Atlassian Easing Functions */
-  .transition-atlassian-entrance {
-    transition-timing-function: var(--ease-entrance);
-    transition-duration: var(--duration-medium);
-  }
-
-  .transition-atlassian-exit {
-    transition-timing-function: var(--ease-exit);
-    transition-duration: var(--duration-short);
-  }
-
-  .transition-atlassian-standard {
-    transition-timing-function: var(--ease-standard);
-    transition-duration: var(--duration-short);
-  }
-
-  .transition-atlassian-decelerate {
-    transition-timing-function: var(--ease-decelerate);
-    transition-duration: var(--duration-medium);
-  }
-
-  /* Atlassian Interactive States */
-  .atlassian-interactive {
-    transition: all var(--duration-short) var(--ease-standard);
-    cursor: pointer;
-  }
-
-  .atlassian-interactive:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(9, 30, 66, 0.25);
-  }
-
-  .atlassian-interactive:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25);
-    transition: all var(--duration-micro) var(--ease-exit);
-  }
-
-  .atlassian-interactive:focus {
-    outline: 2px solid hsl(var(--primary));
-    outline-offset: 2px;
-  }
-
-  .atlassian-interactive:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
-
-  /* Selection styling */
-  ::selection {
-    background-color: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-  }
-
-  /* Atlassian Button Styles */
-  .btn-atlassian-primary {
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    border: none;
-    border-radius: 4px;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    min-height: 40px;
-    cursor: pointer;
-    transition: all var(--duration-short) var(--ease-standard);
-  }
-
-  .btn-atlassian-primary:hover {
-    background: hsl(var(--primary) / 0.9);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(9, 30, 66, 0.25);
-  }
-
-  .btn-atlassian-primary:active {
-    background: hsl(var(--primary) / 0.8);
-    transform: translateY(0);
-    transition: all var(--duration-micro) var(--ease-exit);
-  }
-
-  .btn-atlassian-secondary {
-    background: hsl(var(--background));
-    color: hsl(var(--foreground));
-    border: 1px solid hsl(var(--border));
-    border-radius: 4px;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    min-height: 40px;
-    transition: all var(--duration-short) var(--ease-standard);
-  }
-
-  .btn-atlassian-secondary:hover {
-    background: hsl(var(--muted));
-    border-color: hsl(var(--border));
-  }
-
-  /* Atlassian Card Styles */
-  .card-atlassian {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: 8px;
-    padding: 24px;
-    box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25);
-    transition: all var(--duration-short) var(--ease-standard);
-  }
-
-  .card-atlassian:hover {
-    box-shadow: 0 4px 8px rgba(9, 30, 66, 0.25);
-    transform: translateY(-2px);
-  }
-
-  /* Focus states for accessibility */
-  .atlassian-focus:focus {
-    outline: 2px solid hsl(var(--primary));
-    outline-offset: 2px;
-  }
-
-  /* Remove legacy styles */
-  .card-hover {
-    transition: all var(--duration-short) var(--ease-standard);
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(9, 30, 66, 0.25);
-      .dark & {
-        box-shadow: 0 2px 4px rgba(9, 30, 66, 0.4);
-      }
-    }
-
-    &:active {
-      transform: translateY(0px);
-      transition: all var(--duration-micro) var(--ease-exit);
-    }
-  }
-
-  /* ===== Radix UI Dropdown Menu 防溢出全局样式 ===== */
-  /* 确保所有 Radix UI dropdown 永远不会溢出视口 */
-  [data-radix-popper-content-wrapper] {
-    max-width: calc(100vw - 16px) !important;
-    z-index: 9999 !important;
-  }
-
-  [role="menu"],
-  [role="dialog"] {
-    max-width: calc(100vw - 16px) !important;
-  }
-
-  /* 确保 header 不会限制 dropdown */
-  header,
-  header nav,
-  header .container {
-    overflow: visible !important;
-  }
-
+header,
+header nav,
+header .container {
+  overflow: visible !important;
+}

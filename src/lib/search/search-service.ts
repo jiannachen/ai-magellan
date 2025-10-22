@@ -21,7 +21,7 @@ export interface SearchResult {
     slug: string;
     url: string;
     description: string;
-    category_id: number;
+    category_id: number | null;
     thumbnail?: string;
     logo_url?: string;
     visits: number;
