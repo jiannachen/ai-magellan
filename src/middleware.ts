@@ -22,9 +22,14 @@ const isPublicRoute = createRouteMatcher([
 
 export default clerkMiddleware((auth, req) => {
   const { pathname } = req.nextUrl;
-  
+
   // Skip internationalization for API routes but not admin routes
   if (pathname.startsWith('/api/')) {
+    return;
+  }
+
+  // Skip internationalization for sitemap and robots.txt
+  if (pathname === '/sitemap.xml' || pathname === '/robots.txt') {
     return;
   }
 

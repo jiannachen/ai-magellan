@@ -5,13 +5,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://aimagellan.com'
   
   try {
-    // 获取所有已批准的网站
+    // 渐进式SEO策略：先放出高质量的工具，逐步扩大
+    // 阶段1: 100个 -> 阶段2: 300个 -> 阶段3: 1000个 -> 最终: 全部
+    const SITEMAP_TOOL_LIMIT = 100
+
+    // 获取高质量的已批准网站，按优先级排序
     const websites = await prisma.website.findMany({
       where: { status: 'approved' },
       select: {
         slug: true,
         updated_at: true,
+        is_featured: true,
+        quality_score: true,
+        visits: true,
+        likes: true,
       },
+      orderBy: [
+        { is_featured: 'desc' },      // 精选优先
+        { quality_score: 'desc' },    // 高质量优先
+        { visits: 'desc' },           // 有流量优先
+        { likes: 'desc' },            // 有互动优先
+      ],
+      take: SITEMAP_TOOL_LIMIT,
     })
 
     // 获取所有分类
@@ -80,10 +95,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
     ]
 
-    // 多语言版本的静态页面
-    const locales = ['en', 'tw']
-    const localizedPages = staticPages.flatMap(page => 
-      locales.map(locale => ({
+    // 多语言版本的静态页面（只包含非默认语言）
+    const nonDefaultLocales = ['tw'] // 默认语言是en，不需要/en/前缀
+    const localizedPages = staticPages.flatMap(page =>
+      nonDefaultLocales.map(locale => ({
         ...page,
         url: page.url === baseUrl ? `${baseUrl}/${locale}` : `${baseUrl}/${locale}${page.url.replace(baseUrl, '')}`,
         priority: page.priority * 0.9, // 稍微降低非主语言优先级
@@ -98,9 +113,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }))
 
-    // 多语言工具页面
-    const localizedToolPages = toolPages.flatMap(page => 
-      locales.map(locale => ({
+    // 多语言工具页面（只包含非默认语言）
+    const localizedToolPages = toolPages.flatMap(page =>
+      nonDefaultLocales.map(locale => ({
         ...page,
         url: `${baseUrl}/${locale}/tools/${page.url.split('/').pop()}`,
         priority: 0.5,
@@ -115,9 +130,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }))
 
-    // 多语言分类页面
-    const localizedCategoryPages = categoryPages.flatMap(page => 
-      locales.map(locale => ({
+    // 多语言分类页面（只包含非默认语言）
+    const localizedCategoryPages = categoryPages.flatMap(page =>
+      nonDefaultLocales.map(locale => ({
         ...page,
         url: `${baseUrl}/${locale}/categories/${page.url.split('/').pop()}`,
         priority: 0.6,
