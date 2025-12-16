@@ -5,9 +5,8 @@ import { categories, websites, websiteCategories } from '@/lib/db/schema';
 import { eq, and, desc, sql, isNull, asc } from 'drizzle-orm';
 import CategoryPage from '@/components/category/category-page';
 
-// 此页面依赖运行时数据库查询，强制动态渲染避免构建期静态化导致的 DYNAMIC_SERVER_USAGE 错误
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// 使用 ISR 提升性能,每60秒重新验证
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   try {
@@ -101,28 +100,29 @@ export default async function CategoryPageRoute({
     orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
   });
 
-  // Get website counts for categories
-  const categoriesWithCounts = await Promise.all(
-    allCategoriesData.map(async (cat) => {
-      const [{ count }] = await db
-        .select({ count: sql<number>`count(distinct ${websiteCategories.websiteId})` })
-        .from(websiteCategories)
-        .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
-        .where(
-          and(
-            eq(websiteCategories.categoryId, cat.id),
-            eq(websites.status, 'approved')
-          )
-        );
-
-      return {
-        ...cat,
-        _count: {
-          websites: Number(count),
-        },
-      };
+  // 使用单次查询获取所有分类的网站数量，避免 N+1 问题
+  const websiteCounts = await db
+    .select({
+      categoryId: websiteCategories.categoryId,
+      count: sql<number>`count(distinct ${websiteCategories.websiteId})`.as('count'),
     })
+    .from(websiteCategories)
+    .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
+    .where(eq(websites.status, 'approved'))
+    .groupBy(websiteCategories.categoryId);
+
+  // 创建一个 Map 用于快速查找
+  const countMap = new Map(
+    websiteCounts.map(item => [item.categoryId, Number(item.count)])
   );
+
+  // 合并分类和计数
+  const categoriesWithCounts = allCategoriesData.map(cat => ({
+    ...cat,
+    _count: {
+      websites: countMap.get(cat.id) || 0,
+    },
+  }));
 
   // 如果是子分类，获取父分类信息
   let parentCategory = null;
@@ -137,7 +137,7 @@ export default async function CategoryPageRoute({
     });
 
     if (parentCat) {
-      // Get children manually
+      // Get children
       const children = await db.query.categories.findMany({
         where: eq(categories.parentId, parentCat.id),
         columns: {
@@ -148,28 +148,13 @@ export default async function CategoryPageRoute({
         orderBy: (table, { asc }) => [asc(table.sortOrder)],
       });
 
-      // Get counts for children
-      const childrenWithCounts = await Promise.all(
-        children.map(async (child) => {
-          const [{ count }] = await db
-            .select({ count: sql<number>`count(distinct ${websiteCategories.websiteId})` })
-            .from(websiteCategories)
-            .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
-            .where(
-              and(
-                eq(websiteCategories.categoryId, child.id),
-                eq(websites.status, 'approved')
-              )
-            );
-
-          return {
-            ...child,
-            _count: {
-              websites: Number(count),
-            },
-          };
-        })
-      );
+      // 使用已经获取的 countMap 来添加计数，避免额外查询
+      const childrenWithCounts = children.map(child => ({
+        ...child,
+        _count: {
+          websites: countMap.get(child.id) || 0,
+        },
+      }));
 
       parentCategory = {
         ...parentCat,

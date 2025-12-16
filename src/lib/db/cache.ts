@@ -1,46 +1,29 @@
 "use server";
 
-const cache = new Map();
+import { unstable_cache } from 'next/cache';
+
+// 缓存统计(仅用于开发调试)
 const CACHE_STATS = {
   hits: 0,
   misses: 0,
   total: 0,
 };
 
-// Add cache persistence check
-function shouldRefreshCache(
-  cachedData: CacheEntry<any>,
-  options: CacheOptions
-): boolean {
-  if (!cachedData) return true;
-
-  const { timestamp } = cachedData;
-  const age = (Date.now() - timestamp) / 1000;
-  const isExpired = age > options.ttl;
-
-  // Refresh cache if it's more than 80% through its TTL
-  const shouldRefreshEarly = age > options.ttl * 0.8;
-
-  return isExpired || shouldRefreshEarly;
-}
-
 interface CacheOptions {
   ttl: number; // 缓存时间（秒）
+  tags?: string[]; // 可选的缓存标签，用于按需失效
 }
 
-interface CacheEntry<T> {
-  data: T;
-  timestamp: number;
-  size?: number;
-}
-
+/**
+ * 使用 Next.js 内置的 unstable_cache 进行数据缓存
+ * 相比 Map 缓存，这个方法可以在 Serverless 环境中正常工作
+ * 并且支持跨请求、跨实例的缓存共享
+ */
 export async function cachedPrismaQuery<T>(
   queryName: string,
   queryFn: () => Promise<T>,
   options: CacheOptions = { ttl: 3600 }
 ): Promise<T> {
-  const cacheKey = queryName;
-  const cachedData = cache.get(cacheKey) as CacheEntry<T> | undefined;
   CACHE_STATS.total++;
 
   console.log("--------------------------------");
@@ -48,64 +31,27 @@ export async function cachedPrismaQuery<T>(
   console.log(
     `[Cache] 当前缓存统计 - 总请求数: ${CACHE_STATS.total}, 命中数: ${CACHE_STATS.hits}, 未命中数: ${CACHE_STATS.misses}`
   );
+  console.log(`[Cache] TTL设置: ${options.ttl}秒`);
 
-  if (cachedData) {
-    const { data, timestamp } = cachedData;
-    const age = (Date.now() - timestamp) / 1000;
-    const isExpired = shouldRefreshCache(cachedData, options);
-
-    console.log(`[Cache] 找到缓存数据`);
-    console.log(`[Cache] 缓存年龄: ${age.toFixed(1)}秒`);
-    console.log(`[Cache] TTL设置: ${options.ttl.toFixed(1)}秒`);
-
-    if (isExpired) {
-      console.log(`[Cache] 缓存已过期 ❌ `);
-      // 在后台刷新缓存
-      queryFn()
-        .then((newData) => {
-          cache.set(cacheKey, {
-            data: newData,
-            timestamp: Date.now(),
-            size: JSON.stringify(newData).length,
-          });
-          console.log(`[Cache] 后台刷新缓存完成`);
-        })
-        .catch((error) => {
-          console.error(`[Cache] 后台刷新缓存失败:`, error);
-        });
-
-      // 返回过期的数据
-      CACHE_STATS.hits++;
-      console.log(`[Cache] 返回过期数据，后台刷新中...`);
-      return data;
-    } else {
-      CACHE_STATS.hits++;
-      console.log(`[Cache] 缓存命中 ✅`);
-      return data;
+  // 使用 Next.js 的 unstable_cache 进行缓存
+  // 这会在构建时和运行时都提供缓存能力
+  const cachedFn = unstable_cache(
+    queryFn,
+    [queryName], // 缓存键
+    {
+      revalidate: options.ttl, // 重新验证时间（秒）
+      tags: options.tags || [queryName], // 缓存标签，可用于按需失效
     }
-  } else {
-    console.log(`[Cache] 未找到缓存数据 ❌`);
+  );
+
+  try {
+    const data = await cachedFn();
+    CACHE_STATS.hits++;
+    console.log(`[Cache] 数据获取成功 ✅`);
+    return data;
+  } catch (error) {
+    CACHE_STATS.misses++;
+    console.error(`[Cache] 查询失败 ❌`, error);
+    throw error;
   }
-
-  CACHE_STATS.misses++;
-  const data = await queryFn();
-  cache.set(cacheKey, {
-    data,
-    timestamp: Date.now(),
-    size: JSON.stringify(data).length,
-  });
-
-  // Implement LRU-like cleanup if cache gets too large
-  if (cache.size > 1000) {
-    const entries = Array.from(cache.entries());
-    const oldestEntries = entries
-      .sort(([, a], [, b]) => a.timestamp - b.timestamp)
-      .slice(0, Math.floor(entries.length * 0.2)); // Remove oldest 20%
-
-    for (const [key] of oldestEntries) {
-      cache.delete(key);
-    }
-  }
-
-  return data;
 }

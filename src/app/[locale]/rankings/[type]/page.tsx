@@ -50,8 +50,8 @@ const RANKING_TYPES = {
 } as const;
 
 export const dynamicParams = true;
-export const dynamic = 'force-dynamic'; // Force dynamic rendering due to searchParams usage
-export const revalidate = 0; // No caching for dynamic pages
+// 使用 ISR 提升性能,每60秒重新验证
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   return Object.keys(RANKING_TYPES).map((type) => ({

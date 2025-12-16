@@ -43,8 +43,8 @@ export function WebsiteThumbnail({
             fill
             sizes="(max-width: 640px) 64px, (max-width: 768px) 72px, 80px"
             className="object-contain"
-            unoptimized
             onError={() => setLogoError(true)}
+            loading="lazy"
           />
         </div>
       </div>
@@ -67,7 +67,7 @@ export function WebsiteThumbnail({
           width={64}
           height={64}
           className="w-full h-full object-contain p-2"
-          unoptimized
+          loading="lazy"
           onError={(e) => {
             setFaviconError(true);
             // @ts-ignore
@@ -97,7 +97,7 @@ export function WebsiteThumbnail({
           fill
           sizes="(max-width: 640px) 64px, (max-width: 768px) 72px, 80px"
           className="object-cover"
-          unoptimized
+          loading="lazy"
           onError={() => {}}
         />
       </div>

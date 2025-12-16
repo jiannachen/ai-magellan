@@ -1,11 +1,19 @@
 import { db } from "@/lib/db/db";
 import { websites, categories } from "@/lib/db/schema";
-import { eq, isNull, asc } from "drizzle-orm";
-import SimplifiedHomePage from "@/app/simplified-home-page";
+import { eq, isNull, desc } from "drizzle-orm";
 import { cachedPrismaQuery } from "@/lib/db/cache";
 import { StructuredData } from "@/components/seo/structured-data";
+import { HeroSection } from "@/components/home/hero-section";
+import { RankingSection } from "@/components/home/ranking-section";
+import { ValuePropsSection } from "@/components/home/value-props-section";
+import { FAQSection } from "@/components/home/faq-section";
+import { CTASection } from "@/components/home/cta-section";
+import HomeClientWrapper from "@/components/home/home-client-wrapper";
+import { getTranslations } from 'next-intl/server';
 
-export const dynamic = "force-dynamic";
+// 使用 ISR (Incremental Static Regeneration) 代替 force-dynamic
+// 每60秒重新验证一次,提供静态页面的性能优势,同时保持数据新鲜度
+export const revalidate = 60;
 
 export default async function Home() {
   // 在服务端获取初始数据，使用缓存，只选择需要的字段
@@ -38,7 +46,7 @@ export default async function Home() {
         });
         return result;
       },
-      { ttl: 1 } // 1天缓存
+      { ttl: 86400 } // 1天缓存
     ),
     cachedPrismaQuery(
       "all-categories",
@@ -68,7 +76,7 @@ export default async function Home() {
         });
         return result;
       },
-      { ttl: 1 } // 1周缓存
+      { ttl: 604800 } // 1周缓存
     ),
   ]);
 
@@ -92,6 +100,24 @@ export default async function Home() {
       sort_order: child.sortOrder,
     })),
   }));
+
+  // 在服务端计算排行榜数据
+  const topRatedWebsites = [...preFilteredWebsites]
+    .sort((a, b) => (b.qualityScore ?? 50) - (a.qualityScore ?? 50))
+    .slice(0, 12);
+
+  const mostPopularWebsites = [...preFilteredWebsites]
+    .sort((a, b) => b.visits - a.visits)
+    .slice(0, 12);
+
+  const recentWebsites = [...preFilteredWebsites]
+    .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+    .slice(0, 12);
+
+  const topFreeWebsites = preFilteredWebsites
+    .filter(w => w.pricingModel === 'free' || w.hasFreeVersion)
+    .sort((a, b) => (b.qualityScore ?? 50) - (a.qualityScore ?? 50))
+    .slice(0, 12);
 
   // FAQ数据 - 用于结构化数据 (英文版本，SEO友好)
   const faqData = [
@@ -121,6 +147,8 @@ export default async function Home() {
     }
   ];
 
+  const tLanding = await getTranslations('landing');
+
   return (
     <>
       {/* JSON-LD结构化数据 */}
@@ -129,10 +157,63 @@ export default async function Home() {
       <StructuredData type="itemList" websites={preFilteredWebsites.slice(0, 20)} />
       <StructuredData type="faq" faqs={faqData} />
 
-      <SimplifiedHomePage
+      {/* 客户端包装器 - 仅负责初始化全局状态 */}
+      <HomeClientWrapper
         initialWebsites={preFilteredWebsites}
         initialCategories={transformedCategories}
-      />
+      >
+        <div className="min-h-screen bg-background mobile-safe-bottom">
+          {/* Hero Section - 服务端组件 */}
+          <HeroSection
+            websiteCount={preFilteredWebsites.length}
+            categoryCount={transformedCategories.length}
+          />
+
+          {/* Rankings Sections - 服务端组件 */}
+          <RankingSection
+            title={tLanding('sections.ranking_sections.premier_discoveries.title')}
+            description={tLanding('sections.ranking_sections.premier_discoveries.description')}
+            websites={topRatedWebsites}
+            iconName="crown"
+            viewAllLink="/rankings/top-rated"
+          />
+
+          <RankingSection
+            title={tLanding('sections.ranking_sections.trending_expeditions.title')}
+            description={tLanding('sections.ranking_sections.trending_expeditions.description')}
+            websites={mostPopularWebsites}
+            iconName="trendingUp"
+            viewAllLink="/rankings/popular"
+            variant="muted"
+          />
+
+          <RankingSection
+            title={tLanding('sections.ranking_sections.free_territory.title')}
+            description={tLanding('sections.ranking_sections.free_territory.description')}
+            websites={topFreeWebsites}
+            iconName="checkCircle"
+            viewAllLink="/rankings/free"
+          />
+
+          <RankingSection
+            title={tLanding('sections.ranking_sections.new_horizons.title')}
+            description={tLanding('sections.ranking_sections.new_horizons.description')}
+            websites={recentWebsites}
+            iconName="clock"
+            viewAllLink="/rankings/recent"
+            variant="muted"
+          />
+
+          {/* Value Props Section - 服务端组件 */}
+          <ValuePropsSection />
+
+          {/* FAQ Section - 服务端组件 */}
+          <FAQSection />
+
+          {/* CTA Section - 服务端组件 */}
+          <CTASection />
+        </div>
+      </HomeClientWrapper>
     </>
   );
 }
