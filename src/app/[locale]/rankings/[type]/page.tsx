@@ -50,7 +50,8 @@ const RANKING_TYPES = {
 } as const;
 
 export const dynamicParams = true;
-export const revalidate = 3600; // Revalidate every hour
+export const dynamic = 'force-dynamic'; // Force dynamic rendering due to searchParams usage
+export const revalidate = 0; // No caching for dynamic pages
 
 export async function generateStaticParams() {
   return Object.keys(RANKING_TYPES).map((type) => ({
@@ -150,7 +151,7 @@ async function getRankingData(type: string, categorySlug?: string) {
         },
       },
     },
-    orderBy: (websites, { desc }) => [orderByClause],
+    orderBy: [orderByClause],
     limit: 100,
   });
 
