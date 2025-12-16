@@ -72,15 +72,31 @@ export const websites = pgTable('websites', {
   hasFreeVersionIdx: index('websites_has_free_version_idx').on(table.hasFreeVersion),
   slugIdx: index('websites_slug_idx').on(table.slug),
 
+  // Performance-critical indexes for sorting (DESC order)
+  visitsIdx: index('websites_visits_idx').on(table.visits.desc()),
+  likesIdx: index('websites_likes_idx').on(table.likes.desc()),
+  createdAtIdx: index('websites_created_at_idx').on(table.createdAt.desc()),
+  activeIdx: index('websites_active_idx').on(table.active),
+
   // Composite indexes for common query patterns
-  // Query by status + quality (for rankings)
-  statusQualityIdx: index('websites_status_quality_idx').on(table.status, table.qualityScore),
+  // Query by status + quality (for top-rated rankings)
+  statusQualityIdx: index('websites_status_quality_idx').on(table.status, table.qualityScore.desc()),
   // Query by status + featured (for homepage)
   statusFeaturedIdx: index('websites_status_featured_idx').on(table.status, table.isFeatured),
   // Query by status + pricing (for free tools ranking)
   statusPricingIdx: index('websites_status_pricing_idx').on(table.status, table.pricingModel),
-  // Query by status + created_at (for recent websites)
-  statusCreatedIdx: index('websites_status_created_idx').on(table.status, table.createdAt),
+  // Query by status + created_at (for newest websites)
+  statusCreatedIdx: index('websites_status_created_idx').on(table.status, table.createdAt.desc()),
+
+  // High-performance composite indexes for rankings
+  // For popular rankings: WHERE status = 'approved' AND active = 1 ORDER BY visits DESC
+  statusActiveVisitsIdx: index('websites_status_active_visits_idx').on(table.status, table.active, table.visits.desc()),
+  // For trending rankings: WHERE status = 'approved' AND active = 1 ORDER BY likes DESC
+  statusActiveLikesIdx: index('websites_status_active_likes_idx').on(table.status, table.active, table.likes.desc()),
+  // For top-rated rankings: WHERE status = 'approved' AND active = 1 ORDER BY quality_score DESC
+  statusActiveQualityIdx: index('websites_status_active_quality_idx').on(table.status, table.active, table.qualityScore.desc()),
+  // For newest rankings: WHERE status = 'approved' AND active = 1 ORDER BY created_at DESC
+  statusActiveCreatedIdx: index('websites_status_active_created_idx').on(table.status, table.active, table.createdAt.desc()),
 }));
 
 // Relations
