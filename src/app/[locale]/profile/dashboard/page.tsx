@@ -167,31 +167,30 @@ export default function DashboardPage() {
 
   return (
     <ProfileLayout>
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Page Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
-              <Ship className="h-6 w-6 text-primary" />
+      <div className="space-y-6 sm:space-y-8">
+        {/* Page Header - 移动端优化 */}
+        <div>
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20 flex-shrink-0">
+              <Ship className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground truncate">
                 {tProfile('dashboard.welcome', { name: user?.firstName || 'User' })}
               </h1>
-              <p className="text-muted-foreground">{tProfile('dashboard.welcome_back')}</p>
+              <p className="text-sm sm:text-base text-muted-foreground">{tProfile('dashboard.welcome_back')}</p>
             </div>
           </div>
-
         </div>
 
-        <div className="space-y-8">
-          {/* Stats Overview */}
+        <div className="space-y-6 sm:space-y-8">
+          {/* Stats Overview - 移动端优化 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
               <StatCard
                 label={tProfile('dashboard.stats.bookmarked_tools')}
                 value={stats.totalFavorites}
@@ -216,7 +215,7 @@ export default function DashboardPage() {
             </div>
           </motion.div>
 
-          {/* Quick Actions */}
+          {/* Quick Actions - 移动端优化 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -224,13 +223,13 @@ export default function DashboardPage() {
           >
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Compass className="h-5 w-5 text-primary" />
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Compass className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   {tProfile('dashboard.quick_actions')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-3 sm:gap-4">
                   <ActionCard
                     title={tProfile('dashboard.actions.submit_new_tool')}
                     description={tProfile('dashboard.actions.share_tool')}
@@ -255,43 +254,44 @@ export default function DashboardPage() {
             </Card>
           </motion.div>
 
-          {/* Recent Bookmarks */}
+          {/* Recent Bookmarks - 移动端优化 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="h-5 w-5 text-primary" />
+              <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Star className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   {tProfile('dashboard.recent_favorites')}
                 </CardTitle>
-                <Link href="/profile/favorites">
-                  <Button variant="outline" size="sm">
+                <Link href="/profile/favorites" className="w-full sm:w-auto">
+                  <Button variant="outline" size="sm" className="w-full sm:w-auto">
                     <Waves className="h-4 w-4 mr-2" />
-                    {tProfile('dashboard.actions.view_all_favorites')}
+                    <span className="hidden sm:inline">{tProfile('dashboard.actions.view_all_favorites')}</span>
+                    <span className="sm:hidden">{tProfile('dashboard.actions.view_all')}</span>
                     <ArrowUpRight className="h-4 w-4 ml-2" />
                   </Button>
                 </Link>
               </CardHeader>
               <CardContent>
                 {favorites.length === 0 ? (
-                  <div className="text-center py-12">
+                  <div className="text-center py-8 sm:py-12">
                     <div className="space-y-4">
                       <div className="relative">
-                        <Bookmark className="h-16 w-16 text-muted-foreground mx-auto" />
-                        <Sparkles className="h-6 w-6 text-primary absolute -top-1 -right-1" />
+                        <Bookmark className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto" />
+                        <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary absolute -top-1 -right-1" />
                       </div>
-                      <h3 className="text-lg font-medium text-foreground">
+                      <h3 className="text-base sm:text-lg font-medium text-foreground">
                         {tProfile('dashboard.no_favorites')}
                       </h3>
-                      <p className="text-muted-foreground max-w-md mx-auto">
+                      <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">
                         {tProfile('dashboard.no_favorites_desc')}
                       </p>
                       <div className="pt-4">
                         <Link href="/">
-                          <Button>
+                          <Button className="w-full sm:w-auto">
                             <Compass className="h-4 w-4 mr-2" />
                             {tProfile('dashboard.actions.get_started')}
                           </Button>
@@ -300,7 +300,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3">
                     {favorites.map((website, index) => (
                       <motion.div
                         key={website.id}

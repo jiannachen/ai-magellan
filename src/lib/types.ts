@@ -89,12 +89,12 @@ export interface Category {
   id: number;
   name: string;
   slug: string;
-  name_en?: string;
-  name_zh?: string;
-  parent_id?: number | null;
-  sort_order?: number;
-  created_at?: Date | string;
-  updated_at?: Date | string;
+  nameEn?: string;
+  nameZh?: string;
+  parentId?: number | null;
+  sortOrder?: number;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
   websites?: Website[];
   parent?: Category | null;
   children?: Category[];

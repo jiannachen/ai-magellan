@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { websites } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 interface CheckUrlResponse {
   isAlive: boolean;
@@ -47,10 +49,11 @@ export async function POST(request: Request) {
 
     const result = await checkUrl(url);
 
-    const updatedWebsite = await prisma.website.update({
-      where: { id: websiteId },
-      data: { active: result.isAlive ? 1 : 0 },
-    });
+    const [updatedWebsite] = await db.update(websites)
+      .set({ active: result.isAlive ? 1 : 0 })
+      .where(eq(websites.id, websiteId))
+      .returning();
+
     return NextResponse.json(
       AjaxResponse.ok({ active: updatedWebsite.active })
     );

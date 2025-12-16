@@ -1,25 +1,23 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db/db';
+import { websites } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 export async function updateWebsiteActive() {
   try {
     // 获取所有需要检查的网站
-    const websites = await prisma.website.findMany({
-      where: {
-        status: "approved",
-      },
-      select: {
+    const websitesList = await db.query.websites.findMany({
+      where: eq(websites.status, "approved"),
+      columns: {
         id: true,
         url: true,
         title: true,
       },
     });
 
-    console.log(`开始检查 ${websites.length} 个网站的可访问性`);
+    console.log(`开始检查 ${websitesList.length} 个网站的可访问性`);
 
     // 逐个检查网站
-    for (const website of websites) {
+    for (const website of websitesList) {
       try {
         await fetch(`/api/websites/active`, {
           method: "POST",
@@ -51,7 +49,5 @@ export async function updateWebsiteActive() {
     } else {
       console.log("检查网站过程中发生未知错误");
     }
-  } finally {
-    await prisma.$disconnect();
   }
 }

@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { auth } from '@clerk/nextjs/server';
 import { AjaxResponse, ensureUserExists } from "@/lib/utils";
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { websites, websiteLikes } from "@/lib/db/schema";
+import { eq, and, sql } from "drizzle-orm";
 
 // POST /api/websites/[id]/like - Add like (点赞只能增加，不能取消)
 export async function POST(
@@ -28,13 +30,11 @@ export async function POST(
     const websiteId = parseInt((await params).id);
 
     // 检查是否已经点赞
-    const existingLike = await prisma.websiteLike.findUnique({
-      where: {
-        userId_websiteId: {
-          userId,
-          websiteId
-        }
-      }
+    const existingLike = await db.query.websiteLikes.findFirst({
+      where: and(
+        eq(websiteLikes.userId, userId),
+        eq(websiteLikes.websiteId, websiteId)
+      )
     });
 
     if (existingLike) {
@@ -44,22 +44,21 @@ export async function POST(
     }
 
     // 添加点赞记录和更新计数
-    await prisma.$transaction([
-      prisma.websiteLike.create({
-        data: {
-          userId,
-          websiteId
-        }
-      }),
-      prisma.website.update({
-        where: { id: websiteId },
-        data: { likes: { increment: 1 } }
-      })
-    ]);
+    await db.transaction(async (tx) => {
+      await tx.insert(websiteLikes).values({
+        id: `${userId}_${websiteId}`,
+        userId,
+        websiteId
+      });
 
-    const updatedWebsite = await prisma.website.findUnique({
-      where: { id: websiteId },
-      select: { likes: true }
+      await tx.update(websites)
+        .set({ likes: sql`${websites.likes} + 1` })
+        .where(eq(websites.id, websiteId));
+    });
+
+    const updatedWebsite = await db.query.websites.findFirst({
+      where: eq(websites.id, websiteId),
+      columns: { likes: true }
     });
 
     return NextResponse.json(AjaxResponse.ok({ likes: updatedWebsite?.likes || 0 }));

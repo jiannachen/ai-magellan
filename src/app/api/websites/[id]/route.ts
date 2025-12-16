@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { auth } from '@clerk/nextjs/server';
 import { AjaxResponse, generateSlug } from "@/lib/utils";
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { websites, categories, websiteLikes, websiteFavorites, websiteCategories } from "@/lib/db/schema";
+import { eq, and, ne, sql, desc } from "drizzle-orm";
 import { validateWebsiteEdit } from "@/lib/validations/website";
 
 // GET /api/websites/[id]
@@ -13,26 +15,23 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     // 尝试解析为数字，如果失败则认为是slug
     const isNumericId = !isNaN(Number(id));
 
-    const website = await prisma.website.findUnique({
-      where: isNumericId ? { id: parseInt(id) } : { slug: id },
-      include: {
-        category: {
-          include: {
-            parent: true
-          }
-        },
+    const website = await db.query.websites.findFirst({
+      where: isNumericId ? eq(websites.id, parseInt(id)) : eq(websites.slug, id),
+      with: {
         websiteCategories: {
-          include: {
+          with: {
             category: {
-              select: {
+              columns: {
                 id: true,
                 name: true,
                 slug: true,
-                name_en: true,
-                name_zh: true,
-                parent_id: true,
+                nameEn: true,
+                nameZh: true,
+                parentId: true,
+              },
+              with: {
                 parent: {
-                  select: {
+                  columns: {
                     id: true,
                     name: true,
                     slug: true
@@ -41,15 +40,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
               }
             }
           },
-          orderBy: {
-            isPrimary: 'desc' // 主分类排在前面
-          }
-        },
-        _count: {
-          select: {
-            websiteLikes: true,
-            websiteFavorites: true
-          }
+          orderBy: desc(websiteCategories.isPrimary)
         }
       },
     });
@@ -60,7 +51,24 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       });
     }
 
-    return NextResponse.json(AjaxResponse.ok(website));
+    // Get counts separately
+    const [likesCount] = await db.select({ count: sql<number>`count(*)` })
+      .from(websiteLikes)
+      .where(eq(websiteLikes.websiteId, website.id));
+
+    const [favoritesCount] = await db.select({ count: sql<number>`count(*)` })
+      .from(websiteFavorites)
+      .where(eq(websiteFavorites.websiteId, website.id));
+
+    const websiteWithCounts = {
+      ...website,
+      _count: {
+        websiteLikes: likesCount.count,
+        websiteFavorites: favoritesCount.count
+      }
+    };
+
+    return NextResponse.json(AjaxResponse.ok(websiteWithCounts));
   } catch (error) {
     console.error("Failed to fetch website:", error);
     return NextResponse.json(AjaxResponse.fail("Failed to fetch website"), {
@@ -81,8 +89,8 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const websiteId = parseInt(id);
 
     // Check if website exists first
-    const website = await prisma.website.findUnique({
-      where: { id: websiteId },
+    const website = await db.query.websites.findFirst({
+      where: eq(websites.id, websiteId),
     });
 
     if (!website) {
@@ -92,9 +100,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     }
 
     // Delete the website
-    await prisma.website.delete({
-      where: { id: websiteId },
-    });
+    await db.delete(websites).where(eq(websites.id, websiteId));
 
     return NextResponse.json(AjaxResponse.ok("Website deleted successfully"));
   } catch (error) {
@@ -151,8 +157,8 @@ export async function PUT(
 
     const validatedData = validationResult.data;
 
-    const existingWebsite = await prisma.website.findUnique({
-      where: { id: websiteId },
+    const existingWebsite = await db.query.websites.findFirst({
+      where: eq(websites.id, websiteId),
     });
 
     if (!existingWebsite) {
@@ -168,8 +174,8 @@ export async function PUT(
       });
     }
 
-    const category = await prisma.category.findUnique({
-      where: { id: Number(validatedData.category_id) },
+    const category = await db.query.categories.findFirst({
+      where: eq(categories.id, Number(validatedData.category_id)),
     });
 
     if (!category) {
@@ -179,11 +185,11 @@ export async function PUT(
     }
 
     // 检查URL是否已存在（排除当前网站）
-    const urlExists = await prisma.website.findFirst({
-      where: { 
-        url: validatedData.url,
-        id: { not: websiteId }
-      }
+    const urlExists = await db.query.websites.findFirst({
+      where: and(
+        eq(websites.url, validatedData.url),
+        ne(websites.id, websiteId)
+      )
     });
 
     if (urlExists) {
@@ -199,30 +205,29 @@ export async function PUT(
       let slugCounter = 1;
 
       // 确保slug唯一（排除当前网站）
-      while (await prisma.website.findFirst({
-        where: {
-          slug,
-          id: { not: websiteId }
-        }
+      while (await db.query.websites.findFirst({
+        where: and(
+          eq(websites.slug, slug),
+          ne(websites.id, websiteId)
+        )
       })) {
         slug = `${generateSlug(validatedData.title)}-${slugCounter}`;
         slugCounter++;
       }
     }
 
-    const website = await prisma.website.update({
-      where: { id: websiteId },
-      data: {
+    const [website] = await db.update(websites)
+      .set({
         // 基本信息
         title: validatedData.title.trim(),
         slug: slug,
         url: validatedData.url.trim(),
         email: validatedData.email?.trim() || null,
         description: validatedData.description?.trim() || "",
-        category_id: Number(validatedData.category_id),
+        categoryId: Number(validatedData.category_id),
 
         // 图片资源
-        logo_url: validatedData.logo_url?.trim() || null,
+        logoUrl: validatedData.logo_url?.trim() || null,
         thumbnail: validatedData.thumbnail?.trim() || null,
 
         // 标签和描述
@@ -233,44 +238,53 @@ export async function PUT(
         features: validatedData.features || [],
 
         // 使用场景和目标受众
-        use_cases: validatedData.use_cases || [],
-        target_audience: validatedData.target_audience || [],
+        useCases: validatedData.use_cases || [],
+        targetAudience: validatedData.target_audience || [],
 
         // 常见问题
         faq: validatedData.faq || [],
 
         // 定价信息
-        pricing_model: validatedData.pricing_model || 'free',
-        has_free_version: Boolean(validatedData.has_free_version),
-        api_available: Boolean(validatedData.api_available),
-        pricing_plans: validatedData.pricing_plans || [],
+        pricingModel: validatedData.pricing_model || 'free',
+        hasFreeVersion: Boolean(validatedData.has_free_version),
+        apiAvailable: Boolean(validatedData.api_available),
+        pricingPlans: validatedData.pricing_plans || [],
 
         // 社交媒体链接
-        twitter_url: validatedData.twitter_url?.trim() || null,
-        linkedin_url: validatedData.linkedin_url?.trim() || null,
-        facebook_url: validatedData.facebook_url?.trim() || null,
-        instagram_url: validatedData.instagram_url?.trim() || null,
-        youtube_url: validatedData.youtube_url?.trim() || null,
-        discord_url: validatedData.discord_url?.trim() || null,
+        twitterUrl: validatedData.twitter_url?.trim() || null,
+        linkedinUrl: validatedData.linkedin_url?.trim() || null,
+        facebookUrl: validatedData.facebook_url?.trim() || null,
+        instagramUrl: validatedData.instagram_url?.trim() || null,
+        youtubeUrl: validatedData.youtube_url?.trim() || null,
+        discordUrl: validatedData.discord_url?.trim() || null,
 
         // 集成
         integrations: validatedData.integrations || [],
 
         // 平台支持
-        ios_app_url: validatedData.ios_app_url?.trim() || null,
-        android_app_url: validatedData.android_app_url?.trim() || null,
-        web_app_url: validatedData.web_app_url?.trim() || null,
-        desktop_platforms: validatedData.desktop_platforms || [],
+        iosAppUrl: validatedData.ios_app_url?.trim() || null,
+        androidAppUrl: validatedData.android_app_url?.trim() || null,
+        webAppUrl: validatedData.web_app_url?.trim() || null,
+        desktopPlatforms: validatedData.desktop_platforms || [],
 
         // 保持原状态或根据需要重置为待审核
         status: existingWebsite.status,
-      },
-      include: {
-        category: true
+      })
+      .where(eq(websites.id, websiteId))
+      .returning();
+
+    const websiteWithCategory = await db.query.websites.findFirst({
+      where: eq(websites.id, websiteId),
+      with: {
+        websiteCategories: {
+          with: {
+            category: true
+          }
+        }
       }
     });
 
-    return NextResponse.json(AjaxResponse.ok(website));
+    return NextResponse.json(AjaxResponse.ok(websiteWithCategory));
   } catch (error) {
     console.error("Failed to update website:", error);
     return NextResponse.json(AjaxResponse.fail("Failed to update website"), {

@@ -1,39 +1,41 @@
 import { MetadataRoute } from 'next'
-import { prisma } from '@/lib/db/db'
+import { db } from '@/lib/db/db'
+import { websites, categories } from '@/lib/db/schema'
+import { eq, desc } from 'drizzle-orm'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://aimagellan.com'
-  
+
   try {
     // 渐进式SEO策略：先放出高质量的工具，逐步扩大
     // 阶段1: 100个 -> 阶段2: 300个 -> 阶段3: 1000个 -> 最终: 全部
     const SITEMAP_TOOL_LIMIT = 100
 
     // 获取高质量的已批准网站，按优先级排序
-    const websites = await prisma.website.findMany({
-      where: { status: 'approved' },
-      select: {
+    const websitesList = await db.query.websites.findMany({
+      where: eq(websites.status, 'approved'),
+      columns: {
         slug: true,
-        updated_at: true,
-        is_featured: true,
-        quality_score: true,
+        updatedAt: true,
+        isFeatured: true,
+        qualityScore: true,
         visits: true,
         likes: true,
       },
-      orderBy: [
-        { is_featured: 'desc' },      // 精选优先
-        { quality_score: 'desc' },    // 高质量优先
-        { visits: 'desc' },           // 有流量优先
-        { likes: 'desc' },            // 有互动优先
+      orderBy: (websites, { desc }) => [
+        desc(websites.isFeatured),
+        desc(websites.qualityScore),
+        desc(websites.visits),
+        desc(websites.likes),
       ],
-      take: SITEMAP_TOOL_LIMIT,
+      limit: SITEMAP_TOOL_LIMIT,
     })
 
     // 获取所有分类
-    const categories = await prisma.category.findMany({
-      select: {
+    const categoriesList = await db.query.categories.findMany({
+      columns: {
         slug: true,
-        updated_at: true,
+        updatedAt: true,
       },
     })
 
@@ -106,9 +108,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     )
 
     // 工具详情页面
-    const toolPages = websites.map(website => ({
+    const toolPages = websitesList.map(website => ({
       url: `${baseUrl}/tools/${website.slug}`,
-      lastModified: website.updated_at || new Date(),
+      lastModified: website.updatedAt || new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.6,
     }))
@@ -123,9 +125,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     )
 
     // 分类页面
-    const categoryPages = categories.map(category => ({
+    const categoryPages = categoriesList.map(category => ({
       url: `${baseUrl}/categories/${category.slug}`,
-      lastModified: category.updated_at || new Date(),
+      lastModified: category.updatedAt || new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.7,
     }))

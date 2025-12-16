@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db/db';
+import { websites, categories, users } from '@/lib/db/schema';
+import { eq, and, or } from 'drizzle-orm';
 
 // Valid ranking types
 const RANKING_TYPES = {
@@ -59,45 +61,60 @@ export async function GET(
 
     // Add category filter if specified
     if (categorySlug) {
-      const category = await prisma.category.findUnique({
-        where: { slug: categorySlug }
+      const category = await db.query.categories.findFirst({
+        where: eq(categories.slug, categorySlug),
       });
       if (category) {
-        whereCondition.category_id = category.id;
+        whereCondition.categoryId = category.id;
       }
     }
 
     // Add pricing filter for free tools
     if ('filter' in rankingType && rankingType.filter === 'free') {
       whereCondition.OR = [
-        { pricing_model: 'free' },
-        { has_free_version: true }
+        { pricingModel: 'free' },
+        { hasFreeVersion: true }
       ];
     }
 
+    // Build where conditions array
+    const conditions = [eq(websites.status, 'approved')];
+    if (whereCondition.categoryId) {
+      conditions.push(eq(websites.categoryId, whereCondition.categoryId));
+    }
+    if (whereCondition.OR) {
+      conditions.push(
+        or(
+          eq(websites.pricingModel, 'free'),
+          eq(websites.hasFreeVersion, true)
+        )!
+      );
+    }
+
     // Get websites with sorting
-    const websites = await prisma.website.findMany({
-      where: whereCondition,
-      include: {
-        category: true,
+    const websitesList = await db.query.websites.findMany({
+      where: and(...conditions),
+      with: {
+        websiteCategories: {
+          with: {
+            category: true,
+          },
+        },
         submitter: {
-          select: {
+          columns: {
             id: true,
             name: true,
           }
         }
       },
-      orderBy: {
-        [rankingType.sortField]: rankingType.sortOrder
-      },
-      take: 100 // Limit to top 100
+      limit: 100,
     });
 
     return NextResponse.json({
-      websites: websites || [],
+      websites: websitesList || [],
       type,
       rankingType,
-      total: websites.length
+      total: websitesList.length
     });
   } catch (error) {
     console.error('Error fetching ranking data:', error);

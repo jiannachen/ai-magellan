@@ -550,6 +550,7 @@
         "description": "Description",
         "features": "Features",
         "category": "Category",
+        "categories": "Categories",
         "use_cases": "Use Cases",
         "target_audience": "Target Audience",
         "pricing_section": "Pricing",
@@ -608,7 +609,8 @@
         "featured": "Featured",
         "verified": "Verified",
         "free": "Free",
-        "premium": "Premium"
+        "premium": "Premium",
+        "primary": "Primary"
       },
       "placeholders": {
         "no_preview": "No Preview Available",

@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { prisma } from '@/lib/db/db'
+import { db } from '@/lib/db/db'
+import { websites, websiteLikes, websiteFavorites } from '@/lib/db/schema'
+import { eq, desc, sql } from 'drizzle-orm'
 
 export async function GET(request: NextRequest) {
   try {
     const { userId } = await auth()
-    
+
     if (!userId) {
       return NextResponse.json(
-        { error: 'Unauthorized' }, 
+        { error: 'Unauthorized' },
         { status: 401 }
       )
     }
@@ -19,35 +21,48 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit
 
     // 获取用户提交的网站
-    const websites = await prisma.website.findMany({
-      where: {
-        submittedBy: userId
-      },
-      include: {
-        category: true,
-        _count: {
-          select: {
-            websiteLikes: true,
-            websiteFavorites: true
+    const websitesList = await db.query.websites.findMany({
+      where: eq(websites.submittedBy, userId),
+      with: {
+        websiteCategories: {
+          with: {
+            category: true
           }
         }
       },
-      orderBy: {
-        created_at: 'desc'
-      },
-      skip: offset,
-      take: limit
+      orderBy: desc(websites.createdAt),
+      limit,
+      offset
     })
 
     // 获取总数
-    const total = await prisma.website.count({
-      where: {
-        submittedBy: userId
-      }
-    })
+    const [{ count: total }] = await db.select({ count: sql<number>`count(*)` })
+      .from(websites)
+      .where(eq(websites.submittedBy, userId))
+
+    // Add counts for each website
+    const websitesWithCounts = await Promise.all(
+      websitesList.map(async (website) => {
+        const [likesCount] = await db.select({ count: sql<number>`count(*)` })
+          .from(websiteLikes)
+          .where(eq(websiteLikes.websiteId, website.id))
+
+        const [favoritesCount] = await db.select({ count: sql<number>`count(*)` })
+          .from(websiteFavorites)
+          .where(eq(websiteFavorites.websiteId, website.id))
+
+        return {
+          ...website,
+          _count: {
+            websiteLikes: likesCount.count,
+            websiteFavorites: favoritesCount.count
+          }
+        }
+      })
+    )
 
     return NextResponse.json({
-      websites,
+      websites: websitesWithCounts,
       pagination: {
         page,
         limit,
@@ -59,7 +74,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching user submissions:', error)
     return NextResponse.json(
-      { error: 'Internal server error' }, 
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }

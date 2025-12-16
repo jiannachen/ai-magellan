@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { prisma } from '@/lib/db/db'
+import { db } from '@/lib/db/db'
+import { websiteFavorites, websites, websiteLikes } from '@/lib/db/schema'
+import { eq, sql } from 'drizzle-orm'
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,25 +16,19 @@ export async function GET(request: NextRequest) {
     }
 
     // 获取收藏数量
-    const totalFavorites = await prisma.websiteFavorite.count({
-      where: {
-        userId: userId
-      }
-    })
+    const [{ count: totalFavorites }] = await db.select({ count: sql<number>`count(*)` })
+      .from(websiteFavorites)
+      .where(eq(websiteFavorites.userId, userId))
 
     // 获取提交数量
-    const totalSubmissions = await prisma.website.count({
-      where: {
-        submittedBy: userId
-      }
-    })
+    const [{ count: totalSubmissions }] = await db.select({ count: sql<number>`count(*)` })
+      .from(websites)
+      .where(eq(websites.submittedBy, userId))
 
     // 获取点赞数量
-    const totalLikes = await prisma.websiteLike.count({
-      where: {
-        userId: userId
-      }
-    })
+    const [{ count: totalLikes }] = await db.select({ count: sql<number>`count(*)` })
+      .from(websiteLikes)
+      .where(eq(websiteLikes.userId, userId))
 
     return NextResponse.json({
       data: {

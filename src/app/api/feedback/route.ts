@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { feedbacks } from "@/lib/db/schema";
+import { desc } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
 
 // POST /api/feedback - submit feedback
@@ -24,13 +26,12 @@ export async function POST(request: Request) {
       });
     }
 
-    const created = await prisma.feedback.create({
-      data: {
-        name: name?.trim() || null,
-        content: feedback.trim(),
-        source: source?.trim() || null,
-      },
-    });
+    const [created] = await db.insert(feedbacks).values({
+      id: `feedback_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+      name: name?.trim() || null,
+      content: feedback.trim(),
+      source: source?.trim() || null,
+    }).returning();
 
     return NextResponse.json(AjaxResponse.ok(created));
   } catch (error) {
@@ -44,9 +45,9 @@ export async function POST(request: Request) {
 // GET /api/feedback - list feedback (optional public listing)
 export async function GET() {
   try {
-    const items = await prisma.feedback.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 100,
+    const items = await db.query.feedbacks.findMany({
+      orderBy: desc(feedbacks.createdAt),
+      limit: 100,
     });
     return NextResponse.json(AjaxResponse.ok(items));
   } catch (error) {
@@ -56,4 +57,3 @@ export async function GET() {
     });
   }
 }
-

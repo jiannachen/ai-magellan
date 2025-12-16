@@ -328,7 +328,8 @@
         "featured": "Featured",
         "verified": "Verified",
         "free": "Free",
-        "premium": "Premium"
+        "premium": "Premium",
+        "primary": "Primary"
       },
       "placeholders": {
         "no_preview": "No Preview Available",

@@ -18,15 +18,15 @@ interface ActionCardProps {
 
 const variantStyles = {
   default: {
-    card: "bg-card border-border hover:border-primary/30 hover:bg-primary/5",
+    card: "bg-card border-border hover:border-border/80 hover:shadow-sm",
     icon: "text-primary"
   },
   dashed: {
-    card: "border-2 border-dashed border-border hover:border-primary hover:bg-primary/5",
+    card: "border-2 border-dashed border-border hover:border-primary/60 hover:bg-secondary/50",
     icon: "text-primary"
   },
   primary: {
-    card: "bg-gradient-to-br from-primary/10 to-magellan-teal/5 border-primary/20 hover:from-primary/15 hover:to-magellan-teal/10",
+    card: "bg-primary/5 border-primary/20 hover:bg-primary/10 hover:border-primary/30",
     icon: "text-primary"
   }
 };
@@ -45,31 +45,31 @@ export function ActionCard({
   const isClickable = !!onClick;
 
   return (
-    <Card 
+    <Card
       className={cn(
         "group relative overflow-hidden transition-all duration-200",
         styles.card,
-        isClickable && !disabled && "cursor-pointer subtle-hover",
+        isClickable && !disabled && "cursor-pointer",
         disabled && "opacity-50 cursor-not-allowed",
         className
       )}
       onClick={!disabled ? onClick : undefined}
     >
-      <CardContent className="p-6">
-        <div className="space-y-4">
+      <CardContent className="p-5">
+        <div className="space-y-3">
           {/* 图标和标题 */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-start gap-3">
             {Icon && (
-              <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <Icon className={cn("h-5 w-5", styles.icon)} />
+              <div className="p-2 rounded-lg bg-primary/10 transition-colors">
+                <Icon className={cn("h-4 w-4", styles.icon)} />
               </div>
             )}
-            <div className="flex-1">
-              <h3 className="font-medium text-foreground">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-medium text-sm text-foreground leading-tight">
                 {title}
               </h3>
               {description && (
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                   {description}
                 </p>
               )}

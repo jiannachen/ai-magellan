@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { websites } from "@/lib/db/schema";
+import { eq, and, ne } from "drizzle-orm";
 
 /**
  * GET /api/websites/check-url?url=xxx&excludeId=xxx
@@ -20,13 +22,14 @@ export async function GET(request: Request) {
     }
 
     // 查找是否有相同URL的网站
-    const existingWebsite = await prisma.website.findFirst({
-      where: {
-        url: url.trim(),
-        // 如果提供了excludeId,排除该ID(用于编辑时检查)
-        ...(excludeId && { id: { not: parseInt(excludeId) } })
-      },
-      select: {
+    const existingWebsite = await db.query.websites.findFirst({
+      where: excludeId
+        ? and(
+            eq(websites.url, url.trim()),
+            ne(websites.id, parseInt(excludeId))
+          )
+        : eq(websites.url, url.trim()),
+      columns: {
         id: true,
         title: true,
         status: true

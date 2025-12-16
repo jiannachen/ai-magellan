@@ -179,38 +179,39 @@ export default function MySubmissionsPage() {
 
   return (
     <ProfileLayout>
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Page Header */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
-                <Map className="h-6 w-6 text-primary" />
+      <div className="space-y-6 sm:space-y-8">
+        {/* Page Header - 移动端优化 */}
+        <div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-start sm:items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20 flex-shrink-0">
+                <Map className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">{tProfile('submissions.title')}</h1>
-                <p className="text-muted-foreground">{tProfile('submissions.description')}</p>
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground truncate">{tProfile('submissions.title')}</h1>
+                <p className="text-sm sm:text-base text-muted-foreground">{tProfile('submissions.description')}</p>
               </div>
             </div>
             <div className="flex-shrink-0">
-              <Link href="/submit">
+              <Link href="/submit" className="block w-full sm:w-auto">
                 <Button className="bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90 !text-white [&_*]:!text-white w-full sm:w-auto">
                   <Upload className="h-4 w-4 mr-2" />
-                  {tProfile('dashboard.actions.submit_new_tool')}
+                  <span className="hidden sm:inline">{tProfile('dashboard.actions.submit_new_tool')}</span>
+                  <span className="sm:hidden">Submit Tool</span>
                 </Button>
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="space-y-8">
-          {/* Stats Overview */}
+        <div className="space-y-6 sm:space-y-8">
+          {/* Stats Overview - 移动端优化 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
               <StatCard
                 label={`⚓ ${tProfile('submissions.total_submissions')}`}
                 value={pagination.total}
@@ -235,7 +236,7 @@ export default function MySubmissionsPage() {
             </div>
           </motion.div>
 
-          {/* Submissions List */}
+          {/* Submissions List - 移动端优化 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -243,8 +244,8 @@ export default function MySubmissionsPage() {
           >
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Ship className="h-5 w-5 text-primary" />
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Ship className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   {tProfile('submissions.title')}
                 </CardTitle>
               </CardHeader>
@@ -279,20 +280,20 @@ export default function MySubmissionsPage() {
                     </div>
                   </div>
                 ) : submissions.length === 0 ? (
-                  <div className="text-center py-12">
+                  <div className="text-center py-8 sm:py-12">
                     <div className="space-y-4">
                       <div className="relative">
-                        <Map className="h-16 w-16 text-muted-foreground mx-auto" />
-                        <Waves className="h-8 w-8 text-primary absolute -bottom-2 -right-2" />
+                        <Map className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto" />
+                        <Waves className="h-6 w-6 sm:h-8 sm:w-8 text-primary absolute -bottom-2 -right-2" />
                       </div>
-                      <h3 className="text-lg font-medium text-foreground">
+                      <h3 className="text-base sm:text-lg font-medium text-foreground">
                         {tProfile('submissions.no_submissions')}
                       </h3>
-                      <p className="text-muted-foreground max-w-md mx-auto">
+                      <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">
                         {tProfile('submissions.no_submissions_desc')}
                       </p>
                       <Link href="/submit" className="mt-8 inline-block">
-                        <Button className="bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90 !text-white [&_*]:!text-white">
+                        <Button className="bg-gradient-to-r from-primary to-magellan-teal hover:from-primary/90 hover:to-magellan-teal/90 !text-white [&_*]:!text-white w-full sm:w-auto">
                           <Telescope className="h-4 w-4 mr-2" />
                           {tProfile('submissions.submit_first_tool')}
                         </Button>
@@ -300,7 +301,7 @@ export default function MySubmissionsPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {submissions.map((website, index) => (
                       <motion.div
                         key={website.id}
@@ -309,39 +310,40 @@ export default function MySubmissionsPage() {
                         transition={{ duration: 0.3, delay: index * 0.05 }}
                         className="group"
                       >
-                        <div className="flex items-center space-x-4 p-4 border border-border rounded-lg hover:border-primary/30 hover:bg-muted/30 transition-all duration-200">
-                          {/* Tool Image - 使用 WebsiteThumbnail 组件 */}
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 border border-border rounded-lg hover:border-primary/30 hover:bg-muted/30 transition-all duration-200">
+                          {/* Tool Image - 移动端优化 */}
                           <WebsiteThumbnail
                             url={website.url}
                             thumbnail={website.thumbnail}
                             logoUrl={website.logo_url}
                             title={website.title}
-                            className="w-16 h-16 rounded-lg flex-shrink-0"
+                            className="w-full sm:w-16 h-32 sm:h-16 rounded-lg flex-shrink-0"
                           />
 
-                          {/* Tool Info */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                          {/* Tool Info - 移动端优化 */}
+                          <div className="flex-1 min-w-0 space-y-2">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="font-semibold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors truncate">
                                 {website.title}
                               </h3>
                               {website.is_featured && (
-                                <Badge className="bg-magellan-gold/20 text-magellan-gold border-magellan-gold/30">
+                                <Badge className="bg-magellan-gold/20 text-magellan-gold border-magellan-gold/30 text-xs">
                                   <Crown className="h-3 w-3 mr-1" />
                                   {tWebsite('featured')}
                                 </Badge>
                               )}
-                              <Badge className={getStatusBadge(website.status).className}>
+                              <Badge className={getStatusBadge(website.status).className + " text-xs"}>
                                 {getStatusBadge(website.status).label}
                               </Badge>
                             </div>
-                            <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+                            <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2">
                               {website.description}
                             </p>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <Calendar className="h-3 w-3" />
-                                {new Date(website.created_at).toLocaleDateString()}
+                                <span className="hidden sm:inline">{new Date(website.created_at).toLocaleDateString()}</span>
+                                <span className="sm:hidden">{new Date(website.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric' })}</span>
                               </span>
                               <span className="flex items-center gap-1">
                                 <Eye className="h-3 w-3" />
@@ -355,33 +357,33 @@ export default function MySubmissionsPage() {
                                 <Bookmark className="h-3 w-3" />
                                 {website._count.websiteFavorites}
                               </span>
-                              <Badge variant="outline" className="text-xs">
+                              <Badge variant="outline" className="text-xs hidden sm:inline-flex">
                                 {website.category.name}
                               </Badge>
-                              <div className="flex items-center gap-1 text-xs">
+                              <div className="flex items-center gap-1 text-xs hidden sm:flex">
                                 <Star className="h-3 w-3" />
                                 {website.quality_score}
                               </div>
                             </div>
                           </div>
-                          
-                          {/* Action Buttons */}
-                          <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-                            <Link href={`/tools/${website.slug}`}>
-                              <Button variant="outline" size="sm">
+
+                          {/* Action Buttons - 移动端优化 */}
+                          <div className="flex sm:flex-col items-center gap-2 sm:ml-4 flex-shrink-0">
+                            <Link href={`/tools/${website.slug}`} className="flex-1 sm:flex-none w-full sm:w-auto">
+                              <Button variant="outline" size="sm" className="w-full sm:w-auto">
                                 <Eye className="h-3 w-3 mr-1" />
                                 {t('view')}
                               </Button>
                             </Link>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className=""
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-shrink-0"
                               onClick={() => window.open(website.url, '_blank')}
                             >
                               <ExternalLink className="h-3 w-3" />
                             </Button>
-                            <Button variant="outline" size="sm" asChild>
+                            <Button variant="outline" size="sm" className="flex-shrink-0" asChild>
                               <Link href={`/profile/submissions/${website.id}/edit`}>
                                 <Edit className="h-3 w-3" />
                               </Link>
@@ -391,24 +393,28 @@ export default function MySubmissionsPage() {
                       </motion.div>
                     ))}
 
-                    {/* Pagination */}
+                    {/* Pagination - 移动端优化 */}
                     {pagination.pages > 1 && (
-                      <div className="flex justify-center gap-2 mt-8 pt-6 border-t border-border">
+                      <div className="flex flex-col sm:flex-row justify-center items-center gap-2 mt-8 pt-6 border-t border-border">
                         <Button
                           variant="outline"
+                          size="sm"
                           disabled={pagination.page === 1}
                           onClick={() => fetchSubmissions(pagination.page - 1)}
+                          className="w-full sm:w-auto"
                         >
                           <ArrowRight className="h-4 w-4 mr-2 rotate-180" />
                           {t('previous')}
                         </Button>
-                        <div className="flex items-center px-4 py-2 text-sm text-muted-foreground">
+                        <div className="flex items-center px-4 py-2 text-xs sm:text-sm text-muted-foreground">
                           {tProfile('submissions.page_info', { current: pagination.page, total: pagination.pages })}
                         </div>
                         <Button
                           variant="outline"
+                          size="sm"
                           disabled={pagination.page === pagination.pages}
                           onClick={() => fetchSubmissions(pagination.page + 1)}
+                          className="w-full sm:w-auto"
                         >
                           {t('next')}
                           <ArrowRight className="h-4 w-4 ml-2" />

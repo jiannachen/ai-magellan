@@ -1,22 +1,22 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db/db';
+import { categories } from '@/lib/db/schema';
+import { isNull, asc } from 'drizzle-orm';
 
 export async function GET() {
   try {
     // 只获取一级分类，并包含子分类
-    const categories = await prisma.category.findMany({
-      where: {
-        parent_id: null
-      },
-      include: {
+    const categoriesList = await db.query.categories.findMany({
+      where: isNull(categories.parentId),
+      with: {
         children: {
-          orderBy: { sort_order: 'asc' }
+          orderBy: (categories, { asc }) => [asc(categories.sortOrder)]
         }
       },
-      orderBy: { sort_order: 'asc' }
+      orderBy: (categories, { asc }) => [asc(categories.sortOrder)]
     });
 
-    return NextResponse.json(categories);
+    return NextResponse.json(categoriesList);
   } catch (error) {
     console.error('Error fetching categories:', error);
     return NextResponse.json(

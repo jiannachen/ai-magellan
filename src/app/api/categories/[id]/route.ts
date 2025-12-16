@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { categories } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 // PUT: 更新分类
 export async function PUT(
@@ -19,8 +21,8 @@ export async function PUT(
       );
     }
 
-    const existingCategory = await prisma.category.findUnique({
-      where: { id },
+    const existingCategory = await db.query.categories.findFirst({
+      where: eq(categories.id, id),
     });
 
     if (!existingCategory) {
@@ -29,10 +31,10 @@ export async function PUT(
       });
     }
 
-    const updatedCategory = await prisma.category.update({
-      where: { id },
-      data: { name, slug },
-    });
+    const [updatedCategory] = await db.update(categories)
+      .set({ name, slug })
+      .where(eq(categories.id, id))
+      .returning();
 
     return NextResponse.json(AjaxResponse.ok(updatedCategory));
   } catch (error) {
@@ -50,9 +52,7 @@ export async function DELETE(
   try {
     const id = parseInt(params.id);
 
-    await prisma.category.delete({
-      where: { id },
-    });
+    await db.delete(categories).where(eq(categories.id, id));
 
     return NextResponse.json(AjaxResponse.ok(null));
   } catch (error) {

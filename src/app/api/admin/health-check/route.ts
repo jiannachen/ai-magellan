@@ -35,46 +35,47 @@ export async function POST(request: NextRequest) {
 // 获取健康检查统计信息
 export async function GET(_request: NextRequest) {
   try {
-    const { prisma } = await import('@/lib/db/db');
-    
+    const { db } = await import('@/lib/db/db');
+    const { websites } = await import('@/lib/db/schema');
+    const { eq, isNull, sql, desc } = await import('drizzle-orm');
+
     // 获取网站状态统计
-    const stats = await prisma.website.groupBy({
-      by: ['active'],
-      where: { status: 'approved' },
-      _count: true,
-    });
-    
+    const stats = await db
+      .select({
+        active: websites.active,
+        count: sql<number>`count(*)`,
+      })
+      .from(websites)
+      .where(eq(websites.status, 'approved'))
+      .groupBy(websites.active);
+
     // 获取最近检查的网站
-    const recentChecks = await prisma.website.findMany({
-      where: { 
-        status: 'approved',
-        last_checked: { not: null }
-      },
-      select: {
-        url: true,
-        active: true,
-        response_time: true,
-        last_checked: true,
-        ssl_enabled: true,
-      },
-      orderBy: { last_checked: 'desc' },
-      take: 10,
-    });
-    
+    const recentChecks = await db
+      .select({
+        url: websites.url,
+        active: websites.active,
+        responseTime: websites.responseTime,
+        lastChecked: websites.lastChecked,
+        sslEnabled: websites.sslEnabled,
+      })
+      .from(websites)
+      .where(eq(websites.status, 'approved'))
+      .orderBy(desc(websites.lastChecked))
+      .limit(10);
+
     // 计算平均响应时间
-    const avgResponseTime = await prisma.website.aggregate({
-      where: { 
-        status: 'approved',
-        response_time: { not: null }
-      },
-      _avg: { response_time: true },
-    });
-    
+    const [avgResult] = await db
+      .select({
+        avg: sql<number>`avg(${websites.responseTime})`,
+      })
+      .from(websites)
+      .where(eq(websites.status, 'approved'));
+
     return NextResponse.json({
       stats: {
-        online: stats.find(s => s.active === 1)?._count || 0,
-        offline: stats.find(s => s.active === 0)?._count || 0,
-        averageResponseTime: avgResponseTime._avg.response_time || 0,
+        online: stats.find(s => s.active === 1)?.count || 0,
+        offline: stats.find(s => s.active === 0)?.count || 0,
+        averageResponseTime: avgResult?.avg || 0,
       },
       recentChecks,
       lastUpdate: new Date().toISOString(),

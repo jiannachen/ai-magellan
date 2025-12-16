@@ -260,6 +260,7 @@
         "tags": "標籤",
         "features": "功能特色",
         "category": "分類",
+        "categories": "分類",
         "use_cases": "使用場景",
         "target_audience": "目標使用者",
         "pricing_section": "定價",
@@ -328,7 +329,8 @@
         "featured": "精選",
         "verified": "已驗證",
         "free": "免費",
-        "premium": "付費"
+        "premium": "付費",
+        "primary": "主要"
       },
       "placeholders": {
         "no_preview": "無預覽圖片",

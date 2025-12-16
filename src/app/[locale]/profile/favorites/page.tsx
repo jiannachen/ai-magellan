@@ -187,63 +187,63 @@ export default function MyFavoritesPage() {
 
   return (
     <ProfileLayout>
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Page Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
-              <Bookmark className="h-6 w-6 text-primary" />
+      <div className="space-y-4 sm:space-y-6">
+        {/* Page Header - 移动端优化 */}
+        <div>
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20 flex-shrink-0">
+              <Bookmark className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground truncate">
                 {tProfile('favorites.title')}
               </h1>
-              <p className="text-muted-foreground">{tProfile('favorites.description')}</p>
+              <p className="text-sm sm:text-base text-muted-foreground">{tProfile('favorites.description')}</p>
             </div>
           </div>
         </div>
 
-        <div className="space-y-4">
-          {/* Stats Overview - Compact */}
+        <div className="space-y-3 sm:space-y-4">
+          {/* Stats Overview - 移动端优化紧凑布局 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="grid grid-cols-3 gap-3">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-card">
-                <Bookmark className="h-4 w-4 text-primary flex-shrink-0" />
-                <div>
-                  <div className="text-lg font-semibold">{favorites.length}</div>
-                  <div className="text-xs text-muted-foreground">{tProfile('favorites.stats.total_bookmarks')}</div>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              <div className="flex flex-col sm:flex-row items-center sm:gap-2 px-2 sm:px-3 py-2 rounded-lg border border-border bg-card">
+                <Bookmark className="h-4 w-4 text-primary flex-shrink-0 mb-1 sm:mb-0" />
+                <div className="text-center sm:text-left">
+                  <div className="text-base sm:text-lg font-semibold">{favorites.length}</div>
+                  <div className="text-[10px] sm:text-xs text-muted-foreground leading-tight">{tProfile('favorites.stats.total_bookmarks')}</div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-card">
-                <Crown className="h-4 w-4 text-yellow-600 flex-shrink-0" />
-                <div>
-                  <div className="text-lg font-semibold">{favorites.filter(w => w.is_featured === true).length}</div>
-                  <div className="text-xs text-muted-foreground">{tProfile('favorites.stats.featured_tools')}</div>
+              <div className="flex flex-col sm:flex-row items-center sm:gap-2 px-2 sm:px-3 py-2 rounded-lg border border-border bg-card">
+                <Crown className="h-4 w-4 text-yellow-600 flex-shrink-0 mb-1 sm:mb-0" />
+                <div className="text-center sm:text-left">
+                  <div className="text-base sm:text-lg font-semibold">{favorites.filter(w => w.is_featured === true).length}</div>
+                  <div className="text-[10px] sm:text-xs text-muted-foreground leading-tight">{tProfile('favorites.stats.featured_tools')}</div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-card">
-                <Star className="h-4 w-4 text-primary flex-shrink-0" />
-                <div>
-                  <div className="text-lg font-semibold">{favorites.filter(w => (w.quality_score || 0) >= 80).length}</div>
-                  <div className="text-xs text-muted-foreground">{tProfile('favorites.stats.high_quality')}</div>
+              <div className="flex flex-col sm:flex-row items-center sm:gap-2 px-2 sm:px-3 py-2 rounded-lg border border-border bg-card">
+                <Star className="h-4 w-4 text-primary flex-shrink-0 mb-1 sm:mb-0" />
+                <div className="text-center sm:text-left">
+                  <div className="text-base sm:text-lg font-semibold">{favorites.filter(w => (w.quality_score || 0) >= 80).length}</div>
+                  <div className="text-[10px] sm:text-xs text-muted-foreground leading-tight">{tProfile('favorites.stats.high_quality')}</div>
                 </div>
               </div>
             </div>
           </motion.div>
 
-          {/* Search and Filters - Compact */}
+          {/* Search and Filters - 移动端垂直布局 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <div className="flex flex-col md:flex-row gap-2 items-center bg-card border border-border rounded-lg p-3">
+            <div className="flex flex-col gap-2 bg-card border border-border rounded-lg p-3">
               {/* Search */}
-              <div className="flex-1 w-full">
+              <div className="w-full">
                 <div className="relative">
                   <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -255,43 +255,45 @@ export default function MyFavoritesPage() {
                 </div>
               </div>
 
-              {/* Sort */}
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-full md:w-52 h-9 text-sm">
-                  <SortAsc className="h-3.5 w-3.5 mr-2" />
-                  <SelectValue placeholder={tProfile('favorites.sort.placeholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="recent">{tProfile('favorites.sort.recent')}</SelectItem>
-                  <SelectItem value="popular">{tProfile('favorites.sort.popular')}</SelectItem>
-                  <SelectItem value="quality">{tProfile('favorites.sort.quality')}</SelectItem>
-                  <SelectItem value="alphabetical">{tProfile('favorites.sort.alphabetical')}</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2">
+                {/* Sort */}
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="flex-1 h-9 text-sm">
+                    <SortAsc className="h-3.5 w-3.5 mr-2" />
+                    <SelectValue placeholder={tProfile('favorites.sort.placeholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="recent">{tProfile('favorites.sort.recent')}</SelectItem>
+                    <SelectItem value="popular">{tProfile('favorites.sort.popular')}</SelectItem>
+                    <SelectItem value="quality">{tProfile('favorites.sort.quality')}</SelectItem>
+                    <SelectItem value="alphabetical">{tProfile('favorites.sort.alphabetical')}</SelectItem>
+                  </SelectContent>
+                </Select>
 
-              {/* View Mode */}
-              <div className="flex gap-1">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'outline'}
-                  size="sm"
-                  className="h-9 w-9 p-0"
-                  onClick={() => setViewMode('grid')}
-                >
-                  <Grid3X3 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'outline'}
-                  size="sm"
-                  className="h-9 w-9 p-0"
-                  onClick={() => setViewMode('list')}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
+                {/* View Mode */}
+                <div className="flex gap-1 flex-shrink-0">
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-9 w-9 p-0"
+                    onClick={() => setViewMode('grid')}
+                  >
+                    <Grid3X3 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-9 w-9 p-0"
+                    onClick={() => setViewMode('list')}
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </motion.div>
 
-          {/* Results */}
+          {/* Results - 移动端优化 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -299,33 +301,34 @@ export default function MyFavoritesPage() {
           >
             {filteredFavorites.length === 0 ? (
               <Card>
-                <CardContent className="text-center py-12">
+                <CardContent className="text-center py-8 sm:py-12">
                   <div className="space-y-4">
                     <div className="relative">
-                      <Bookmark className="h-16 w-16 text-muted-foreground mx-auto" />
-                      <Search className="h-6 w-6 text-primary absolute -top-1 -right-1" />
+                      <Bookmark className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto" />
+                      <Search className="h-5 w-5 sm:h-6 sm:w-6 text-primary absolute -top-1 -right-1" />
                     </div>
-                    <h3 className="text-lg font-medium text-foreground">
+                    <h3 className="text-base sm:text-lg font-medium text-foreground">
                       {searchQuery ? tProfile('favorites.empty.no_matching') : tProfile('favorites.empty.no_bookmarks')}
                     </h3>
-                    <p className="text-muted-foreground max-w-md mx-auto">
-                      {searchQuery 
+                    <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">
+                      {searchQuery
                         ? tProfile('favorites.empty.try_different_search', { query: searchQuery })
                         : tProfile('favorites.empty.start_exploring')
                       }
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
                       {searchQuery && (
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           onClick={() => setSearchQuery('')}
+                          className="w-full sm:w-auto"
                         >
                           <Filter className="h-4 w-4 mr-2" />
                           {tProfile('favorites.actions.clear_search')}
                         </Button>
                       )}
-                      <Link href="/">
-                        <Button>
+                      <Link href="/" className="w-full sm:w-auto">
+                        <Button className="w-full">
                           <Compass className="h-4 w-4 mr-2" />
                           {tProfile('favorites.empty.start_button')}
                         </Button>
@@ -336,9 +339,9 @@ export default function MyFavoritesPage() {
               </Card>
             ) : (
             <div className={cn(
-              "grid gap-3",
+              "grid gap-2 sm:gap-3",
               viewMode === 'grid'
-                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                ? "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                 : "grid-cols-1"
             )}>
               {filteredFavorites.map((website, index) => (
@@ -368,16 +371,16 @@ export default function MyFavoritesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-center text-sm text-muted-foreground"
+            className="text-center text-xs sm:text-sm text-muted-foreground py-2"
           >
             <p>
-              {searchQuery 
-                ? tProfile('favorites.results.showing_search', { 
-                  current: filteredFavorites.length, 
-                  total: favorites.length 
+              {searchQuery
+                ? tProfile('favorites.results.showing_search', {
+                  current: filteredFavorites.length,
+                  total: favorites.length
                 })
-                : tProfile('favorites.results.showing_total', { 
-                  count: filteredFavorites.length 
+                : tProfile('favorites.results.showing_total', {
+                  count: filteredFavorites.length
                 })
               }
             </p>

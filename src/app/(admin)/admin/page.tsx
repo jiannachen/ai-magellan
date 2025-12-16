@@ -2,7 +2,9 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AdminPageClient } from "@/components/admin/admin-page-client";
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { websites, categories } from "@/lib/db/schema";
+import { desc, asc } from "drizzle-orm";
 
 export const dynamic = 'force-dynamic';
 
@@ -13,26 +15,26 @@ function isAdminEmail(email: string): boolean {
 }
 
 async function getWebsites() {
-  const websites = await prisma.website.findMany({
-    include: {
-      category: true,
+  const websitesList = await db.query.websites.findMany({
+    with: {
+      websiteCategories: {
+        with: {
+          category: true,
+        },
+      },
       submitter: true,
     },
-    orderBy: {
-      created_at: 'desc'
-    }
+    orderBy: (websites, { desc }) => [desc(websites.createdAt)],
   });
   // Type assertion for compatibility with Website interface
-  return websites as any;
+  return websitesList as any;
 }
 
 async function getCategories() {
-  const categories = await prisma.category.findMany({
-    orderBy: {
-      name: 'asc'
-    }
+  const categoriesList = await db.query.categories.findMany({
+    orderBy: (categories, { asc }) => [asc(categories.name)],
   });
-  return categories;
+  return categoriesList;
 }
 
 export default async function AdminPage() {
@@ -45,7 +47,7 @@ export default async function AdminPage() {
   // 获取Clerk用户信息
   let clerkUser;
   let userEmail;
-  
+
   try {
     clerkUser = await currentUser();
     userEmail = clerkUser?.emailAddresses[0]?.emailAddress;
@@ -109,10 +111,10 @@ export default async function AdminPage() {
   }
 
   // 获取网站和分类数据
-  const [websites, categories] = await Promise.all([
+  const [websitesData, categoriesData] = await Promise.all([
     getWebsites(),
     getCategories()
   ]);
 
-  return <AdminPageClient initialWebsites={websites} initialCategories={categories} />;
+  return <AdminPageClient initialWebsites={websitesData} initialCategories={categoriesData} />;
 }

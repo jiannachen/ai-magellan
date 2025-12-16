@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { prisma } from '@/lib/db/db'
+import { db } from '@/lib/db/db'
+import { websiteReviews } from '@/lib/db/schema'
+import { eq, and, desc, sql } from 'drizzle-orm'
 import { ensureUserExists } from '@/lib/utils'
 
 // GET /api/websites/[id]/reviews
@@ -11,24 +13,24 @@ export async function GET(
 ) {
   try {
     const websiteId = parseInt((await params).id)
-    
-    const reviews = await prisma.websiteReview.findMany({
-      where: { websiteId },
-      include: {
+
+    const reviews = await db.query.websiteReviews.findMany({
+      where: eq(websiteReviews.websiteId, websiteId),
+      with: {
         user: {
-          select: {
+          columns: {
             id: true,
             name: true,
             image: true
           }
         }
       },
-      orderBy: { createdAt: 'desc' },
-      take: 10 // 限制返回数量
+      orderBy: desc(websiteReviews.createdAt),
+      limit: 10 // 限制返回数量
     })
 
     // 计算平均评分
-    const avgRating = reviews.length > 0 
+    const avgRating = reviews.length > 0
       ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
       : 0
 
@@ -74,32 +76,35 @@ export async function POST(
     }
 
     // 检查是否已经评论过
-    const existingReview = await prisma.websiteReview.findUnique({
-      where: {
-        userId_websiteId: {
-          userId,
-          websiteId
-        }
-      }
+    const existingReview = await db.query.websiteReviews.findFirst({
+      where: and(
+        eq(websiteReviews.userId, userId),
+        eq(websiteReviews.websiteId, websiteId)
+      )
     })
 
     let review
     if (existingReview) {
       // 更新现有评论
-      review = await prisma.websiteReview.update({
-        where: {
-          userId_websiteId: {
-            userId,
-            websiteId
-          }
-        },
-        data: {
+      await db.update(websiteReviews)
+        .set({
           rating,
-          comment: comment?.trim() || null
-        },
-        include: {
+          comment: comment?.trim() || null,
+          updatedAt: new Date()
+        })
+        .where(and(
+          eq(websiteReviews.userId, userId),
+          eq(websiteReviews.websiteId, websiteId)
+        ))
+
+      review = await db.query.websiteReviews.findFirst({
+        where: and(
+          eq(websiteReviews.userId, userId),
+          eq(websiteReviews.websiteId, websiteId)
+        ),
+        with: {
           user: {
-            select: {
+            columns: {
               id: true,
               name: true,
               image: true
@@ -109,16 +114,22 @@ export async function POST(
       })
     } else {
       // 创建新评论
-      review = await prisma.websiteReview.create({
-        data: {
-          userId,
-          websiteId,
-          rating,
-          comment: comment?.trim() || null
-        },
-        include: {
+      await db.insert(websiteReviews).values({
+        id: `${userId}_${websiteId}`,
+        userId,
+        websiteId,
+        rating,
+        comment: comment?.trim() || null
+      })
+
+      review = await db.query.websiteReviews.findFirst({
+        where: and(
+          eq(websiteReviews.userId, userId),
+          eq(websiteReviews.websiteId, websiteId)
+        ),
+        with: {
           user: {
-            select: {
+            columns: {
               id: true,
               name: true,
               image: true
@@ -156,14 +167,10 @@ export async function DELETE(
 
     const websiteId = parseInt((await params).id)
 
-    const deletedReview = await prisma.websiteReview.delete({
-      where: {
-        userId_websiteId: {
-          userId,
-          websiteId
-        }
-      }
-    })
+    await db.delete(websiteReviews).where(and(
+      eq(websiteReviews.userId, userId),
+      eq(websiteReviews.websiteId, websiteId)
+    ))
 
     return NextResponse.json({ message: 'Review deleted successfully' })
   } catch (error) {

@@ -1,7 +1,9 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { feedbacks } from "@/lib/db/schema";
+import { desc } from "drizzle-orm";
 import { FeedbackList } from "@/components/admin/feedback-list";
 import { ListFilter, Users, MessageSquare } from "lucide-react";
 
@@ -13,9 +15,9 @@ function isAdminEmail(email: string): boolean {
 }
 
 async function getFeedbacks() {
-  const list = await prisma.feedback.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 200,
+  const list = await db.query.feedbacks.findMany({
+    orderBy: (feedbacks, { desc }) => [desc(feedbacks.createdAt)],
+    limit: 200,
   });
   return list;
 }
@@ -93,4 +95,3 @@ export default async function AdminFeedbackPage() {
     </div>
   );
 }
-

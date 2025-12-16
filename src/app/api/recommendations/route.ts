@@ -1,4 +1,6 @@
-import { prisma } from '@/lib/db/db';
+import { db } from '@/lib/db/db';
+import { websites } from '@/lib/db/schema';
+import { eq, and, or, gte, ne, sql } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 // 获取网站推荐
@@ -9,43 +11,48 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '6');
     const excludeId = searchParams.get('exclude');
 
+    // Build where conditions
+    const conditions = [
+      eq(websites.status, 'approved'),
+      eq(websites.active, 1),
+    ];
+
+    if (categoryId) {
+      conditions.push(eq(websites.categoryId, parseInt(categoryId)));
+    }
+
+    if (excludeId) {
+      conditions.push(ne(websites.id, parseInt(excludeId)));
+    }
+
+    // Add quality filters
+    conditions.push(
+      or(
+        eq(websites.isFeatured, true),
+        gte(websites.qualityScore, 70),
+        and(
+          gte(websites.visits, 50),
+          gte(websites.likes, 10)
+        )!
+      )!
+    );
+
     // 获取推荐网站（基于质量分数和受欢迎程度）
-    const recommendations = await prisma.website.findMany({
-      where: {
-        status: 'approved',
-        active: 1,
-        ...(categoryId && { category_id: parseInt(categoryId) }),
-        ...(excludeId && { id: { not: parseInt(excludeId) } }),
-        OR: [
-          { is_featured: true },
-          { quality_score: { gte: 70 } },
-          { 
-            AND: [
-              { visits: { gte: 50 } },
-              { likes: { gte: 10 } }
-            ]
-          }
-        ]
-      },
-      select: {
+    const recommendations = await db.query.websites.findMany({
+      where: and(...conditions),
+      columns: {
         id: true,
         title: true,
         url: true,
         description: true,
         thumbnail: true,
-        category_id: true,
+        categoryId: true,
         visits: true,
         likes: true,
-        quality_score: true,
-        is_featured: true,
+        qualityScore: true,
+        isFeatured: true,
       },
-      orderBy: [
-        { is_featured: 'desc' },
-        { quality_score: 'desc' },
-        { visits: 'desc' },
-        { likes: 'desc' }
-      ],
-      take: limit,
+      limit: limit,
     });
 
     return NextResponse.json({
@@ -73,10 +80,10 @@ export async function POST(request: NextRequest) {
     
     // 暂时只是简单地增加访问量
     if (action === 'visit' && websiteId) {
-      await prisma.website.update({
-        where: { id: websiteId },
-        data: { visits: { increment: 1 } }
-      });
+      await db
+        .update(websites)
+        .set({ visits: sql`${websites.visits} + 1` })
+        .where(eq(websites.id, websiteId));
     }
 
     return NextResponse.json({ success: true });

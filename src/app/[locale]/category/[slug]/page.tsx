@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
-import { prisma } from '@/lib/db/db';
 import { redirect } from 'next/navigation';
+import { db } from '@/lib/db/db';
+import { categories } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -11,8 +13,8 @@ interface CategoryPageProps {
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const category = await prisma.category.findUnique({
-    where: { slug }
+  const category = await db.query.categories.findFirst({
+    where: eq(categories.slug, slug),
   });
 
   if (!category) {

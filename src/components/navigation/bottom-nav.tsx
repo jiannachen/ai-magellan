@@ -48,20 +48,19 @@ export default function BottomNavigation() {
 
   return (
     <>
-      {/* 底部导航栏 - 真正固定在屏幕底部，不受浏览器地址栏影响 */}
-      <nav 
+      {/* 底部导航栏 - 现代简约风格 */}
+      <nav
         className={cn(
-          // 固定定位 - 始终在底部可见，提高z-index确保在最顶层
+          // 固定定位
           "fixed bottom-0 left-0 right-0 z-[9999]",
-          // 背景和边框 - 增强透明度效果
-          "bg-background/98 backdrop-blur-md supports-[backdrop-filter]:bg-background/85",
-          "border-t border-border/60",
+          // 背景和边框 - 简约风格
+          "bg-background border-t border-border",
           // 仅在移动端显示
           "block md:hidden",
           // 确保不会横向溢出
           "w-full",
-          // 添加阴影提升层次感
-          "shadow-lg",
+          // 添加阴影
+          "shadow-sm",
           // 应用移动端修复类
           "mobile-fixed-bottom"
         )}
@@ -85,18 +84,18 @@ export default function BottomNavigation() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  // 基础样式 - 优化触摸目标
+                  // 基础样式
                   "flex flex-col items-center justify-center relative",
-                  "min-w-0 flex-1 px-1 sm:px-2 py-2 rounded-xl",
-                  // 确保最小触摸目标 44px x 44px (Apple HIG)
+                  "min-w-0 flex-1 px-1 sm:px-2 py-2 rounded-lg",
+                  // 确保最小触摸目标 44px
                   "min-h-[44px] min-w-[44px]",
-                  // 交互样式 - 增强反馈
-                  "transition-all duration-200 ease-in-out",
+                  // 交互样式
+                  "transition-all duration-200 ease-out",
                   "active:scale-95 touch-manipulation",
-                  "hover:bg-muted/50 active:bg-muted/70",
+                  "hover:bg-secondary active:bg-secondary",
                   // 状态样式
-                  isActive 
-                    ? "text-primary bg-primary/10" 
+                  isActive
+                    ? "text-primary bg-secondary/50"
                     : "text-muted-foreground hover:text-foreground active:text-foreground"
                 )}
                 aria-current={isActive ? "page" : undefined}
@@ -124,9 +123,9 @@ export default function BottomNavigation() {
                   {t(item.labelKey)}
                 </span>
                 
-                {/* 活跃指示器 - 优化设计和位置 */}
+                {/* 活跃指示器 */}
                 {isActive && (
-                  <div 
+                  <div
                     className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full"
                     aria-hidden="true"
                   />

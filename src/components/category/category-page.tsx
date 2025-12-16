@@ -25,7 +25,7 @@ interface CategoryPageProps {
     id: number;
     name: string;
     slug: string;
-    parent_id: number | null;
+    parentId: number | null;
   };
   websites: any[];
   allCategories: any[];

@@ -2,143 +2,111 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== AI MAGELLAN 海洋主题设计系统 ===== */
-/* 专业、简洁、品牌一致的视觉规范 */
+/* ========================================================================
+   AI MAGELLAN DESIGN SYSTEM | 现代简约设计系统
+   风格: Modern SaaS (Linear, Vercel, Stripe) - 简约、优雅、专业
+   ======================================================================== */
 
+/* ------------------------------------------------------------------------ */
+/* 1. THEME VARIABLES | 主题变量定义
+/* ------------------------------------------------------------------------ */
 :root {
-  /* ===== 核心海洋主题颜色系统 (5色方案) ===== */
+  /* === 核心品牌色 (Modern Purple) === */
+  --nebula-primary: 262 80% 55%;          /* #8B5CF6 - 优雅紫 */
+  --nebula-primary-hover: 262 85% 50%;    /* 悬停态 */
+  --nebula-primary-light: 262 100% 98%;   /* 极浅背景 */
 
-  /* 主品牌色 - 深海蓝 */
-  --ocean-primary: 214 79% 30%;           /* #0B4F8C - 主色调 */
-  --ocean-primary-hover: 214 79% 26%;     /* #083A6B - 悬停态 */
-  --ocean-primary-light: 213 62% 58%;     /* #4A90E2 - 浅色版 */
+  /* === 辅助色 (Minimal Accents) === */
+  --nebula-secondary: 270 50% 50%;        /* 辅助紫 */
+  --nebula-cyan: 195 91% 60%;             /* 青色点缀 */
 
-  /* 功能色彩 */
-  --ocean-success: 161 84% 39%;           /* #10B981 - 成功/免费 */
-  --ocean-warning: 27 94% 54%;            /* #F97316 - 警告/热门 */
-  --ocean-accent: 170 97% 27%;            /* #0F766E - 强调色 */
-  --ocean-neutral: 221 43% 20%;           /* #172B4D - 深色文字 */
+  /* === 功能状态色 (Functional) === */
+  --nebula-success: 142 71% 45%;          /* #10B981 - 成功绿 */
+  --nebula-warning: 38 92% 50%;           /* #F59E0B - 警告橙 */
+  --nebula-error: 0 72% 51%;              /* #DC2626 - 错误红 */
+  --nebula-neutral: 240 5% 26%;           /* 中性深灰 */
 
-  /* 中性灰度系统 */
-  --neutral-50: 210 20% 98%;              /* #F8FAFC - 最浅 */
-  --neutral-100: 216 33% 97%;             /* #F1F5F9 */
-  --neutral-200: 219 12% 89%;             /* #DFE1E6 */
-  --neutral-300: 221 14% 78%;             /* #C1C7D0 */
-  --neutral-400: 221 13% 63%;             /* #8993A4 */
-  --neutral-500: 221 14% 54%;             /* #6B778C */
-  --neutral-600: 220 15% 51%;             /* #5E6C84 */
-  --neutral-700: 221 39% 35%;             /* #42526E */
-  --neutral-800: 221 43% 20%;             /* #172B4D */
-  --neutral-900: 224 71% 14%;             /* #091E42 */
+  /* === 中性色系统 (Minimal Grayscale) === */
+  --neutral-50: 0 0% 98%;                 /* #FAFAFA */
+  --neutral-100: 240 5% 96%;              /* #F5F5F6 */
+  --neutral-200: 240 6% 90%;              /* #E4E4E7 */
+  --neutral-300: 240 5% 84%;              /* #D4D4D8 */
+  --neutral-500: 240 4% 46%;              /* #71717A */
+  --neutral-800: 240 5% 26%;              /* #27272A */
+  --neutral-900: 240 6% 10%;              /* #18181B */
 
-  /* ===== 语义化颜色映射 ===== */
-  --primary: var(--ocean-primary);
-  --primary-foreground: 0 0% 100%;
-
-  --background: 0 0% 100%;
-  --foreground: var(--neutral-900);
+  /* === Shadcn/Tailwind 语义映射 === */
+  --background: 0 0% 100%;                /* 纯白背景 */
+  --foreground: 240 6% 10%;
 
   --card: 0 0% 100%;
-  --card-foreground: var(--neutral-900);
-
+  --card-foreground: 240 6% 10%;
   --popover: 0 0% 100%;
-  --popover-foreground: var(--neutral-900);
+  --popover-foreground: 240 6% 10%;
 
-  --secondary: var(--neutral-100);
-  --secondary-foreground: var(--neutral-800);
+  --primary: var(--nebula-primary);
+  --primary-foreground: 0 0% 100%;
 
-  --muted: var(--neutral-100);
-  --muted-foreground: var(--neutral-500);
+  --secondary: 240 5% 96%;
+  --secondary-foreground: 240 6% 10%;
 
-  --accent: var(--neutral-100);
-  --accent-foreground: var(--neutral-800);
+  --muted: 240 5% 96%;
+  --muted-foreground: 240 4% 46%;
 
-  --border: var(--neutral-200);
-  --input: var(--neutral-200);
-  --ring: var(--ocean-primary);
+  --accent: 240 5% 96%;
+  --accent-foreground: 240 6% 10%;
 
-  --destructive: 0 84% 60%;               /* #DC2626 */
+  --destructive: var(--nebula-error);
   --destructive-foreground: 0 0% 100%;
 
-  --success: var(--ocean-success);
+  --border: 240 6% 90%;
+  --input: 240 6% 90%;
+  --ring: var(--nebula-primary);
+
+  --success: var(--nebula-success);
   --success-foreground: 0 0% 100%;
 
-  --warning: var(--ocean-warning);
-  --warning-foreground: var(--neutral-900);
+  --warning: var(--nebula-warning);
+  --warning-foreground: 0 0% 100%;
 
-  /* ===== 统一设计标准 ===== */
-
-  /* 圆角系统 - 统一为8px */
+  /* === 设计规范 (Design Tokens) === */
   --radius: 8px;
-
-  /* 间距系统 - 8px网格 */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 12px;
-  --space-lg: 16px;
-  --space-xl: 24px;
-  --space-2xl: 32px;
-  --space-3xl: 48px;
-
-  /* 动画时长 */
-  --duration-fast: 150ms;
-  --duration-normal: 200ms;
-  --duration-slow: 300ms;
-
-  /* 动画曲线 */
+  --radius-lg: 12px;
+  --radius-sm: 6px;
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-in: cubic-bezier(0.4, 0, 1, 1);
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);
 }
 
-/* 暗色模式 */
+/* === 暗色模式 (Modern Dark) === */
 .dark {
-  --background: 224 71% 4%;               /* #0D1117 */
-  --foreground: 0 0% 100%;
+  --background: 240 10% 4%;               /* 深邃纯净黑 */
+  --foreground: 240 5% 96%;
 
-  --card: 220 13% 9%;                     /* #161B22 */
-  --card-foreground: 0 0% 100%;
+  --card: 240 10% 8%;
+  --card-foreground: 240 5% 96%;
 
-  --popover: 224 71% 4%;
-  --popover-foreground: 0 0% 100%;
+  --popover: 240 10% 8%;
+  --popover-foreground: 240 5% 96%;
 
-  --secondary: 219 11% 15%;               /* #21262D */
-  --secondary-foreground: 0 0% 100%;
+  --primary: 262 80% 60%;                 /* 暗模式下稍亮 */
+  --primary-foreground: 240 10% 4%;
 
-  --muted: 219 11% 15%;
-  --muted-foreground: 220 9% 55%;
+  --secondary: 240 10% 15%;
+  --secondary-foreground: 240 5% 96%;
 
-  --accent: 219 11% 15%;
-  --accent-foreground: 0 0% 100%;
+  --muted: 240 10% 15%;
+  --muted-foreground: 240 5% 65%;
 
-  --border: 221 12% 31%;                  /* #484F58 */
-  --input: 221 12% 31%;
+  --accent: 240 10% 15%;
+  --accent-foreground: 240 5% 96%;
 
-  --ocean-primary: 216 87% 65%;           /* 亮蓝色适配暗色模式 */
-  --ocean-success: 148 58% 58%;
-  --ocean-warning: 48 100% 55%;
+  --border: 240 10% 18%;
+  --input: 240 10% 18%;
+  --ring: 262 80% 60%;
 }
 
-/* ===== 核心动画 (仅保留2个) ===== */
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes gentle-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
-}
-
-/* ===== 基础样式 ===== */
-
+/* ------------------------------------------------------------------------ */
+/* 2. BASE STYLES | 基础样式
+/* ------------------------------------------------------------------------ */
 @layer base {
   * {
     @apply border-border;
@@ -146,265 +114,114 @@
 
   html {
     -webkit-tap-highlight-color: transparent;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
-    /* 修复移动端viewport高度问题 */
-    height: 100%;
-    height: 100dvh;
-    height: -webkit-fill-available;
+    scroll-behavior: smooth;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-size: 14px;
-    line-height: 1.6;
-
-    /* 移动端高度适配 */
-    min-height: 100vh;
-    min-height: 100dvh;
-    min-height: -webkit-fill-available;
-
-    /* 移动端宽度和滚动优化 */
-    max-width: 100vw;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: none;
-
-    /* 文本渲染优化 */
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-
-    /* 触摸行为优化 */
-    touch-action: manipulation;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* 统一排版系统 */
-  h1 { @apply text-2xl font-semibold leading-tight; }
-  h2 { @apply text-xl font-semibold leading-tight; }
-  h3 { @apply text-lg font-semibold leading-tight; }
-  h4 { @apply text-base font-medium leading-tight; }
-
-  p { @apply text-sm leading-relaxed; }
-
-  /* 选择文本样式 */
-  ::selection {
-    @apply bg-primary/20;
+  /* 标题优化 - 更简洁的字重 */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight text-foreground;
   }
+
+  h1 { @apply text-3xl md:text-4xl lg:text-5xl; }
+  h2 { @apply text-2xl md:text-3xl; }
+  h3 { @apply text-xl md:text-2xl; }
 }
 
-/* ===== 实用工具类 ===== */
-
+/* ------------------------------------------------------------------------ */
+/* 3. UTILITIES | 工具类
+/* ------------------------------------------------------------------------ */
 @layer utilities {
-  /* ===== 海洋主题颜色类 ===== */
 
-  .text-ocean-primary { color: hsl(var(--ocean-primary)); }
-  .text-ocean-success { color: hsl(var(--ocean-success)); }
-  .text-ocean-warning { color: hsl(var(--ocean-warning)); }
-  .text-ocean-accent { color: hsl(var(--ocean-accent)); }
+  /* === 主题色彩类 === */
+  .text-nebula-primary   { color: hsl(var(--nebula-primary)); }
+  .text-nebula-secondary { color: hsl(var(--nebula-secondary)); }
+  .text-nebula-cyan      { color: hsl(var(--nebula-cyan)); }
+  .text-nebula-success   { color: hsl(var(--nebula-success)); }
+  .text-nebula-warning   { color: hsl(var(--nebula-warning)); }
 
-  .bg-ocean-primary { background-color: hsl(var(--ocean-primary)); }
-  .bg-ocean-success { background-color: hsl(var(--ocean-success)); }
-  .bg-ocean-warning { background-color: hsl(var(--ocean-warning)); }
-  .bg-ocean-accent { background-color: hsl(var(--ocean-accent)); }
+  .bg-nebula-primary     { background-color: hsl(var(--nebula-primary)); }
+  .bg-nebula-secondary   { background-color: hsl(var(--nebula-secondary)); }
+  .bg-nebula-cyan        { background-color: hsl(var(--nebula-cyan)); }
+  .bg-nebula-light       { background-color: hsl(var(--nebula-primary-light)); }
 
-  .border-ocean-primary { border-color: hsl(var(--ocean-primary)); }
-  .border-ocean-success { border-color: hsl(var(--ocean-success)); }
-  .border-ocean-warning { border-color: hsl(var(--ocean-warning)); }
-  .border-ocean-accent { border-color: hsl(var(--ocean-accent)); }
+  .border-nebula-primary { border-color: hsl(var(--nebula-primary)); }
 
-  /* ===== 向后兼容：旧的magellan-*类名映射 ===== */
+  /* === 核心组件 === */
 
-  /* 文本颜色兼容 */
-  .text-magellan-primary { color: hsl(var(--ocean-primary)); }
-  .text-magellan-coral { color: hsl(var(--ocean-warning)); }
-  .text-magellan-gold { color: hsl(var(--ocean-warning)); }
-  .text-magellan-teal { color: hsl(var(--ocean-accent)); }
-  .text-magellan-mint { color: hsl(var(--ocean-success)); }
-  .text-magellan-navy { color: hsl(var(--ocean-primary)); }
+  /* 1. 现代卡片 - 更简洁的悬停效果 */
+  .nebula-card {
+    @apply rounded-lg bg-card border border-border/60 overflow-hidden;
+    @apply transition-all duration-200 ease-out;
+    @apply hover:border-border hover:shadow-sm;
+  }
 
-  /* 背景颜色兼容 */
-  .bg-magellan-primary { background-color: hsl(var(--ocean-primary)); }
-  .bg-magellan-coral { background-color: hsl(var(--ocean-warning)); }
-  .bg-magellan-gold { background-color: hsl(var(--ocean-warning)); }
-  .bg-magellan-teal { background-color: hsl(var(--ocean-accent)); }
-  .bg-magellan-mint { background-color: hsl(var(--ocean-success)); }
-  .bg-magellan-navy { background-color: hsl(var(--ocean-primary)); }
-  .bg-magellan-depth-50 { background-color: hsl(var(--neutral-50)); }
-  .bg-magellan-depth-100 { background-color: hsl(var(--neutral-100)); }
-
-  /* 边框颜色兼容 */
-  .border-magellan-primary { border-color: hsl(var(--ocean-primary)); }
-  .border-magellan-coral { border-color: hsl(var(--ocean-warning)); }
-  .border-magellan-gold { border-color: hsl(var(--ocean-warning)); }
-  .border-magellan-teal { border-color: hsl(var(--ocean-accent)); }
-  .border-magellan-mint { border-color: hsl(var(--ocean-success)); }
-  .border-magellan-navy { border-color: hsl(var(--ocean-primary)); }
-
-  /* ===== Atlassian文本类兼容 ===== */
-
-  .text-atlassian-h3 { @apply text-lg font-semibold leading-tight; }
-  .text-atlassian-h4 { @apply text-base font-medium leading-tight; }
-  .text-atlassian-body { @apply text-sm leading-relaxed; }
-  .text-atlassian-body-large { @apply text-base leading-relaxed; }
-  .text-atlassian-body-small { @apply text-xs leading-normal; }
-
-  /* ===== 统一的卡片样式 ===== */
-
-  .ocean-card {
-    @apply rounded-lg bg-card border border-border/40;
-    @apply hover:border-ocean-primary/30 hover:shadow-md;
+  /* 2. 简约按钮 */
+  .btn-modern {
+    @apply relative overflow-hidden rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white;
     @apply transition-all duration-200;
+    @apply hover:bg-primary/90;
+    @apply active:scale-[0.98];
   }
 
-  /* ===== 移动端优化工具类 ===== */
-
-  /* 触摸友好的点击目标 - Apple HIG推荐44px */
-  .touch-target {
-    @apply min-h-[44px] min-w-[44px];
+  /* 3. 标签 */
+  .tag-pill {
+    @apply inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium;
+    @apply bg-secondary text-secondary-foreground;
+    @apply transition-colors;
   }
 
-  /* 移动端优化按钮 */
-  .mobile-button {
-    min-height: 44px;
-    padding: 12px 16px;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
+  /* === 视觉效果 === */
+
+  /* 渐变文字 */
+  .text-gradient-purple {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-purple-400;
   }
 
-  /* 移动端安全区域适配 */
-  .safe-area-bottom {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
+  /* === 辅助类 === */
 
-  .safe-area-top {
-    padding-top: env(safe-area-inset-top, 0px);
-  }
-
-  /* 防止移动端缩放 */
-  .prevent-zoom {
-    touch-action: manipulation;
-  }
-
-  /* 移动端响应式文本 */
-  .text-mobile-sm {
-    font-size: 12px;
-    line-height: 1.4;
-  }
-
-  .text-mobile-base {
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  .text-mobile-lg {
-    font-size: 16px;
-    line-height: 1.5;
-  }
-
-  /* 移动端间距优化 */
-  .mobile-spacing-sm {
-    gap: 8px;
-    padding: 8px;
-  }
-
-  .mobile-spacing-md {
-    gap: 12px;
-    padding: 12px;
-  }
-
-  .mobile-spacing-lg {
-    gap: 16px;
-    padding: 16px;
-  }
-
-  /* 动画类 */
-  .animate-fade-in {
-    animation: fade-in 200ms var(--ease-smooth);
-  }
-
-  .animate-float {
-    animation: gentle-float 3s ease-in-out infinite;
-  }
-
-  /* 隐藏滚动条 */
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
 
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
   }
 
-  /* 移动端固定定位修复 */
-  @media (max-width: 768px) {
-    /* 移动端页面内容底部安全间距 - 避免被底部导航遮挡 */
-    .mobile-safe-bottom {
-      padding-bottom: calc(80px + env(safe-area-inset-bottom, 8px));
-    }
+  /* ========================================================================
+     LEGACY SUPPORT | 向后兼容
+     ======================================================================== */
 
-    /* 确保固定定位元素正确显示 */
-    .mobile-fixed-bottom {
-      position: fixed !important;
-      bottom: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      z-index: 9999 !important;
-      /* 防止移动端浏览器地址栏影响 */
-      transform: translateZ(0) !important;
-      will-change: transform;
-      contain: layout style paint;
-    }
+  /* Ocean 主题映射 */
+  .text-ocean-primary   { color: hsl(var(--nebula-primary)); }
+  .bg-ocean-primary     { background-color: hsl(var(--nebula-primary)); }
+  .border-ocean-primary { border-color: hsl(var(--nebula-primary)); }
+  .text-ocean-accent    { color: hsl(var(--nebula-cyan)); }
+  .bg-ocean-accent      { background-color: hsl(var(--nebula-cyan)); }
+  .text-ocean-success   { color: hsl(var(--nebula-success)); }
+  .bg-ocean-success     { background-color: hsl(var(--nebula-success)); }
+  .text-ocean-warning   { color: hsl(var(--nebula-warning)); }
+  .bg-ocean-warning     { background-color: hsl(var(--nebula-warning)); }
+  .ocean-card { @apply nebula-card; }
 
-    /* 修复viewport高度变化问题 */
-    .mobile-viewport-fix {
-      height: 100vh;
-      height: 100dvh;
-      height: -webkit-fill-available;
-    }
-  }
-}
+  /* Magellan 主题映射 */
+  .text-magellan-primary { color: hsl(var(--nebula-primary)); }
+  .text-magellan-navy    { color: hsl(var(--nebula-neutral)); }
+  .text-magellan-teal    { color: hsl(var(--nebula-cyan)); }
+  .bg-magellan-primary   { background-color: hsl(var(--nebula-primary)); }
+  .bg-magellan-teal      { background-color: hsl(var(--nebula-cyan)); }
 
-/* ===== 阴影系统 ===== */
-
-.shadow-ocean-sm {
-  box-shadow: 0 1px 2px rgba(9, 30, 66, 0.08);
-}
-
-.shadow-ocean-md {
-  box-shadow: 0 2px 4px rgba(9, 30, 66, 0.12);
-}
-
-.shadow-ocean-lg {
-  box-shadow: 0 4px 8px rgba(9, 30, 66, 0.15);
-}
-
-/* ===== 可访问性 ===== */
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* ===== Radix UI 防溢出 ===== */
-
-[data-radix-popper-content-wrapper] {
-  max-width: calc(100vw - 16px) !important;
-  z-index: 9999 !important;
-}
-
-[role="menu"],
-[role="dialog"] {
-  max-width: calc(100vw - 16px) !important;
-}
-
-header,
-header nav,
-header .container {
-  overflow: visible !important;
+  /* Atlassian 排版 */
+  .text-atlassian-h3         { @apply text-lg font-semibold leading-tight; }
+  .text-atlassian-h4         { @apply text-base font-medium leading-tight; }
+  .text-atlassian-body       { @apply text-sm leading-relaxed; }
+  .text-atlassian-body-large { @apply text-base leading-relaxed; }
+  .text-atlassian-body-small { @apply text-xs leading-normal; }
 }

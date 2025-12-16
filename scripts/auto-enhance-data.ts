@@ -1,9 +1,9 @@
 import fetch from 'node-fetch';
-import { PrismaClient } from '@prisma/client';
+import { db } from '../src/lib/db/db';
+import { websites } from '../src/lib/db/schema';
+import { or, eq, isNull, desc, sql } from 'drizzle-orm';
 import * as fs from 'fs';
 import * as path from 'path';
-
-const prisma = new PrismaClient();
 
 // 智能网站内容分析器
 class WebsiteAnalyzer {
@@ -238,51 +238,58 @@ async function autoEnhanceWebsiteData(website: any, retries = 3): Promise<any> {
 
     // 组合更新数据
     const updates: any = {
-      last_checked: new Date(),
-      response_time: Date.now() % 1000, // 模拟响应时间
+      lastChecked: new Date(),
+      responseTime: Date.now() % 1000, // 模拟响应时间
     };
 
     // 更新meta信息
-    if (metadata.logo_url && !website.logo_url) {
-      updates.logo_url = metadata.logo_url;
+    if (metadata.logo_url && !website.logoUrl) {
+      updates.logoUrl = metadata.logo_url;
     }
 
     // 更新社交链接
     Object.entries(socialLinks).forEach(([key, value]) => {
-      if (value && !website[key]) {
-        updates[key] = value;
+      // 转换 snake_case 到 camelCase
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+      if (value && !(website as any)[camelKey]) {
+        updates[camelKey] = value;
       }
     });
 
     // 更新定价信息
-    if (pricingInfo.pricing_model !== website.pricing_model) {
-      updates.pricing_model = pricingInfo.pricing_model;
+    if (pricingInfo.pricing_model !== website.pricingModel) {
+      updates.pricingModel = pricingInfo.pricing_model;
     }
-    if (pricingInfo.has_free_version !== website.has_free_version) {
-      updates.has_free_version = pricingInfo.has_free_version;
+    if (pricingInfo.has_free_version !== website.hasFreeVersion) {
+      updates.hasFreeVersion = pricingInfo.has_free_version;
     }
-    if (pricingInfo.base_price && !website.base_price) {
-      updates.base_price = pricingInfo.base_price;
+    if (pricingInfo.base_price && !website.basePrice) {
+      updates.basePrice = pricingInfo.base_price;
     }
 
     // 更新应用链接
     Object.entries(appLinks).forEach(([key, value]) => {
-      if (value && !website[key]) {
-        updates[key] = value;
+      // 转换 snake_case 到 camelCase
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+      if (value && !(website as any)[camelKey]) {
+        updates[camelKey] = value;
       }
     });
 
     // 更新平台支持
     if (platforms.length > 0) {
-      const currentPlatforms = website.supported_platforms ? 
-        JSON.parse(String(website.supported_platforms)) : ['web'];
+      const currentPlatforms = website.supportedPlatforms
+        ? (Array.isArray(website.supportedPlatforms)
+            ? website.supportedPlatforms
+            : JSON.parse(String(website.supportedPlatforms)))
+        : ['web'];
       const newPlatforms = [...new Set([...currentPlatforms, ...platforms])];
-      updates.supported_platforms = JSON.stringify(newPlatforms);
+      updates.supportedPlatforms = newPlatforms;
     }
 
     // 更新API信息
-    if (hasAPI && !website.api_available) {
-      updates.api_available = true;
+    if (hasAPI && !website.apiAvailable) {
+      updates.apiAvailable = true;
     }
 
     // 生成邮箱建议（不直接更新，只记录）
@@ -291,14 +298,14 @@ async function autoEnhanceWebsiteData(website: any, retries = 3): Promise<any> {
     }
 
     // 统计更新字段数
-    const updateCount = Object.keys(updates).length - 2; // 排除 last_checked 和 response_time
+    const updateCount = Object.keys(updates).length - 2; // 排除 lastChecked 和 responseTime
     
     console.log(`✅ 成功分析: ${website.title}`);
     console.log(`📊 更新字段: ${updateCount} 个`);
     if (updateCount > 0) {
-      console.log(`🔄 更新内容: ${Object.keys(updates).filter(k => k !== 'last_checked' && k !== 'response_time').join(', ')}`);
+      console.log(`🔄 更新内容: ${Object.keys(updates).filter(k => k !== 'lastChecked' && k !== 'responseTime').join(', ')}`);
     }
-    
+
     return { success: true, updates, updateCount };
 
   } catch (error) {
@@ -307,12 +314,12 @@ async function autoEnhanceWebsiteData(website: any, retries = 3): Promise<any> {
       await new Promise(resolve => setTimeout(resolve, 2000));
       return autoEnhanceWebsiteData(website, retries - 1);
     }
-    
+
     console.error(`❌ 分析失败: ${website.title} - ${error}`);
-    return { 
-      success: false, 
+    return {
+      success: false,
       error: error instanceof Error ? error.message : String(error),
-      updates: { last_checked: new Date(), response_time: null }
+      updates: { lastChecked: new Date(), responseTime: null }
     };
   }
 }
@@ -322,28 +329,23 @@ async function batchAutoEnhance(limit: number = 20) {
   console.log('🚀 启动自动数据增强...\n');
 
   // 获取需要增强的网站
-  const websites = await prisma.website.findMany({
-    where: {
-      OR: [
-        { logo_url: null },
-        { twitter_url: null },
-        { linkedin_url: null },
-        { github_url: null },
-        { base_price: null },
-        { ios_app_url: null },
-        { android_app_url: null },
-        { api_available: false },
-        { pricing_model: 'freemium' }, // 重新分析定价模型
-      ]
-    },
-    orderBy: [
-      { is_featured: 'desc' },
-      { likes: 'desc' }
-    ],
-    take: limit
+  const websitesList = await db.query.websites.findMany({
+    where: or(
+      isNull(websites.logoUrl),
+      isNull(websites.twitterUrl),
+      isNull(websites.linkedinUrl),
+      isNull(websites.githubUrl),
+      isNull(websites.basePrice),
+      isNull(websites.iosAppUrl),
+      isNull(websites.androidAppUrl),
+      eq(websites.apiAvailable, false),
+      eq(websites.pricingModel, 'freemium')
+    ),
+    orderBy: [desc(websites.isFeatured), desc(websites.likes)],
+    limit: limit
   });
 
-  console.log(`📊 找到 ${websites.length} 个待增强的网站\n`);
+  console.log(`📊 找到 ${websitesList.length} 个待增强的网站\n`);
 
   const stats = {
     processed: 0,
@@ -353,45 +355,43 @@ async function batchAutoEnhance(limit: number = 20) {
   };
 
   // 处理每个网站
-  for (let i = 0; i < websites.length; i++) {
-    const website = websites[i];
-    
-    console.log(`\n[${i + 1}/${websites.length}] 处理: ${website.title}`);
-    
+  for (let i = 0; i < websitesList.length; i++) {
+    const website = websitesList[i];
+
+    console.log(`\n[${i + 1}/${websitesList.length}] 处理: ${website.title}`);
+
     try {
       const result = await autoEnhanceWebsiteData(website);
-      
+
       if (result.success) {
         // 更新数据库
-        await prisma.website.update({
-          where: { id: website.id },
-          data: result.updates
-        });
-        
+        await db.update(websites)
+          .set(result.updates)
+          .where(eq(websites.id, website.id));
+
         stats.success++;
         stats.totalUpdates += result.updateCount || 0;
-        
+
         console.log(`✅ 已更新数据库`);
       } else {
         // 记录失败但仍更新检查时间
-        await prisma.website.update({
-          where: { id: website.id },
-          data: result.updates
-        });
-        
+        await db.update(websites)
+          .set(result.updates)
+          .where(eq(websites.id, website.id));
+
         stats.failed++;
         console.log(`❌ 处理失败: ${result.error}`);
       }
-      
+
     } catch (error) {
       stats.failed++;
       console.error(`💥 数据库更新失败: ${error}`);
     }
-    
+
     stats.processed++;
-    
+
     // 避免请求过频
-    if (i < websites.length - 1) {
+    if (i < websitesList.length - 1) {
       await new Promise(resolve => setTimeout(resolve, 3000));
     }
   }
@@ -412,25 +412,25 @@ async function batchAutoEnhance(limit: number = 20) {
 async function generateAutoEnhancementReport() {
   console.log('📊 生成自动增强报告...\n');
 
-  const websites = await prisma.website.findMany();
-  const total = websites.length;
+  const websitesList = await db.query.websites.findMany();
+  const total = websitesList.length;
 
   // 计算各字段的填充率
   const fields = [
-    'logo_url', 'twitter_url', 'linkedin_url', 'github_url',
-    'base_price', 'ios_app_url', 'android_app_url', 'email',
-    'api_available', 'has_free_version'
+    'logoUrl', 'twitterUrl', 'linkedinUrl', 'githubUrl',
+    'basePrice', 'iosAppUrl', 'androidAppUrl', 'email',
+    'apiAvailable', 'hasFreeVersion'
   ];
 
   console.log('📈 数据完整度报告:');
   console.log('='.repeat(60));
 
   fields.forEach(field => {
-    const filled = websites.filter(w => {
+    const filled = websitesList.filter(w => {
       const value = (w as any)[field];
       return value !== null && value !== undefined && value !== '' && value !== false;
     }).length;
-    
+
     const percentage = ((filled / total) * 100).toFixed(1);
     console.log(`${field.padEnd(20)}: ${filled.toString().padStart(4)}/${total} (${percentage}%)`);
   });
@@ -438,12 +438,14 @@ async function generateAutoEnhancementReport() {
   // 平台支持统计
   console.log('\n💻 平台支持统计:');
   console.log('-'.repeat(40));
-  
+
   const platformStats: Record<string, number> = {};
-  websites.forEach(website => {
-    if (website.supported_platforms) {
+  websitesList.forEach(website => {
+    if (website.supportedPlatforms) {
       try {
-        const platforms = JSON.parse(String(website.supported_platforms));
+        const platforms = Array.isArray(website.supportedPlatforms)
+          ? website.supportedPlatforms
+          : JSON.parse(String(website.supportedPlatforms));
         platforms.forEach((platform: string) => {
           platformStats[platform] = (platformStats[platform] || 0) + 1;
         });
@@ -463,10 +465,10 @@ async function generateAutoEnhancementReport() {
   // 定价模型统计
   console.log('\n💰 定价模型分布:');
   console.log('-'.repeat(40));
-  
+
   const pricingStats: Record<string, number> = {};
-  websites.forEach(website => {
-    const model = website.pricing_model || 'unknown';
+  websitesList.forEach(website => {
+    const model = website.pricingModel || 'unknown';
     pricingStats[model] = (pricingStats[model] || 0) + 1;
   });
 
@@ -497,8 +499,6 @@ async function main() {
 
   } catch (error) {
     console.error('❌ 程序错误:', error);
-  } finally {
-    await prisma.$disconnect();
   }
 }
 

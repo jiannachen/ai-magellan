@@ -1,13 +1,13 @@
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { websites, categories } from "@/lib/db/schema";
+import { desc, asc } from "drizzle-orm";
 
 export async function getWebsites() {
   try {
-    const websites = await prisma.website.findMany({
-      orderBy: {
-        created_at: "desc",
-      },
+    const websitesList = await db.query.websites.findMany({
+      orderBy: (websites, { desc }) => [desc(websites.createdAt)],
     });
-    return websites;
+    return websitesList;
   } catch (error) {
     console.error("Error fetching websites:", error);
     return [];
@@ -16,12 +16,10 @@ export async function getWebsites() {
 
 export async function getCategories() {
   try {
-    const categories = await prisma.category.findMany({
-      orderBy: {
-        id: "asc",
-      },
+    const categoriesList = await db.query.categories.findMany({
+      orderBy: (categories, { asc }) => [asc(categories.id)],
     });
-    return categories;
+    return categoriesList;
   } catch (error) {
     console.error("Error fetching categories:", error);
     return [];

@@ -1,27 +1,29 @@
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { footerLinks } from "@/lib/db/schema";
+import { asc } from "drizzle-orm";
 import FooterContent from "./footer-content";
 import type { FooterSettings } from "@/lib/types";
 import { cachedPrismaQuery } from "@/lib/db/cache";
 
 export async function Footer() {
   // 在服务端获取数据
-  const footerLinks = await cachedPrismaQuery(
+  const footerLinksList = await cachedPrismaQuery(
     "footer-links",
-    () =>
-      prisma.footerLink.findMany({
-        select: {
+    async () => {
+      const result = await db.query.footerLinks.findMany({
+        columns: {
           title: true,
           url: true,
         },
-        orderBy: {
-          created_at: "asc",
-        },
-      }),
+        orderBy: (footerLinks, { asc }) => [asc(footerLinks.createdAt)],
+      });
+      return result;
+    },
     { ttl: 86400 } // 1天缓存
   );
 
   const footerSettings: FooterSettings = {
-    links: footerLinks,
+    links: footerLinksList,
     copyright: "© 2024 AI Magellan - Chart Your AI Journey",
     icpBeian: "",
     customHtml: "",

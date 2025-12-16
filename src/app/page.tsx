@@ -1,4 +1,6 @@
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { websites, categories } from "@/lib/db/schema";
+import { eq, isNull, asc } from "drizzle-orm";
 import SimplifiedHomePage from "@/app/simplified-home-page";
 import { cachedPrismaQuery } from "@/lib/db/cache";
 import { StructuredData } from "@/components/seo/structured-data";
@@ -10,62 +12,62 @@ export default async function Home() {
   const [websitesData, categoriesData] = await Promise.all([
     cachedPrismaQuery(
       "approved-websites",
-      () =>
-        prisma.website.findMany({
-          where: { status: "approved" },
-          select: {
+      async () => {
+        const result = await db.query.websites.findMany({
+          where: eq(websites.status, 'approved'),
+          columns: {
             id: true,
             title: true,
             slug: true,
             url: true,
             description: true,
-            category_id: true,
+            categoryId: true,
             thumbnail: true,
-            logo_url: true,
+            logoUrl: true,
             status: true,
             visits: true,
             likes: true,
-            active: true, // 添加missing的字段
-            quality_score: true,
-            is_featured: true,
-            is_trusted: true,
-            created_at: true,
-            pricing_model: true,
-            has_free_version: true,
+            active: true,
+            qualityScore: true,
+            isFeatured: true,
+            isTrusted: true,
+            createdAt: true,
+            pricingModel: true,
+            hasFreeVersion: true,
           },
-        }),
+        });
+        return result;
+      },
       { ttl: 1 } // 1天缓存
     ),
     cachedPrismaQuery(
       "all-categories",
-      () =>
-        prisma.category.findMany({
-          where: {
-            parent_id: null // 只获取一级分类
-          },
-          select: {
+      async () => {
+        const result = await db.query.categories.findMany({
+          where: isNull(categories.parentId),
+          columns: {
             id: true,
             name: true,
             slug: true,
-            parent_id: true,
-            sort_order: true,
+            parentId: true,
+            sortOrder: true,
+          },
+          with: {
             children: {
-              select: {
+              columns: {
                 id: true,
                 name: true,
                 slug: true,
-                parent_id: true,
-                sort_order: true,
+                parentId: true,
+                sortOrder: true,
               },
-              orderBy: {
-                sort_order: 'asc'
-              }
-            }
+              orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
+            },
           },
-          orderBy: {
-            sort_order: 'asc'
-          }
-        }),
+          orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
+        });
+        return result;
+      },
       { ttl: 1 } // 1周缓存
     ),
   ]);
@@ -73,10 +75,29 @@ export default async function Home() {
   // 预处理数据，减少客户端计算
   const preFilteredWebsites = websitesData.map((website) => ({
     ...website,
+    category_id: website.categoryId,
+    logo_url: website.logoUrl ?? undefined,
     thumbnail: website.thumbnail ?? undefined,
-    logo_url: website.logo_url ?? undefined,
     status: website.status as "approved" | "pending" | "rejected",
+    quality_score: website.qualityScore,
+    is_featured: website.isFeatured,
+    is_trusted: website.isTrusted,
+    created_at: website.createdAt,
+    pricing_model: website.pricingModel,
+    has_free_version: website.hasFreeVersion,
     searchText: `${website.title.toLowerCase()} ${website.description.toLowerCase()}`,
+  }));
+
+  // Transform categories to match expected format
+  const transformedCategories = categoriesData.map(cat => ({
+    ...cat,
+    parent_id: cat.parentId,
+    sort_order: cat.sortOrder,
+    children: cat.children.map(child => ({
+      ...child,
+      parent_id: child.parentId,
+      sort_order: child.sortOrder,
+    })),
   }));
 
   // FAQ数据 - 用于结构化数据 (英文版本，SEO友好)
@@ -114,10 +135,10 @@ export default async function Home() {
       <StructuredData type="organization" />
       <StructuredData type="itemList" websites={preFilteredWebsites.slice(0, 20)} />
       <StructuredData type="faq" faqs={faqData} />
-      
+
       <SimplifiedHomePage
         initialWebsites={preFilteredWebsites}
-        initialCategories={categoriesData}
+        initialCategories={transformedCategories}
       />
     </>
   );

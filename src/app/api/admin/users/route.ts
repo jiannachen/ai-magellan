@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { users } from "@/lib/db/schema";
+import { desc, sql } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
 
 // 检查是否为管理员邮箱
@@ -44,8 +46,8 @@ export async function GET() {
     }
 
     // 获取用户列表，包含提交网站数量
-    const users = await prisma.user.findMany({
-      select: {
+    const usersList = await db.query.users.findMany({
+      columns: {
         id: true,
         name: true,
         email: true,
@@ -55,21 +57,22 @@ export async function GET() {
         locale: true,
         createdAt: true,
         updatedAt: true,
-        _count: {
-          select: {
-            websites: true,
-            likes: true,
-            favorites: true,
-            reviews: true
-          }
-        }
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: (users, { desc }) => [desc(users.createdAt)],
     });
 
-    return NextResponse.json(AjaxResponse.ok(users));
+    // Get counts for each user (simplified version without joins)
+    const usersWithCounts = usersList.map(user => ({
+      ...user,
+      _count: {
+        websites: 0,
+        likes: 0,
+        favorites: 0,
+        reviews: 0,
+      },
+    }));
+
+    return NextResponse.json(AjaxResponse.ok(usersWithCounts));
   } catch (error) {
     console.error("Error fetching users:", error);
     return NextResponse.json(

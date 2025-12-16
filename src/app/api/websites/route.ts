@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { AjaxResponse, generateSlug, ensureUserExists } from "@/lib/utils";
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { websites, websiteCategories, categories } from "@/lib/db/schema";
+import { eq, and, inArray } from "drizzle-orm";
 import { validateWebsiteSubmit } from "@/lib/validations/website";
 
 // GET /api/websites
@@ -11,38 +13,50 @@ export async function GET(request: Request) {
   const statusParam = searchParams.get("status");
   const categoryId = searchParams.get("categoryId");
 
-  const websites = await prisma.website.findMany({
-    where: {
-      ...(statusParam && statusParam !== "all" ? { status: statusParam as any } : {}),
-      ...(categoryId ? {
-        websiteCategories: {
-          some: {
-            categoryId: parseInt(categoryId)
-          }
-        }
-      } : {})
+  const websitesList = await db.query.websites.findMany({
+    where: (websites, { eq, and, exists }) => {
+      const conditions = [];
+
+      if (statusParam && statusParam !== "all") {
+        conditions.push(eq(websites.status, statusParam));
+      }
+
+      if (categoryId) {
+        conditions.push(
+          exists(
+            db.select()
+              .from(websiteCategories)
+              .where(
+                and(
+                  eq(websiteCategories.websiteId, websites.id),
+                  eq(websiteCategories.categoryId, parseInt(categoryId))
+                )
+              )
+          )
+        );
+      }
+
+      return conditions.length > 0 ? and(...conditions) : undefined;
     },
-    include: {
+    with: {
       websiteCategories: {
-        include: {
+        with: {
           category: {
-            select: {
+            columns: {
               id: true,
               name: true,
               slug: true,
-              name_en: true,
-              name_zh: true
+              nameEn: true,
+              nameZh: true
             }
           }
         },
-        orderBy: {
-          isPrimary: 'desc' // 主分类排在前面
-        }
+        orderBy: (websiteCategories, { desc }) => [desc(websiteCategories.isPrimary)]
       }
     }
   });
 
-  return NextResponse.json(AjaxResponse.ok(websites));
+  return NextResponse.json(AjaxResponse.ok(websitesList));
 }
 
 // POST /api/websites
@@ -102,19 +116,19 @@ export async function POST(request: Request) {
       : [Number(validatedData.category_id)];
 
     // 验证所有分类是否存在
-    const categories = await prisma.category.findMany({
-      where: { id: { in: categoryIds } }
+    const categoriesList = await db.query.categories.findMany({
+      where: inArray(categories.id, categoryIds)
     });
 
-    if (categories.length !== categoryIds.length) {
+    if (categoriesList.length !== categoryIds.length) {
       return NextResponse.json(AjaxResponse.fail("One or more categories do not exist"), {
         status: 400,
       });
     }
 
     // Check if URL already exists
-    const existingWebsite = await prisma.website.findFirst({
-      where: { url: validatedData.url },
+    const existingWebsite = await db.query.websites.findFirst({
+      where: eq(websites.url, validatedData.url),
     });
 
     if (existingWebsite) {
@@ -128,24 +142,26 @@ export async function POST(request: Request) {
     let slugCounter = 1;
 
     // 确保slug唯一
-    while (await prisma.website.findUnique({ where: { slug } })) {
+    while (await db.query.websites.findFirst({ where: eq(websites.slug, slug) })) {
       slug = `${generateSlug(validatedData.title)}-${slugCounter}`;
       slugCounter++;
     }
 
-    const website = await prisma.website.create({
-      data: {
+    // Use transaction to create website and categories atomically
+    const result = await db.transaction(async (tx) => {
+      // Create website
+      const [website] = await tx.insert(websites).values({
         // 基本信息
         title: validatedData.title.trim(),
         slug: slug,
         url: validatedData.url.trim(),
         email: validatedData.email?.trim() || null,
-        category_id: Number(categoryIds[0]), // 保留旧字段为主分类
+        categoryId: Number(categoryIds[0]), // 保留旧字段为主分类
         status: "pending", // 默认为待审核状态
         submittedBy: userId,
 
         // 图片资源
-        logo_url: validatedData.logo_url?.trim() || null,
+        logoUrl: validatedData.logo_url?.trim() || null,
         thumbnail: validatedData.thumbnail?.trim() || null,
 
         // 标签和描述
@@ -157,53 +173,61 @@ export async function POST(request: Request) {
         features: validatedData.features || [],
 
         // 使用场景和目标受众
-        use_cases: validatedData.use_cases || [],
-        target_audience: validatedData.target_audience || [],
+        useCases: validatedData.use_cases || [],
+        targetAudience: validatedData.target_audience || [],
 
         // 常见问题
         faq: validatedData.faq || [],
 
         // 定价信息
-        pricing_model: validatedData.pricing_model || "free",
-        has_free_version: validatedData.has_free_version || false,
-        api_available: validatedData.api_available || false,
-        pricing_plans: validatedData.pricing_plans || [],
+        pricingModel: validatedData.pricing_model || "free",
+        hasFreeVersion: validatedData.has_free_version || false,
+        apiAvailable: validatedData.api_available || false,
+        pricingPlans: validatedData.pricing_plans || [],
 
         // 社交媒体链接
-        twitter_url: validatedData.twitter_url?.trim() || null,
-        linkedin_url: validatedData.linkedin_url?.trim() || null,
-        facebook_url: validatedData.facebook_url?.trim() || null,
-        instagram_url: validatedData.instagram_url?.trim() || null,
-        youtube_url: validatedData.youtube_url?.trim() || null,
-        discord_url: validatedData.discord_url?.trim() || null,
+        twitterUrl: validatedData.twitter_url?.trim() || null,
+        linkedinUrl: validatedData.linkedin_url?.trim() || null,
+        facebookUrl: validatedData.facebook_url?.trim() || null,
+        instagramUrl: validatedData.instagram_url?.trim() || null,
+        youtubeUrl: validatedData.youtube_url?.trim() || null,
+        discordUrl: validatedData.discord_url?.trim() || null,
 
         // 集成
         integrations: validatedData.integrations || [],
 
         // 平台支持
-        ios_app_url: validatedData.ios_app_url?.trim() || null,
-        android_app_url: validatedData.android_app_url?.trim() || null,
-        web_app_url: validatedData.web_app_url?.trim() || null,
-        desktop_platforms: validatedData.desktop_platforms || [],
+        iosAppUrl: validatedData.ios_app_url?.trim() || null,
+        androidAppUrl: validatedData.android_app_url?.trim() || null,
+        webAppUrl: validatedData.web_app_url?.trim() || null,
+        desktopPlatforms: validatedData.desktop_platforms || [],
+      }).returning();
 
-        // 创建多分类关联
-        websiteCategories: {
-          create: categoryIds.map((catId, index) => ({
-            categoryId: catId,
-            isPrimary: index === 0 // 第一个为主分类
-          }))
-        }
-      },
-      include: {
-        websiteCategories: {
-          include: {
-            category: true
+      // Create website categories
+      await tx.insert(websiteCategories).values(
+        categoryIds.map((catId, index) => ({
+          websiteId: website.id,
+          categoryId: catId,
+          isPrimary: index === 0 // 第一个为主分类
+        }))
+      );
+
+      // Fetch the complete website with categories
+      const websiteWithCategories = await tx.query.websites.findFirst({
+        where: eq(websites.id, website.id),
+        with: {
+          websiteCategories: {
+            with: {
+              category: true
+            }
           }
         }
-      }
+      });
+
+      return websiteWithCategories;
     });
 
-    return NextResponse.json(AjaxResponse.ok(website));
+    return NextResponse.json(AjaxResponse.ok(result));
   } catch (error) {
     console.error("Failed to create website:", error);
     return NextResponse.json(AjaxResponse.fail("Failed to create website"), {

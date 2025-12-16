@@ -103,9 +103,9 @@ export default function MobileMenu() {
 
   return (
     <div className="md:hidden">
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-lg hover:bg-muted transition-colors"
+        className="p-2 rounded-lg hover:bg-secondary transition-all active:scale-95"
         aria-label={isOpen ? '关闭菜单' : '打开菜单'}
       >
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -114,15 +114,15 @@ export default function MobileMenu() {
       {isOpen && (
         <>
           {/* 遮罩层 */}
-          <div 
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40" 
+          <div
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
             onClick={() => setIsOpen(false)}
             aria-label="关闭菜单"
           />
-          
-          {/* 菜单内容 - 优化移动端定位和尺寸 */}
+
+          {/* 菜单内容 - 现代简约风格 */}
           <div className="absolute top-full left-1 right-1 sm:left-4 sm:right-4 mt-2 z-50">
-            <div className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-lg p-3 sm:p-4 max-w-full overflow-hidden mx-auto" style={{ maxWidth: '420px' }}>
+            <div className="bg-background border border-border rounded-lg shadow-lg p-3 sm:p-4 max-w-full overflow-hidden mx-auto" style={{ maxWidth: '420px' }}>
               <div className="flex flex-col space-y-4">
                 
                 {/* Categories Section - 海域地图 */}
@@ -130,7 +130,7 @@ export default function MobileMenu() {
                   <Button
                     variant="ghost"
                     onClick={() => setCategoriesOpen(!categoriesOpen)}
-                    className="w-full justify-between hover:bg-muted/50 font-medium text-sm sm:text-base rounded-lg h-11 sm:h-12 px-3 sm:px-4 min-h-[44px]"
+                    className="w-full justify-between hover:bg-secondary font-medium text-sm sm:text-base rounded-lg h-11 sm:h-12 px-3 sm:px-4 min-h-[44px]"
                   >
                     <div className="flex items-center">
                       <Map className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-primary" />
@@ -147,7 +147,7 @@ export default function MobileMenu() {
                       <Link href="/categories" className="block">
                         <Button
                           variant="ghost"
-                          className="w-full justify-start hover:bg-accent text-sm rounded-lg h-10 min-h-[40px] px-3"
+                          className="w-full justify-start hover:bg-secondary text-sm rounded-lg h-10 min-h-[40px] px-3"
                           onClick={() => setIsOpen(false)}
                         >
                           <Map className="h-4 w-4 mr-2 text-primary" />
@@ -162,7 +162,7 @@ export default function MobileMenu() {
                         >
                           <Button
                             variant="ghost"
-                            className="w-full justify-start hover:bg-accent text-sm rounded-lg h-9"
+                            className="w-full justify-start hover:bg-secondary text-sm rounded-lg h-9"
                             onClick={() => setIsOpen(false)}
                           >
                             {getCategoryIcon(category.slug)}
@@ -181,7 +181,7 @@ export default function MobileMenu() {
                   <Button
                     variant="ghost"
                     onClick={() => setRankingsOpen(!rankingsOpen)}
-                    className="w-full justify-between hover:bg-muted/50 font-medium text-sm sm:text-base rounded-lg h-11 sm:h-12 px-3 sm:px-4 min-h-[44px]"
+                    className="w-full justify-between hover:bg-secondary font-medium text-sm sm:text-base rounded-lg h-11 sm:h-12 px-3 sm:px-4 min-h-[44px]"
                   >
                     <div className="flex items-center">
                       <Trophy className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-primary" />
@@ -198,7 +198,7 @@ export default function MobileMenu() {
                       <Link href="/rankings" className="block">
                         <Button
                           variant="ghost"
-                          className="w-full justify-start hover:bg-accent text-sm rounded-lg h-10 min-h-[40px] px-3"
+                          className="w-full justify-start hover:bg-secondary text-sm rounded-lg h-10 min-h-[40px] px-3"
                           onClick={() => setIsOpen(false)}
                         >
                           <Trophy className="h-4 w-4 mr-2 text-primary" />
@@ -213,7 +213,7 @@ export default function MobileMenu() {
                         >
                           <Button
                             variant="ghost"
-                            className="w-full justify-start hover:bg-accent text-sm rounded-lg h-9"
+                            className="w-full justify-start hover:bg-secondary text-sm rounded-lg h-9"
                             onClick={() => setIsOpen(false)}
                           >
                             <link.icon className="h-4 w-4 mr-2 text-muted-foreground" />

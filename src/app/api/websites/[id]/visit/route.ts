@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { websites } from "@/lib/db/schema";
+import { eq, sql } from "drizzle-orm";
 
 // POST /api/websites/[id]/visit
 export async function POST(
@@ -17,10 +19,10 @@ export async function POST(
       });
     }
 
-    const updatedWebsite = await prisma.website.update({
-      where: { id: websiteId },
-      data: { visits: { increment: 1 } },
-    });
+    const [updatedWebsite] = await db.update(websites)
+      .set({ visits: sql`${websites.visits} + 1` })
+      .where(eq(websites.id, websiteId))
+      .returning();
 
     return NextResponse.json(
       AjaxResponse.ok({ visits: updatedWebsite.visits })

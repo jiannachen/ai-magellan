@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { users, websites, categories } from "@/lib/db/schema";
+import { eq, desc, sql } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
 
 // 检查是否为管理员邮箱
@@ -48,36 +50,32 @@ export async function GET(
     }
 
     // 获取用户详情，包含提交的网站列表
-    const user = await prisma.user.findUnique({
-      where: { id },
-      include: {
-        websites: {
-          select: {
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, id),
+      with: {
+        submittedWebsites: {
+          columns: {
             id: true,
             title: true,
             url: true,
             status: true,
-            created_at: true,
-            category: {
-              select: {
-                name: true,
-                slug: true
-              }
-            }
+            createdAt: true,
           },
-          orderBy: {
-            created_at: 'desc'
-          }
+          with: {
+            websiteCategories: {
+              with: {
+                category: {
+                  columns: {
+                    name: true,
+                    slug: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: (websites, { desc }) => [desc(websites.createdAt)],
         },
-        _count: {
-          select: {
-            websites: true,
-            likes: true,
-            favorites: true,
-            reviews: true
-          }
-        }
-      }
+      },
     });
 
     if (!user) {
@@ -87,7 +85,23 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(AjaxResponse.ok(user));
+    // Get counts separately
+    const [websitesCount] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(websites)
+      .where(eq(websites.submittedBy, id));
+
+    const userWithCount = {
+      ...user,
+      _count: {
+        websites: Number(websitesCount?.count || 0),
+        likes: 0,
+        favorites: 0,
+        reviews: 0,
+      },
+    };
+
+    return NextResponse.json(AjaxResponse.ok(userWithCount));
   } catch (error) {
     console.error("Error fetching user:", error);
     return NextResponse.json(
@@ -165,24 +179,25 @@ export async function PUT(
     }
 
     // 更新用户
-    const updatedUser = await prisma.user.update({
-      where: { id },
-      data: {
-        ...(role && { role }),
-        ...(status && { status }),
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-        role: true,
-        status: true,
-        locale: true,
-        createdAt: true,
-        updatedAt: true,
-      }
-    });
+    const updateData: any = {};
+    if (role) updateData.role = role;
+    if (status) updateData.status = status;
+
+    const [updatedUser] = await db
+      .update(users)
+      .set(updateData)
+      .where(eq(users.id, id))
+      .returning({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        image: users.image,
+        role: users.role,
+        status: users.status,
+        locale: users.locale,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+      });
 
     return NextResponse.json(AjaxResponse.ok(updatedUser));
   } catch (error) {

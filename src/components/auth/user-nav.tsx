@@ -84,11 +84,11 @@ export function UserNav() {
         </Button>
       </DropdownMenuTrigger>
 
-      <UserNavDropdownWrapper className="w-[calc(100vw-40px)] sm:w-60 max-w-[260px]">
+      <UserNavDropdownWrapper className="w-[280px] sm:w-[300px]">
         {/* 用户信息头部 */}
         <DropdownMenuLabel className="font-normal">
-          <div className="flex items-center gap-3 p-2">
-            <Avatar className="h-8 w-8 border">
+          <div className="flex items-center gap-2.5 px-2 py-2.5">
+            <Avatar className="h-9 w-9 border">
               <AvatarImage src={user?.imageUrl || ''} alt={user?.fullName || ''} />
               <AvatarFallback className="text-sm">
                 {user?.firstName?.charAt(0) || user?.emailAddresses?.[0]?.emailAddress?.charAt(0) || 'U'}
@@ -115,11 +115,11 @@ export function UserNav() {
               <Link
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-2 cursor-pointer",
+                  "flex items-center gap-2.5 px-3 py-2.5 cursor-pointer",
                   isActive && "bg-primary text-white hover:bg-primary/90"
                 )}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className="h-4 w-4 flex-shrink-0" />
                 <span className="font-medium text-sm">
                   {item.label}
                 </span>
@@ -131,9 +131,9 @@ export function UserNav() {
         <DropdownMenuSeparator />
 
         {/* 退出登录按钮 */}
-        <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
-          <LogOut className="h-4 w-4 mr-2" />
-          {t('signout')}
+        <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive px-3 py-2.5">
+          <LogOut className="h-4 w-4 mr-2.5 flex-shrink-0" />
+          <span className="text-sm font-medium">{t('signout')}</span>
         </DropdownMenuItem>
       </UserNavDropdownWrapper>
     </DropdownMenu>

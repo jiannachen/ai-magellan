@@ -3,7 +3,9 @@ import { UserManagementClient } from "@/components/admin/user-management-client"
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { users } from "@/lib/db/schema";
+import { eq, desc } from "drizzle-orm";
 import { ListFilter, Users, MessageSquare } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -18,8 +20,8 @@ function isAdminEmail(email: string): boolean {
 }
 
 async function getUsers() {
-  const users = await prisma.user.findMany({
-    select: {
+  const usersList = await db.query.users.findMany({
+    columns: {
       id: true,
       name: true,
       email: true,
@@ -29,25 +31,21 @@ async function getUsers() {
       locale: true,
       createdAt: true,
       updatedAt: true,
-      _count: {
-        select: {
-          websites: true,
-          likes: true,
-          favorites: true,
-          reviews: true
-        }
-      }
     },
-    orderBy: {
-      createdAt: 'desc'
-    }
+    orderBy: (users, { desc }) => [desc(users.createdAt)],
   });
 
   // Convert Date objects to strings for client component
-  return users.map(user => ({
+  return usersList.map(user => ({
     ...user,
     createdAt: user.createdAt.toISOString(),
-    updatedAt: user.updatedAt.toISOString()
+    updatedAt: user.updatedAt.toISOString(),
+    _count: {
+      websites: 0,
+      likes: 0,
+      favorites: 0,
+      reviews: 0,
+    },
   }));
 }
 
@@ -125,38 +123,46 @@ export default async function AdminUsersPage() {
   }
 
   // 确保数据库中用户记录存在且为管理员
-  let adminUser = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { role: true }
+  let adminUser = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+    columns: { role: true },
   });
 
   // 如果用户不存在或角色不是管理员，则创建或更新
   if (!adminUser || adminUser.role !== 'admin') {
     try {
-      adminUser = await prisma.user.upsert({
-        where: { id: userId },
-        update: {
-          role: 'admin',
-          status: 'active',
-          name: clerkUser?.fullName || clerkUser?.firstName || 'Admin',
-          image: clerkUser?.imageUrl,
-        },
-        create: {
+      const existingUser = await db.query.users.findFirst({
+        where: eq(users.id, userId),
+      });
+
+      if (existingUser) {
+        await db
+          .update(users)
+          .set({
+            role: 'admin',
+            status: 'active',
+            name: clerkUser?.fullName || clerkUser?.firstName || 'Admin',
+            image: clerkUser?.imageUrl,
+          })
+          .where(eq(users.id, userId));
+      } else {
+        await db.insert(users).values({
           id: userId,
           email: userEmail,
           name: clerkUser?.fullName || clerkUser?.firstName || 'Admin',
           image: clerkUser?.imageUrl,
           role: 'admin',
           status: 'active',
-        },
-        select: { role: true }
-      });
+        });
+      }
+
+      adminUser = { role: 'admin' };
     } catch (error) {
       console.error('Error creating/updating admin user:', error);
     }
   }
 
-  const users = await getUsers();
+  const usersData = await getUsers();
 
   return (
     <div className="container max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6 min-h-[calc(100vh-4rem)] space-y-6">
@@ -196,7 +202,7 @@ export default async function AdminUsersPage() {
 
       {/* Content */}
       <div className="rounded-xl border border-border/40 bg-background/30 shadow-sm overflow-hidden backdrop-blur-sm">
-        <UserManagementClient initialUsers={users} />
+        <UserManagementClient initialUsers={usersData} />
       </div>
     </div>
   );

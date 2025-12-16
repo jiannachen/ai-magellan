@@ -2,14 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAtom } from 'jotai'
 import { categoriesAtom } from '@/lib/atoms'
 import { toast } from '@/hooks/use-toast'
-
-interface Category {
-  id: number
-  name: string
-  slug: string
-  parent_id?: number | null
-  children?: Category[]
-}
+import { Category } from '@/lib/types'
 
 interface WebsiteData {
   category_id?: number
@@ -29,12 +22,12 @@ export function useCategories(websiteData?: WebsiteData) {
         if (!response.ok) throw new Error('Failed to load categories')
         const data = await response.json()
 
-        // API returns parent categories with children populated by Prisma
-        // Filter to ensure we only have parent categories (parent_id is null or undefined)
+        // API returns parent categories with children populated by Drizzle
+        // Filter to ensure we only have parent categories (parentId is null or undefined)
         // Use strict comparison to avoid filtering errors
         const allCategories = Array.isArray(data.data) ? data.data : []
         const parentCategories = allCategories.filter(
-          (cat: Category) => cat.parent_id === null || cat.parent_id === undefined
+          (cat: Category) => cat.parentId === null || cat.parentId === undefined
         )
 
         setCategories(parentCategories)
@@ -85,8 +78,8 @@ export function useCategories(websiteData?: WebsiteData) {
 
     if (currentCategory) {
       // If it's a subcategory, set its parent as selected
-      if (currentCategory.parent_id) {
-        setSelectedParentCategory(currentCategory.parent_id)
+      if (currentCategory.parentId) {
+        setSelectedParentCategory(currentCategory.parentId)
       } else {
         // If it's a parent category, set itself as selected
         setSelectedParentCategory(currentCategory.id)

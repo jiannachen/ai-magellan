@@ -1,4 +1,6 @@
-import { prisma } from '@/lib/db/db';
+import { db } from '@/lib/db/db';
+import { websites } from '@/lib/db/schema';
+import { eq, and, or, gte, like, inArray, sql } from 'drizzle-orm';
 
 interface SearchParams {
   q?: string;
@@ -63,147 +65,114 @@ export async function searchWebsites(params: SearchParams): Promise<{
       ...params
     };
 
-    // 构建Prisma查询条件
-    const where: any = {
-      status: 'approved', // 只返回已批准的工具
-      active: 1 // 只返回活跃的工具
-    };
+    // 构建查询条件
+    const conditions = [
+      eq(websites.status, 'approved'),
+      eq(websites.active, 1)
+    ];
 
     // 全文搜索 - 搜索标题、描述、标签
     if (searchParams.q && searchParams.q.trim()) {
-      const searchTerm = searchParams.q.trim();
-      where.OR = [
-        {
-          title: {
-            contains: searchTerm,
-            mode: 'insensitive'
-          }
-        },
-        {
-          description: {
-            contains: searchTerm,
-            mode: 'insensitive'
-          }
-        },
-        {
-          tags: {
-            contains: searchTerm,
-            mode: 'insensitive'
-          }
-        }
-      ];
+      const searchTerm = `%${searchParams.q.trim()}%`;
+      conditions.push(
+        or(
+          like(websites.title, searchTerm),
+          like(websites.description, searchTerm),
+          like(websites.tags, searchTerm)
+        )!
+      );
     }
 
     // 分类过滤
     if (searchParams.category) {
-      where.category_id = parseInt(searchParams.category);
+      conditions.push(eq(websites.categoryId, parseInt(searchParams.category)));
     }
 
     // 定价模型过滤
     if (searchParams.pricingModel && searchParams.pricingModel.length > 0) {
-      where.pricing_model = {
-        in: searchParams.pricingModel
-      };
+      conditions.push(inArray(websites.pricingModel, searchParams.pricingModel));
     }
 
     // 质量评分过滤
     if (searchParams.minQualityScore && searchParams.minQualityScore > 0) {
-      where.quality_score = {
-        gte: searchParams.minQualityScore
-      };
+      conditions.push(gte(websites.qualityScore, searchParams.minQualityScore));
     }
 
     // 特性过滤
     if (searchParams.isTrusted) {
-      where.is_trusted = true;
+      conditions.push(eq(websites.isTrusted, true));
     }
 
     if (searchParams.isFeatured) {
-      where.is_featured = true;
+      conditions.push(eq(websites.isFeatured, true));
     }
 
     if (searchParams.hasFreePlan) {
-      where.has_free_version = true;
-    }
-
-    // 排序逻辑
-    let orderBy: any = [];
-    switch (searchParams.sortBy) {
-      case 'created_at':
-        orderBy = [{ created_at: searchParams.sortOrder }];
-        break;
-      case 'visits':
-        orderBy = [{ visits: searchParams.sortOrder }];
-        break;
-      case 'likes':
-        orderBy = [{ likes: searchParams.sortOrder }];
-        break;
-      case 'title':
-        orderBy = [{ title: searchParams.sortOrder }];
-        break;
-      case 'quality_score':
-      default:
-        // 默认排序：精选优先，然后按质量评分
-        orderBy = [
-          { is_featured: 'desc' },
-          { quality_score: 'desc' }
-        ];
-        break;
+      conditions.push(eq(websites.hasFreeVersion, true));
     }
 
     // 计算分页
     const skip = (searchParams.page - 1) * searchParams.limit;
 
+    // 获取总数
+    const [{ count: totalCount }] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(websites)
+      .where(and(...conditions));
+
     // 执行搜索查询
-    const [websites, totalCount] = await Promise.all([
-      prisma.website.findMany({
-        where,
-        orderBy,
-        skip,
-        take: searchParams.limit,
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          url: true,
-          description: true,
-          category_id: true,
-          thumbnail: true,
-          logo_url: true,
-          visits: true,
-          likes: true,
-          quality_score: true,
-          is_featured: true,
-          is_trusted: true,
-          created_at: true,
-          pricing_model: true,
-          has_free_version: true,
-          tags: true,
-          active: true,
-          status: true
-        }
-      }),
-      prisma.website.count({ where })
-    ]);
+    const websitesList = await db.query.websites.findMany({
+      where: and(...conditions),
+      columns: {
+        id: true,
+        title: true,
+        slug: true,
+        url: true,
+        description: true,
+        categoryId: true,
+        thumbnail: true,
+        logoUrl: true,
+        visits: true,
+        likes: true,
+        qualityScore: true,
+        isFeatured: true,
+        isTrusted: true,
+        createdAt: true,
+        pricingModel: true,
+        hasFreeVersion: true,
+        tags: true,
+        active: true,
+        status: true,
+      },
+      limit: searchParams.limit,
+      offset: skip,
+    });
 
     // 计算分页信息
-    const totalPages = Math.ceil(totalCount / searchParams.limit);
+    const totalPages = Math.ceil(Number(totalCount) / searchParams.limit);
     const hasNextPage = searchParams.page < totalPages;
     const hasPrevPage = searchParams.page > 1;
 
     return {
       success: true,
       data: {
-        websites: websites.map(website => ({
+        websites: websitesList.map(website => ({
           ...website,
+          category_id: website.categoryId,
           thumbnail: website.thumbnail ?? undefined,
-          logo_url: website.logo_url ?? undefined,
+          logo_url: website.logoUrl ?? undefined,
+          quality_score: website.qualityScore,
+          is_featured: website.isFeatured,
+          is_trusted: website.isTrusted,
+          created_at: website.createdAt,
+          pricing_model: website.pricingModel,
+          has_free_version: website.hasFreeVersion,
           status: website.status as "pending" | "approved" | "rejected"
         })),
         pagination: {
           page: searchParams.page,
           limit: searchParams.limit,
-          total: totalCount,
+          total: Number(totalCount),
           totalPages,
           hasNextPage,
           hasPrevPage

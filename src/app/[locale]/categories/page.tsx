@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
-import { prisma } from '@/lib/db/db';
+import { db } from '@/lib/db/db';
+import { categories, websites, websiteCategories } from '@/lib/db/schema';
+import { isNull, eq, and, sql } from 'drizzle-orm';
 import CategoriesListPage from '@/components/category/categories-list-page';
 
 export const metadata: Metadata = {
@@ -12,70 +14,66 @@ export const metadata: Metadata = {
 };
 
 export default async function CategoriesPage() {
-  // 优化：使用单次查询获取所有分类及其网站数量统计
-  const categories = await prisma.category.findMany({
-    where: {
-      parent_id: null  // 只获取一级分类
-    },
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      sort_order: true,
-      _count: {
-        select: {
-          websiteCategories: {
-            where: {
-              website: {
-                status: 'approved'
-              }
-            }
-          }
-        }
-      },
+  // 获取所有一级分类及其子分类
+  const categoriesData = await db.query.categories.findMany({
+    where: isNull(categories.parentId),
+    with: {
       children: {
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          sort_order: true,
-          _count: {
-            select: {
-              websiteCategories: {
-                where: {
-                  website: {
-                    status: 'approved'
-                  }
-                }
-              }
-            }
-          }
-        },
-        orderBy: {
-          sort_order: 'asc'
-        }
-      }
+        orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
+      },
     },
-    orderBy: {
-      sort_order: 'asc'
-    }
+    orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
   });
 
-  // 转换数据结构以匹配组件需求
-  const categoriesWithCounts = categories.map(category => ({
-    id: category.id,
-    name: category.name,
-    slug: category.slug,
-    sort_order: category.sort_order,
-    toolCount: category._count.websiteCategories,
-    subcategories: category.children.map(child => ({
-      id: child.id,
-      name: child.name,
-      slug: child.slug,
-      toolCount: child._count.websiteCategories,
-      description: `${child.name}相关的AI工具`
-    }))
-  }));
+  // 获取每个分类的网站数量
+  const categoriesWithCounts = await Promise.all(
+    categoriesData.map(async (category) => {
+      // 获取一级分类的网站数量
+      const [{ count: mainCount }] = await db
+        .select({ count: sql<number>`count(distinct ${websiteCategories.websiteId})` })
+        .from(websiteCategories)
+        .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
+        .where(
+          and(
+            eq(websiteCategories.categoryId, category.id),
+            eq(websites.status, 'approved')
+          )
+        );
+
+      // 获取子分类及其网站数量
+      const subcategories = await Promise.all(
+        category.children.map(async (child) => {
+          const [{ count: childCount }] = await db
+            .select({ count: sql<number>`count(distinct ${websiteCategories.websiteId})` })
+            .from(websiteCategories)
+            .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
+            .where(
+              and(
+                eq(websiteCategories.categoryId, child.id),
+                eq(websites.status, 'approved')
+              )
+            );
+
+          return {
+            id: child.id,
+            name: child.name,
+            slug: child.slug,
+            toolCount: Number(childCount),
+            description: `${child.name}相关的AI工具`,
+          };
+        })
+      );
+
+      return {
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        sort_order: category.sortOrder,
+        toolCount: Number(mainCount),
+        subcategories,
+      };
+    })
+  );
 
   return <CategoriesListPage categories={categoriesWithCounts} />;
 }

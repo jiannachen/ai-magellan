@@ -662,8 +662,8 @@ export default function ToolDetailPage() {
                       </h3>
                       <div className="p-3 rounded-lg bg-muted/50 border border-magellan-primary/10">
                         <div className="flex items-center gap-2 text-sm">
-                          <span className="text-muted-foreground">{t('profile.submit.simple_form.business_email_required').replace(' *', '')}:</span>
-                          <a 
+                          <span className="text-muted-foreground">{(t('profile.submit.simple_form.business_email_required') || 'Business Email').replace(' *', '')}:</span>
+                          <a
                             href={`mailto:${website.email}`}
                             className="text-magellan-primary hover:text-magellan-primary-hover transition-colors"
                           >
@@ -866,7 +866,7 @@ export default function ToolDetailPage() {
                         <Coins className="h-4 w-4 text-primary" />
                         <span className="font-semibold">{t('form.pricing_model')}</span>
                       </div>
-                      <p className="text-sm text-muted-foreground capitalize">{website.pricing_model.replace('_', ' ')}</p>
+                      <p className="text-sm text-muted-foreground capitalize">{website.pricing_model?.replace('_', ' ') || 'N/A'}</p>
                     </div>
                     
                     <div className="p-4 rounded-lg bg-muted/50 border border-primary/10">

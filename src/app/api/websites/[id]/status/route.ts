@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
-import { prisma } from "@/lib/db/db";
+import { db } from "@/lib/db/db";
+import { websites } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -14,8 +16,8 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
       });
     }
 
-    const website = await prisma.website.findUnique({
-      where: { id: websiteId },
+    const website = await db.query.websites.findFirst({
+      where: eq(websites.id, websiteId),
     });
 
     if (!website) {
@@ -24,10 +26,9 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
       });
     }
 
-    await prisma.website.update({
-      where: { id: websiteId },
-      data: { status },
-    });
+    await db.update(websites)
+      .set({ status })
+      .where(eq(websites.id, websiteId));
 
     return NextResponse.json(AjaxResponse.ok("Status updated"));
   } catch (error) {

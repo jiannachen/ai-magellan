@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { prisma } from '@/lib/db/db';
+import { db } from '@/lib/db/db';
+import { categories, websites, websiteCategories } from '@/lib/db/schema';
+import { eq, and, desc, sql, isNull, asc } from 'drizzle-orm';
 import CategoryPage from '@/components/category/category-page';
 
 // 此页面依赖运行时数据库查询，强制动态渲染避免构建期静态化导致的 DYNAMIC_SERVER_USAGE 错误
@@ -9,16 +11,15 @@ export const revalidate = 0;
 
 export async function generateStaticParams() {
   try {
-    const categories = await prisma.category.findMany({
-      select: { slug: true }
+    const categoriesList = await db.query.categories.findMany({
+      columns: { slug: true },
     });
 
-    return categories.map((category) => ({
+    return categoriesList.map((category) => ({
       slug: category.slug,
     }));
   } catch (error) {
     console.warn('Failed to generate static params for categories:', error);
-    // Return empty array to allow dynamic rendering
     return [];
   }
 }
@@ -29,10 +30,10 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  
-  const category = await prisma.category.findUnique({
-    where: { slug },
-    select: { name: true, slug: true }
+
+  const category = await db.query.categories.findFirst({
+    where: eq(categories.slug, slug),
+    columns: { name: true, slug: true },
   });
 
   if (!category) {
@@ -57,116 +58,122 @@ export default async function CategoryPageRoute({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  
+
   // 获取分类信息
-  const category = await prisma.category.findUnique({
-    where: { slug },
-    select: { 
-      id: true, 
-      name: true, 
+  const category = await db.query.categories.findFirst({
+    where: eq(categories.slug, slug),
+    columns: {
+      id: true,
+      name: true,
       slug: true,
-      parent_id: true
-    }
+      parentId: true,
+    },
   });
 
   if (!category) {
-    // 如果是子分类页面不存在，重定向到主分类页面
     redirect(`/categories#${slug}`);
   }
 
   // 获取该分类下的网站（使用多分类关系）
-  const websites = await prisma.website.findMany({
-    where: {
-      websiteCategories: {
-        some: {
-          categoryId: category.id
-        }
-      },
-      status: 'approved'
-    },
-    orderBy: [
-      { is_featured: 'desc' },
-      { quality_score: 'desc' }
-    ]
-  });
+  const websitesList = await db
+    .select()
+    .from(websites)
+    .innerJoin(websiteCategories, eq(websites.id, websiteCategories.websiteId))
+    .where(
+      and(
+        eq(websiteCategories.categoryId, category.id),
+        eq(websites.status, 'approved')
+      )
+    )
+    .orderBy(desc(websites.isFeatured), desc(websites.qualityScore));
 
-  // 获取所有分类（用于导航）- 优化：使用 _count 避免 N+1 查询
-  const allCategoriesData = await prisma.category.findMany({
-    select: {
+  // Extract websites from join result
+  const websitesData = websitesList.map(row => row.websites);
+
+  // 获取所有分类（用于导航）
+  const allCategoriesData = await db.query.categories.findMany({
+    columns: {
       id: true,
       name: true,
       slug: true,
-      parent_id: true,
-      _count: {
-        select: {
-          websiteCategories: {
-            where: {
-              website: {
-                status: 'approved'
-              }
-            }
-          }
-        }
-      }
+      parentId: true,
     },
-    orderBy: {
-      sort_order: 'asc'
-    }
+    orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
   });
 
-  // 转换数据结构以匹配组件需求
-  const categoriesWithCounts = allCategoriesData.map(cat => ({
-    ...cat,
-    _count: {
-      websites: cat._count.websiteCategories
-    }
-  }));
+  // Get website counts for categories
+  const categoriesWithCounts = await Promise.all(
+    allCategoriesData.map(async (cat) => {
+      const [{ count }] = await db
+        .select({ count: sql<number>`count(distinct ${websiteCategories.websiteId})` })
+        .from(websiteCategories)
+        .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
+        .where(
+          and(
+            eq(websiteCategories.categoryId, cat.id),
+            eq(websites.status, 'approved')
+          )
+        );
 
-  // 如果是子分类，获取父分类信息 - 优化：使用 _count 避免 N+1 查询
+      return {
+        ...cat,
+        _count: {
+          websites: Number(count),
+        },
+      };
+    })
+  );
+
+  // 如果是子分类，获取父分类信息
   let parentCategory = null;
-  if (category.parent_id) {
-    const parentCat = await prisma.category.findUnique({
-      where: { id: category.parent_id },
-      select: {
+  if (category.parentId) {
+    const parentCat = await db.query.categories.findFirst({
+      where: eq(categories.id, category.parentId),
+      columns: {
         id: true,
         name: true,
         slug: true,
-        children: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            _count: {
-              select: {
-                websiteCategories: {
-                  where: {
-                    website: {
-                      status: 'approved'
-                    }
-                  }
-                }
-              }
-            }
-          },
-          orderBy: {
-            sort_order: 'asc'
-          }
-        }
-      }
+      },
     });
 
     if (parentCat) {
-      // 转换数据结构以匹配组件需求
-      const childrenWithCounts = parentCat.children.map(child => ({
-        ...child,
-        _count: {
-          websites: child._count.websiteCategories
-        }
-      }));
+      // Get children manually
+      const children = await db.query.categories.findMany({
+        where: eq(categories.parentId, parentCat.id),
+        columns: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+        orderBy: (table, { asc }) => [asc(table.sortOrder)],
+      });
+
+      // Get counts for children
+      const childrenWithCounts = await Promise.all(
+        children.map(async (child) => {
+          const [{ count }] = await db
+            .select({ count: sql<number>`count(distinct ${websiteCategories.websiteId})` })
+            .from(websiteCategories)
+            .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
+            .where(
+              and(
+                eq(websiteCategories.categoryId, child.id),
+                eq(websites.status, 'approved')
+              )
+            );
+
+          return {
+            ...child,
+            _count: {
+              websites: Number(count),
+            },
+          };
+        })
+      );
 
       parentCategory = {
         ...parentCat,
-        children: childrenWithCounts
+        children: childrenWithCounts,
       };
     }
   }
@@ -174,7 +181,7 @@ export default async function CategoryPageRoute({
   return (
     <CategoryPage
       category={category}
-      websites={websites}
+      websites={websitesData}
       allCategories={categoriesWithCounts}
       parentCategory={parentCategory}
     />

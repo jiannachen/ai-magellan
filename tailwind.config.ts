@@ -74,51 +74,61 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
 
-        // 海洋主题颜色 - 直接映射到CSS变量
-        'ocean-primary': 'hsl(var(--ocean-primary))',
-        'ocean-primary-hover': 'hsl(var(--ocean-primary-hover))',
-        'ocean-primary-light': 'hsl(var(--ocean-primary-light))',
-        'ocean-success': 'hsl(var(--ocean-success))',
-        'ocean-warning': 'hsl(var(--ocean-warning))',
-        'ocean-accent': 'hsl(var(--ocean-accent))',
-        'ocean-neutral': 'hsl(var(--ocean-neutral))',
+        // 海洋主题颜色 - 映射到 Nebula 紫色主题
+        'ocean-primary': 'hsl(var(--nebula-primary))',
+        'ocean-primary-hover': 'hsl(var(--nebula-primary-hover))',
+        'ocean-primary-light': 'hsl(var(--nebula-primary-light))',
+        'ocean-success': 'hsl(var(--nebula-success))',
+        'ocean-warning': 'hsl(var(--nebula-warning))',
+        'ocean-accent': 'hsl(var(--nebula-cyan))',
+        'ocean-neutral': 'hsl(var(--nebula-neutral))',
+
+        // Magellan 主题颜色 - 映射到 Nebula 紫色主题
+        'magellan-primary': 'hsl(var(--nebula-primary))',
+        'magellan-teal': 'hsl(var(--nebula-cyan))',
+        'magellan-coral': 'hsl(var(--nebula-secondary))',
+        'magellan-gold': 'hsl(var(--nebula-warning))',
+        'magellan-mint': 'hsl(var(--nebula-success))',
+        'magellan-navy': 'hsl(var(--nebula-neutral))',
+        'magellan-depth-50': 'hsl(var(--neutral-50))',
+        'magellan-depth-600': 'hsl(var(--neutral-500))',
+        'magellan-depth-700': 'hsl(270 30% 30%)',
+        'magellan-depth-800': 'hsl(var(--neutral-800))',
+        'magellan-depth-900': 'hsl(var(--neutral-900))',
       },
 
-      // 统一圆角系统 - 8px标准
+      // 统一圆角系统 - 现代SaaS风格
       borderRadius: {
-        lg: "var(--radius)",        // 8px - 标准圆角
-        md: "calc(var(--radius) - 2px)",  // 6px
-        sm: "calc(var(--radius) - 4px)",  // 4px
+        lg: "var(--radius-lg)",     // 12px - 大圆角
+        DEFAULT: "var(--radius)",   // 8px - 标准圆角
+        md: "var(--radius)",        // 8px
+        sm: "var(--radius-sm)",     // 6px - 小圆角
       },
 
-      // 统一间距系统 - 8px网格
+      // 统一间距系统 - 4px网格
       spacing: {
-        'xs': 'var(--space-xs)',    // 4px
-        'sm': 'var(--space-sm)',    // 8px
-        'md': 'var(--space-md)',    // 12px
-        'lg': 'var(--space-lg)',    // 16px
-        'xl': 'var(--space-xl)',    // 24px
-        '2xl': 'var(--space-2xl)',  // 32px
-        '3xl': 'var(--space-3xl)',  // 48px
+        '18': '4.5rem',   // 72px
+        '22': '5.5rem',   // 88px
       },
 
-      // 统一阴影系统
+      // 现代阴影系统
       boxShadow: {
-        'ocean-sm': '0 1px 2px rgba(9, 30, 66, 0.08)',
-        'ocean-md': '0 2px 4px rgba(9, 30, 66, 0.12)',
-        'ocean-lg': '0 4px 8px rgba(9, 30, 66, 0.15)',
+        'sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+        'md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        'lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+        'xl': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
       },
 
-      // 动画时长
+      // 动画配置
       transitionDuration: {
-        'fast': 'var(--duration-fast)',      // 150ms
-        'normal': 'var(--duration-normal)',  // 200ms
-        'slow': 'var(--duration-slow)',      // 300ms
+        DEFAULT: '200ms',
+        'fast': '150ms',
+        'slow': '300ms',
       },
 
-      // 动画曲线
       transitionTimingFunction: {
-        'smooth': 'var(--ease-smooth)',
+        DEFAULT: 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
 
       // 统一字体大小

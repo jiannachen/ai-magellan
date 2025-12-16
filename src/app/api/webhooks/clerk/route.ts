@@ -1,7 +1,9 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { Webhook } from 'svix';
-import { prisma } from '@/lib/db/db';
+import { db } from '@/lib/db/db';
+import { users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 // Clerk Webhook 事件类型
 type ClerkWebhookEvent = {
@@ -81,13 +83,11 @@ export async function POST(req: Request) {
       const name = [first_name, last_name].filter(Boolean).join(' ') || username || 'User';
 
       // 创建用户记录
-      await prisma.user.create({
-        data: {
-          id,
-          email,
-          name,
-          image: image_url,
-        }
+      await db.insert(users).values({
+        id,
+        email,
+        name,
+        image: image_url,
       });
 
       console.log(`✅ Created user: ${id} (${email})`);
@@ -98,21 +98,28 @@ export async function POST(req: Request) {
       const email = email_addresses[0]?.email_address || `${id}@clerk.local`;
       const name = [first_name, last_name].filter(Boolean).join(' ') || username || 'User';
 
-      // 更新用户记录（如果存在）
-      await prisma.user.upsert({
-        where: { id },
-        update: {
-          email,
-          name,
-          image: image_url,
-        },
-        create: {
+      // 更新用户记录（使用upsert逻辑）
+      const existingUser = await db.query.users.findFirst({
+        where: eq(users.id, id),
+      });
+
+      if (existingUser) {
+        await db
+          .update(users)
+          .set({
+            email,
+            name,
+            image: image_url,
+          })
+          .where(eq(users.id, id));
+      } else {
+        await db.insert(users).values({
           id,
           email,
           name,
           image: image_url,
-        }
-      });
+        });
+      }
 
       console.log(`✅ Updated user: ${id} (${email})`);
     } else if (eventType === 'user.deleted') {
@@ -120,9 +127,7 @@ export async function POST(req: Request) {
       const { id } = evt.data;
 
       // 删除用户记录（级联删除相关数据）
-      await prisma.user.delete({
-        where: { id }
-      });
+      await db.delete(users).where(eq(users.id, id));
 
       console.log(`✅ Deleted user: ${id}`);
     }
@@ -138,13 +143,11 @@ export async function POST(req: Request) {
 
       try {
         // 使用备用邮箱重试
-        await prisma.user.create({
-          data: {
-            id,
-            email: `${id}@clerk.duplicate`,
-            name,
-            image: image_url,
-          }
+        await db.insert(users).values({
+          id,
+          email: `${id}@clerk.duplicate`,
+          name,
+          image: image_url,
         });
 
         console.log(`⚠️ Created user with duplicate email fallback: ${id}`);

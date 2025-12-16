@@ -1,5 +1,7 @@
 import { Suspense } from 'react';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db/db';
+import { websites, categories } from '@/lib/db/schema';
+import { eq, isNull, asc, desc, or, sql } from 'drizzle-orm';
 import RankingsHomePage from '@/components/rankings/rankings-home-page';
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -11,79 +13,100 @@ export const metadata: Metadata = {
 
 async function getRankingsData() {
   // Get approved websites for different rankings
-  const websites = await prisma.website.findMany({
-    where: {
-      status: 'approved'
-    },
-    include: {
-      category: true,
+  const websitesList = await db.query.websites.findMany({
+    where: eq(websites.status, 'approved'),
+    with: {
+      websiteCategories: {
+        with: {
+          category: true,
+        },
+      },
       submitter: {
-        select: {
+        columns: {
           id: true,
           name: true,
-        }
-      }
-    }
+        },
+      },
+    },
   });
 
   // Get categories with tool counts (只获取一级分类，并包含子分类)
-  const categories = await prisma.category.findMany({
-    where: {
-      parent_id: null
-    },
-    include: {
+  const categoriesList = await db.query.categories.findMany({
+    where: isNull(categories.parentId),
+    with: {
       children: {
-        include: {
-          _count: {
-            select: {
-              websites: {
-                where: { status: 'approved' }
-              }
-            }
-          }
-        },
-        orderBy: { sort_order: 'asc' }
+        orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
       },
-      _count: {
-        select: {
-          websites: {
-            where: {
-              status: 'approved'
-            }
-          }
-        }
-      }
     },
-    orderBy: { sort_order: 'asc' }
+    orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
   });
+
+  // Get counts for each category
+  const categoriesWithCounts = await Promise.all(
+    categoriesList.map(async (cat) => {
+      const [{ count }] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(websites)
+        .where(
+          eq(websites.categoryId, cat.id)
+        );
+
+      // Get counts for children
+      const childrenWithCounts = await Promise.all(
+        cat.children.map(async (child) => {
+          const [{ count: childCount }] = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(websites)
+            .where(
+              eq(websites.categoryId, child.id)
+            );
+
+          return {
+            ...child,
+            _count: {
+              websites: Number(childCount),
+            },
+          };
+        })
+      );
+
+      return {
+        ...cat,
+        _count: {
+          websites: Number(count),
+        },
+        children: childrenWithCounts,
+      };
+    })
+  );
 
   // Calculate different rankings
   const rankings = {
-    popular: websites
+    popular: [...websitesList]
       .sort((a, b) => b.visits - a.visits)
       .slice(0, 20),
-    topRated: websites
-      .sort((a, b) => b.quality_score - a.quality_score)
+    topRated: [...websitesList]
+      .sort((a, b) => b.qualityScore - a.qualityScore)
       .slice(0, 20),
-    trending: websites
+    trending: [...websitesList]
       .sort((a, b) => b.likes - a.likes)
       .slice(0, 20),
-    free: websites
-      .filter(w => w.pricing_model === 'free' || w.has_free_version)
-      .sort((a, b) => b.quality_score - a.quality_score)
+    free: websitesList
+      .filter(w => w.pricingModel === 'free' || w.hasFreeVersion)
+      .sort((a, b) => b.qualityScore - a.qualityScore)
       .slice(0, 20),
-    newest: websites
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      .slice(0, 20)
+    newest: [...websitesList]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 20),
   };
 
   return {
     rankings,
-    categories: categories.map(cat => ({
+    categories: categoriesWithCounts.map(cat => ({
       ...cat,
-      toolCount: cat._count.websites
+      toolCount: cat._count.websites,
     })),
-    totalTools: websites.length
+    totalTools: websitesList.length,
   };
 }
 
