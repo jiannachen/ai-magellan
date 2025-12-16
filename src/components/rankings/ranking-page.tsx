@@ -25,7 +25,7 @@ import {
   Star,
   ExternalLink
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { cn } from '@/lib/utils/utils';
@@ -51,16 +51,18 @@ const rankingIcons = {
   new: Telescope
 };
 
-export default function RankingPage({ type, rankingType, websites: initialWebsites, categories, selectedCategory }: RankingPageProps) {
+export default function RankingPage({ type, rankingType, websites: initialWebsites, categories, selectedCategory: initialSelectedCategory }: RankingPageProps) {
   const { user } = useUser();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const tRanking = useTranslations('pages.rankings');
   const tCommon = useTranslations('common');
   const [websites, setWebsites] = useState(initialWebsites);
   const [filteredWebsites, setFilteredWebsites] = useState(initialWebsites);
   const [searchQuery, setSearchQuery] = useState('');
   const [priceFilter, setPriceFilter] = useState<FilterOption>('all');
-  const [categoryFilter, setCategoryFilter] = useState(selectedCategory || 'all');
+  // 从 URL query 参数读取分类过滤器,优先于 prop
+  const [categoryFilter, setCategoryFilter] = useState(searchParams.get('category') || initialSelectedCategory || 'all');
   const [timeRange, setTimeRange] = useState('all');
   const [userLikes, setUserLikes] = useState<Set<number>>(new Set());
   const [userFavorites, setUserFavorites] = useState<Set<number>>(new Set());
@@ -88,7 +90,7 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
   // Fetch data when filters change
   useEffect(() => {
     const fetchRankingData = async () => {
-      if (timeRange === 'all' && categoryFilter === (selectedCategory || 'all')) {
+      if (timeRange === 'all' && categoryFilter === 'all') {
         setWebsites(initialWebsites);
         return;
       }
@@ -115,7 +117,7 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
     };
 
     fetchRankingData();
-  }, [timeRange, categoryFilter, type, initialWebsites, selectedCategory]);
+  }, [timeRange, categoryFilter, type, initialWebsites]);
 
   // Filter and search websites
   useEffect(() => {

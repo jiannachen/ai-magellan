@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { db } from '@/lib/db/db';
-import { websites, categories } from '@/lib/db/schema';
-import { eq, and, or, isNull, asc, desc, inArray } from 'drizzle-orm';
+import { websites } from '@/lib/db/schema';
+import { eq, and, or, desc } from 'drizzle-orm';
 import RankingPage from '@/components/rankings/ranking-page';
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -10,9 +10,6 @@ import { getTranslations } from 'next-intl/server';
 interface PageProps {
   params: Promise<{
     type: string;
-  }>;
-  searchParams: Promise<{
-    category?: string;
   }>;
 }
 
@@ -52,6 +49,8 @@ const RANKING_TYPES = {
 export const dynamicParams = true;
 // 使用 ISR 提升性能,每60秒重新验证
 export const revalidate = 60;
+// 明确设置为动态路由以支持 searchParams
+export const dynamic = 'auto';
 
 export async function generateStaticParams() {
   return Object.keys(RANKING_TYPES).map((type) => ({
@@ -79,7 +78,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-async function getRankingData(type: string, categorySlug?: string) {
+async function getRankingData(type: string) {
   const rankingType = RANKING_TYPES[type as keyof typeof RANKING_TYPES];
 
   if (!rankingType) {
@@ -88,28 +87,6 @@ async function getRankingData(type: string, categorySlug?: string) {
 
   // Build where conditions
   const conditions = [eq(websites.status, 'approved')];
-
-  // Add category filter if specified
-  if (categorySlug) {
-    const allCategories = await db.query.categories.findMany({
-      with: { children: true },
-    });
-
-    const selectedCategory = allCategories.find(cat => cat.slug === categorySlug);
-    if (selectedCategory) {
-      // 如果是一级分类，包含该分类及其所有子分类
-      if (!selectedCategory.parentId) {
-        const categoryIds = [selectedCategory.id];
-        if (selectedCategory.children) {
-          categoryIds.push(...selectedCategory.children.map(child => child.id));
-        }
-        conditions.push(inArray(websites.categoryId, categoryIds));
-      } else {
-        // 如果是二级分类，只筛选该分类
-        conditions.push(eq(websites.categoryId, selectedCategory.id));
-      }
-    }
-  }
 
   // Add pricing filter for free tools
   if ('filter' in rankingType && rankingType.filter === 'free') {
@@ -171,9 +148,8 @@ async function getCategories() {
   return allCategories.filter(cat => !cat.parentId);
 }
 
-export default async function RankingTypePage({ params, searchParams }: PageProps) {
+export default async function RankingTypePage({ params }: PageProps) {
   const { type } = await params;
-  const { category } = await searchParams;
 
   const rankingType = RANKING_TYPES[type as keyof typeof RANKING_TYPES];
 
@@ -182,7 +158,7 @@ export default async function RankingTypePage({ params, searchParams }: PageProp
   }
 
   const [websitesList, categoriesList] = await Promise.all([
-    getRankingData(type, category),
+    getRankingData(type),
     getCategories()
   ]);
 
@@ -204,7 +180,7 @@ export default async function RankingTypePage({ params, searchParams }: PageProp
         rankingType={rankingTypeInfo}
         websites={websitesList}
         categories={categoriesList}
-        selectedCategory={category}
+        selectedCategory={undefined}
       />
     </Suspense>
   );
