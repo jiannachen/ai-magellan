@@ -51,7 +51,7 @@ const rankingIcons = {
   new: Telescope
 };
 
-export default function RankingPage({ type, rankingType, websites: initialWebsites, categories, selectedCategory: initialSelectedCategory }: RankingPageProps) {
+function RankingPageContent({ type, rankingType, websites: initialWebsites, categories, selectedCategory: initialSelectedCategory }: RankingPageProps) {
   const { user } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -552,4 +552,9 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
       </div>
     </div>
   );
+}
+
+// Export the wrapped component with Suspense boundary
+export default function RankingPage(props: RankingPageProps) {
+  return <RankingPageContent {...props} />;
 }

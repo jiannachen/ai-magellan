@@ -174,7 +174,14 @@ export default async function RankingTypePage({ params }: PageProps) {
   };
 
   return (
-    <Suspense fallback={<div>{tRank('loading')}</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-magellan-depth-50 flex items-center justify-center">
+        <div className="flex items-center gap-3 text-magellan-depth-600">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-magellan-primary"></div>
+          <span>{tRank('loading')}</span>
+        </div>
+      </div>
+    }>
       <RankingPage
         type={type}
         rankingType={rankingTypeInfo}
