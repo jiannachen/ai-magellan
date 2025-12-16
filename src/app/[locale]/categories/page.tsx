@@ -28,22 +28,10 @@ export default async function CategoriesPage() {
   // 获取每个分类的网站数量
   const categoriesWithCounts = await Promise.all(
     categoriesData.map(async (category) => {
-      // 获取一级分类的网站数量
-      const [{ count: mainCount }] = await db
-        .select({ count: sql<number>`count(distinct ${websiteCategories.websiteId})` })
-        .from(websiteCategories)
-        .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
-        .where(
-          and(
-            eq(websiteCategories.categoryId, category.id),
-            eq(websites.status, 'approved')
-          )
-        );
-
       // 获取子分类及其网站数量
       const subcategories = await Promise.all(
         category.children.map(async (child) => {
-          const [{ count: childCount }] = await db
+          const result = await db
             .select({ count: sql<number>`count(distinct ${websiteCategories.websiteId})` })
             .from(websiteCategories)
             .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
@@ -54,6 +42,8 @@ export default async function CategoriesPage() {
               )
             );
 
+          const childCount = result[0]?.count || 0;
+
           return {
             id: child.id,
             name: child.name,
@@ -63,6 +53,9 @@ export default async function CategoriesPage() {
           };
         })
       );
+
+      // 一级分类的工具数量 = 所有子分类的工具数量之和
+      const mainCount = subcategories.reduce((sum, sub) => sum + sub.toolCount, 0);
 
       return {
         id: category.id,

@@ -111,9 +111,9 @@ export async function POST(request: Request) {
     const validatedData = validationResult.data;
 
     // Check if at least one category is provided
-    const categoryIds: number[] = Array.isArray(validatedData.category_id)
-      ? validatedData.category_id.map(Number)
-      : [Number(validatedData.category_id)];
+    const categoryIds: number[] = Array.isArray(validatedData.categoryId)
+      ? validatedData.categoryId.map(Number)
+      : [Number(validatedData.categoryId)];
 
     // 验证所有分类是否存在
     const categoriesList = await db.query.categories.findMany({
@@ -161,7 +161,7 @@ export async function POST(request: Request) {
         submittedBy: userId,
 
         // 图片资源
-        logoUrl: validatedData.logo_url?.trim() || null,
+        logoUrl: validatedData.logoUrl?.trim() || null,
         thumbnail: validatedData.thumbnail?.trim() || null,
 
         // 标签和描述
@@ -173,34 +173,34 @@ export async function POST(request: Request) {
         features: validatedData.features || [],
 
         // 使用场景和目标受众
-        useCases: validatedData.use_cases || [],
-        targetAudience: validatedData.target_audience || [],
+        useCases: validatedData.useCases || [],
+        targetAudience: validatedData.targetAudience || [],
 
         // 常见问题
         faq: validatedData.faq || [],
 
         // 定价信息
-        pricingModel: validatedData.pricing_model || "free",
-        hasFreeVersion: validatedData.has_free_version || false,
-        apiAvailable: validatedData.api_available || false,
-        pricingPlans: validatedData.pricing_plans || [],
+        pricingModel: validatedData.pricingModel || "free",
+        hasFreeVersion: validatedData.hasFreeVersion || false,
+        apiAvailable: validatedData.apiAvailable || false,
+        pricingPlans: validatedData.pricingPlans || [],
 
         // 社交媒体链接
-        twitterUrl: validatedData.twitter_url?.trim() || null,
-        linkedinUrl: validatedData.linkedin_url?.trim() || null,
-        facebookUrl: validatedData.facebook_url?.trim() || null,
-        instagramUrl: validatedData.instagram_url?.trim() || null,
-        youtubeUrl: validatedData.youtube_url?.trim() || null,
-        discordUrl: validatedData.discord_url?.trim() || null,
+        twitterUrl: validatedData.twitterUrl?.trim() || null,
+        linkedinUrl: validatedData.linkedinUrl?.trim() || null,
+        facebookUrl: validatedData.facebookUrl?.trim() || null,
+        instagramUrl: validatedData.instagramUrl?.trim() || null,
+        youtubeUrl: validatedData.youtubeUrl?.trim() || null,
+        discordUrl: validatedData.discordUrl?.trim() || null,
 
         // 集成
         integrations: validatedData.integrations || [],
 
         // 平台支持
-        iosAppUrl: validatedData.ios_app_url?.trim() || null,
-        androidAppUrl: validatedData.android_app_url?.trim() || null,
-        webAppUrl: validatedData.web_app_url?.trim() || null,
-        desktopPlatforms: validatedData.desktop_platforms || [],
+        iosAppUrl: validatedData.iosAppUrl?.trim() || null,
+        androidAppUrl: validatedData.androidAppUrl?.trim() || null,
+        webAppUrl: validatedData.webAppUrl?.trim() || null,
+        desktopPlatforms: validatedData.desktopPlatforms || [],
       }).returning();
 
       // Create website categories

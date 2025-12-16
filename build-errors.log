@@ -1,0 +1,26 @@
+
+> nexty-ai-navigation@0.2.0 build
+> next build
+
+   ▲ Next.js 15.5.9
+   - Environments: .env
+   - Experiments (use with caution):
+     ✓ optimizeCss
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 7.0s
+   Skipping linting
+   Checking validity of types ...
+Failed to compile.
+
+./src/app/[locale]/search/search-results.tsx:203:38
+Type error: Type '{ id: number; title: string; slug: string; url: string; description: string; category_id: number | null; thumbnail?: string | undefined; logo_url?: string | undefined; visits: number; likes: number; ... 8 more ...; status: "pending" | ... 1 more ... | "rejected"; }' is missing the following properties from type 'Website': categoryId, qualityScore
+
+[0m [90m 201 |[39m                         }}
+ [90m 202 |[39m                       [33m>[39m
+[31m[1m>[22m[39m[90m 203 |[39m                         [33m<[39m[33mCompactCard[39m website[33m=[39m{website} onVisit[33m=[39m{handleVisit} [33m/[39m[33m>[39m
+ [90m     |[39m                                      [31m[1m^[22m[39m
+ [90m 204 |[39m                       [33m<[39m[33m/[39m[33mmotion[39m[33m.[39mdiv[33m>[39m
+ [90m 205 |[39m                     ))}
+ [90m 206 |[39m                   [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m[0m
+Next.js build worker exited with code: 1 and signal: null

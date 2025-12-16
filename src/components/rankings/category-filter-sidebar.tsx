@@ -5,12 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils/utils';
 import { ChevronDown, ChevronRight, Compass, Navigation } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 
 interface Category {
   id: number;
   name: string;
   slug: string;
-  parent_id?: number | null;
+  parentId?: number | null;
   children?: Category[];
 }
 
@@ -30,10 +31,11 @@ export default function CategoryFilterSidebar({
   onSearchChange
 }: CategoryFilterSidebarProps) {
   const tRanking = useTranslations('pages.rankings');
+  const router = useRouter();
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
 
   // 获取一级分类（parent_id为null或未定义）
-  const parentCategories = categories.filter(cat => !cat.parent_id);
+  const parentCategories = categories.filter(cat => !cat.parentId);
 
   // 切换分类展开/收起
   const toggleCategory = (categoryId: number) => {
@@ -47,11 +49,27 @@ export default function CategoryFilterSidebar({
   };
 
   // 选择分类（一级或二级）
-  const handleCategoryClick = (slug: string, categoryId: number, hasChildren: boolean) => {
-    onCategoryChange(slug);
-    // 如果有子分类，切换展开/收起状态
+  const handleCategoryClick = (slug: string, categoryId: number, hasChildren: boolean, e: React.MouseEvent) => {
+    // 如果按住 Ctrl/Cmd 键，在新标签页打开
+    if (e.ctrlKey || e.metaKey) {
+      window.open(`/categories/${slug}`, '_blank');
+      return;
+    }
+
+    // 如果是"全部"分类，只更新筛选状态
+    if (slug === 'all') {
+      onCategoryChange(slug);
+      return;
+    }
+
+    // 对于一级分类，如果有子分类，展开/收起
     if (hasChildren) {
       toggleCategory(categoryId);
+      // 同时也允许筛选该分类
+      onCategoryChange(slug);
+    } else {
+      // 对于没有子分类的分类或二级分类，跳转到分类页面
+      router.push(`/categories/${slug}`);
     }
   };
 
@@ -72,7 +90,7 @@ export default function CategoryFilterSidebar({
     return (
       <div key={category.id}>
         <button
-          onClick={() => handleCategoryClick(category.slug, category.id, !!hasChildren)}
+          onClick={(e) => handleCategoryClick(category.slug, category.id, !!hasChildren, e)}
           className={cn(
             "w-full text-left rounded-lg transition-all duration-200 group",
             "border border-transparent hover:border-magellan-primary/30",

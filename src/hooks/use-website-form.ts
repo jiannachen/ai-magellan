@@ -23,29 +23,29 @@ export function useWebsiteForm({ websiteId, isEdit = false }: UseWebsiteFormProp
       url: '',
       email: '',
       title: '',
-      category_id: '',
+      categoryId: '',
       tags: [] as string[],
       tagline: '',
       description: '',
       features: [{ name: '', description: '' }],
-      use_cases: [] as string[],
-      target_audience: [] as string[],
+      useCases: [] as string[],
+      targetAudience: [] as string[],
       faq: [],
-      pricing_model: '',
-      has_free_version: false,
-      api_available: false,
-      pricing_plans: [],
-      twitter_url: '',
-      linkedin_url: '',
-      facebook_url: '',
-      instagram_url: '',
-      youtube_url: '',
-      discord_url: '',
+      pricingModel: '',
+      hasFreeVersion: false,
+      apiAvailable: false,
+      pricingPlans: [],
+      twitterUrl: '',
+      linkedinUrl: '',
+      facebookUrl: '',
+      instagramUrl: '',
+      youtubeUrl: '',
+      discordUrl: '',
       integrations: [] as string[],
-      ios_app_url: '',
-      android_app_url: '',
-      web_app_url: '',
-      desktop_platforms: []
+      iosAppUrl: '',
+      androidAppUrl: '',
+      webAppUrl: '',
+      desktopPlatforms: []
     }
   })
 
@@ -73,7 +73,7 @@ export function useWebsiteForm({ websiteId, isEdit = false }: UseWebsiteFormProp
     remove: removePricingPlan
   } = useFieldArray({
     control: form.control,
-    name: "pricing_plans"
+    name: "pricingPlans"
   })
 
   // Array manipulation helpers
@@ -95,11 +95,11 @@ export function useWebsiteForm({ websiteId, isEdit = false }: UseWebsiteFormProp
       url: 'basic',
       email: 'basic',
       title: 'basic',
-      category_id: 'basic',
+      categoryId: 'basic',
       tagline: 'basic',
       description: 'basic',
       features: 'features',
-      pricing_model: 'pricing'
+      pricingModel: 'pricing'
     }
 
     const sectionId = fieldToSectionMap[fieldName] || 'basic'

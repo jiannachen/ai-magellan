@@ -49,6 +49,9 @@ const RANKING_TYPES = {
   }
 } as const;
 
+export const dynamicParams = true;
+export const revalidate = 3600; // Revalidate every hour
+
 export async function generateStaticParams() {
   return Object.keys(RANKING_TYPES).map((type) => ({
     type,

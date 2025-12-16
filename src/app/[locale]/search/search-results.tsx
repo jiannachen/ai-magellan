@@ -8,6 +8,7 @@ import { CompactCard } from '@/components/website/compact-card';
 import { AdvancedSearch, SearchFilters } from '@/components/search/advanced-search';
 import { Button } from '@/ui/common/button';
 import { Badge } from '@/ui/common/badge';
+import { addRefParam } from '@/lib/utils/utils';
 import {
   Search,
   ArrowLeft,
@@ -77,7 +78,7 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
     if (filters.isTrusted) params.set('isTrusted', 'true');
     if (filters.isFeatured) params.set('isFeatured', 'true');
     if (filters.hasFreePlan) params.set('hasFreePlan', 'true');
-    if (filters.sortBy && filters.sortBy !== 'relevance') params.set('sortBy', filters.sortBy === 'relevance' ? 'quality_score' : filters.sortBy);
+    if (filters.sortBy && filters.sortBy !== 'relevance') params.set('sortBy', filters.sortBy === 'relevance' ? 'qualityScore' : filters.sortBy);
     if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
     
     // 重置到第一页
@@ -112,7 +113,7 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
       await fetch(`/api/websites/${website.id}/visit`, { method: "POST" });
       // 更新本地数据中的访问次数
       if (data) {
-        const updatedWebsites = data.websites.map(w => 
+        const updatedWebsites = data.websites.map(w =>
           w.id === website.id ? { ...w, visits: w.visits + 1 } : w
         );
         setData({ ...data, websites: updatedWebsites });
@@ -120,7 +121,9 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
     } catch (error) {
       console.error('Failed to track visit:', error);
     }
-    window.open(website.url, "_blank");
+    // 添加ref参数用于追踪来源
+    const urlWithRef = addRefParam(website.url);
+    window.open(urlWithRef, "_blank");
   };
 
   const currentQuery = searchParams.get('q') || '';

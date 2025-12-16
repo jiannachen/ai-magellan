@@ -64,7 +64,7 @@ export function useCategories(websiteData?: WebsiteData) {
 
   // Set parent category when website data is loaded
   useEffect(() => {
-    if (!websiteData?.category_id || categories.length === 0) {
+    if (!websiteData?.categoryId || categories.length === 0) {
       return
     }
 
@@ -74,7 +74,7 @@ export function useCategories(websiteData?: WebsiteData) {
       ...(Array.isArray(cat.children) ? cat.children : [])
     ])
 
-    const currentCategory = allCategories.find(cat => cat.id === websiteData.category_id)
+    const currentCategory = allCategories.find(cat => cat.id === websiteData.categoryId)
 
     if (currentCategory) {
       // If it's a subcategory, set its parent as selected
@@ -85,7 +85,7 @@ export function useCategories(websiteData?: WebsiteData) {
         setSelectedParentCategory(currentCategory.id)
       }
     }
-  }, [websiteData?.category_id, categories])
+  }, [websiteData?.categoryId, categories])
 
   return {
     categories,

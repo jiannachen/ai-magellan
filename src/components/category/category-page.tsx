@@ -138,13 +138,13 @@ export default function CategoryPage({ category, websites: initialWebsites }: Ca
     if (searchFilters.pricingModel && searchFilters.pricingModel.length > 0) {
       filtered = filtered.filter(website => {
         if (searchFilters.pricingModel?.includes('free')) {
-          if (website.pricing_model === 'free' || website.has_free_version) return true;
+          if (website.pricingModel === 'free' || website.hasFreeVersion) return true;
         }
         if (searchFilters.pricingModel?.includes('freemium')) {
-          if (website.pricing_model === 'freemium') return true;
+          if (website.pricingModel === 'freemium') return true;
         }
         if (searchFilters.pricingModel?.includes('paid')) {
-          if (website.pricing_model !== 'free' && !website.has_free_version && website.pricing_model !== 'freemium') return true;
+          if (website.pricingModel !== 'free' && !website.hasFreeVersion && website.pricingModel !== 'freemium') return true;
         }
         return false;
       });
@@ -152,21 +152,21 @@ export default function CategoryPage({ category, websites: initialWebsites }: Ca
 
     // Apply quality score filter
     if (searchFilters.minQualityScore && searchFilters.minQualityScore > 0) {
-      filtered = filtered.filter(website => website.quality_score >= (searchFilters.minQualityScore || 0));
+      filtered = filtered.filter(website => website.qualityScore >= (searchFilters.minQualityScore || 0));
     }
 
     // Apply feature filters
     if (searchFilters.isTrusted) {
-      filtered = filtered.filter(website => website.is_trusted);
+      filtered = filtered.filter(website => website.isTrusted);
     }
     if (searchFilters.isFeatured) {
-      filtered = filtered.filter(website => website.is_featured);
+      filtered = filtered.filter(website => website.isFeatured);
     }
     if (searchFilters.hasFreePlan) {
-      filtered = filtered.filter(website => website.has_free_version);
+      filtered = filtered.filter(website => website.hasFreeVersion);
     }
     if (searchFilters.sslEnabled) {
-      filtered = filtered.filter(website => website.ssl_enabled);
+      filtered = filtered.filter(website => website.sslEnabled);
     }
 
     // Apply sorting
@@ -177,23 +177,23 @@ export default function CategoryPage({ category, websites: initialWebsites }: Ca
       case 'relevance':
       default:
         filtered.sort((a, b) => {
-          if (a.is_featured && !b.is_featured) return -1;
-          if (!a.is_featured && b.is_featured) return 1;
-          return b.quality_score - a.quality_score;
+          if (a.isFeatured && !b.isFeatured) return -1;
+          if (!a.isFeatured && b.isFeatured) return 1;
+          return b.qualityScore - a.qualityScore;
         });
         break;
       case 'visits':
         filtered.sort((a, b) => sortOrder === 'desc' ? b.visits - a.visits : a.visits - b.visits);
         break;
-      case 'created_at':
+      case 'createdAt':
         filtered.sort((a, b) => {
-          const aDate = new Date(a.created_at).getTime();
-          const bDate = new Date(b.created_at).getTime();
+          const aDate = new Date(a.createdAt).getTime();
+          const bDate = new Date(b.createdAt).getTime();
           return sortOrder === 'desc' ? bDate - aDate : aDate - bDate;
         });
         break;
-      case 'quality_score':
-        filtered.sort((a, b) => sortOrder === 'desc' ? b.quality_score - a.quality_score : a.quality_score - b.quality_score);
+      case 'qualityScore':
+        filtered.sort((a, b) => sortOrder === 'desc' ? b.qualityScore - a.qualityScore : a.qualityScore - b.qualityScore);
         break;
       case 'likes':
         filtered.sort((a, b) => sortOrder === 'desc' ? (b.likes || 0) - (a.likes || 0) : (a.likes || 0) - (b.likes || 0));

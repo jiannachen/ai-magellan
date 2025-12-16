@@ -49,38 +49,38 @@ export function SearchManager({
 
     // 分类过滤
     if (selectedCategory) {
-      results = results.filter(website => 
-        website.category_id === Number(selectedCategory)
+      results = results.filter(website =>
+        website.categoryId === Number(selectedCategory)
       )
     }
 
     // 高级过滤
     if (filters.pricingModel && filters.pricingModel.length > 0) {
       results = results.filter(website =>
-        website.pricing_model && filters.pricingModel!.includes(website.pricing_model)
+        website.pricingModel && filters.pricingModel!.includes(website.pricingModel)
       )
     }
 
     if (filters.minQualityScore && filters.minQualityScore > 0) {
-      results = results.filter(website => 
-        (website.quality_score || 0) >= filters.minQualityScore!
+      results = results.filter(website =>
+        (website.qualityScore || 0) >= filters.minQualityScore!
       )
     }
 
     if (filters.isTrusted) {
-      results = results.filter(website => website.is_trusted)
+      results = results.filter(website => website.isTrusted)
     }
 
     if (filters.isFeatured) {
-      results = results.filter(website => website.is_featured)
+      results = results.filter(website => website.isFeatured)
     }
 
     if (filters.hasFreePlan) {
-      results = results.filter(website => website.has_free_version)
+      results = results.filter(website => website.hasFreeVersion)
     }
 
     if (filters.sslEnabled) {
-      results = results.filter(website => website.ssl_enabled)
+      results = results.filter(website => website.sslEnabled)
     }
 
     // 排序
@@ -90,9 +90,9 @@ export function SearchManager({
         let bValue: any
 
         switch (filters.sortBy) {
-          case 'created_at':
-            aValue = new Date(a.created_at || 0).getTime()
-            bValue = new Date(b.created_at || 0).getTime()
+          case 'createdAt':
+            aValue = new Date(a.createdAt || 0).getTime()
+            bValue = new Date(b.createdAt || 0).getTime()
             break
           case 'visits':
             aValue = a.visits || 0
@@ -102,9 +102,9 @@ export function SearchManager({
             aValue = a.likes || 0
             bValue = b.likes || 0
             break
-          case 'quality_score':
-            aValue = a.quality_score || 0
-            bValue = b.quality_score || 0
+          case 'qualityScore':
+            aValue = a.qualityScore || 0
+            bValue = b.qualityScore || 0
             break
           case 'title':
             aValue = a.title.toLowerCase()
@@ -126,19 +126,19 @@ export function SearchManager({
       results.sort((a, b) => {
         const aTitle = a.title.toLowerCase().includes(query)
         const bTitle = b.title.toLowerCase().includes(query)
-        
+
         if (aTitle && !bTitle) return -1
         if (!aTitle && bTitle) return 1
-        
+
         // 如果都匹配标题或都不匹配，按质量评分排序
-        return (b.quality_score || 0) - (a.quality_score || 0)
+        return (b.qualityScore || 0) - (a.qualityScore || 0)
       })
     } else {
       // 默认排序：精选工具优先，然后按质量评分
       results.sort((a, b) => {
-        if (a.is_featured && !b.is_featured) return -1
-        if (!a.is_featured && b.is_featured) return 1
-        return (b.quality_score || 0) - (a.quality_score || 0)
+        if (a.isFeatured && !b.isFeatured) return -1
+        if (!a.isFeatured && b.isFeatured) return 1
+        return (b.qualityScore || 0) - (a.qualityScore || 0)
       })
     }
 

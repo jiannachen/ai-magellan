@@ -23,17 +23,17 @@ export interface SearchResult {
     slug: string;
     url: string;
     description: string;
-    category_id: number | null;
+    categoryId: number | null;
     thumbnail?: string;
-    logo_url?: string;
+    logoUrl?: string;
     visits: number;
     likes: number;
-    quality_score: number;
-    is_featured: boolean;
-    is_trusted: boolean;
-    created_at: Date;
-    pricing_model: string;
-    has_free_version: boolean;
+    qualityScore: number;
+    isFeatured: boolean;
+    isTrusted: boolean;
+    createdAt: Date;
+    pricingModel: string;
+    hasFreeVersion: boolean;
     tags: string[];
     active: number;
     status: "pending" | "approved" | "rejected";
@@ -60,7 +60,7 @@ export async function searchWebsites(params: SearchParams): Promise<{
     const searchParams = {
       page: params.page || 1,
       limit: params.limit || 20,
-      sortBy: params.sortBy || 'quality_score',
+      sortBy: params.sortBy || 'qualityScore',
       sortOrder: params.sortOrder || 'desc' as 'desc',
       ...params
     };
@@ -158,15 +158,8 @@ export async function searchWebsites(params: SearchParams): Promise<{
       data: {
         websites: websitesList.map(website => ({
           ...website,
-          category_id: website.categoryId,
           thumbnail: website.thumbnail ?? undefined,
-          logo_url: website.logoUrl ?? undefined,
-          quality_score: website.qualityScore,
-          is_featured: website.isFeatured,
-          is_trusted: website.isTrusted,
-          created_at: website.createdAt,
-          pricing_model: website.pricingModel,
-          has_free_version: website.hasFreeVersion,
+          logoUrl: website.logoUrl ?? undefined,
           status: website.status as "pending" | "approved" | "rejected"
         })),
         pagination: {

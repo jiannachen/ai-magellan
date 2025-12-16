@@ -35,7 +35,7 @@ export function AdminPageClient({
     const matchesStatus = website.status === activeStatus;
     const matchesCategory =
       selectedCategory === "all" ||
-      website.category_id === parseInt(selectedCategory);
+      website.categoryId === parseInt(selectedCategory);
     return matchesStatus && matchesCategory;
   });
 

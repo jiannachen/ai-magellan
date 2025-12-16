@@ -736,7 +736,14 @@
     "monthly_hot": "Monthly Hot",
     "filter_featured": "Featured Only",
     "filter_free": "Free Tools",
-    "filter_paid": "Paid Tools"
+    "filter_paid": "Paid Tools",
+    "pricingModel": "Pricing Model",
+    "qualityScore": "Minimum Quality Score: {score}",
+    "features": "Feature Filters",
+    "trusted_tools": "Trusted Tools",
+    "featured_tools": "Featured Tools",
+    "free_version": "Has Free Version",
+    "ssl_security": "SSL Security"
   },
   "footer": {
     "description": "The best platform to discover quality AI tools and resources",
@@ -852,7 +859,9 @@
       "sort_direction": "Sort Direction",
       "sort_desc": "Descending",
       "sort_asc": "Ascending"
-    }
+    },
+    "apply_filters": "Apply Filters",
+    "close": "Close"
   },
   "seo": {
     "site_name": "AI Navigation",

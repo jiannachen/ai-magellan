@@ -140,15 +140,15 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
 
       if (selectedCat) {
         // 如果选中的是一级分类，包含该分类及其所有子分类的网站
-        if (!selectedCat.parent_id) {
+        if (!selectedCat.parentId) {
           const categoryIds = [selectedCat.id];
           if (selectedCat.children) {
             categoryIds.push(...selectedCat.children.map((child: any) => child.id));
           }
-          filtered = filtered.filter(website => categoryIds.includes(website.category_id));
+          filtered = filtered.filter(website => categoryIds.includes(website.categoryId));
         } else {
           // 如果选中的是二级分类，只显示该分类的网站
-          filtered = filtered.filter(website => website.category_id === selectedCat.id);
+          filtered = filtered.filter(website => website.categoryId === selectedCat.id);
         }
       }
     }
@@ -157,15 +157,15 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
     if (priceFilter !== 'all') {
       if (priceFilter === 'free') {
         filtered = filtered.filter(website => 
-          website.pricing_model === 'free' || website.has_free_version
+          website.pricingModel === 'free' || website.hasFreeVersion
         );
       } else if (priceFilter === 'paid') {
         filtered = filtered.filter(website => 
-          website.pricing_model !== 'free' && !website.has_free_version
+          website.pricingModel !== 'free' && !website.hasFreeVersion
         );
       } else if (priceFilter === 'freemium') {
         filtered = filtered.filter(website => 
-          website.pricing_model === 'freemium'
+          website.pricingModel === 'freemium'
         );
       }
     }
@@ -456,7 +456,7 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                           <WebsiteThumbnail
                             url={website.url}
                             thumbnail={website.thumbnail}
-                            logoUrl={website.logo_url}
+                            logoUrl={website.logoUrl}
                             title={website.title}
                             className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg border border-magellan-primary/10"
                           />
@@ -473,14 +473,14 @@ export default function RankingPage({ type, rankingType, websites: initialWebsit
                                 {website.description || 'A mysterious treasure awaiting discovery...'}
                               </p>
                               <div className="flex items-center gap-1.5 sm:gap-2 mt-1 sm:mt-2">
-                                {website.pricing_model === 'free' && (
+                                {website.pricingModel === 'free' && (
                                   <Badge className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 bg-magellan-mint/10 text-magellan-mint border-magellan-mint/30">
                                     {tRanking('filters.pricing_free')}
                                   </Badge>
                                 )}
-                                {website.pricing_model && website.pricing_model !== 'free' && (
+                                {website.pricingModel && website.pricingModel !== 'free' && (
                                   <Badge variant="outline" className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 bg-magellan-primary/5 text-magellan-primary border-magellan-primary/30">
-                                    {website.pricing_model}
+                                    {website.pricingModel}
                                   </Badge>
                                 )}
                               </div>

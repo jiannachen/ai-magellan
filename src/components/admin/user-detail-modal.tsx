@@ -51,7 +51,7 @@ interface UserWebsite {
   title: string;
   url: string;
   status: string;
-  created_at: string;
+  createdAt: string;
   category: {
     name: string;
     slug: string;
@@ -312,7 +312,7 @@ export function UserDetailModal({ user, isOpen, onClose }: UserDetailModalProps)
                             </span>
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
-                              {new Date(website.created_at).toLocaleDateString('zh-CN')}
+                              {new Date(website.createdAt).toLocaleDateString('zh-CN')}
                             </span>
                           </div>
                         </div>

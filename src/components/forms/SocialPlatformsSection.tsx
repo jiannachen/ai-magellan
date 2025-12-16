@@ -12,12 +12,12 @@ import { WebsiteEditData } from '@/lib/validations/website'
 import { Plus, X, Waves, Anchor, Globe, MessageSquare, Smartphone, Monitor, Laptop } from 'lucide-react'
 
 const SOCIAL_PLATFORMS = [
-  { key: 'twitter_url', labelKey: 'twitter', icon: MessageSquare, placeholderKey: 'twitter_placeholder' },
-  { key: 'linkedin_url', labelKey: 'linkedin', icon: MessageSquare, placeholderKey: 'linkedin_placeholder' },
-  { key: 'facebook_url', labelKey: 'facebook', icon: Globe, placeholderKey: 'facebook_placeholder' },
-  { key: 'instagram_url', labelKey: 'instagram', icon: Globe, placeholderKey: 'instagram_placeholder' },
-  { key: 'youtube_url', labelKey: 'youtube', icon: MessageSquare, placeholderKey: 'youtube_placeholder' },
-  { key: 'discord_url', labelKey: 'discord', icon: MessageSquare, placeholderKey: 'discord_placeholder' }
+  { key: 'twitterUrl', labelKey: 'twitter', icon: MessageSquare, placeholderKey: 'twitter_placeholder' },
+  { key: 'linkedinUrl', labelKey: 'linkedin', icon: MessageSquare, placeholderKey: 'linkedin_placeholder' },
+  { key: 'facebookUrl', labelKey: 'facebook', icon: Globe, placeholderKey: 'facebook_placeholder' },
+  { key: 'instagramUrl', labelKey: 'instagram', icon: Globe, placeholderKey: 'instagram_placeholder' },
+  { key: 'youtubeUrl', labelKey: 'youtube', icon: MessageSquare, placeholderKey: 'youtube_placeholder' },
+  { key: 'discordUrl', labelKey: 'discord', icon: MessageSquare, placeholderKey: 'discord_placeholder' }
 ]
 
 const COMMON_INTEGRATIONS = [
@@ -54,7 +54,7 @@ export function SocialPlatformsSection({
   const tForm = useTranslations('form')
 
   const integrations = watch('integrations') || []
-  const desktopPlatforms = watch('desktop_platforms') || []
+  const desktopPlatforms = watch('desktopPlatforms') || []
 
   const handleAddIntegration = useCallback(() => {
     const current = watch('integrations') || []
@@ -190,32 +190,32 @@ export function SocialPlatformsSection({
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="ios_app_url" className="text-sm font-medium">{tForm('ios_app_url')}</Label>
+                <Label htmlFor="iosAppUrl" className="text-sm font-medium">{tForm('iosAppUrl')}</Label>
                 <Input
-                  id="ios_app_url"
+                  id="iosAppUrl"
                   placeholder={tForm('ios_placeholder')}
-                  {...register('ios_app_url')}
+                  {...register('iosAppUrl')}
                 />
-                {errors.ios_app_url && (
+                {errors.iosAppUrl && (
                   <p className="text-sm text-destructive">
-                    {errors.ios_app_url.message === 'Please enter a valid URL'
+                    {errors.iosAppUrl.message === 'Please enter a valid URL'
                       ? tSubmit('validation.valid_url')
-                      : errors.ios_app_url.message}
+                      : errors.iosAppUrl.message}
                   </p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="android_app_url" className="text-sm font-medium">{tForm('android_app_url')}</Label>
+                <Label htmlFor="androidAppUrl" className="text-sm font-medium">{tForm('androidAppUrl')}</Label>
                 <Input
-                  id="android_app_url"
+                  id="androidAppUrl"
                   placeholder={tForm('android_placeholder')}
-                  {...register('android_app_url')}
+                  {...register('androidAppUrl')}
                 />
-                {errors.android_app_url && (
+                {errors.androidAppUrl && (
                   <p className="text-sm text-destructive">
-                    {errors.android_app_url.message === 'Please enter a valid URL'
+                    {errors.androidAppUrl.message === 'Please enter a valid URL'
                       ? tSubmit('validation.valid_url')
-                      : errors.android_app_url.message}
+                      : errors.androidAppUrl.message}
                   </p>
                 )}
               </div>
@@ -229,17 +229,17 @@ export function SocialPlatformsSection({
               <h3 className="font-semibold">{tForm('web_app')}</h3>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="web_app_url" className="text-sm font-medium">{tForm('web_app_url')}</Label>
+              <Label htmlFor="webAppUrl" className="text-sm font-medium">{tForm('webAppUrl')}</Label>
               <Input
-                id="web_app_url"
+                id="webAppUrl"
                 placeholder={tForm('web_app_placeholder')}
-                {...register('web_app_url')}
+                {...register('webAppUrl')}
               />
-              {errors.web_app_url && (
+              {errors.webAppUrl && (
                 <p className="text-sm text-destructive">
-                  {errors.web_app_url.message === 'Please enter a valid URL'
+                  {errors.webAppUrl.message === 'Please enter a valid URL'
                     ? tSubmit('validation.valid_url')
-                    : errors.web_app_url.message}
+                    : errors.webAppUrl.message}
                 </p>
               )}
             </div>
@@ -266,9 +266,9 @@ export function SocialPlatformsSection({
                       checked={isChecked}
                       onCheckedChange={(checked) => {
                         if (checked) {
-                          addToArray('desktop_platforms', platform.value)
+                          addToArray('desktopPlatforms', platform.value)
                         } else {
-                          removeFromArray('desktop_platforms', platform.value)
+                          removeFromArray('desktopPlatforms', platform.value)
                         }
                       }}
                       className="w-5 h-5 border-2 border-border group-hover:border-primary/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-white"

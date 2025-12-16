@@ -136,7 +136,7 @@ export default function SimplifiedHomePage({
 
     // Top rated by quality score
     const topRated = [...approvedWebsites]
-      .sort((a, b) => (b.quality_score ?? 50) - (a.quality_score ?? 50))
+      .sort((a, b) => (b.qualityScore ?? 50) - (a.qualityScore ?? 50))
       .slice(0, 12);
     setTopRatedWebsites(topRated);
 
@@ -148,14 +148,14 @@ export default function SimplifiedHomePage({
 
     // Recent websites
     const recent = [...approvedWebsites]
-      .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+      .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
       .slice(0, 12);
     setRecentWebsites(recent);
 
     // Top free tools
     const topFree = approvedWebsites
-      .filter(w => w.pricing_model === 'free' || w.has_free_version)
-      .sort((a, b) => (b.quality_score ?? 50) - (a.quality_score ?? 50))
+      .filter(w => w.pricingModel === 'free' || w.hasFreeVersion)
+      .sort((a, b) => (b.qualityScore ?? 50) - (a.qualityScore ?? 50))
       .slice(0, 12);
     setTopFreeWebsites(topFree);
   }, [websites]);

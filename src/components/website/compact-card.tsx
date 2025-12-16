@@ -4,7 +4,7 @@ import { Card } from "@/ui/common/card";
 import { Button } from "@/ui/common/button";
 import { Badge } from "@/ui/common/badge";
 import { ExternalLink } from "lucide-react";
-import { cn } from "@/lib/utils/utils";
+import { cn, addRefParam } from "@/lib/utils/utils";
 import type { Website } from "@/lib/types";
 import { WebsiteThumbnail } from "./website-thumbnail";
 import Link from "next/link";
@@ -18,6 +18,17 @@ interface CompactCardProps {
 
 export function CompactCard({ website, onVisit, className }: CompactCardProps) {
   const tLanding = useTranslations('landing');
+  const tPricing = useTranslations('pricing_models');
+
+  // 处理访问时添加ref参数
+  const handleVisit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const urlWithRef = addRefParam(website.url);
+    window.open(urlWithRef, '_blank');
+    // 调用原始的onVisit回调用于统计
+    onVisit(website);
+  };
 
   return (
     <div className={cn("group", className)}>
@@ -44,11 +55,7 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
           <Button
             variant="ghost"
             size="icon-sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              onVisit(website);
-            }}
+            onClick={handleVisit}
             className={cn(
               "h-8 w-8 rounded-lg",
               "bg-background/90 hover:bg-ocean-primary/10",
@@ -70,7 +77,7 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
               <WebsiteThumbnail
                 url={website.url}
                 thumbnail={website.thumbnail}
-                logoUrl={website.logo_url}
+                logoUrl={website.logoUrl}
                 title={website.title}
                 className={cn(
                   "w-16 h-16 rounded-lg",
@@ -93,20 +100,20 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
 
               {/* 定价标签 */}
               <div className="flex items-center gap-1.5">
-                {website.pricing_model === 'free' && (
+                {website.pricingModel === 'free' && (
                   <Badge
                     variant="secondary"
                     className="text-xs px-2 py-0.5 bg-ocean-success/10 text-ocean-success border-ocean-success/20"
                   >
-                    免费
+                    {tPricing('free')}
                   </Badge>
                 )}
-                {website.pricing_model && website.pricing_model !== 'free' && (
+                {website.pricingModel && website.pricingModel !== 'free' && (
                   <Badge
                     variant="outline"
                     className="text-xs px-2 py-0.5 bg-ocean-primary/5 text-ocean-primary border-ocean-primary/20"
                   >
-                    {website.pricing_model}
+                    {tPricing(website.pricingModel)}
                   </Badge>
                 )}
               </div>

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils/utils';
 import { ChevronDown, Compass, X, Filter } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/ui/common/button';
+import { useRouter } from 'next/navigation';
 import {
   Dialog,
   DialogContent,
@@ -18,7 +19,7 @@ interface Category {
   id: number;
   name: string;
   slug: string;
-  parent_id?: number | null;
+  parentId?: number | null;
   children?: Category[];
 }
 
@@ -38,11 +39,12 @@ export default function MobileCategoryFilter({
   onSearchChange
 }: MobileCategoryFilterProps) {
   const tRanking = useTranslations('pages.rankings');
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
 
   // 获取一级分类
-  const parentCategories = categories.filter(cat => !cat.parent_id);
+  const parentCategories = categories.filter(cat => !cat.parentId);
 
   // 切换分类展开/收起
   const toggleCategory = (categoryId: number) => {
@@ -57,13 +59,22 @@ export default function MobileCategoryFilter({
 
   // 选择分类
   const handleCategoryClick = (slug: string, categoryId: number, hasChildren: boolean) => {
-    onCategoryChange(slug);
-    if (hasChildren) {
-      // 如果有子分类，切换展开/收起状态
-      toggleCategory(categoryId);
-    } else {
-      // 如果没有子分类，选择后关闭弹框
+    // 如果是"全部"分类，只更新筛选状态并关闭弹框
+    if (slug === 'all') {
+      onCategoryChange(slug);
       setIsOpen(false);
+      return;
+    }
+
+    // 对于一级分类，如果有子分类，展开/收起
+    if (hasChildren) {
+      toggleCategory(categoryId);
+      // 同时也允许筛选该分类
+      onCategoryChange(slug);
+    } else {
+      // 对于没有子分类的分类或二级分类，跳转到分类页面并关闭弹框
+      setIsOpen(false);
+      router.push(`/categories/${slug}`);
     }
   };
 
@@ -89,14 +100,15 @@ export default function MobileCategoryFilter({
     const isExpanded = expandedCategories.has(category.id);
 
     const handleClick = () => {
-      onCategoryChange(category.slug);
-
+      // 对于一级分类，如果有子分类，展开/收起
       if (hasChildren) {
-        // 如果有子分类，切换展开/收起状态
         toggleCategory(category.id);
+        // 同时也允许筛选该分类
+        onCategoryChange(category.slug);
       } else {
-        // 如果没有子分类，选择后关闭弹框
+        // 对于没有子分类的分类或二级分类，跳转到分类页面并关闭弹框
         setIsOpen(false);
+        router.push(`/categories/${category.slug}`);
       }
     };
 

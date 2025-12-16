@@ -168,7 +168,7 @@ export function WebsiteList({
                 <WebsiteThumbnail
                   url={website.url}
                   thumbnail={website.thumbnail}
-                  logoUrl={website.logo_url}
+                  logoUrl={website.logoUrl}
                   title={website.title}
                   className="w-12 h-12 rounded-lg shrink-0 shadow-sm transition-transform duration-200 group-hover:scale-105"
                 />
@@ -182,7 +182,7 @@ export function WebsiteList({
                         variant="outline"
                         className="bg-background/30 border-border/40 text-xs px-1.5 py-0 h-5"
                       >
-                        {categories.find((c) => c.id === website.category_id)
+                        {categories.find((c) => c.id === website.categoryId)
                           ?.name || "未分类"}
                       </Badge>
                       <Badge

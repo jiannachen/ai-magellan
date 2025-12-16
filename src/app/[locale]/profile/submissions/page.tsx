@@ -40,14 +40,14 @@ interface Website {
   slug: string
   url: string
   description: string
-  thumbnail: string | null
-  logo_url: string | null
+  thumbnail?: string
+  logoUrl?: string
   status: string
   visits: number
   likes: number
-  quality_score: number
-  is_featured: boolean
-  created_at: string
+  qualityScore: number
+  isFeatured?: boolean
+  createdAt: string
   category: {
     id: number
     name: string
@@ -315,7 +315,7 @@ export default function MySubmissionsPage() {
                           <WebsiteThumbnail
                             url={website.url}
                             thumbnail={website.thumbnail}
-                            logoUrl={website.logo_url}
+                            logoUrl={website.logoUrl}
                             title={website.title}
                             className="w-full sm:w-16 h-32 sm:h-16 rounded-lg flex-shrink-0"
                           />
@@ -326,7 +326,7 @@ export default function MySubmissionsPage() {
                               <h3 className="font-semibold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors truncate">
                                 {website.title}
                               </h3>
-                              {website.is_featured && (
+                              {website.isFeatured && (
                                 <Badge className="bg-magellan-gold/20 text-magellan-gold border-magellan-gold/30 text-xs">
                                   <Crown className="h-3 w-3 mr-1" />
                                   {tWebsite('featured')}
@@ -342,8 +342,8 @@ export default function MySubmissionsPage() {
                             <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <Calendar className="h-3 w-3" />
-                                <span className="hidden sm:inline">{new Date(website.created_at).toLocaleDateString()}</span>
-                                <span className="sm:hidden">{new Date(website.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric' })}</span>
+                                <span className="hidden sm:inline">{new Date(website.createdAt).toLocaleDateString()}</span>
+                                <span className="sm:hidden">{new Date(website.createdAt).toLocaleDateString('en', { month: 'short', day: 'numeric' })}</span>
                               </span>
                               <span className="flex items-center gap-1">
                                 <Eye className="h-3 w-3" />
@@ -362,7 +362,7 @@ export default function MySubmissionsPage() {
                               </Badge>
                               <div className="flex items-center gap-1 text-xs hidden sm:flex">
                                 <Star className="h-3 w-3" />
-                                {website.quality_score}
+                                {website.qualityScore}
                               </div>
                             </div>
                           </div>

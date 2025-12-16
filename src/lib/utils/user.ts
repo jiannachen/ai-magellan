@@ -1,7 +1,7 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { db } from "@/lib/db/db";
 import { users } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 /**
  * 确保用户在数据库中存在
@@ -34,6 +34,8 @@ export async function ensureUserExists(userId: string): Promise<boolean> {
       email: userEmail || `${userId}@clerk.local`,
       name: userName,
       image: user.imageUrl,
+      createdAt: sql`CURRENT_TIMESTAMP`,
+      updatedAt: sql`CURRENT_TIMESTAMP`,
     });
 
     return true;
@@ -48,6 +50,8 @@ export async function ensureUserExists(userId: string): Promise<boolean> {
           email: `${userId}@clerk.duplicate`,
           name: user?.fullName || user?.firstName || 'User',
           image: user?.imageUrl,
+          createdAt: sql`CURRENT_TIMESTAMP`,
+          updatedAt: sql`CURRENT_TIMESTAMP`,
         });
         return true;
       } catch (retryError) {

@@ -81,7 +81,7 @@ export default function MobileMenu() {
             // Filter to ensure we only have parent categories
             const allCategories = Array.isArray(data.data) ? data.data : [];
             const parentCategories = allCategories.filter(
-              (cat: any) => cat.parent_id === null || cat.parent_id === undefined
+              (cat: any) => cat.parentId === null || cat.parentId === undefined
             );
             setCategories(parentCategories);
           }

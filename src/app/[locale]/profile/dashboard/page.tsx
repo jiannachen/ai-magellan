@@ -33,7 +33,12 @@ interface Website {
   slug: string
   url: string
   description: string
-  thumbnail: string | null
+  thumbnail?: string
+  status: "pending" | "approved" | "rejected"
+  active: number
+  likes: number
+  visits: number
+  qualityScore: number
   category: {
     name: string
   }

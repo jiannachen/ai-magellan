@@ -106,3 +106,24 @@ export function generateSlug(title: string): string {
     .substring(0, 100);
 }
 
+/**
+ * 为外部链接添加ref参数
+ * 按照导航站最佳实践,添加来源追踪参数
+ * @param url - 原始URL
+ * @param ref - 引用来源 (default: 'aimagellan.com')
+ * @returns 添加了ref参数的URL
+ */
+export function addRefParam(url: string, ref: string = 'aimagellan.com'): string {
+  try {
+    const urlObj = new URL(url);
+    // 如果已经有ref参数,不重复添加
+    if (!urlObj.searchParams.has('ref')) {
+      urlObj.searchParams.append('ref', ref);
+    }
+    return urlObj.toString();
+  } catch (error) {
+    // 如果URL格式不正确,返回原始URL
+    return url;
+  }
+}
+

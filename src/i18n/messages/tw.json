@@ -634,7 +634,14 @@
     "monthly_hot": "每月熱度",
     "filter_featured": "僅顯示精選",
     "filter_free": "免費工具",
-    "filter_paid": "付費工具"
+    "filter_paid": "付費工具",
+    "pricingModel": "定價模式",
+    "qualityScore": "最低品質評分: {score}",
+    "features": "功能篩選",
+    "trusted_tools": "可信工具",
+    "featured_tools": "精選工具",
+    "free_version": "有免費版本",
+    "ssl_security": "SSL安全"
   },
   "footer": {
     "description": "發現優質AI工具與資源的最佳平台",
@@ -750,7 +757,9 @@
       "sort_direction": "排序方向",
       "sort_desc": "降序",
       "sort_asc": "升序"
-    }
+    },
+    "apply_filters": "套用篩選",
+    "close": "關閉"
    
   },
   "seo": {

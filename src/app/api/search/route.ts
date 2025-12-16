@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     isTrusted: searchParams.get('isTrusted') === 'true',
     isFeatured: searchParams.get('isFeatured') === 'true',
     hasFreePlan: searchParams.get('hasFreePlan') === 'true',
-    sortBy: searchParams.get('sortBy') || 'quality_score',
+    sortBy: searchParams.get('sortBy') || 'qualityScore',
     sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc',
     page: parseInt(searchParams.get('page') || '1'),
     limit: parseInt(searchParams.get('limit') || '20')

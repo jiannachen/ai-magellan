@@ -23,21 +23,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ProfileLayout } from '@/components/profile/profile-layout'
 import { toast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils/utils'
+import { Website as BaseWebsite } from '@/lib/types'
 import { FavoriteCard } from '@/components/favorites/favorite-card'
 
-interface Website {
-  id: number
-  title: string
-  slug: string
-  url: string
-  description: string
-  thumbnail: string | null
-  status?: string
-  visits?: number
-  likes?: number
-  quality_score?: number
-  is_featured?: boolean
-  created_at?: string
+interface Website extends Omit<BaseWebsite, 'categoryId'> {
   category: {
     id?: number
     name: string
@@ -97,8 +86,8 @@ export default function MyFavoritesPage() {
     switch (sortBy) {
       case 'recent':
         filtered.sort((a, b) => {
-          const aTime = a.created_at ? new Date(a.created_at).getTime() : 0
-          const bTime = b.created_at ? new Date(b.created_at).getTime() : 0
+          const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
+          const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
           return bTime - aTime
         })
         break
@@ -106,7 +95,7 @@ export default function MyFavoritesPage() {
         filtered.sort((a, b) => (b.visits || 0) - (a.visits || 0))
         break
       case 'quality':
-        filtered.sort((a, b) => (b.quality_score || 0) - (a.quality_score || 0))
+        filtered.sort((a, b) => (b.qualityScore || 0) - (a.qualityScore || 0))
         break
       case 'alphabetical':
         filtered.sort((a, b) => a.title.localeCompare(b.title))
@@ -221,14 +210,14 @@ export default function MyFavoritesPage() {
               <div className="flex flex-col sm:flex-row items-center sm:gap-2 px-2 sm:px-3 py-2 rounded-lg border border-border bg-card">
                 <Crown className="h-4 w-4 text-yellow-600 flex-shrink-0 mb-1 sm:mb-0" />
                 <div className="text-center sm:text-left">
-                  <div className="text-base sm:text-lg font-semibold">{favorites.filter(w => w.is_featured === true).length}</div>
+                  <div className="text-base sm:text-lg font-semibold">{favorites.filter(w => w.isFeatured === true).length}</div>
                   <div className="text-[10px] sm:text-xs text-muted-foreground leading-tight">{tProfile('favorites.stats.featured_tools')}</div>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row items-center sm:gap-2 px-2 sm:px-3 py-2 rounded-lg border border-border bg-card">
                 <Star className="h-4 w-4 text-primary flex-shrink-0 mb-1 sm:mb-0" />
                 <div className="text-center sm:text-left">
-                  <div className="text-base sm:text-lg font-semibold">{favorites.filter(w => (w.quality_score || 0) >= 80).length}</div>
+                  <div className="text-base sm:text-lg font-semibold">{favorites.filter(w => (w.qualityScore || 0) >= 80).length}</div>
                   <div className="text-[10px] sm:text-xs text-muted-foreground leading-tight">{tProfile('favorites.stats.high_quality')}</div>
                 </div>
               </div>

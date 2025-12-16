@@ -143,7 +143,7 @@ export function BasicInfoWithTagsSection({
       // if (metadata.title) setValue('title', metadata.title)
       if (metadata.tagline) setValue('tagline', metadata.tagline)
       if (metadata.description) setValue('description', metadata.description)
-      if (metadata.logo) setValue('logo_url', metadata.logo)
+      if (metadata.logo) setValue('logoUrl', metadata.logo)
       if (metadata.thumbnail) setValue('thumbnail', metadata.thumbnail)
 
       toast.success(tMessages('auto_fill_success'))
@@ -323,11 +323,11 @@ export function BasicInfoWithTagsSection({
                     setSelectedParentCategory(category.id)
                     // If no subcategories, auto-select parent as category
                     if (!category.children || category.children.length === 0) {
-                      setValue('category_id', category.id.toString())
-                      clearErrors('category_id')
+                      setValue('categoryId', category.id.toString())
+                      clearErrors('categoryId')
                     } else {
-                      setValue('category_id', '')
-                      clearErrors('category_id')
+                      setValue('categoryId', '')
+                      clearErrors('categoryId')
                     }
                   }}
                   className={cn(
@@ -361,16 +361,16 @@ export function BasicInfoWithTagsSection({
                     <Button
                       key={subcategory.id}
                       type="button"
-                      variant={watch('category_id') === subcategory.id.toString() ? "default" : "outline"}
+                      variant={watch('categoryId') === subcategory.id.toString() ? "default" : "outline"}
                       onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
-                        setValue('category_id', subcategory.id.toString(), { shouldValidate: true })
-                        clearErrors('category_id')
+                        setValue('categoryId', subcategory.id.toString(), { shouldValidate: true })
+                        clearErrors('categoryId')
                       }}
                       className={cn(
                         "h-auto py-2 px-3 justify-start text-left font-normal transition-all cursor-pointer",
-                        watch('category_id') === subcategory.id.toString()
+                        watch('categoryId') === subcategory.id.toString()
                           ? "bg-primary text-primary-foreground shadow-sm"
                           : "hover:bg-muted"
                       )}
@@ -393,9 +393,9 @@ export function BasicInfoWithTagsSection({
             </p>
           )}
 
-          {errors.category_id && (
+          {errors.categoryId && (
             <p className="text-sm text-destructive">
-              {errors.category_id.message}
+              {errors.categoryId.message}
             </p>
           )}
         </div>
@@ -442,21 +442,21 @@ export function BasicInfoWithTagsSection({
 
         {/* Logo URL输入和预览 */}
         <div className="space-y-3">
-          <Label htmlFor="logo_url" className="text-sm font-medium flex items-center gap-2">
+          <Label htmlFor="logoUrl" className="text-sm font-medium flex items-center gap-2">
             <Ship className="h-4 w-4 text-primary" />
             Logo URL (Optional)
           </Label>
           <Input
-            id="logo_url"
+            id="logoUrl"
             placeholder="https://example.com/logo.png"
-            {...register('logo_url')}
+            {...register('logoUrl')}
           />
-          {watch('logo_url') && (
+          {watch('logoUrl') && (
             <div className="p-3 rounded-lg bg-muted/30 border border-magellan-primary/10">
               <Label className="text-xs text-muted-foreground mb-2 block">Logo Preview</Label>
               <div className="relative aspect-square max-w-[150px] rounded-lg overflow-hidden bg-white border border-border">
                 <img
-                  src={watch('logo_url') || ''}
+                  src={watch('logoUrl') || ''}
                   alt="Logo preview"
                   className="w-full h-full object-contain p-3"
                   onError={(e) => {

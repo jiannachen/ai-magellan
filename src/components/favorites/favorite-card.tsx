@@ -4,21 +4,10 @@ import { Crown, ExternalLink, Trash2, Map, Eye, Star } from 'lucide-react'
 import { Button } from '@/ui/common/button'
 import { Card } from '@/ui/common/card'
 import { Badge } from '@/ui/common/badge'
-import { cn } from '@/lib/utils/utils'
+import { cn, addRefParam } from '@/lib/utils/utils'
+import { Website as BaseWebsite } from '@/lib/types'
 
-interface Website {
-  id: number
-  title: string
-  slug: string
-  url: string
-  description: string
-  thumbnail: string | null
-  status?: string
-  visits?: number
-  likes?: number
-  quality_score?: number
-  is_featured?: boolean
-  created_at?: string
+interface Website extends Omit<BaseWebsite, 'categoryId'> {
   category: {
     id?: number
     name: string
@@ -55,10 +44,12 @@ export function FavoriteCard({
 
   const handleVisit = (e: React.MouseEvent) => {
     e.stopPropagation()
+    // 添加ref参数用于追踪来源
+    const urlWithRef = addRefParam(website.url)
     if (onVisit) {
       onVisit(website)
     } else {
-      window.open(website.url, '_blank')
+      window.open(urlWithRef, '_blank')
     }
   }
 
@@ -108,7 +99,7 @@ export function FavoriteCard({
               )}>
                 {website.title}
               </h3>
-              {website.is_featured && (
+              {website.isFeatured && (
                 <Crown className="h-4 w-4 text-yellow-600 flex-shrink-0" />
               )}
             </div>
@@ -127,10 +118,10 @@ export function FavoriteCard({
                     <span>{website.visits}</span>
                   </div>
                 )}
-                {website.quality_score !== undefined && (
+                {website.qualityScore !== undefined && (
                   <div className="flex items-center gap-0.5">
                     <Star className="h-3 w-3" />
-                    <span>{website.quality_score}</span>
+                    <span>{website.qualityScore}</span>
                   </div>
                 )}
               </div>
@@ -237,7 +228,7 @@ export function FavoriteCard({
               "group-hover:text-primary transition-colors duration-200"
             )}>
               {website.title}
-              {website.is_featured && (
+              {website.isFeatured && (
                 <Crown className="inline-block h-3.5 w-3.5 text-yellow-600 ml-1" />
               )}
             </h3>
@@ -263,10 +254,10 @@ export function FavoriteCard({
                 {website.visits}
               </div>
             )}
-            {website.quality_score !== undefined && (
+            {website.qualityScore !== undefined && (
               <div className="flex items-center gap-0.5">
                 <Star className="h-3 w-3" />
-                {website.quality_score}
+                {website.qualityScore}
               </div>
             )}
           </div>

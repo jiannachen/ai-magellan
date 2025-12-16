@@ -40,7 +40,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         isTrusted: params.isTrusted === 'true',
         isFeatured: params.isFeatured === 'true',
         hasFreePlan: params.hasFreePlan === 'true',
-        sortBy: params.sortBy || 'quality_score',
+        sortBy: params.sortBy || 'qualityScore',
         sortOrder: (params.sortOrder as 'asc' | 'desc') || 'desc',
         page: parseInt(params.page || '1'),
         limit: 20

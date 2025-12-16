@@ -9,33 +9,33 @@ interface Website {
   title: string
   url: string
   description: string
-  category_id: number
+  categoryId: number
   thumbnail: string | null
-  logo_url: string | null
+  logoUrl: string | null
   status: string
   submittedBy: string
   tagline: string | null
   email: string | null
   features: any
-  use_cases: string[] | null
-  target_audience: string[] | null
+  useCases: string[] | null
+  targetAudience: string[] | null
   faq: Array<{question: string, answer: string}> | null
-  pricing_model: string
-  has_free_version: boolean
-  api_available: boolean
+  pricingModel: string
+  hasFreeVersion: boolean
+  apiAvailable: boolean
   tags: string[] | null
-  twitter_url: string | null
-  linkedin_url: string | null
-  facebook_url: string | null
-  instagram_url: string | null
-  youtube_url: string | null
-  discord_url: string | null
+  twitterUrl: string | null
+  linkedinUrl: string | null
+  facebookUrl: string | null
+  instagramUrl: string | null
+  youtubeUrl: string | null
+  discordUrl: string | null
   integrations: string[] | null
-  ios_app_url: string | null
-  android_app_url: string | null
-  web_app_url: string | null
-  desktop_platforms: string[] | null
-  pricing_plans: Array<{name: string, billing_cycle: string, price: string, features: string[]}> | null
+  iosAppUrl: string | null
+  androidAppUrl: string | null
+  webAppUrl: string | null
+  desktopPlatforms: string[] | null
+  pricingPlans: Array<{name: string, billing_cycle: string, price: string, features: string[]}> | null
 }
 
 export function useWebsiteData(websiteId: string | undefined, reset: UseFormReset<WebsiteEditData>) {
@@ -97,30 +97,30 @@ export function useWebsiteData(websiteId: string | undefined, reset: UseFormRese
         url: websiteData.url,
         email: websiteData.email || '',
         description: websiteData.description,
-        category_id: websiteData.category_id.toString(),
+        categoryId: websiteData.categoryId.toString(),
         tagline: websiteData.tagline || '',
         thumbnail: websiteData.thumbnail || '',
-        logo_url: websiteData.logo_url || '',
+        logoUrl: websiteData.logoUrl || '',
         tags: websiteData.tags || [],
         features: processFeatures(websiteData.features),
-        use_cases: websiteData.use_cases || [],
-        target_audience: websiteData.target_audience || [],
+        useCases: websiteData.useCases || [],
+        targetAudience: websiteData.targetAudience || [],
         faq: websiteData.faq || [],
-        pricing_model: websiteData.pricing_model || '',
-        pricing_plans: websiteData.pricing_plans || [],
-        has_free_version: websiteData.has_free_version || false,
-        api_available: websiteData.api_available || false,
-        twitter_url: websiteData.twitter_url || '',
-        linkedin_url: websiteData.linkedin_url || '',
-        facebook_url: websiteData.facebook_url || '',
-        instagram_url: websiteData.instagram_url || '',
-        youtube_url: websiteData.youtube_url || '',
-        discord_url: websiteData.discord_url || '',
+        pricingModel: websiteData.pricingModel || '',
+        pricingPlans: websiteData.pricingPlans || [],
+        hasFreeVersion: websiteData.hasFreeVersion || false,
+        apiAvailable: websiteData.apiAvailable || false,
+        twitterUrl: websiteData.twitterUrl || '',
+        linkedinUrl: websiteData.linkedinUrl || '',
+        facebookUrl: websiteData.facebookUrl || '',
+        instagramUrl: websiteData.instagramUrl || '',
+        youtubeUrl: websiteData.youtubeUrl || '',
+        discordUrl: websiteData.discordUrl || '',
         integrations: websiteData.integrations || [],
-        ios_app_url: websiteData.ios_app_url || '',
-        android_app_url: websiteData.android_app_url || '',
-        web_app_url: websiteData.web_app_url || '',
-        desktop_platforms: websiteData.desktop_platforms || []
+        iosAppUrl: websiteData.iosAppUrl || '',
+        androidAppUrl: websiteData.androidAppUrl || '',
+        webAppUrl: websiteData.webAppUrl || '',
+        desktopPlatforms: websiteData.desktopPlatforms || []
       })
     } catch (error) {
       console.error('Error fetching website:', error)

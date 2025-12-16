@@ -10,7 +10,7 @@ const RANKING_TYPES = {
     sortOrder: 'desc' as const
   },
   'top-rated': {
-    sortField: 'quality_score',
+    sortField: 'qualityScore',
     sortOrder: 'desc' as const
   },
   'trending': {
@@ -18,12 +18,12 @@ const RANKING_TYPES = {
     sortOrder: 'desc' as const
   },
   'free': {
-    sortField: 'quality_score',
+    sortField: 'qualityScore',
     sortOrder: 'desc' as const,
     filter: 'free' as const
   },
   'new': {
-    sortField: 'created_at',
+    sortField: 'createdAt',
     sortOrder: 'desc' as const
   },
   'monthly-hot': {
@@ -31,7 +31,7 @@ const RANKING_TYPES = {
     sortOrder: 'desc' as const
   },
   'category-leaders': {
-    sortField: 'quality_score',
+    sortField: 'qualityScore',
     sortOrder: 'desc' as const
   }
 } as const;

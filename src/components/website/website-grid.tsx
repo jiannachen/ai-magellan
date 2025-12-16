@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAtom } from "jotai";
 import { websitesAtom } from "@/lib/atoms";
 import { CompactCard } from "./compact-card";
-import { cn } from "@/lib/utils/utils";
+import { cn, addRefParam } from "@/lib/utils/utils";
 import type { Website } from "@/lib/types";
 import { Globe } from "lucide-react";
 
@@ -29,7 +29,9 @@ export default function WebsiteGrid({
       body: JSON.stringify({ url: website.url, id: website.id }),
     });
 
-    window.open(website.url, "_blank");
+    // 添加ref参数用于追踪来源
+    const urlWithRef = addRefParam(website.url);
+    window.open(urlWithRef, "_blank");
   };
 
   return (

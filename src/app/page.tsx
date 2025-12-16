@@ -75,16 +75,9 @@ export default async function Home() {
   // 预处理数据，减少客户端计算
   const preFilteredWebsites = websitesData.map((website) => ({
     ...website,
-    category_id: website.categoryId,
-    logo_url: website.logoUrl ?? undefined,
+    logoUrl: website.logoUrl ?? undefined,
     thumbnail: website.thumbnail ?? undefined,
     status: website.status as "approved" | "pending" | "rejected",
-    quality_score: website.qualityScore,
-    is_featured: website.isFeatured,
-    is_trusted: website.isTrusted,
-    created_at: website.createdAt,
-    pricing_model: website.pricingModel,
-    has_free_version: website.hasFreeVersion,
     searchText: `${website.title.toLowerCase()} ${website.description.toLowerCase()}`,
   }));
 

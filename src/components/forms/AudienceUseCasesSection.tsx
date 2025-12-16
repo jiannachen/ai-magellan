@@ -33,27 +33,27 @@ export function AudienceUseCasesSection({
   const tForm = useTranslations('form')
 
   // 直接从表单获取数组值
-  const useCases = watch('use_cases') || []
-  const targetAudience = watch('target_audience') || []
+  const useCases = watch('useCases') || []
+  const targetAudience = watch('targetAudience') || []
 
   // 添加用例
   const addUseCase = () => {
-    setValue('use_cases', [...useCases, ''])
+    setValue('useCases', [...useCases, ''])
   }
 
   // 删除用例
   const removeUseCase = (index: number) => {
-    setValue('use_cases', useCases.filter((_, i) => i !== index))
+    setValue('useCases', useCases.filter((_, i) => i !== index))
   }
 
   // 添加目标受众
   const addTargetAudience = () => {
-    setValue('target_audience', [...targetAudience, ''])
+    setValue('targetAudience', [...targetAudience, ''])
   }
 
   // 删除目标受众
   const removeTargetAudience = (index: number) => {
-    setValue('target_audience', targetAudience.filter((_, i) => i !== index))
+    setValue('targetAudience', targetAudience.filter((_, i) => i !== index))
   }
 
   return (
@@ -70,7 +70,7 @@ export function AudienceUseCasesSection({
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-3">
               <Target className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold">{tForm('use_cases')}</h3>
+              <h3 className="font-semibold">{tForm('useCases')}</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-3">{tSubmit('use_cases_help')}</p>
             <div className="space-y-3">
@@ -91,7 +91,7 @@ export function AudienceUseCasesSection({
                     <div key={index} className="flex gap-2">
                       <Input
                         placeholder={tForm('use_case_placeholder')}
-                        {...register(`use_cases.${index}` as const)}
+                        {...register(`useCases.${index}` as const)}
                       />
                       <Button
                         type="button"
@@ -124,7 +124,7 @@ export function AudienceUseCasesSection({
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-3">
               <Users className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold">{tForm('target_audience')}</h3>
+              <h3 className="font-semibold">{tForm('targetAudience')}</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-3">{tSubmit('target_audience_help')}</p>
             <div className="space-y-3">
@@ -145,7 +145,7 @@ export function AudienceUseCasesSection({
                     <div key={index} className="flex gap-2">
                       <Input
                         placeholder={tForm('target_audience_placeholder')}
-                        {...register(`target_audience.${index}` as const)}
+                        {...register(`targetAudience.${index}` as const)}
                       />
                       <Button
                         type="button"

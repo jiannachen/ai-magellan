@@ -74,10 +74,10 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
 
   const SORT_OPTIONS = [
     { value: 'relevance', label: t('filters.sort_relevance') },
-    { value: 'created_at', label: t('filters.sort_newest') },
+    { value: 'createdAt', label: t('filters.sort_newest') },
     { value: 'visits', label: t('filters.sort_visits') },
     { value: 'likes', label: t('filters.sort_likes') },
-    { value: 'quality_score', label: t('filters.sort_quality') },
+    { value: 'qualityScore', label: t('filters.sort_quality') },
     { value: 'title', label: t('filters.sort_name') }
   ]
 
@@ -277,9 +277,9 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="mt-4 relative z-20" /* 确保层级高于其他元素 */
+            className="mt-4 relative z-20"
           >
-            <Card className="max-h-[80vh] overflow-y-auto md:max-h-none"> /* 移动端限制高度并可滚动 */
+            <Card className="max-h-[80vh] overflow-y-auto md:max-h-none">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg flex items-center gap-2">
@@ -298,15 +298,15 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                   </div>
                 </div>
               </CardHeader>
-              
-              <CardContent className="space-y-4 sm:space-y-6"> {/* 移动端减少间距 */}
+
+              <CardContent className="space-y-4 sm:space-y-6">
                 {/* 定价模型 */}
                 <div>
                   <label className="text-sm font-medium mb-3 flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
                     {t('filters.pricing_model')}
                   </label>
-                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2"> {/* 移动端使用网格布局 */}
+                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
                     {PRICING_OPTIONS.map((option) => (
                       <button
                         key={option.value}
@@ -406,31 +406,38 @@ export function AdvancedSearch({ value, onChange, onFiltersChange, className }: 
                       value={filters.sortBy}
                       onValueChange={(value) => handleFilterChange('sortBy', value)}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full border-border hover:border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="border-border bg-background">
                         {SORT_OPTIONS.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
+                          <SelectItem
+                            key={option.value}
+                            value={option.value}
+                            className="hover:bg-muted focus:bg-muted"
+                          >
                             {option.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div>
-                    <label className="text-sm font-medium mb-2 block">{t('filters.sort_direction')}</label>
+                    <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      {t('filters.sort_direction')}
+                    </label>
                     <Select
                       value={filters.sortOrder}
                       onValueChange={(value: 'asc' | 'desc') => handleFilterChange('sortOrder', value)}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full border-border hover:border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="desc">{t('filters.sort_desc')}</SelectItem>
-                        <SelectItem value="asc">{t('filters.sort_asc')}</SelectItem>
+                      <SelectContent className="border-border bg-background">
+                        <SelectItem value="desc" className="hover:bg-muted focus:bg-muted">{t('filters.sort_desc')}</SelectItem>
+                        <SelectItem value="asc" className="hover:bg-muted focus:bg-muted">{t('filters.sort_asc')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

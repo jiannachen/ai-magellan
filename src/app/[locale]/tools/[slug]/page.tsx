@@ -3,30 +3,24 @@
 import { useState, useEffect } from 'react'
 import { useParams, notFound } from 'next/navigation'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { cn } from '@/lib/utils/utils'
-import { 
-  ExternalLink, 
-  Heart, 
-  Bookmark, 
-  Share2, 
+import { cn, addRefParam } from '@/lib/utils/utils'
+import {
+  ExternalLink,
+  Heart,
+  Bookmark,
+  Share2,
   Star,
-  Clock,
   Shield,
-  DollarSign,
   Users,
   Zap,
   CheckCircle,
   Globe,
   Twitter,
-  Calendar,
-  TrendingUp,
   Target,
   Award,
   Smartphone,
   Monitor,
   HelpCircle,
-  X,
   Map,
   Compass,
   Anchor,
@@ -34,12 +28,7 @@ import {
   Crown,
   Eye,
   Lightbulb,
-  Plus,
-  Home,
   ArrowRight,
-  MapPin,
-  Flag,
-  FileText,
   Coins,
   Code,
   MessageSquare,
@@ -50,7 +39,6 @@ import {
 import { Button } from '@/ui/common/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Badge } from '@/ui/common/badge'
-import { Avatar, AvatarFallback, AvatarImage } from '@/ui/common/avatar'
 import { toast } from '@/hooks/use-toast'
 import { useUser } from '@clerk/nextjs'
 import { Reviews } from '@/components/reviews/reviews'
@@ -94,7 +82,7 @@ interface Website {
   status: string
   visits: number
   likes: number
-  quality_score: number
+  qualityScore: number
   is_trusted: boolean
   is_featured: boolean
   tags: string[] | null
@@ -134,7 +122,7 @@ interface Website {
 
 export default function ToolDetailPage() {
   const params = useParams()
-  const { isSignedIn, user } = useUser()
+  const { isSignedIn } = useUser()
   const t = useTranslations()
   const [website, setWebsite] = useState<Website | null>(null)
   const [loading, setLoading] = useState(true)
@@ -273,71 +261,6 @@ export default function ToolDetailPage() {
     }
   }
 
-  const copyToClipboard = async (text: string) => {
-    console.log('Attempting to copy:', text)
-    
-    // 方法1：尝试现代 Clipboard API
-    if (navigator.clipboard && window.isSecureContext) {
-      try {
-        await navigator.clipboard.writeText(text)
-        console.log('Clipboard API success')
-        return true
-      } catch (error) {
-        console.warn('Clipboard API failed:', error)
-      }
-    }
-    
-    // 方法2：降级到传统方法
-    try {
-      const textArea = document.createElement('textarea')
-      textArea.value = text
-      textArea.style.position = 'fixed'
-      textArea.style.left = '-999999px'
-      textArea.style.top = '-999999px'
-      document.body.appendChild(textArea)
-      textArea.focus()
-      textArea.select()
-      
-      const success = document.execCommand('copy')
-      document.body.removeChild(textArea)
-      
-      console.log('execCommand result:', success)
-      if (success) {
-        return true
-      }
-    } catch (error) {
-      console.warn('execCommand failed:', error)
-    }
-    
-    // 方法3：最简单的降级方案 - 选择地址栏
-    try {
-      const selection = window.getSelection()
-      const range = document.createRange()
-      const span = document.createElement('span')
-      span.textContent = text
-      span.style.position = 'fixed'
-      span.style.left = '-9999px'
-      document.body.appendChild(span)
-      
-      range.selectNodeContents(span)
-      selection?.removeAllRanges()
-      selection?.addRange(range)
-      
-      const success = document.execCommand('copy')
-      document.body.removeChild(span)
-      selection?.removeAllRanges()
-      
-      console.log('Selection method result:', success)
-      if (success) {
-        return true
-      }
-    } catch (error) {
-      console.warn('Selection method failed:', error)
-    }
-    
-    return false
-  }
-
   const handleShare = async () => {
     if (!website) return
     
@@ -380,7 +303,9 @@ export default function ToolDetailPage() {
 
   const handleVisit = () => {
     if (website) {
-      window.open(website.url, '_blank')
+      // 添加ref参数用于追踪来源
+      const urlWithRef = addRefParam(website.url)
+      window.open(urlWithRef, '_blank')
     }
   }
 
@@ -623,9 +548,9 @@ export default function ToolDetailPage() {
                   />
                   <StatCard
                     label={t('profile.tools.detail.stats.quality_score')}
-                    value={`${website.quality_score}/100`}
+                    value={`${website.qualityScore}/100`}
                     icon={Award}
-                    variant={website.quality_score >= 80 ? "success" : website.quality_score >= 60 ? "warning" : "default"}
+                    variant={website.qualityScore >= 80 ? "success" : website.qualityScore >= 60 ? "warning" : "default"}
                   />
                 </div>
               </Card>
@@ -709,7 +634,7 @@ export default function ToolDetailPage() {
                       {/* Display multiple categories if available */}
                       {website.websiteCategories && website.websiteCategories.length > 0 ? (
                         <div className="space-y-3">
-                          {website.websiteCategories.map((wc, index) => (
+                          {website.websiteCategories.map((wc) => (
                             <div key={wc.category.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 rounded-lg bg-background/50 border border-primary/5">
                               <div className="flex items-center gap-2">
                                 {wc.isPrimary && (
