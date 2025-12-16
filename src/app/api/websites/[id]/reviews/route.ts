@@ -114,15 +114,12 @@ export async function POST(
       })
     } else {
       // 创建新评论
-      const now = new Date().toISOString()
       await db.insert(websiteReviews).values({
         id: `${userId}_${websiteId}`,
-        userId,
-        websiteId,
-        rating,
+        userId: userId,
+        websiteId: websiteId,
+        rating: rating,
         comment: comment?.trim() || null,
-        createdAt: now,
-        updatedAt: now
       })
 
       review = await db.query.websiteReviews.findFirst({

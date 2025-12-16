@@ -83,14 +83,11 @@ export async function POST(req: Request) {
       const name = [first_name, last_name].filter(Boolean).join(' ') || username || 'User';
 
       // 创建用户记录
-      const now = new Date().toISOString();
       await db.insert(users).values({
-        id,
-        email,
-        name,
+        id: id,
+        email: email,
+        name: name,
         image: image_url,
-        createdAt: now,
-        updatedAt: now,
       });
 
       console.log(`✅ Created user: ${id} (${email})`);
@@ -110,21 +107,17 @@ export async function POST(req: Request) {
         await db
           .update(users)
           .set({
-            email,
-            name,
+            email: email,
+            name: name,
             image: image_url,
-            updatedAt: new Date().toISOString(),
           })
           .where(eq(users.id, id));
       } else {
-        const now = new Date().toISOString();
         await db.insert(users).values({
-          id,
-          email,
-          name,
+          id: id,
+          email: email,
+          name: name,
           image: image_url,
-          createdAt: now,
-          updatedAt: now,
         });
       }
 
@@ -150,14 +143,11 @@ export async function POST(req: Request) {
 
       try {
         // 使用备用邮箱重试
-        const now = new Date().toISOString();
         await db.insert(users).values({
-          id,
+          id: id,
           email: `${id}@clerk.duplicate`,
-          name,
+          name: name,
           image: image_url,
-          createdAt: now,
-          updatedAt: now,
         });
 
         console.log(`⚠️ Created user with duplicate email fallback: ${id}`);

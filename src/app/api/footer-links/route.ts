@@ -37,10 +37,8 @@ export async function POST(request: Request) {
     }
 
     const [link] = await db.insert(footerLinks).values({
-      title,
-      url,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      title: title,
+      url: url,
     }).returning();
 
     return NextResponse.json(AjaxResponse.ok(link));

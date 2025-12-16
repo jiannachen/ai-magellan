@@ -107,14 +107,11 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const { name, slug, parent_id, sort_order = 0 } = await request.json();
-    const now = new Date().toISOString();
     const newCategory = await db.insert(categories).values({
-      name,
-      slug,
+      name: name,
+      slug: slug,
       parentId: parent_id ? parseInt(parent_id) : null,
       sortOrder: sort_order,
-      createdAt: now,
-      updatedAt: now,
     }).returning();
 
     return NextResponse.json(AjaxResponse.ok(newCategory[0]));
