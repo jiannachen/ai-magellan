@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db/db';
-import { websites, categories, users } from '@/lib/db/schema';
+import { websites, categories, users, websiteCategories } from '@/lib/db/schema';
 import { eq, and, or, sql, desc, asc, inArray, gte } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
@@ -8,7 +8,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || 'popular';
     const category = searchParams.get('category');
+    const priceFilter = searchParams.get('priceFilter') || 'all';
     const timeRange = searchParams.get('timeRange') || 'all';
+    const searchQuery = searchParams.get('searchQuery');
     const limit = parseInt(searchParams.get('limit') || '50');
     const page = parseInt(searchParams.get('page') || '1');
 
@@ -44,32 +46,70 @@ export async function GET(request: NextRequest) {
       conditions.push(gte(websites.createdAt, dateFilter));
     }
 
-    // Add category filter
-    if (category) {
+    // Add category filter (use websiteCategories many-to-many table)
+    if (category && category !== 'all') {
       const allCategories = await db.query.categories.findMany({
         with: { children: true },
       });
 
       const categoryRecord = allCategories.find(cat => cat.slug === category);
       if (categoryRecord) {
-        if (!categoryRecord.parentId) {
-          const categoryIds = [categoryRecord.id];
-          if (categoryRecord.children) {
-            categoryIds.push(...categoryRecord.children.map((child: any) => child.id));
-          }
-          conditions.push(inArray(websites.categoryId, categoryIds));
+        // If parent category, include all child categories
+        const categoryIds = !categoryRecord.parentId && categoryRecord.children && categoryRecord.children.length > 0
+          ? [categoryRecord.id, ...categoryRecord.children.map((child: any) => child.id)]
+          : [categoryRecord.id];
+
+        // Use websiteCategories many-to-many table for querying
+        const websiteIds = await db
+          .select({ websiteId: websiteCategories.websiteId })
+          .from(websiteCategories)
+          .where(inArray(websiteCategories.categoryId, categoryIds));
+
+        if (websiteIds.length > 0) {
+          conditions.push(inArray(websites.id, websiteIds.map(w => w.websiteId)));
         } else {
-          conditions.push(eq(websites.categoryId, categoryRecord.id));
+          // No websites in this category, return empty
+          conditions.push(sql`false`);
         }
       }
     }
 
-    // Add pricing filter for free tools
-    if (type === 'free') {
+    // Add pricing filter (user selection has priority over type='free')
+    if (priceFilter && priceFilter !== 'all') {
+      if (priceFilter === 'free') {
+        conditions.push(
+          or(
+            eq(websites.pricingModel, 'free'),
+            eq(websites.hasFreeVersion, true)
+          )!
+        );
+      } else if (priceFilter === 'paid') {
+        conditions.push(
+          and(
+            eq(websites.pricingModel, 'paid'),
+            eq(websites.hasFreeVersion, false)
+          )!
+        );
+      } else if (priceFilter === 'freemium') {
+        conditions.push(eq(websites.pricingModel, 'freemium'));
+      }
+    } else if (type === 'free') {
+      // If no user price filter, apply type='free' default
       conditions.push(
         or(
           eq(websites.pricingModel, 'free'),
           eq(websites.hasFreeVersion, true)
+        )!
+      );
+    }
+
+    // Add search query filter
+    if (searchQuery && searchQuery.trim()) {
+      conditions.push(
+        or(
+          sql`${websites.title} ILIKE ${`%${searchQuery}%`}`,
+          sql`${websites.description} ILIKE ${`%${searchQuery}%`}`,
+          sql`${websites.tagline} ILIKE ${`%${searchQuery}%`}`
         )!
       );
     }

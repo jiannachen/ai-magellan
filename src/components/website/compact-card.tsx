@@ -81,9 +81,7 @@ export function CompactCard({ website, onVisit, className }: CompactCardProps) {
                 title={website.title}
                 className={cn(
                   "w-16 h-16 rounded-lg",
-                  "border border-border/40",
-                  "group-hover:border-ocean-primary/40",
-                  "transition-all duration-200"
+                  "border border-border/40"
                 )}
               />
             </div>

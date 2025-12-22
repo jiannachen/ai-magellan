@@ -8,6 +8,8 @@ import Footer from "@/components/footer/index";
 import BottomNavigation from "@/components/navigation/bottom-nav";
 import { HrefLang } from "@/components/seo/hreflang";
 import FloatingFeedbackButton from "@/components/feedback/floating-feedback-button";
+import { NavigationLoading } from "@/components/loading";
+import { NavigationProvider } from "@/contexts/navigation-context";
 import { Metadata } from 'next';
 
 interface LocaleLayoutProps {
@@ -87,24 +89,28 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages} locale={locale}>
-      <div className="min-h-screen flex flex-col">
-        <HrefLang />
-        <Header />
-        {/* 主内容区域 - 在移动端为底部导航预留足够空间 */}
-        <main className="flex-1 relative">
-          <div className="pb-20 md:pb-0 min-h-full">
-            {children}
+      <NavigationProvider>
+        <div className="min-h-screen flex flex-col">
+          <HrefLang />
+          <Header />
+          {/* 主内容区域 - 在移动端为底部导航预留足够空间 */}
+          <main className="flex-1 relative">
+            <div className="pb-20 md:pb-0 min-h-full">
+              {children}
+            </div>
+          </main>
+          {/* Footer 在移动端隐藏，避免与底部导航冲突 */}
+          <div className="hidden md:block">
+            <Footer />
           </div>
-        </main>
-        {/* Footer 在移动端隐藏，避免与底部导航冲突 */}
-        <div className="hidden md:block">
-          <Footer />
+          {/* 底部导航 - 固定在底部，仅移动端显示 */}
+          <BottomNavigation />
+          {/* 浮动反馈按钮 */}
+          <FloatingFeedbackButton />
+          {/* 全局导航加载状态 */}
+          <NavigationLoading />
         </div>
-        {/* 底部导航 - 固定在底部，仅移动端显示 */}
-        <BottomNavigation />
-        {/* 浮动反馈按钮 */}
-        <FloatingFeedbackButton />
-      </div>
+      </NavigationProvider>
     </NextIntlClientProvider>
   );
 }

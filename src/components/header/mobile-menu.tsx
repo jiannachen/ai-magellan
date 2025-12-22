@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import NavigationLink from "@/components/navigation/navigation-link";
 import { 
   Trophy, 
   Plus, 
@@ -144,7 +145,7 @@ export default function MobileMenu() {
                   
                   {categoriesOpen && (
                     <div className="mt-2 pl-6 sm:pl-8 space-y-1">
-                      <Link href="/categories" className="block">
+                      <NavigationLink href="/categories" className="block">
                         <Button
                           variant="ghost"
                           className="w-full justify-start hover:bg-secondary text-sm rounded-lg h-10 min-h-[40px] px-3"
@@ -153,9 +154,9 @@ export default function MobileMenu() {
                           <Map className="h-4 w-4 mr-2 text-primary" />
                           {t('filters.all_categories')}
                         </Button>
-                      </Link>
+                      </NavigationLink>
                       {categories.slice(0, 6).map((category: { id: number; name: string; slug: string }) => (
-                        <Link
+                        <NavigationLink
                           key={category.id}
                           href={`/categories#${category.slug}`}
                           className="block"
@@ -170,7 +171,7 @@ export default function MobileMenu() {
                               {category.name}
                             </span>
                           </Button>
-                        </Link>
+                        </NavigationLink>
                       ))}
                     </div>
                   )}
@@ -195,7 +196,7 @@ export default function MobileMenu() {
                   
                   {rankingsOpen && (
                     <div className="mt-2 pl-6 sm:pl-8 space-y-1">
-                      <Link href="/rankings" className="block">
+                      <NavigationLink href="/rankings" className="block">
                         <Button
                           variant="ghost"
                           className="w-full justify-start hover:bg-secondary text-sm rounded-lg h-10 min-h-[40px] px-3"
@@ -204,9 +205,9 @@ export default function MobileMenu() {
                           <Trophy className="h-4 w-4 mr-2 text-primary" />
                           {tRank('view_all')}
                         </Button>
-                      </Link>
+                      </NavigationLink>
                       {rankingLinks.map((link) => (
-                        <Link
+                        <NavigationLink
                           key={link.href}
                           href={link.href}
                           className="block"
@@ -219,7 +220,7 @@ export default function MobileMenu() {
                             <link.icon className="h-4 w-4 mr-2 text-muted-foreground" />
                             {link.title}
                           </Button>
-                        </Link>
+                        </NavigationLink>
                       ))}
                     </div>
                   )}

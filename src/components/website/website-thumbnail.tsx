@@ -32,7 +32,6 @@ export function WebsiteThumbnail({
       <div
         className={cn(
           "rounded-lg overflow-hidden bg-white dark:bg-gray-800 p-2",
-          "group-hover:ring-2 ring-primary/20 transition-all duration-300",
           className
         )}
       >
@@ -57,7 +56,6 @@ export function WebsiteThumbnail({
       <div
         className={cn(
           "relative rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center",
-          "group-hover:bg-gray-200 dark:group-hover:bg-gray-600 transition-colors duration-300",
           className
         )}
       >
@@ -87,7 +85,6 @@ export function WebsiteThumbnail({
       <div
         className={cn(
           "relative rounded-lg overflow-hidden",
-          "group-hover:ring-2 ring-primary/20 transition-all duration-300",
           className
         )}
       >
@@ -109,7 +106,6 @@ export function WebsiteThumbnail({
     <div
       className={cn(
         "relative rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center",
-        "group-hover:bg-gray-200 dark:group-hover:bg-gray-600 transition-colors duration-300",
         className
       )}
     >

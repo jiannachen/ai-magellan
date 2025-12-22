@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/ui/common/card';
 import { Button } from '@/ui/common/button';
@@ -25,7 +25,7 @@ import {
   Star,
   ExternalLink
 } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { cn } from '@/lib/utils/utils';
@@ -38,7 +38,19 @@ interface RankingPageProps {
   };
   websites: any[];
   categories: any[];
-  selectedCategory?: string;
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasMore: boolean;
+  };
+  initialFilters: {
+    category: string;
+    price: string;
+    timeRange: string;
+    search: string;
+  };
 }
 
 type FilterOption = 'all' | 'free' | 'paid' | 'freemium';
@@ -51,24 +63,60 @@ const rankingIcons = {
   new: Telescope
 };
 
-function RankingPageContent({ type, rankingType, websites: initialWebsites, categories, selectedCategory: initialSelectedCategory }: RankingPageProps) {
+function RankingPageContent({ type, rankingType, websites: initialWebsites, categories, pagination: initialPagination, initialFilters }: RankingPageProps) {
   const { user } = useUser();
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const tRanking = useTranslations('pages.rankings');
   const tCommon = useTranslations('common');
-  const [websites, setWebsites] = useState(initialWebsites);
-  const [filteredWebsites, setFilteredWebsites] = useState(initialWebsites);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [priceFilter, setPriceFilter] = useState<FilterOption>('all');
-  // 从 URL query 参数读取分类过滤器,优先于 prop
-  const [categoryFilter, setCategoryFilter] = useState(searchParams.get('category') || initialSelectedCategory || 'all');
-  const [timeRange, setTimeRange] = useState('all');
+
+  // 瀑布流状态管理
+  const [allWebsites, setAllWebsites] = useState(initialWebsites);
+  const [currentPage, setCurrentPage] = useState(initialPagination.page);
+  const [hasMore, setHasMore] = useState(initialPagination.hasMore);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  // 使用URL参数作为状态来源
+  const [searchQuery, setSearchQuery] = useState(initialFilters.search);
+  const [priceFilter, setPriceFilter] = useState<FilterOption>(initialFilters.price as FilterOption);
+  const [categoryFilter, setCategoryFilter] = useState(initialFilters.category);
+  const [timeRange, setTimeRange] = useState(initialFilters.timeRange);
   const [userLikes, setUserLikes] = useState<Set<number>>(new Set());
   const [userFavorites, setUserFavorites] = useState<Set<number>>(new Set());
-  const [loading, setLoading] = useState(false);
 
   const IconComponent = rankingIcons[type as keyof typeof rankingIcons] || Trophy;
+
+  // 当筛选条件改变时，重置数据
+  useEffect(() => {
+    setAllWebsites(initialWebsites);
+    setCurrentPage(initialPagination.page);
+    setHasMore(initialPagination.hasMore);
+    setIsFiltering(false);
+  }, [initialWebsites, initialPagination]);
+
+  // 更新URL参数的辅助函数
+  const updateURLParams = (updates: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams?.toString());
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value && value !== 'all' && value !== '') {
+        params.set(key, value);
+      } else {
+        params.delete(key);
+      }
+    });
+
+    // 重置页码到第一页（当筛选条件改变时）
+    params.delete('page');
+
+    // 设置筛选加载状态
+    setIsFiltering(true);
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   // Load user interactions if logged in
   useEffect(() => {
@@ -87,105 +135,97 @@ function RankingPageContent({ type, rankingType, websites: initialWebsites, cate
     }
   }, [user]);
 
-  // Fetch data when filters change
-  useEffect(() => {
-    const fetchRankingData = async () => {
-      if (timeRange === 'all' && categoryFilter === 'all') {
-        setWebsites(initialWebsites);
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({
-          type,
-          timeRange,
-          ...(categoryFilter !== 'all' && { category: categoryFilter }),
-          limit: '100'
-        });
-
-        const response = await fetch(`/api/rankings?${params}`);
-        if (response.ok) {
-          const data = await response.json();
-          setWebsites(data.data.websites);
-        }
-      } catch (error) {
-        console.error('Failed to fetch ranking data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRankingData();
-  }, [timeRange, categoryFilter, type, initialWebsites]);
-
-  // Filter and search websites
-  useEffect(() => {
-    let filtered = [...websites];
-
-    // Apply search filter
-    if (searchQuery) {
-      filtered = filtered.filter(website =>
-        website.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        website.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (website.tagline && website.tagline.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-    }
-
-    // Apply category filter
-    if (categoryFilter !== 'all') {
-      // 扁平化所有分类（包括子分类）
-      const allCategories = categories.flatMap(cat =>
-        cat.children ? [cat, ...cat.children] : [cat]
-      );
-      const selectedCat = allCategories.find(c => c.slug === categoryFilter);
-
-      if (selectedCat) {
-        // 如果选中的是一级分类，包含该分类及其所有子分类的网站
-        if (!selectedCat.parentId) {
-          const categoryIds = [selectedCat.id];
-          if (selectedCat.children) {
-            categoryIds.push(...selectedCat.children.map((child: any) => child.id));
-          }
-          filtered = filtered.filter(website => categoryIds.includes(website.categoryId));
-        } else {
-          // 如果选中的是二级分类，只显示该分类的网站
-          filtered = filtered.filter(website => website.categoryId === selectedCat.id);
-        }
-      }
-    }
-
-    // Apply price filter
-    if (priceFilter !== 'all') {
-      if (priceFilter === 'free') {
-        filtered = filtered.filter(website => 
-          website.pricingModel === 'free' || website.hasFreeVersion
-        );
-      } else if (priceFilter === 'paid') {
-        filtered = filtered.filter(website => 
-          website.pricingModel !== 'free' && !website.hasFreeVersion
-        );
-      } else if (priceFilter === 'freemium') {
-        filtered = filtered.filter(website => 
-          website.pricingModel === 'freemium'
-        );
-      }
-    }
-
-    setFilteredWebsites(filtered);
-  }, [websites, searchQuery, categoryFilter, priceFilter]);
-
   const handleVisit = async (website: any) => {
     try {
       await fetch(`/api/websites/${website.id}/visit`, { method: "POST" });
-      setWebsites(prev => prev.map(w => 
-        w.id === website.id ? { ...w, visits: w.visits + 1 } : w
-      ));
     } catch (error) {
       console.error('Failed to track visit:', error);
     }
     window.open(website.url, "_blank");
   };
+
+  // 处理筛选器变更
+  const handleCategoryChange = (category: string) => {
+    setCategoryFilter(category);
+    updateURLParams({ category });
+  };
+
+  const handlePriceChange = (price: FilterOption) => {
+    setPriceFilter(price);
+    updateURLParams({ price });
+  };
+
+  const handleTimeRangeChange = (range: string) => {
+    setTimeRange(range);
+    updateURLParams({ timeRange: range });
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    updateURLParams({ search: query });
+  };
+
+  // 加载下一页数据
+  const loadNextPage = useCallback(async () => {
+    if (isLoading || !hasMore) return;
+
+    setIsLoading(true);
+    try {
+      // 构建API请求参数
+      const apiParams = new URLSearchParams({
+        type,
+        page: String(currentPage + 1),
+        limit: '20',
+      });
+
+      if (categoryFilter && categoryFilter !== 'all') apiParams.set('category', categoryFilter);
+      if (priceFilter && priceFilter !== 'all') apiParams.set('priceFilter', priceFilter);
+      if (timeRange && timeRange !== 'all') apiParams.set('timeRange', timeRange);
+      if (searchQuery) apiParams.set('searchQuery', searchQuery);
+
+      const response = await fetch(`/api/rankings?${apiParams.toString()}`);
+      if (!response.ok) throw new Error('Failed to fetch data');
+
+      const data = await response.json();
+
+      if (data.success && data.data.websites) {
+        setAllWebsites(prev => [...prev, ...data.data.websites]);
+        setCurrentPage(data.data.pagination.page);
+        setHasMore(data.data.pagination.hasMore);
+      }
+    } catch (error) {
+      console.error('Failed to load more websites:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading, hasMore, currentPage, type, categoryFilter, priceFilter, timeRange, searchQuery]);
+
+  // 设置 Intersection Observer 监听滚动到底部
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const firstEntry = entries[0];
+        if (firstEntry.isIntersecting && hasMore && !isLoading) {
+          loadNextPage();
+        }
+      },
+      {
+        threshold: 0.1, // 当目标元素10%可见时触发
+        rootMargin: '100px', // 提前100px触发
+      }
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [hasMore, isLoading, loadNextPage]);
 
   return (
     <div className="min-h-screen bg-magellan-depth-50">
@@ -240,31 +280,23 @@ function RankingPageContent({ type, rankingType, websites: initialWebsites, cate
           <CategoryFilterSidebar
             categories={categories}
             selectedCategory={categoryFilter}
-            onCategoryChange={setCategoryFilter}
+            onCategoryChange={handleCategoryChange}
             searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
+            onSearchChange={handleSearchChange}
           />
 
         {/* 移动端筛选区域 - 只在移动端显示 */}
         <MobileCategoryFilter
           categories={categories}
           selectedCategory={categoryFilter}
-          onCategoryChange={setCategoryFilter}
+          onCategoryChange={handleCategoryChange}
           searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
+          onSearchChange={handleSearchChange}
         />
 
         {/* Main Content Area */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="flex items-center gap-3 text-magellan-depth-600">
-                <Compass className="h-5 w-5 professional-compass" />
-                <span>{tRanking('loading')}</span>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-8">
+          <div className="space-y-8">
               {/* Professional Filter Controls */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -281,8 +313,8 @@ function RankingPageContent({ type, rankingType, websites: initialWebsites, cate
                   <div className="bg-magellan-primary/5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-magellan-primary/10 w-fit">
                     <span className="text-xs sm:text-sm font-medium text-magellan-depth-700 whitespace-nowrap">
                       {tRanking('main.showing_count', {
-                        current: Math.min(filteredWebsites.length, 100),
-                        total: filteredWebsites.length
+                        current: allWebsites.length,
+                        total: initialPagination.total
                       })}
                     </span>
                   </div>
@@ -307,7 +339,7 @@ function RankingPageContent({ type, rankingType, websites: initialWebsites, cate
                       ].map((timeOption) => (
                         <button
                           key={timeOption.value}
-                          onClick={() => setTimeRange(timeOption.value)}
+                          onClick={() => handleTimeRangeChange(timeOption.value)}
                           className={cn(
                             "px-2.5 sm:px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
                             "whitespace-nowrap",
@@ -342,7 +374,7 @@ function RankingPageContent({ type, rankingType, websites: initialWebsites, cate
                       ].map((priceOption) => (
                         <button
                           key={priceOption.value}
-                          onClick={() => setPriceFilter(priceOption.value as FilterOption)}
+                          onClick={() => handlePriceChange(priceOption.value as FilterOption)}
                           className={cn(
                             "px-2.5 sm:px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200",
                             "whitespace-nowrap",
@@ -360,9 +392,17 @@ function RankingPageContent({ type, rankingType, websites: initialWebsites, cate
               </motion.div>
 
               {/* Ranking List */}
-              {filteredWebsites.length > 0 ? (
-                <div className="space-y-2 sm:space-y-3">
-                  {filteredWebsites.slice(0, 100).map((website, index) => (
+              {isFiltering ? (
+                <div className="flex justify-center py-20">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-magellan-primary"></div>
+                    <span className="text-sm text-magellan-depth-600">{tRanking('loading')}</span>
+                  </div>
+                </div>
+              ) : allWebsites.length > 0 ? (
+                <>
+                  <div className="space-y-2 sm:space-y-3">
+                    {allWebsites.map((website, index) => (
                     <motion.div
                       key={website.id}
                       initial={{ opacity: 0, x: -20 }}
@@ -513,6 +553,27 @@ function RankingPageContent({ type, rankingType, websites: initialWebsites, cate
                     </motion.div>
                   ))}
                 </div>
+
+                {/* 瀑布流加载指示器 - 用于触发自动加载 */}
+                <div ref={loadMoreRef} className="flex justify-center py-8">
+                  {isLoading ? (
+                    <div className="flex items-center gap-3 text-magellan-depth-600">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-magellan-primary"></div>
+                      <span className="text-sm">{tRanking('loading')}</span>
+                    </div>
+                  ) : hasMore ? (
+                    <div className="text-sm text-magellan-depth-500">
+                      {/* 占位符，用于 Intersection Observer 监听 */}
+                      <Compass className="h-5 w-5 professional-compass opacity-30" />
+                    </div>
+                  ) : (
+                    <div className="text-sm text-magellan-depth-500 flex items-center gap-2">
+                      <Anchor className="h-4 w-4" />
+                      <span>{tRanking('main.no_more_results')}</span>
+                    </div>
+                  )}
+                </div>
+              </>
               ) : (
                 <div className="text-center py-20">
                   <div className="max-w-md mx-auto">
@@ -529,14 +590,11 @@ function RankingPageContent({ type, rankingType, websites: initialWebsites, cate
                       {tRanking('empty_state.description')}
                     </p>
                     
-                    <Button 
+                    <Button
                       variant="default"
                       className="bg-gradient-to-r from-magellan-primary to-magellan-teal hover:from-magellan-primary/90 hover:to-magellan-teal/90 text-white"
                       onClick={() => {
-                        setSearchQuery('');
-                        setCategoryFilter('all');
-                        setPriceFilter('all');
-                        setTimeRange('all');
+                        router.push(pathname);
                       }}
                     >
                       <Compass className="h-4 w-4 mr-2" />
@@ -546,7 +604,6 @@ function RankingPageContent({ type, rankingType, websites: initialWebsites, cate
                 </div>
               )}
             </div>
-          )}
         </main>
         </div>
       </div>

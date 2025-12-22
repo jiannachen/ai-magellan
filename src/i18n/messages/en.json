@@ -213,7 +213,9 @@
       "main": {
         "treasure_list_title": "Treasure Discovery List",
         "showing_count": "Showing {current} of {total} tools",
-        "reset_filters": "Reset Filters"
+        "reset_filters": "Reset Filters",
+        "load_more": "Load More",
+        "no_more_results": "— All Results Loaded —"
       },
       "search_placeholder": "Search tools...",
       "loading": "Loading rankings...",

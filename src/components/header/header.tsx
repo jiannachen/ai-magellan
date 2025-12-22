@@ -1,6 +1,7 @@
 'use client'
 
 import Link from "next/link";
+import NavigationLink from "@/components/navigation/navigation-link";
 import { Trophy, Plus, Compass, ChevronDown, Star, TrendingUp, CheckCircle, Map, Anchor, Code, Palette, Brain, Zap, Monitor, Shield, Users, Camera, Music, Gamepad2, Briefcase, Heart, GraduationCap, ShoppingCart, Wrench } from "lucide-react";
 import { Button } from "@/ui/common/button";
 import {
@@ -129,23 +130,23 @@ export default function Header() {
                 collisionPadding={collisionPadding}
               >
                 <DropdownMenuItem asChild>
-                  <Link 
+                  <NavigationLink
                     href="/categories"
                     className="flex items-center gap-3 cursor-pointer font-medium p-2 rounded-md hover:bg-accent"
                   >
                     <Map className="h-4 w-4 text-primary" />
                     <span>{t('filters.all_categories')}</span>
-                  </Link>
+                  </NavigationLink>
                 </DropdownMenuItem>
                 {categories.slice(0, 6).map((category: { id: number; name: string; slug: string }) => (
                   <DropdownMenuItem key={category.id} asChild>
-                    <Link 
+                    <NavigationLink
                       href={`/categories#${category.slug}`}
                       className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-accent"
                     >
                       {getCategoryIcon(category.slug)}
                       <span>{category.name}</span>
-                    </Link>
+                    </NavigationLink>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -175,54 +176,54 @@ export default function Header() {
                 collisionPadding={collisionPadding}
               >
                 <DropdownMenuItem asChild>
-                  <Link 
+                  <NavigationLink
                     href="/rankings"
                     className="flex items-center gap-3 cursor-pointer font-medium p-2 rounded-md hover:bg-accent"
                   >
                     <Trophy className="h-4 w-4 text-primary" />
                     <span>{tRank('view_all')}</span>
-                  </Link>
+                  </NavigationLink>
                 </DropdownMenuItem>
-                
+
                 {/* 排行榜选项 - 航海主题图标 */}
                 <DropdownMenuItem asChild>
-                  <Link 
+                  <NavigationLink
                     href="/rankings/popular"
                     className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-accent"
                   >
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
                     <span>{tRank('types.popular.title')}</span>
-                  </Link>
+                  </NavigationLink>
                 </DropdownMenuItem>
-                
+
                 <DropdownMenuItem asChild>
-                  <Link 
+                  <NavigationLink
                     href="/rankings/top-rated"
                     className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-accent"
                   >
                     <Star className="h-4 w-4 text-muted-foreground" />
                     <span>{tRank('types.top-rated.title')}</span>
-                  </Link>
+                  </NavigationLink>
                 </DropdownMenuItem>
-                
+
                 <DropdownMenuItem asChild>
-                  <Link 
+                  <NavigationLink
                     href="/rankings/free"
                     className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-accent"
                   >
                     <CheckCircle className="h-4 w-4 text-muted-foreground" />
                     <span>{tRank('types.free.title')}</span>
-                  </Link>
+                  </NavigationLink>
                 </DropdownMenuItem>
-                
+
                 <DropdownMenuItem asChild>
-                  <Link 
+                  <NavigationLink
                     href="/rankings/new"
                     className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-accent"
                   >
                     <Plus className="h-4 w-4 text-muted-foreground" />
                     <span>{tRank('types.new.title')}</span>
-                  </Link>
+                  </NavigationLink>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

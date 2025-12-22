@@ -213,7 +213,9 @@
       "main": {
         "treasure_list_title": "寶藏發現列表",
         "showing_count": "顯示 {current} / {total} 工具",
-        "reset_filters": "重置篩選"
+        "reset_filters": "重置篩選",
+        "load_more": "載入更多",
+        "no_more_results": "— 已加載全部 —"
       },
       "search_placeholder": "搜尋工具...",
       "loading": "排行榜載入中...",

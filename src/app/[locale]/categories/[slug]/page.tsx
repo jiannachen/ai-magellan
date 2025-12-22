@@ -2,11 +2,12 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db/db';
 import { categories, websites, websiteCategories } from '@/lib/db/schema';
-import { eq, and, desc, sql, isNull, asc } from 'drizzle-orm';
+import { eq, and, desc, sql, like, or } from 'drizzle-orm';
 import CategoryPage from '@/components/category/category-page';
 
-// 使用 ISR 提升性能,每60秒重新验证
-export const revalidate = 60;
+// 使用 ISR 策略：保持缓存优势，同时定期更新数据
+export const revalidate = 60; // 60秒重新验证
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   try {

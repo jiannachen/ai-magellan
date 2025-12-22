@@ -8,6 +8,22 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizeCss: true,
   },
+  // 路由重定向配置
+  async redirects() {
+    return [
+      {
+        source: '/:locale/category/:slug',
+        destination: '/:locale/categories/:slug',
+        permanent: true, // 308 永久重定向
+      },
+      // 兼容不带 locale 的旧路由
+      {
+        source: '/category/:slug',
+        destination: '/categories/:slug',
+        permanent: true,
+      },
+    ];
+  },
   // Webpack 配置优化
   webpack: (config, { webpack }) => {
     // 禁用大字符串序列化警告

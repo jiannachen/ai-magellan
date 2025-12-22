@@ -48,29 +48,24 @@ export default function CategoryFilterSidebar({
     setExpandedCategories(newExpanded);
   };
 
-  // 选择分类（一级或二级）
+  // 选择分类（一级或二级） - 只筛选，不跳转
   const handleCategoryClick = (slug: string, categoryId: number, hasChildren: boolean, e: React.MouseEvent) => {
-    // 如果按住 Ctrl/Cmd 键，在新标签页打开
-    if (e.ctrlKey || e.metaKey) {
-      window.open(`/categories/${slug}`, '_blank');
-      return;
-    }
+    // 阻止默认行为
+    e.preventDefault();
 
-    // 如果是"全部"分类，只更新筛选状态
-    if (slug === 'all') {
-      onCategoryChange(slug);
-      return;
-    }
+    // 更新筛选状态
+    onCategoryChange(slug);
 
-    // 对于一级分类，如果有子分类，展开/收起
-    if (hasChildren) {
+    // 如果是有子分类的一级分类，自动展开
+    if (hasChildren && !expandedCategories.has(categoryId)) {
       toggleCategory(categoryId);
-      // 同时也允许筛选该分类
-      onCategoryChange(slug);
-    } else {
-      // 对于没有子分类的分类或二级分类，跳转到分类页面
-      router.push(`/categories/${slug}`);
     }
+  };
+
+  // 切换展开/收起（点击图标时）
+  const handleToggleClick = (categoryId: number, e: React.MouseEvent) => {
+    e.stopPropagation(); // 阻止触发 handleCategoryClick
+    toggleCategory(categoryId);
   };
 
   // 渲染分类项
@@ -131,10 +126,14 @@ export default function CategoryFilterSidebar({
 
             {/* 展开/收起图标 */}
             {hasChildren && (
-              <div className={cn(
-                "flex-shrink-0 p-0.5 rounded transition-transform duration-200",
-                isExpanded ? "rotate-0" : ""
-              )}>
+              <div
+                onClick={(e) => handleToggleClick(category.id, e)}
+                className={cn(
+                  "flex-shrink-0 p-0.5 rounded transition-transform duration-200 cursor-pointer",
+                  "hover:bg-magellan-primary/10",
+                  isExpanded ? "rotate-0" : ""
+                )}
+              >
                 {isExpanded ? (
                   <ChevronDown className="h-4 w-4 text-magellan-depth-600" />
                 ) : (
