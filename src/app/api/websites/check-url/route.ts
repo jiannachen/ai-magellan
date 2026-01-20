@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { websites } from "@/lib/db/schema";
 import { eq, and, ne } from "drizzle-orm";
+
 
 /**
  * GET /api/websites/check-url?url=xxx&excludeId=xxx
@@ -10,6 +11,7 @@ import { eq, and, ne } from "drizzle-orm";
  */
 export async function GET(request: Request) {
   try {
+    const db = getDB();
     const { searchParams } = new URL(request.url);
     const url = searchParams.get("url");
     const excludeId = searchParams.get("excludeId");

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { updateWebsiteThumbnails } from "@/lib/utils/update-thumbnails";
 import { AjaxResponse } from "@/lib/utils";
 
+
 export async function POST() {
   try {
     console.log("手动触发缩略图更新任务");

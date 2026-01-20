@@ -63,7 +63,7 @@ export function useWebsiteData(websiteId: string | undefined, reset: UseFormRese
         throw new Error(tEdit('errors.fetch_failed'))
       }
 
-      const data = await response.json()
+      const data = await response.json() as { data?: any }
       const websiteData = data.data || data
 
       // Check if current user owns the website

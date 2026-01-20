@@ -1,4 +1,4 @@
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { websites, categories } from "@/lib/db/schema";
 import { eq, isNull, desc } from "drizzle-orm";
 import { cachedPrismaQuery } from "@/lib/db/cache";
@@ -21,6 +21,7 @@ export default async function Home() {
     cachedPrismaQuery(
       "approved-websites",
       async () => {
+        const db = getDB();
         const result = await db.query.websites.findMany({
           where: eq(websites.status, 'approved'),
           columns: {
@@ -51,6 +52,7 @@ export default async function Home() {
     cachedPrismaQuery(
       "all-categories",
       async () => {
+        const db = getDB();
         const result = await db.query.categories.findMany({
           where: isNull(categories.parentId),
           columns: {

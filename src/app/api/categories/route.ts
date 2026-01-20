@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { categories, websiteCategories, websites } from "@/lib/db/schema";
 import { eq, isNull, sql, and, asc } from "drizzle-orm";
+
 
 // GET: 查询所有分类（支持多分类统计）
 export async function GET(request: Request) {
   try {
+    const db = getDB();
     const { searchParams } = new URL(request.url);
     const includeSubcategories = searchParams.get('includeSubcategories') === 'true';
     const parentId = searchParams.get('parentId');
@@ -106,7 +108,8 @@ export async function GET(request: Request) {
 // POST: 创建新分类
 export async function POST(request: Request) {
   try {
-    const { name, slug, parent_id, sort_order = 0 } = await request.json();
+    const db = getDB();
+    const { name, slug, parent_id, sort_order = 0 } = await request.json() as { name: string; slug: string; parent_id?: string; sort_order?: number };
     const newCategory = await db.insert(categories).values({
       name: name,
       slug: slug,

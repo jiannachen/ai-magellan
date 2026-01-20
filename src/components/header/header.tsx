@@ -16,6 +16,7 @@ import { LanguageSwitcher } from "@/components/language/language-switcher";
 import { useTranslations } from 'next-intl';
 import { useAtom } from 'jotai';
 import { categoriesAtom } from '@/lib/atoms';
+import type { Category } from '@/lib/types';
 import { useEffect } from 'react';
 import { cn } from "@/lib/utils/utils";
 import { useContainerCollisionPadding } from "@/lib/hooks/useContainerCollisionPadding";
@@ -58,7 +59,7 @@ export default function Header() {
         try {
           const response = await fetch('/api/categories?includeSubcategories=true');
           if (response.ok) {
-            const data = await response.json();
+            const data = await response.json() as { data?: Category[] };
             // Filter to ensure we only have parent categories
             const allCategories = Array.isArray(data.data) ? data.data : [];
             const parentCategories = allCategories.filter(

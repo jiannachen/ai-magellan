@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db/db';
+import { getDB } from '@/lib/db';
 import { websites, categories, users, websiteCategories } from '@/lib/db/schema';
 import { eq, and, or, sql, desc, asc, inArray, gte } from 'drizzle-orm';
 
+
 export async function GET(request: NextRequest) {
   try {
+    const db = getDB();
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || 'popular';
     const category = searchParams.get('category');

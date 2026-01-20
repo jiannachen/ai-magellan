@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchWebsites } from '@/lib/search/search-service';
 
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   

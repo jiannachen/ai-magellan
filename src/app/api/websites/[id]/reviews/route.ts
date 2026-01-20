@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { db } from '@/lib/db/db'
+import { getDB } from '@/lib/db'
 import { websiteReviews } from '@/lib/db/schema'
 import { eq, and, desc, sql } from 'drizzle-orm'
 import { ensureUserExists } from '@/lib/utils'
+
 
 // GET /api/websites/[id]/reviews
 // 获取工具的评论列表
@@ -12,6 +13,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const db = getDB();
     const websiteId = parseInt((await params).id)
 
     const reviews = await db.query.websiteReviews.findMany({
@@ -54,6 +56,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const db = getDB();
     const { userId } = await auth()
 
     if (!userId) {
@@ -67,7 +70,7 @@ export async function POST(
     }
 
     const websiteId = parseInt((await params).id)
-    const body = await request.json()
+    const body = await request.json() as { rating: number; comment?: string }
     const { rating, comment } = body
 
     // 验证评分范围
@@ -156,6 +159,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const db = getDB();
     const { userId } = await auth()
 
     if (!userId) {

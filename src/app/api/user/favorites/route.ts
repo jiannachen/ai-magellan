@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { db } from '@/lib/db/db'
+import { getDB } from '@/lib/db'
 import { websiteFavorites, websites, websiteLikes } from '@/lib/db/schema'
 import { eq, and, desc, sql } from 'drizzle-orm'
 import { ensureUserExists } from '@/lib/utils'
 
+
 export async function GET(request: NextRequest) {
   try {
+    const db = getDB();
     const { userId } = await auth()
 
     if (!userId) {
@@ -87,6 +89,7 @@ export async function GET(request: NextRequest) {
 // 添加收藏
 export async function POST(request: NextRequest) {
   try {
+    const db = getDB();
     const { userId } = await auth()
 
     if (!userId) {
@@ -105,7 +108,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { websiteId } = await request.json()
+    const { websiteId } = await request.json() as { websiteId: number }
 
     if (!websiteId) {
       return NextResponse.json(
@@ -116,7 +119,7 @@ export async function POST(request: NextRequest) {
 
     // 检查网站是否存在
     const website = await db.query.websites.findFirst({
-      where: eq(websites.id, parseInt(websiteId))
+      where: eq(websites.id, websiteId)
     })
 
     if (!website) {
@@ -130,7 +133,7 @@ export async function POST(request: NextRequest) {
     const existingFavorite = await db.query.websiteFavorites.findFirst({
       where: and(
         eq(websiteFavorites.userId, userId),
-        eq(websiteFavorites.websiteId, parseInt(websiteId))
+        eq(websiteFavorites.websiteId, websiteId)
       )
     })
 
@@ -145,7 +148,7 @@ export async function POST(request: NextRequest) {
     const [favorite] = await db.insert(websiteFavorites).values({
       id: `${userId}_${websiteId}`,
       userId,
-      websiteId: parseInt(websiteId)
+      websiteId: websiteId
     }).returning()
 
     return NextResponse.json({ success: true, favorite })
@@ -161,6 +164,7 @@ export async function POST(request: NextRequest) {
 // 移除收藏
 export async function DELETE(request: NextRequest) {
   try {
+    const db = getDB();
     const { userId } = await auth()
 
     if (!userId) {
@@ -180,20 +184,22 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const websiteId = searchParams.get('websiteId')
+    const websiteIdStr = searchParams.get('websiteId')
 
-    if (!websiteId) {
+    if (!websiteIdStr) {
       return NextResponse.json(
         { error: 'Website ID is required' },
         { status: 400 }
       )
     }
 
+    const websiteId = parseInt(websiteIdStr)
+
     // 删除收藏
     await db.delete(websiteFavorites).where(
       and(
         eq(websiteFavorites.userId, userId),
-        eq(websiteFavorites.websiteId, parseInt(websiteId))
+        eq(websiteFavorites.websiteId, websiteId)
       )
     )
 

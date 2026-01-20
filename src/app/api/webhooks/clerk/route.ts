@@ -1,9 +1,10 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { Webhook } from 'svix';
-import { db } from '@/lib/db/db';
+import { getDB } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+
 
 // Clerk Webhook 事件类型
 type ClerkWebhookEvent = {
@@ -73,6 +74,8 @@ export async function POST(req: Request) {
   // 处理事件
   const eventType = evt.type;
   console.log(`Received Clerk webhook: ${eventType}`);
+
+  const db = getDB();
 
   try {
     if (eventType === 'user.created') {

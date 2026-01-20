@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from '@clerk/nextjs/server';
 import { AjaxResponse, ensureUserExists } from "@/lib/utils";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { websites, websiteLikes } from "@/lib/db/schema";
 import { eq, and, sql } from "drizzle-orm";
+
 
 // POST /api/websites/[id]/like - Add like (点赞只能增加，不能取消)
 export async function POST(
@@ -11,6 +12,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const db = getDB();
     const { userId } = await auth();
 
     if (!userId) {

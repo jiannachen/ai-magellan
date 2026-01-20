@@ -1,9 +1,10 @@
-import { db } from '@/lib/db/db';
+import { getDB } from '@/lib/db';
 import { websites } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 export async function updateWebsiteActive() {
   try {
+    const db = getDB();
     // 获取所有需要检查的网站
     const websitesList = await db.query.websites.findMany({
       where: eq(websites.status, "approved"),

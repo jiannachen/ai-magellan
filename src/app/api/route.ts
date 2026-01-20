@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
 
+
 /**
  * @swagger
  * /api:

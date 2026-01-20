@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AjaxResponse } from '@/lib/utils';
 
+
 // 网站元数据提取器
 class WebsiteMetadataExtractor {
   private html: string = '';
@@ -200,7 +201,7 @@ class WebsiteMetadataExtractor {
 
 export async function POST(request: NextRequest) {
   try {
-    const { url } = await request.json();
+    const { url } = await request.json() as { url: string };
 
     if (!url) {
       return NextResponse.json(

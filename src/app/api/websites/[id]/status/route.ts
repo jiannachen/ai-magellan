@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { websites } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+
 
 export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   try {
-    const { status } = await request.json();
+    const db = getDB();
+    const { status } = await request.json() as { status: string };
     const websiteId = parseInt(params.id);
 
     if (isNaN(websiteId)) {

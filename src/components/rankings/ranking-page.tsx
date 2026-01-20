@@ -28,6 +28,7 @@ import {
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
+import type { Website } from '@/lib/types';
 import { cn } from '@/lib/utils/utils';
 
 interface RankingPageProps {
@@ -122,14 +123,14 @@ function RankingPageContent({ type, rankingType, websites: initialWebsites, cate
   useEffect(() => {
     if (user) {
       Promise.all([
-        fetch('/api/user/likes/check').then(res => res.ok ? res.json() : { data: [] }),
-        fetch('/api/user/favorites/check').then(res => res.ok ? res.json() : { data: [] })
+        fetch('/api/user/likes/check').then(res => res.ok ? res.json() : { data: [] }) as Promise<{ data?: Array<{ websiteId: number }> }>,
+        fetch('/api/user/favorites/check').then(res => res.ok ? res.json() : { data: [] }) as Promise<{ data?: Array<{ websiteId: number }> }>
       ]).then(([likesRes, favoritesRes]) => {
         if (likesRes.data) {
-          setUserLikes(new Set(likesRes.data.map((item: any) => item.websiteId)));
+          setUserLikes(new Set(likesRes.data.map((item) => item.websiteId)));
         }
         if (favoritesRes.data) {
-          setUserFavorites(new Set(favoritesRes.data.map((item: any) => item.websiteId)));
+          setUserFavorites(new Set(favoritesRes.data.map((item) => item.websiteId)));
         }
       }).catch(console.error);
     }
@@ -186,7 +187,7 @@ function RankingPageContent({ type, rankingType, websites: initialWebsites, cate
       const response = await fetch(`/api/rankings?${apiParams.toString()}`);
       if (!response.ok) throw new Error('Failed to fetch data');
 
-      const data = await response.json();
+      const data = await response.json() as { success: boolean; data: { websites: Website[]; pagination: { page: number; hasMore: boolean } } };
 
       if (data.success && data.data.websites) {
         setAllWebsites(prev => [...prev, ...data.data.websites]);

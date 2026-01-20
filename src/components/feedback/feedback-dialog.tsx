@@ -55,7 +55,7 @@ export default function FeedbackDialog({ trigger, triggerClassName }: FeedbackDi
         }),
       });
 
-      const data = await res.json().catch(() => null);
+      const data = await res.json().catch(() => null) as { success?: boolean; message?: string } | null;
 
       if (!res.ok || !data?.success) {
         throw new Error(data?.message || 'Submit failed');

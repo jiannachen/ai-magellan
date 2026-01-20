@@ -1,56 +1,176 @@
-import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import * as schema from './schema';
+/**
+ * Unified Database Module
+ *
+ * This module provides a unified database access layer that supports:
+ * - PostgreSQL (for Vercel/local development with DATABASE_URL)
+ * - Cloudflare D1 (for Cloudflare Pages deployment)
+ *
+ * The correct database is automatically selected based on the environment.
+ */
 
-// 声明全局类型,使 db 在全局范围内可用
+import * as schemaPg from './schema';
+
+// Lazy import D1 types - only used when in Cloudflare environment
+let drizzleD1: typeof import('drizzle-orm/d1').drizzle | null = null;
+let schemaD1Module: typeof import('./schema-d1') | null = null;
+
+// Type definitions
+export type PgDB = import('drizzle-orm/postgres-js').PostgresJsDatabase<typeof schemaPg>;
+export type D1DB = any; // Simplified type for compatibility
+export type Database = PgDB | D1DB;
+
+// Detect if running in Cloudflare/Edge environment
+function isEdgeRuntime(): boolean {
+  // Check for Cloudflare Workers environment
+  if (typeof globalThis !== 'undefined') {
+    // Check for Cloudflare-specific globals
+    if ('caches' in globalThis && typeof (globalThis as any).caches?.default !== 'undefined') {
+      return true;
+    }
+    // Check for edge runtime flag
+    if (typeof (globalThis as any).EdgeRuntime !== 'undefined') {
+      return true;
+    }
+    // Check for Cloudflare env
+    if ((globalThis as any).__cf_env__) {
+      return true;
+    }
+  }
+  // Check environment variable
+  if (typeof process !== 'undefined' && process.env?.CLOUDFLARE_WORKERS === 'true') {
+    return true;
+  }
+  return false;
+}
+
+// Global storage for development hot reload (PostgreSQL only)
 declare global {
-  var db: PostgresJsDatabase<typeof schema> | undefined;
+  // eslint-disable-next-line no-var
+  var __db: PgDB | undefined;
+  // eslint-disable-next-line no-var
+  var __pgClient: any | undefined;
 }
 
-// Check for DATABASE_URL
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    'DATABASE_URL environment variable is not set. ' +
-    'Please check your .env file or environment configuration.\n' +
-    'Example: DATABASE_URL="postgresql://user:password@localhost:5432/dbname"'
-  );
+/**
+ * Get the PostgreSQL database instance (synchronous)
+ * Used for Vercel deployment and local development
+ */
+function getPostgresDB(): PgDB {
+  // Check for DATABASE_URL
+  if (!process.env.DATABASE_URL) {
+    throw new Error(
+      'DATABASE_URL environment variable is not set. ' +
+      'Please check your .env file or environment configuration.'
+    );
+  }
+
+  // Reuse existing instance in development
+  if (process.env.NODE_ENV !== 'production' && globalThis.__db) {
+    return globalThis.__db;
+  }
+
+  // Synchronous require for non-edge runtime
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { drizzle: drizzlePg } = require('drizzle-orm/postgres-js');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const postgres = require('postgres');
+
+  // Create postgres client
+  const client = globalThis.__pgClient ?? postgres(process.env.DATABASE_URL, {
+    max: process.env.NODE_ENV === 'production' ? 1 : 10,
+    idle_timeout: 20,
+    connect_timeout: 10,
+    prepare: true,
+  });
+
+  if (process.env.NODE_ENV !== 'production') {
+    globalThis.__pgClient = client;
+  }
+
+  // Create drizzle instance
+  const db = drizzlePg(client, { schema: schemaPg });
+
+  if (process.env.NODE_ENV !== 'production') {
+    globalThis.__db = db;
+  }
+
+  return db;
 }
 
-// 创建一个类型安全的全局对象来存储 Drizzle 实例
-const globalForDb = global as { db?: PostgresJsDatabase<typeof schema>; client?: postgres.Sql };
+/**
+ * Get the D1 database instance from Cloudflare context
+ * Used for Cloudflare Pages deployment
+ */
+export function getD1DB(d1: any): D1DB {
+  if (!drizzleD1) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    drizzleD1 = require('drizzle-orm/d1').drizzle;
+  }
+  if (!schemaD1Module) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    schemaD1Module = require('./schema-d1');
+  }
+  return drizzleD1!(d1, { schema: schemaD1Module as any });
+}
 
-// 创建 postgres 客户端
-// - 在生产环境中创建新的客户端
-// - 在开发环境中复用全局客户端以防止热重载时创建多个连接
-// Connection pooling best practices:
-// - max: maximum connections (lower for serverless)
-// - idle_timeout: close idle connections after 20 seconds
-// - connect_timeout: connection timeout (10 seconds)
-const client = globalForDb.client ?? postgres(process.env.DATABASE_URL, {
-  max: process.env.NODE_ENV === 'production' ? 1 : 10, // Serverless-friendly: 1 connection in prod
-  idle_timeout: 20,
-  connect_timeout: 10,
-  // Prepare statements for better performance
-  prepare: true,
+/**
+ * Get database instance for Cloudflare Pages
+ * Call this from Server Components or API routes
+ */
+export function getCloudflareDB(): D1DB {
+  try {
+    // Dynamic require to avoid bundling issues
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { getCloudflareContext } = require('@opennextjs/cloudflare');
+    const { env } = getCloudflareContext();
+    return getD1DB(env.DB);
+  } catch (e) {
+    // Not in Cloudflare environment - this is expected during build
+    throw new Error(
+      'Failed to get Cloudflare D1 database. ' +
+      'Make sure you are running in Cloudflare environment.'
+    );
+  }
+}
+
+/**
+ * Get the appropriate database instance based on environment
+ * This is the main function to use in API routes and components
+ */
+export function getDB(): PgDB {
+  // For now, always return PostgreSQL for local/Vercel
+  // Cloudflare deployment will be handled separately
+  if (isEdgeRuntime()) {
+    // In edge runtime, try to get Cloudflare DB
+    try {
+      return getCloudflareDB() as any;
+    } catch {
+      // Fall through to PostgreSQL if Cloudflare fails
+    }
+  }
+
+  // Default to PostgreSQL
+  return getPostgresDB();
+}
+
+/**
+ * Main database export (for backwards compatibility)
+ * Note: Prefer using getDB() for new code
+ */
+let _db: PgDB | null = null;
+
+export const db: PgDB = new Proxy({} as PgDB, {
+  get(_target, prop) {
+    if (!_db) {
+      _db = getPostgresDB();
+    }
+    return (_db as any)[prop];
+  }
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForDb.client = client;
-}
+// Export schemas
+export { schemaPg as schema };
+export const schemaD1 = {} as typeof import('./schema-d1'); // Placeholder, actual schema loaded dynamically
 
-// 导出 Drizzle 实例:
-// - 如果全局已存在实例则复用
-// - 否则创建新实例
-export const db: PostgresJsDatabase<typeof schema> = globalForDb.db ?? drizzle(client, {
-  schema,
-});
-
-// 在开发环境中将实例保存到全局对象
-// 这样可以防止热重载时创建多个数据库连接
-if (process.env.NODE_ENV !== 'production') {
-  globalForDb.db = db;
-}
-
-// 导出类型
-export type Database = typeof db;
-export { schema };
+// Export types
+export type { PgDB as PostgresDatabase, D1DB as CloudflareDatabase };

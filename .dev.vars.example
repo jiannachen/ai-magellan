@@ -1,0 +1,22 @@
+# Cloudflare deployment environment variables
+# Copy this file to .dev.vars for local development
+
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-clerk-publishable-key
+CLERK_SECRET_KEY=your-clerk-secret-key
+
+# Clerk Redirect URLs
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/auth/signin
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/auth/signup
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+
+# Site Configuration
+NEXT_PUBLIC_BASE_URL=https://aimagellan.com
+
+# Admin Configuration
+ADMIN_EMAILS=your-email@example.com
+
+# Analytics (optional)
+GOOGLE_ANALYTICS=
+CLARITY_PROJECT_ID=

@@ -71,7 +71,7 @@ export default function DashboardPage() {
     if (!response.ok) {
       throw new Error(`Failed to fetch favorites: ${response.status}`)
     }
-    const data = await response.json()
+    const data = await response.json() as { websites?: Website[] }
     setFavorites(data.websites || [])
   }, [])
 
@@ -80,7 +80,7 @@ export default function DashboardPage() {
     if (!response.ok) {
       throw new Error(`Failed to fetch stats: ${response.status}`)
     }
-    const data = await response.json()
+    const data = await response.json() as { data?: { totalFavorites: number; totalSubmissions: number; totalLikes: number } }
     setStats(data.data || {
       totalFavorites: 0,
       totalSubmissions: 0,

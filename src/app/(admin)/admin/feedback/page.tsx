@@ -1,7 +1,7 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { feedbacks } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
 import { FeedbackList } from "@/components/admin/feedback-list";
@@ -15,6 +15,7 @@ function isAdminEmail(email: string): boolean {
 }
 
 async function getFeedbacks() {
+  const db = getDB();
   const list = await db.query.feedbacks.findMany({
     orderBy: (feedbacks, { desc }) => [desc(feedbacks.createdAt)],
     limit: 200,

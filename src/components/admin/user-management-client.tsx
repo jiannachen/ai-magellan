@@ -162,8 +162,8 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
         throw new Error('Failed to update user');
       }
 
-      const result = await response.json();
-      
+      const result = await response.json() as { success: boolean; message?: string };
+
       if (result.success) {
         // 更新本地状态
         setUsers(prev => prev.map(user => 

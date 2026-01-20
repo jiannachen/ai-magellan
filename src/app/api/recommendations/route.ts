@@ -1,11 +1,13 @@
-import { db } from '@/lib/db/db';
+import { getDB } from '@/lib/db';
 import { websites } from '@/lib/db/schema';
 import { eq, and, or, gte, ne, sql } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
+
 // 获取网站推荐
 export async function GET(request: NextRequest) {
   try {
+    const db = getDB();
     const { searchParams } = new URL(request.url);
     const categoryId = searchParams.get('category');
     const limit = parseInt(searchParams.get('limit') || '6');
@@ -73,7 +75,8 @@ export async function GET(request: NextRequest) {
 // 记录用户行为用于改进推荐算法
 export async function POST(request: NextRequest) {
   try {
-    const { websiteId, action, categoryId } = await request.json();
+    const db = getDB();
+    const { websiteId, action, categoryId } = await request.json() as { websiteId?: number; action?: string; categoryId?: number };
     
     // 这里可以记录用户行为，用于改进推荐算法
     // 比如记录用户点击、喜欢、分享等行为

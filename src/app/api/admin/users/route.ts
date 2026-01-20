@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { desc, sql } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
+
 
 // 检查是否为管理员邮箱
 function isAdminEmail(email: string): boolean {
@@ -14,6 +15,7 @@ function isAdminEmail(email: string): boolean {
 // GET /api/admin/users - 获取所有用户列表
 export async function GET() {
   try {
+    const db = getDB();
     // 验证管理员权限
     const { userId } = await auth();
     if (!userId) {

@@ -93,8 +93,8 @@ export function UserDetailModal({ user, isOpen, onClose }: UserDetailModalProps)
     try {
       const response = await fetch(`/api/admin/users/${userId}`);
       if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
+        const result = await response.json() as { success: boolean; data?: DetailedUser };
+        if (result.success && result.data) {
           setDetailedUser(result.data);
         }
       }

@@ -1,4 +1,4 @@
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { websites } from "@/lib/db/schema";
 import { ne } from "drizzle-orm";
 
@@ -30,6 +30,7 @@ function normalizeContentType(contentType: string | null): string {
 
 export async function updateWebsiteThumbnails() {
   try {
+    const db = getDB();
     // 获取所有需要更新的网站
     const websitesList = await db.query.websites.findMany({
       where: ne(websites.thumbnail, ""),

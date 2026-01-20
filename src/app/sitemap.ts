@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next'
-import { db } from '@/lib/db/db'
+import { getDB } from '@/lib/db'
 import { websites, categories } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
 
@@ -7,6 +7,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://aimagellan.com'
 
   try {
+    const db = getDB();
     // 渐进式SEO策略：先放出高质量的工具，逐步扩大
     // 阶段1: 100个 -> 阶段2: 300个 -> 阶段3: 1000个 -> 最终: 全部
     const SITEMAP_TOOL_LIMIT = 100

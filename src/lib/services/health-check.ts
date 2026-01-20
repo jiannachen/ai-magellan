@@ -1,4 +1,4 @@
-import { db } from '@/lib/db/db';
+import { getDB } from '@/lib/db';
 import { websites } from '@/lib/db/schema';
 import { eq, sql, asc, desc } from 'drizzle-orm';
 
@@ -107,6 +107,7 @@ export async function batchCheckWebsiteHealth(urls: string[], concurrency = 5): 
  * 更新数据库中的网站状态
  */
 export async function updateWebsiteStatus(healthChecks: WebsiteHealthCheck[]) {
+  const db = getDB();
   const updatePromises = healthChecks.map(async (check) => {
     try {
       const isOnline = check.status === 'online' || check.status === 'slow';
@@ -135,6 +136,7 @@ export async function updateWebsiteStatus(healthChecks: WebsiteHealthCheck[]) {
  */
 export async function runHealthCheckProcess(limit = 50) {
   try {
+    const db = getDB();
     console.log('开始执行网站健康检查...');
 
     // 获取需要检查的网站（优先检查很久没检查的）

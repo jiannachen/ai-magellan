@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { websites } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+
 
 interface CheckUrlResponse {
   isAlive: boolean;
@@ -35,7 +36,8 @@ async function checkUrl(url: string): Promise<CheckUrlResponse> {
 
 export async function POST(request: Request) {
   try {
-    const { url, id: websiteId } = await request.json();
+    const db = getDB();
+    const { url, id: websiteId } = await request.json() as { url: string; id: number };
 
     if (isNaN(websiteId)) {
       return NextResponse.json(AjaxResponse.fail("Invalid website ID"), {

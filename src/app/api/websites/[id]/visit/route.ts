@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { websites } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
+
 
 // POST /api/websites/[id]/visit
 export async function POST(
@@ -10,6 +11,7 @@ export async function POST(
   props: { params: Promise<{ id: string }> }
 ) {
   try {
+    const db = getDB();
     const params = await props.params;
     const websiteId = parseInt(params.id);
 

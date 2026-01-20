@@ -1,15 +1,17 @@
 import { NextResponse } from "next/server";
 import { auth } from '@clerk/nextjs/server';
 import { AjaxResponse, generateSlug } from "@/lib/utils";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { websites, categories, websiteLikes, websiteFavorites, websiteCategories } from "@/lib/db/schema";
 import { eq, and, ne, sql, desc } from "drizzle-orm";
 import { validateWebsiteEdit } from "@/lib/validations/website";
+
 
 // GET /api/websites/[id]
 // 获取单个网站详细信息 - 支持通过ID或slug查询
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const db = getDB();
     const { id } = await params;
 
     // 尝试解析为数字，如果失败则认为是slug
@@ -81,6 +83,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 // 删除网站
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const db = getDB();
     const { id } = await params;
     if (!id) {
       return NextResponse.json(AjaxResponse.fail("Website ID is required"), {});
@@ -126,6 +129,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const db = getDB();
     // 获取当前用户信息
     const { userId } = await auth();
     
@@ -135,7 +139,7 @@ export async function PUT(
       });
     }
 
-    const data = await request.json();
+    const data = await request.json() as Record<string, unknown>;
     const { id } = await params;
     const websiteId = parseInt(id);
 

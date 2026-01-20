@@ -44,11 +44,11 @@ export async function fetchMetadata(url: string) {
     });
 
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json() as { message?: string };
       throw new Error(error.message || '无法获取网站信息');
     }
 
-    const result = await response.json();
+    const result = await response.json() as { success: boolean; message?: string; data: any };
 
     if (!result.success) {
       throw new Error(result.message || '无法获取网站信息');

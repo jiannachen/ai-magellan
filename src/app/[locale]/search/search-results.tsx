@@ -44,10 +44,10 @@ export default function SearchResults({ initialData, initialSearchParams }: Sear
     setLoading(true);
     try {
       const response = await fetch(`/api/search?${params.toString()}`);
-      const result = await response.json();
-      
+      const result = await response.json() as { success: boolean; data?: SearchResult; error?: string };
+
       if (result.success) {
-        setData(result.data);
+        setData(result.data ?? null);
       } else {
         console.error('Search failed:', result.error);
         setData(null);

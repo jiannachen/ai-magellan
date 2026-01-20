@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { db } from '@/lib/db/db';
+import { getDB } from '@/lib/db';
 import { websites, categories } from '@/lib/db/schema';
 import { eq, isNull, asc, desc, or, sql } from 'drizzle-orm';
 import RankingsHomePage from '@/components/rankings/rankings-home-page';
@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 async function getRankingsData() {
+  const db = getDB();
   // Get approved websites for different rankings
   const websitesList = await db.query.websites.findMany({
     where: eq(websites.status, 'approved'),

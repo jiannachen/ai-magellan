@@ -69,7 +69,7 @@ export function Reviews({ websiteId, websiteTitle }: ReviewsProps) {
       setLoading(true)
       const response = await fetch(`/api/websites/${websiteId}/reviews`)
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as { reviews: Review[]; stats: ReviewStats }
         setReviews(data.reviews)
         setStats(data.stats)
       }
@@ -101,7 +101,7 @@ export function Reviews({ websiteId, websiteTitle }: ReviewsProps) {
       })
 
       if (response.ok) {
-        const newReview = await response.json()
+        const newReview = await response.json() as Review
         
         // 更新评论列表
         setReviews(prev => {

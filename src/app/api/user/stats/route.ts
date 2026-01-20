@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { db } from '@/lib/db/db'
+import { getDB } from '@/lib/db'
 import { websiteFavorites, websites, websiteLikes } from '@/lib/db/schema'
 import { eq, sql } from 'drizzle-orm'
 
+
 export async function GET(request: NextRequest) {
   try {
+    const db = getDB();
     const { userId } = await auth()
 
     if (!userId) {

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { db } from '@/lib/db/db';
+import { getDB } from '@/lib/db';
 import { websites, websiteCategories } from '@/lib/db/schema';
 import { eq, and, or, desc, gte, inArray, sql, like } from 'drizzle-orm';
 import RankingPage from '@/components/rankings/ranking-page';
@@ -101,6 +101,7 @@ async function getRankingData({
   page = 1,
   limit = 20,
 }: RankingDataParams) {
+  const db = getDB();
   const rankingType = RANKING_TYPES[type as keyof typeof RANKING_TYPES];
 
   if (!rankingType) {
@@ -261,6 +262,7 @@ async function getRankingData({
 }
 
 async function getCategories() {
+  const db = getDB();
   // 获取所有分类，包括父子关系
   const allCategories = await db.query.categories.findMany({
     with: {

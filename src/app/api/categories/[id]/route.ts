@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { categories } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+
 
 // PUT: 更新分类
 export async function PUT(
@@ -11,7 +12,8 @@ export async function PUT(
 ) {
   const params = await props.params;
   try {
-    const { name, slug } = await request.json();
+    const db = getDB();
+    const { name, slug } = await request.json() as { name: string; slug: string };
     const id = parseInt(params.id);
 
     if (!name || !slug) {
@@ -50,6 +52,7 @@ export async function DELETE(
 ) {
   const params = await props.params;
   try {
+    const db = getDB();
     const id = parseInt(params.id);
 
     await db.delete(categories).where(eq(categories.id, id));

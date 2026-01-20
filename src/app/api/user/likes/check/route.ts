@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { db } from '@/lib/db/db'
+import { getDB } from '@/lib/db'
 import { websiteLikes } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
+
 
 // GET /api/user/likes/check
 // 检查用户是否已点赞某个工具
 export async function GET(request: Request) {
   try {
+    const db = getDB();
     const { userId } = await auth()
 
     if (!userId) {

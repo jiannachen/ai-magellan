@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { footerLinks } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
 
+
 // 获取所有页脚链接
 export async function GET() {
   try {
+    const db = getDB();
     const links = await db.query.footerLinks.findMany({
       columns: {
         title: true,
@@ -23,7 +25,8 @@ export async function GET() {
 // 创建新的页脚链接
 export async function POST(request: Request) {
   try {
-    const { title, url } = await request.json();
+    const db = getDB();
+    const { title, url } = await request.json() as { title: string; url: string };
 
     if (!title || !url) {
       return NextResponse.json(AjaxResponse.fail("标题和URL都是必需的"));
@@ -53,7 +56,8 @@ export async function POST(request: Request) {
 // 更新页脚链接
 export async function PUT(request: Request) {
   try {
-    const { id, title, url } = await request.json();
+    const db = getDB();
+    const { id, title, url } = await request.json() as { id: number; title: string; url: string };
 
     if (!id || !title || !url) {
       return NextResponse.json(AjaxResponse.fail("ID、标题和URL都是必需的"));
@@ -77,6 +81,7 @@ export async function PUT(request: Request) {
 // 删除页脚链接
 export async function DELETE(request: Request) {
   try {
+    const db = getDB();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 

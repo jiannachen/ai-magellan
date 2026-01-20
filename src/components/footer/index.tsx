@@ -1,4 +1,4 @@
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { footerLinks } from "@/lib/db/schema";
 import { asc } from "drizzle-orm";
 import FooterContent from "./footer-content";
@@ -10,6 +10,7 @@ export async function Footer() {
   const footerLinksList = await cachedPrismaQuery(
     "footer-links",
     async () => {
+      const db = getDB();
       const result = await db.query.footerLinks.findMany({
         columns: {
           title: true,

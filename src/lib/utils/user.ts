@@ -1,5 +1,5 @@
 import { currentUser } from '@clerk/nextjs/server';
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 
@@ -12,6 +12,7 @@ import { eq, sql } from "drizzle-orm";
  */
 export async function ensureUserExists(userId: string): Promise<boolean> {
   try {
+    const db = getDB();
     // 检查用户是否已存在
     const existingUser = await db.query.users.findFirst({
       where: eq(users.id, userId),
@@ -44,6 +45,7 @@ export async function ensureUserExists(userId: string): Promise<boolean> {
     if (error.code === 'P2002') {
       // email 冲突，使用 userId 作为唯一 email
       try {
+        const db = getDB();
         const user = await currentUser();
         await db.insert(users).values({
           id: userId,

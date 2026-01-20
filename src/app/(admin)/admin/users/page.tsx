@@ -3,7 +3,7 @@ import { UserManagementClient } from "@/components/admin/user-management-client"
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { ListFilter, Users, MessageSquare } from "lucide-react";
@@ -20,6 +20,7 @@ function isAdminEmail(email: string): boolean {
 }
 
 async function getUsers() {
+  const db = getDB();
   const usersList = await db.query.users.findMany({
     columns: {
       id: true,
@@ -123,6 +124,7 @@ export default async function AdminUsersPage() {
   }
 
   // 确保数据库中用户记录存在且为管理员
+  const db = getDB();
   let adminUser = await db.query.users.findFirst({
     where: eq(users.id, userId),
     columns: { role: true },

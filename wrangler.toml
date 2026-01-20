@@ -1,0 +1,36 @@
+name = "ai-magellan"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+main = ".open-next/worker.js"
+assets = { directory = ".open-next/assets", binding = "ASSETS" }
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "ai-magellan-db"
+database_id = "ac9ab675-7ce2-4c3b-b380-35dd64a4198d"
+
+# Environment variables
+[vars]
+NEXT_PUBLIC_BASE_URL = "https://aimagellan.com"
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsuYWltYWdlbGxhbi5jb20k"
+NEXT_PUBLIC_CLERK_SIGN_IN_URL = "/auth/signin"
+NEXT_PUBLIC_CLERK_SIGN_UP_URL = "/auth/signup"
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL = "/"
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL = "/"
+CLARITY_PROJECT_ID = "tqy0fo919a"
+
+# Sensitive variables - set via: npx wrangler secret put <NAME>
+# - CLERK_SECRET_KEY
+# - CLERK_WEBHOOK_SECRET
+# - ADMIN_EMAILS
+
+# KV Namespace for caching (optional, for future use)
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = "YOUR_KV_NAMESPACE_ID"
+
+# R2 bucket for static assets/images (optional)
+# [[r2_buckets]]
+# binding = "ASSETS"
+# bucket_name = "ai-magellan-assets"

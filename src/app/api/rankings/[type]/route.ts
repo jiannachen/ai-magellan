@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db/db';
+import { getDB } from '@/lib/db';
 import { websites, categories, users } from '@/lib/db/schema';
 import { eq, and, or } from 'drizzle-orm';
+
 
 // Valid ranking types
 const RANKING_TYPES = {
@@ -41,6 +42,7 @@ export async function GET(
   { params }: { params: Promise<{ type: string }> }
 ) {
   try {
+    const db = getDB();
     const { type } = await params;
     const { searchParams } = new URL(request.url);
     const categorySlug = searchParams.get('category');

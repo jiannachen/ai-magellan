@@ -11,6 +11,14 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "d1:generate": "drizzle-kit generate --config=drizzle-d1.config.ts",
+    "d1:migrate": "wrangler d1 migrations apply ai-magellan-db",
+    "d1:migrate:local": "wrangler d1 migrations apply ai-magellan-db --local",
+    "cf:dev": "next dev",
+    "cf:build": "npx @opennextjs/cloudflare build",
+    "cf:preview": "npx @opennextjs/cloudflare dev",
+    "cf:deploy": "npx wrangler deploy",
+    "pg-to-d1": "npx tsx scripts/migrate-pg-to-d1.ts",
     "init-data": "ts-node --project tsconfig.script.json src/lib/utils/init-data.ts",
     "scrape-producthunt": "ts-node --project tsconfig.script.json scripts/scrape-producthunt.ts",
     "import-mock-data": "ts-node --project tsconfig.script.json scripts/import-mock-data.ts",
@@ -88,7 +96,9 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241230.0",
     "@eslint/eslintrc": "^3",
+    "@opennextjs/cloudflare": "^1.14.9",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^20.17.10",
     "@types/react": "^19",
@@ -99,6 +109,8 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "wrangler": "^4.0.0"
   }
 }

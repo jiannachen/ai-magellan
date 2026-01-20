@@ -20,7 +20,7 @@ export function useCategories(websiteData?: WebsiteData) {
       try {
         const response = await fetch('/api/categories?includeSubcategories=true')
         if (!response.ok) throw new Error('Failed to load categories')
-        const data = await response.json()
+        const data = await response.json() as { data?: Category[] }
 
         // API returns parent categories with children populated by Drizzle
         // Filter to ensure we only have parent categories (parentId is null or undefined)

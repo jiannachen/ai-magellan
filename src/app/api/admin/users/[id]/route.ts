@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { users, websites, categories } from "@/lib/db/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
+
 
 // 检查是否为管理员邮箱
 function isAdminEmail(email: string): boolean {
@@ -18,6 +19,7 @@ export async function GET(
 ) {
   const { id } = await params;
   try {
+    const db = getDB();
     // 验证管理员权限
     const { userId } = await auth();
     if (!userId) {
@@ -118,6 +120,7 @@ export async function PUT(
 ) {
   const { id } = await params;
   try {
+    const db = getDB();
     // 验证管理员权限
     const { userId } = await auth();
     if (!userId) {
@@ -150,7 +153,7 @@ export async function PUT(
     }
 
     // 解析请求数据
-    const { role, status } = await request.json();
+    const { role, status } = await request.json() as { role?: string; status?: string };
 
     // 验证数据
     const validRoles = ['user', 'admin', 'moderator'];

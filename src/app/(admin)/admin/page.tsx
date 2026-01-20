@@ -2,7 +2,7 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AdminPageClient } from "@/components/admin/admin-page-client";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { websites, categories } from "@/lib/db/schema";
 import { desc, asc } from "drizzle-orm";
 
@@ -15,6 +15,7 @@ function isAdminEmail(email: string): boolean {
 }
 
 async function getWebsites() {
+  const db = getDB();
   const websitesList = await db.query.websites.findMany({
     with: {
       websiteCategories: {
@@ -31,6 +32,7 @@ async function getWebsites() {
 }
 
 async function getCategories() {
+  const db = getDB();
   const categoriesList = await db.query.categories.findMany({
     orderBy: (categories, { asc }) => [asc(categories.name)],
   });

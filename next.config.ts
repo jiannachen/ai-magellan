@@ -1,13 +1,20 @@
 import createNextIntlPlugin from 'next-intl/plugin';
 import type { NextConfig } from 'next';
 
+// Setup Cloudflare dev platform for local development
+if (process.env.NODE_ENV === 'development') {
+  const { setupDevPlatform } = require('@cloudflare/next-on-pages/next-dev');
+  setupDevPlatform().catch(console.error);
+}
+
 const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
-  experimental: {
-    optimizeCss: true,
-  },
+  // Note: optimizeCss not compatible with edge runtime
+  // experimental: {
+  //   optimizeCss: true,
+  // },
   // 路由重定向配置
   async redirects() {
     return [
@@ -43,15 +50,15 @@ const nextConfig: NextConfig = {
     // TypeScript 检查仍然保持开启
     ignoreBuildErrors: false,
   },
-  // 图片优化配置
+  // 图片优化配置 - Cloudflare Pages 使用自定义 loader
   images: {
+    loader: 'custom',
+    loaderFile: './src/lib/image-loader.ts',
     formats: ['image/webp', 'image/avif'] as Array<'image/webp' | 'image/avif'>,
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920], // 移动端优先
-    imageSizes: [16, 32, 48, 64, 96, 128, 256], // 包含小尺寸图标
-    minimumCacheTTL: 60 * 60 * 24 * 30, // 30天缓存
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    // 配置外部图片域名以启用优化
     remotePatterns: [
       {
         protocol: 'https' as const,
@@ -70,7 +77,6 @@ const nextConfig: NextConfig = {
         protocol: 'https' as const,
         hostname: '**.googleusercontent.com',
       },
-      // 允许常见的 CDN 和图片托管服务
       {
         protocol: 'https' as const,
         hostname: 'images.unsplash.com',
@@ -93,7 +99,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https' as const,
-        hostname: '**', // Allow all other HTTPS domains as fallback
+        hostname: '**',
       },
     ],
   },

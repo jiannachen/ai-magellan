@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { db } from '@/lib/db/db';
+import { getDB } from '@/lib/db';
 import { categories, websites, websiteCategories } from '@/lib/db/schema';
 import { eq, and, desc, sql, like, or } from 'drizzle-orm';
 import CategoryPage from '@/components/category/category-page';
@@ -11,6 +11,7 @@ export const dynamicParams = true;
 
 export async function generateStaticParams() {
   try {
+    const db = getDB();
     const categoriesList = await db.query.categories.findMany({
       columns: { slug: true },
     });
@@ -30,6 +31,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const db = getDB();
 
   const category = await db.query.categories.findFirst({
     where: eq(categories.slug, slug),
@@ -58,6 +60,7 @@ export default async function CategoryPageRoute({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const db = getDB();
 
   // 获取分类信息
   const category = await db.query.categories.findFirst({

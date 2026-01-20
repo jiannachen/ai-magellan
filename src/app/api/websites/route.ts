@@ -1,14 +1,17 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { AjaxResponse, generateSlug, ensureUserExists } from "@/lib/utils";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { websites, websiteCategories, categories } from "@/lib/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { validateWebsiteSubmit } from "@/lib/validations/website";
 
+// Enable edge runtime for Cloudflare compatibility
+
 // GET /api/websites
 // 获取所有指定分类的网站（支持多分类）
 export async function GET(request: Request) {
+  const db = getDB();
   const { searchParams } = new URL(request.url);
   const statusParam = searchParams.get("status");
   const categoryId = searchParams.get("categoryId");
@@ -69,6 +72,7 @@ export async function POST(request: Request) {
   }
 
   try {
+    const db = getDB();
     // 获取当前用户信息
     const { userId } = await auth();
     const user = await currentUser();
@@ -90,7 +94,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const data = await request.json();
+    const data = await request.json() as Record<string, unknown>;
 
     // 统一表单验证
     const validationResult = validateWebsiteSubmit(data);

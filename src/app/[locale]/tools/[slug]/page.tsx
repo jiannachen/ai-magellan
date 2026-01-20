@@ -1,18 +1,11 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import { useParams, notFound } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { cn, addRefParam } from '@/lib/utils/utils'
+import { Metadata } from 'next'
 import {
-  ExternalLink,
-  Heart,
-  Bookmark,
-  Share2,
+  Zap,
   Star,
   Shield,
   Users,
-  Zap,
   CheckCircle,
   Globe,
   Twitter,
@@ -26,7 +19,6 @@ import {
   Anchor,
   Route,
   Crown,
-  Eye,
   Lightbulb,
   ArrowRight,
   Coins,
@@ -34,104 +26,46 @@ import {
   MessageSquare,
   Waves,
   Laptop,
-  Ship
+  Ship,
+  ExternalLink
 } from 'lucide-react'
 import { Button } from '@/ui/common/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Badge } from '@/ui/common/badge'
-import { toast } from '@/hooks/use-toast'
-import { useUser } from '@clerk/nextjs'
 import { Reviews } from '@/components/reviews/reviews'
-import { useTranslations } from 'next-intl'
-import { StatCard } from '@/components/ui/stat-card'
+import { ToolActions } from '@/components/tools/tool-actions'
+import { ToolStats } from '@/components/tools/tool-stats'
+import { getWebsiteBySlug, getWebsiteReviews, type WebsiteDetail } from '@/lib/services/website'
+import { getTranslations } from 'next-intl/server'
 
-interface Website {
-  id: number
-  title: string
-  url: string
-  description: string
-  category: {
-    id: number
-    name: string
-    slug: string
-    parent_id?: number
-    parent?: {
-      id: number
-      name: string
-      slug: string
+// ISR 配置: 每小时重新验证
+export const revalidate = 3600
+
+// 生成页面元数据
+export async function generateMetadata({ params }: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const website = await getWebsiteBySlug(slug)
+
+  if (!website) {
+    return {
+      title: 'Tool Not Found'
     }
   }
-  websiteCategories?: Array<{
-    isPrimary: boolean
-    category: {
-      id: number
-      name: string
-      slug: string
-      name_en?: string
-      name_zh?: string
-      parent_id?: number
-      parent?: {
-        id: number
-        name: string
-        slug: string
-      }
+
+  return {
+    title: `${website.title} - AI Tool Details`,
+    description: website.tagline || website.description,
+    openGraph: {
+      title: website.title,
+      description: website.tagline || website.description,
+      images: website.thumbnail ? [website.thumbnail] : undefined,
     }
-  }>
-  thumbnail: string | null
-  logo_url: string | null
-  status: string
-  visits: number
-  likes: number
-  qualityScore: number
-  is_trusted: boolean
-  is_featured: boolean
-  tags: string[] | null
-  tagline: string | null
-  email: string | null
-  features: any
-  pricing_model: string
-  has_free_version: boolean
-  pricing_plans: Array<{name: string, billing_cycle: string, price: string, features: string[]}> | null
-  base_price: string | null
-  twitter_url: string | null
-  linkedin_url: string | null
-  facebook_url: string | null
-  instagram_url: string | null
-  youtube_url: string | null
-  discord_url: string | null
-  domain_authority: number | null
-  response_time: number | null
-  ssl_enabled: boolean
-  api_available: boolean
-  use_cases: string[] | null
-  target_audience: string[] | null
-  faq: Array<{question: string, answer: string}> | null
-  integrations: string[] | null
-  ios_app_url: string | null
-  android_app_url: string | null
-  web_app_url: string | null
-  desktop_platforms: string[] | null
-  created_at: string
-  updated_at: string
-  _count: {
-    websiteLikes: number
-    websiteFavorites: number
   }
 }
 
-
-export default function ToolDetailPage() {
-  const params = useParams()
-  const { isSignedIn } = useUser()
-  const t = useTranslations()
-  const [website, setWebsite] = useState<Website | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [isLiked, setIsLiked] = useState(false)
-  const [isFavorited, setIsFavorited] = useState(false)
-  const [likesCount, setLikesCount] = useState(0)
-
-  // Navigation sections for the detail page
-  const detailSections = [
+// 导航区块配置
+function getDetailSections(t: any) {
+  return [
     { id: 'overview', title: t('profile.tools.detail.sections.overview'), icon: Map, description: t('profile.tools.detail.navigation.overview_desc') },
     { id: 'features', title: t('profile.tools.detail.sections.features'), icon: Zap, description: t('profile.tools.detail.navigation.features_desc') },
     { id: 'audience', title: t('profile.tools.detail.sections.use_cases'), icon: Users, description: t('profile.tools.detail.navigation.use_cases_desc') },
@@ -140,217 +74,54 @@ export default function ToolDetailPage() {
     { id: 'platforms', title: t('profile.tools.detail.sections.platform_support'), icon: Anchor, description: t('profile.tools.detail.navigation.platforms_desc') },
     { id: 'reviews', title: t('profile.tools.detail.sections.reviews'), icon: Star, description: t('profile.tools.detail.navigation.reviews_desc') }
   ]
+}
 
-  useEffect(() => {
-    if (params.slug) {
-      fetchToolDetails()
-    }
-  }, [params.slug])
+// 导航侧边栏组件
+function NavigationSidebar({ sections, t }: { sections: ReturnType<typeof getDetailSections>, t: any }) {
+  return (
+    <nav className="space-y-2">
+      {sections.map((section) => {
+        const SectionIcon = section.icon
 
-  useEffect(() => {
-    if (website && isSignedIn) {
-      checkUserInteractions()
-    }
-  }, [website, isSignedIn])
-
-  const fetchToolDetails = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch(`/api/websites/${params.slug}`)
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          notFound()
-        }
-        throw new Error('Failed to fetch tool details')
-      }
-
-      const data = await response.json()
-      const website = data.data || data
-      setWebsite(website)
-      setLikesCount(website._count?.websiteLikes || 0)
-
-      recordVisit(website.id)
-    } catch (error) {
-      console.error('Error fetching tool details:', error)
-      toast.error('Failed to load tool details')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-
-  const recordVisit = async (websiteId: number) => {
-    try {
-      await fetch(`/api/websites/${websiteId}/visit`, { method: 'POST' })
-    } catch (error) {
-      console.error('Error recording visit:', error)
-    }
-  }
-
-  const checkUserInteractions = async () => {
-    if (!website) return
-    
-    try {
-      const [likesResponse, favoritesResponse] = await Promise.all([
-        fetch(`/api/user/likes/check?websiteId=${website.id}`),
-        fetch(`/api/user/favorites/check?websiteId=${website.id}`)
-      ])
-
-      if (likesResponse.ok) {
-        const likesData = await likesResponse.json()
-        setIsLiked(likesData.isLiked || false)
-      }
-
-      if (favoritesResponse.ok) {
-        const favoritesData = await favoritesResponse.json()
-        setIsFavorited(favoritesData.isFavorited || false)
-      }
-    } catch (error) {
-      console.error('Error checking user interactions:', error)
-    }
-  }
-
-  const handleLike = async () => {
-    if (!isSignedIn || !website) {
-      toast.error(t('profile.tools.detail.messages.sign_in_to_like'))
-      return
-    }
-
-    try {
-      // 点赞只能增加，不能取消；已点赞则不再重复请求
-      if (isLiked) {
-        return
-      }
-
-      const response = await fetch(`/api/websites/${website.id}/like`, {
-        method: 'POST'
-      })
-
-      if (response.ok) {
-        setIsLiked(true)
-        setLikesCount(prev => prev + 1)
-        toast.success(t('profile.tools.detail.messages.added_to_likes'))
-      }
-    } catch (error) {
-      console.error('Error toggling like:', error)
-      toast.error(t('profile.tools.detail.messages.failed_to_update_like'))
-    }
-  }
-
-  const handleFavorite = async () => {
-    if (!isSignedIn || !website) {
-      toast.error(t('profile.tools.detail.messages.sign_in_to_bookmark'))
-      return
-    }
-
-    try {
-      const response = await fetch(`/api/user/favorites${isFavorited ? `?websiteId=${website.id}` : ''}`, {
-        method: isFavorited ? 'DELETE' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: isFavorited ? undefined : JSON.stringify({ websiteId: website.id })
-      })
-
-      if (response.ok) {
-        setIsFavorited(!isFavorited)
-        toast.success(isFavorited ? t('profile.tools.detail.messages.removed_from_bookmarks') : t('profile.tools.detail.messages.added_to_bookmarks'))
-      }
-    } catch (error) {
-      console.error('Error toggling favorite:', error)
-      toast.error(t('profile.tools.detail.messages.failed_to_update_bookmark'))
-    }
-  }
-
-  const handleShare = async () => {
-    if (!website) return
-    
-    const shareUrl = window.location.href
-    console.log('Share URL:', shareUrl)
-    
-    // 直接尝试复制，不依赖原生分享
-    try {
-      // 最简单直接的方法
-      await navigator.clipboard.writeText(shareUrl)
-      toast.success(t('common.copy_success'))
-      return
-    } catch (error) {
-      console.warn('Modern clipboard failed:', error)
-    }
-
-    // 降级方法
-    try {
-      const textArea = document.createElement('textarea')
-      textArea.value = shareUrl
-      textArea.style.position = 'absolute'
-      textArea.style.left = '-9999px'
-      document.body.appendChild(textArea)
-      textArea.select()
-      textArea.setSelectionRange(0, 99999)
-      
-      const success = document.execCommand('copy')
-      document.body.removeChild(textArea)
-      
-      if (success) {
-        toast.success(t('common.copy_success'))
-      } else {
-        toast.error(t('common.copy_failed') || `复制失败，请手动复制: ${shareUrl}`)
-      }
-    } catch (error) {
-      console.error('All copy methods failed:', error)
-      toast.error(t('common.copy_failed') || `复制失败，请手动复制: ${shareUrl}`)
-    }
-  }
-
-  const handleVisit = () => {
-    if (website) {
-      // 添加ref参数用于追踪来源
-      const urlWithRef = addRefParam(website.url)
-      window.open(urlWithRef, '_blank')
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background pb-24 md:pb-8">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <div className="animate-pulse space-y-8">
-            <div className="h-8 bg-muted rounded w-1/4"></div>
-            <div className="h-12 bg-muted rounded w-3/4"></div>
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-              <div className="lg:col-span-3 space-y-6">
-                <div className="h-64 bg-muted rounded-2xl"></div>
-                <div className="h-32 bg-muted rounded-2xl"></div>
-              </div>
-              <div className="space-y-6">
-                <div className="h-48 bg-muted rounded-2xl"></div>
-                <div className="h-32 bg-muted rounded-2xl"></div>
+        return (
+          <a
+            key={section.id}
+            href={`#${section.id}`}
+            className="w-full text-left p-3 rounded-lg transition-all duration-200 border hover:bg-muted/50 border-transparent text-muted-foreground hover:text-foreground block"
+          >
+            <div className="flex items-center gap-3">
+              <SectionIcon className="h-4 w-4 text-muted-foreground" />
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-sm text-foreground">
+                  {section.title}
+                </div>
+                <div className="text-xs text-muted-foreground truncate">
+                  {section.description}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+          </a>
+        )
+      })}
+    </nav>
+  )
+}
+
+export default async function ToolDetailPage({ params }: { params: Promise<{ slug: string; locale: string }> }) {
+  const { slug } = await params
+  const t = await getTranslations()
+
+  // 服务端获取数据
+  const website = await getWebsiteBySlug(slug)
 
   if (!website) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center pb-24 md:pb-8">
-        <div className="text-center space-y-6">
-          <h1 className="text-2xl font-bold text-foreground">{t('profile.tools.detail.tool_not_found')}</h1>
-          <p className="text-muted-foreground">{t('profile.tools.detail.tool_not_found_desc')}</p>
-          <Link href="/">
-            <Button>
-              <Compass className="h-4 w-4 mr-2" />
-              {t('common.back')}
-            </Button>
-          </Link>
-        </div>
-      </div>
-    )
+    notFound()
   }
 
+  const detailSections = getDetailSections(t)
+
   return (
-    <div className="min-h-screen bg-background pb-24 md:pb-8"> {/* 移动端底部留空间 */}
+    <div className="min-h-screen bg-background pb-24 md:pb-8">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
 
         {/* Header Section - Tool Info and Image in Left-Right Layout */}
@@ -359,7 +130,7 @@ export default function ToolDetailPage() {
           <div className="absolute top-0 right-0 w-32 h-32 opacity-[0.06] pointer-events-none">
             <div className="w-full h-full bg-gradient-to-bl from-magellan-primary/20 to-transparent"></div>
           </div>
-          
+
           <div className="relative p-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left Side - Tool Info and Actions */}
@@ -375,10 +146,6 @@ export default function ToolDetailPage() {
                           src={website.logo_url}
                           alt={`${website.title} logo`}
                           className="w-full h-full object-contain"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                          }}
                         />
                       </div>
                     )}
@@ -389,7 +156,7 @@ export default function ToolDetailPage() {
                         {website.title}
                       </h1>
 
-                      {/* Status Badges - 使用 AM.md 中定义的海洋色彩 */}
+                      {/* Status Badges */}
                       <div className="flex flex-wrap gap-2">
                         {website.is_featured && (
                           <Badge className="bg-magellan-gold/10 text-magellan-gold border-magellan-gold/20 hover:bg-magellan-gold/15">
@@ -419,52 +186,20 @@ export default function ToolDetailPage() {
                     </p>
                   )}
                 </div>
-                
-                {/* Action Buttons - 主按钮使用深海蓝，符合AM.md设计 */}
-                <div className="space-y-3">
-                  <Button 
-                    onClick={handleVisit}
-                    className="w-full bg-magellan-primary hover:bg-magellan-primary-hover text-white font-medium shadow-lg transition-all duration-200 hover:shadow-xl"
-                    size="lg"
-                  >
-                    <ExternalLink className="h-5 w-5 mr-2" />
-                    {t('profile.tools.detail.actions.visit_tool')}
-                  </Button>
-                  <div className="grid grid-cols-3 gap-2">
-                    <Button 
-                      variant="outline" 
-                      onClick={handleLike}
-                      disabled={isLiked}
-                      className="border-magellan-primary/20 hover:bg-magellan-primary/5 hover:border-magellan-primary/30"
-                    >
-                      <Heart className={cn("h-4 w-4 mr-2", isLiked && "fill-magellan-coral text-magellan-coral")} />
-                      {likesCount}
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={handleFavorite}
-                      className="border-magellan-primary/20 hover:bg-magellan-primary/5 hover:border-magellan-primary/30"
-                    >
-                      <Bookmark className={cn("h-4 w-4 mr-2", isFavorited && "fill-magellan-gold text-magellan-gold")} />
-                      {t('profile.tools.detail.actions.bookmark')}
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={handleShare}
-                      className="border-magellan-primary/20 hover:bg-magellan-primary/5 hover:border-magellan-primary/30"
-                    >
-                      <Share2 className="h-4 w-4 mr-2" />
-                      {t('profile.tools.detail.actions.share')}
-                    </Button>
-                  </div>
-                </div>
+
+                {/* Action Buttons - 客户端组件 */}
+                <ToolActions
+                  websiteId={website.id}
+                  websiteUrl={website.url}
+                  initialLikesCount={website._count.websiteLikes}
+                />
               </div>
-              
+
               {/* Right Side - Tool Image */}
               <div className="relative aspect-video rounded-2xl overflow-hidden bg-gradient-to-br from-magellan-primary/5 to-magellan-teal/8 border border-magellan-primary/10 shadow-sm">
                 {website.thumbnail ? (
-                  <img 
-                    src={website.thumbnail} 
+                  <img
+                    src={website.thumbnail}
                     alt={website.title}
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                   />
@@ -496,61 +231,16 @@ export default function ToolDetailPage() {
                   </h3>
                   <p className="text-sm text-muted-foreground">{t('profile.tools.detail.navigation.explore_sections')}</p>
                 </div>
-                
-                <nav className="space-y-2">
-                  {detailSections.map((section) => {
-                    const SectionIcon = section.icon
-                    
-                    return (
-                      <button
-                        key={section.id}
-                        type="button"
-                        onClick={() => {
-                          const element = document.getElementById(section.id)
-                          if (element) {
-                            const headerHeight = window.innerWidth >= 640 ? 85 : 80
-                            const yOffset = -headerHeight
-                            const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
-                            window.scrollTo({ top: y, behavior: 'smooth' })
-                          }
-                        }}
-                        className="w-full text-left p-3 rounded-lg transition-all duration-200 border hover:bg-muted/50 border-transparent text-muted-foreground hover:text-foreground"
-                      >
-                        <div className="flex items-center gap-3">
-                          <SectionIcon className="h-4 w-4 text-muted-foreground" />
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium text-sm text-foreground">
-                              {section.title}
-                            </div>
-                            <div className="text-xs text-muted-foreground truncate">
-                              {section.description}
-                            </div>
-                          </div>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </nav>
 
-                {/* Quick Stats */}
-                <div className="mt-6 pt-6 border-t border-border space-y-3">
-                  <StatCard
-                    label={t('profile.tools.detail.stats.visits')}
-                    value={website.visits.toLocaleString()}
-                    icon={Eye}
-                    variant="highlight"
-                  />
-                  <StatCard
-                    label={t('profile.tools.detail.stats.likes')}
-                    value={likesCount}
-                    icon={Heart}
-                    variant="success"
-                  />
-                  <StatCard
-                    label={t('profile.tools.detail.stats.quality_score')}
-                    value={`${website.qualityScore}/100`}
-                    icon={Award}
-                    variant={website.qualityScore >= 80 ? "success" : website.qualityScore >= 60 ? "warning" : "default"}
+                <NavigationSidebar sections={detailSections} t={t} />
+
+                {/* Quick Stats - 客户端组件 */}
+                <div className="mt-6 pt-6 border-t border-border">
+                  <ToolStats
+                    websiteId={website.id}
+                    initialVisits={website.visits}
+                    initialLikes={website._count.websiteLikes}
+                    qualityScore={website.qualityScore}
                   />
                 </div>
               </Card>
@@ -599,7 +289,6 @@ export default function ToolDetailPage() {
                     </div>
                   )}
 
-
                   {/* Tags */}
                   {website.tags && Array.isArray(website.tags) && website.tags.length > 0 && (
                     <div className="space-y-3">
@@ -608,7 +297,7 @@ export default function ToolDetailPage() {
                         {t('profile.tools.detail.sections.tags')}
                       </h3>
                       <div className="flex flex-wrap gap-2">
-                        {website.tags && Array.isArray(website.tags) && website.tags.map((tag: string, index: number) => (
+                        {website.tags.map((tag: string, index: number) => (
                           <Badge key={index} variant="secondary" className="bg-magellan-primary/10 text-magellan-primary border-magellan-primary/20">
                             {tag}
                           </Badge>
@@ -793,7 +482,7 @@ export default function ToolDetailPage() {
                       </div>
                       <p className="text-sm text-muted-foreground capitalize">{website.pricing_model?.replace('_', ' ') || 'N/A'}</p>
                     </div>
-                    
+
                     <div className="p-4 rounded-lg bg-muted/50 border border-primary/10">
                       <div className="flex items-center gap-2 mb-2">
                         <Star className="h-4 w-4 text-primary" />
@@ -833,7 +522,7 @@ export default function ToolDetailPage() {
                                   <span>/ {plan.billing_cycle}</span>
                                 </div>
                               </div>
-                              
+
                               {plan.features && Array.isArray(plan.features) && plan.features.length > 0 && (
                                 <div className="space-y-2">
                                   <h5 className="font-medium text-sm">{t('form.plan_features')}</h5>
@@ -1099,7 +788,7 @@ export default function ToolDetailPage() {
                 </Card>
               )}
 
-              {/* Reviews Section */}
+              {/* Reviews Section - 客户端组件 */}
               <Card id="reviews" className="p-6">
                 <CardHeader className="px-0 pt-0">
                   <CardTitle className="flex items-center gap-2">

@@ -88,7 +88,7 @@ export function BasicInfoWithTagsSection({
         : `/api/websites/check-url?url=${encodeURIComponent(url)}`
 
       const response = await fetch(apiUrl)
-      const data = await response.json()
+      const data = await response.json() as { data?: { exists: boolean; website?: { title?: string; status?: string } } }
 
       if (data.data?.exists) {
         const existingWebsite = data.data.website

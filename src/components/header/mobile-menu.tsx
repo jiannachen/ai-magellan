@@ -35,6 +35,7 @@ import { useUser } from '@clerk/nextjs'
 import { useTranslations } from 'next-intl';
 import { useAtom } from 'jotai';
 import { categoriesAtom } from '@/lib/atoms';
+import type { Category } from '@/lib/types';
 import { cn } from "@/lib/utils/utils";
 
 export default function MobileMenu() {
@@ -78,7 +79,7 @@ export default function MobileMenu() {
         try {
           const response = await fetch('/api/categories?includeSubcategories=true');
           if (response.ok) {
-            const data = await response.json();
+            const data = await response.json() as { data?: Category[] };
             // Filter to ensure we only have parent categories
             const allCategories = Array.isArray(data.data) ? data.data : [];
             const parentCategories = allCategories.filter(

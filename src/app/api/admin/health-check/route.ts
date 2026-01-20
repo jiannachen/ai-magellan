@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runHealthCheckProcess } from '@/lib/services/health-check';
+import { getDB } from '@/lib/db';
+import { websites } from '@/lib/db/schema';
+import { eq, sql, desc } from 'drizzle-orm';
+
 
 // 只允许管理员或定时任务调用
 export async function POST(request: NextRequest) {
@@ -12,7 +16,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    const { limit } = await request.json().catch(() => ({ limit: 50 }));
+    const { limit } = await request.json().catch(() => ({ limit: 50 })) as { limit: number };
     
     // 执行健康检查
     await runHealthCheckProcess(limit);
@@ -35,9 +39,7 @@ export async function POST(request: NextRequest) {
 // 获取健康检查统计信息
 export async function GET(_request: NextRequest) {
   try {
-    const { db } = await import('@/lib/db/db');
-    const { websites } = await import('@/lib/db/schema');
-    const { eq, isNull, sql, desc } = await import('drizzle-orm');
+    const db = getDB();
 
     // 获取网站状态统计
     const stats = await db
@@ -80,11 +82,11 @@ export async function GET(_request: NextRequest) {
       recentChecks,
       lastUpdate: new Date().toISOString(),
     });
-    
+
   } catch (error) {
     console.error('Health check stats error:', error);
     return NextResponse.json(
-      { error: 'Failed to get health check stats' }, 
+      { error: 'Failed to get health check stats' },
       { status: 500 }
     );
   }

@@ -1,4 +1,4 @@
-import { db } from '@/lib/db/db';
+import { getDB } from '@/lib/db';
 import { websites } from '@/lib/db/schema';
 import { eq, and, or, gte, like, inArray, sql } from 'drizzle-orm';
 
@@ -56,6 +56,7 @@ export async function searchWebsites(params: SearchParams): Promise<{
   message?: string;
 }> {
   try {
+    const db = getDB();
     // 设置默认值
     const searchParams = {
       page: params.page || 1,

@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db/db';
+import { getDB } from '@/lib/db';
 import { categories } from '@/lib/db/schema';
 import { isNull, asc } from 'drizzle-orm';
 
+
 export async function GET() {
   try {
+    const db = getDB();
     // 只获取一级分类，并包含子分类
     const categoriesList = await db.query.categories.findMany({
       where: isNull(categories.parentId),

@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { db } from '@/lib/db/db';
+import { getDB } from '@/lib/db';
 import { categories, websites, websiteCategories } from '@/lib/db/schema';
 import { isNull, eq, and, sql } from 'drizzle-orm';
 import CategoriesListPage from '@/components/category/categories-list-page';
@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CategoriesPage() {
+  const db = getDB();
   // 获取所有一级分类及其子分类
   const categoriesData = await db.query.categories.findMany({
     where: isNull(categories.parentId),

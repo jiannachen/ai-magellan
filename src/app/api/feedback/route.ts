@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db/db";
+import { getDB } from "@/lib/db";
 import { feedbacks } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
 
+
 // POST /api/feedback - submit feedback
 export async function POST(request: Request) {
   try {
+    const db = getDB();
     const body = await request.json().catch(() => null);
     if (!body) {
       return NextResponse.json(AjaxResponse.fail("Request body is required"), {
@@ -45,6 +47,7 @@ export async function POST(request: Request) {
 // GET /api/feedback - list feedback (optional public listing)
 export async function GET() {
   try {
+    const db = getDB();
     const items = await db.query.feedbacks.findMany({
       orderBy: desc(feedbacks.createdAt),
       limit: 100,

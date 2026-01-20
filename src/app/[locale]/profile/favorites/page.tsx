@@ -59,7 +59,7 @@ export default function MyFavoritesPage() {
         throw new Error('Failed to fetch favorites')
       }
 
-      const data = await response.json()
+      const data = await response.json() as { data?: Website[]; websites?: Website[] }
       const websites = data.data || data.websites || []
       setFavorites(websites)
     } catch (_error) {
