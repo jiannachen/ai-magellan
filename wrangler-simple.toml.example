@@ -1,0 +1,25 @@
+name = "ai-magellan"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+main = ".open-next/worker.js"
+assets = { directory = ".open-next/assets", binding = "ASSETS" }
+
+# 单一生产环境配置
+[[d1_databases]]
+binding = "DB"
+database_name = "ai-magellan-db-production"
+database_id = "6fd1108f-a28c-44d3-8606-c654ae3f28b1"
+
+[vars]
+NEXT_PUBLIC_BASE_URL = "https://aimagellan.com"
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsuYWltYWdlbGxhbi5jb20k"
+NEXT_PUBLIC_CLERK_SIGN_IN_URL = "/auth/signin"
+NEXT_PUBLIC_CLERK_SIGN_UP_URL = "/auth/signup"
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL = "/"
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL = "/"
+CLARITY_PROJECT_ID = "tqy0fo919a"
+
+# Secrets - 通过命令设置: npx wrangler secret put <NAME>
+# - CLERK_SECRET_KEY
+# - CLERK_WEBHOOK_SECRET
+# - ADMIN_EMAILS
