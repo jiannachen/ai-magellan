@@ -24,7 +24,7 @@ function isEdgeRuntime(): boolean {
   // Check for Cloudflare Workers environment
   if (typeof globalThis !== 'undefined') {
     // Check for Cloudflare-specific globals
-    if ('caches' in globalThis && typeof (globalThis as any).caches?.default !== 'undefined') {
+    if ('caches' in globalThis && typeof (globalThis as any).caches !== 'undefined') {
       return true;
     }
     // Check for edge runtime flag
@@ -37,8 +37,14 @@ function isEdgeRuntime(): boolean {
     }
   }
   // Check environment variable
-  if (typeof process !== 'undefined' && process.env?.CLOUDFLARE_WORKERS === 'true') {
-    return true;
+  if (typeof process !== 'undefined' && process.env) {
+    if (process.env.CLOUDFLARE_WORKERS === 'true') {
+      return true;
+    }
+    // Check Next.js edge runtime
+    if (process.env.NEXT_RUNTIME === 'edge') {
+      return true;
+    }
   }
   return false;
 }
@@ -123,12 +129,19 @@ export function getCloudflareDB(): D1DB {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { getCloudflareContext } = require('@opennextjs/cloudflare');
     const { env } = getCloudflareContext();
+
+    if (!env || !env.DB) {
+      throw new Error('Cloudflare D1 binding (DB) is not available. Please check your wrangler.toml configuration.');
+    }
+
     return getD1DB(env.DB);
   } catch (e) {
-    // Not in Cloudflare environment - this is expected during build
+    // Not in Cloudflare environment - provide detailed error
+    const error = e as Error;
+    console.error('[DB] Failed to get Cloudflare database:', error.message);
     throw new Error(
-      'Failed to get Cloudflare D1 database. ' +
-      'Make sure you are running in Cloudflare environment.'
+      `Failed to get Cloudflare D1 database: ${error.message}. ` +
+      'Make sure you are running in Cloudflare environment and DB binding is configured in wrangler.toml.'
     );
   }
 }
@@ -141,15 +154,11 @@ export function getDB(): PgDB {
   // For now, always return PostgreSQL for local/Vercel
   // Cloudflare deployment will be handled separately
   if (isEdgeRuntime()) {
-    // In edge runtime, try to get Cloudflare DB
-    try {
-      return getCloudflareDB() as any;
-    } catch {
-      // Fall through to PostgreSQL if Cloudflare fails
-    }
+    // In edge runtime, ONLY use Cloudflare DB
+    return getCloudflareDB() as any;
   }
 
-  // Default to PostgreSQL
+  // Default to PostgreSQL for Node.js runtime
   return getPostgresDB();
 }
 
@@ -162,7 +171,7 @@ let _db: PgDB | null = null;
 export const db: PgDB = new Proxy({} as PgDB, {
   get(_target, prop) {
     if (!_db) {
-      _db = getPostgresDB();
+      _db = getDB(); // Use getDB() which handles environment detection
     }
     return (_db as any)[prop];
   }
