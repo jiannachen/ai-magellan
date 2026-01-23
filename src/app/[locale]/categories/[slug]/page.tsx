@@ -64,13 +64,21 @@ export async function generateMetadata({
 
 export default async function CategoryPageRoute({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { slug } = await params;
+  const { page } = await searchParams;
   const db = getDB();
 
-  // 获取分类信息
+  // 分页配置：每页20条，减少CPU时间消耗
+  const pageSize = 20;
+  const currentPage = page ? parseInt(page) : 1;
+  const offset = (currentPage - 1) * pageSize;
+
+  // 获取分类信息（必须先执行，后续查询依赖此结果）
   const category = await db.query.categories.findFirst({
     where: eq(categories.slug, slug),
     columns: {
@@ -85,45 +93,80 @@ export default async function CategoryPageRoute({
     redirect(`/categories#${slug}`);
   }
 
-  // 获取该分类下的网站（使用多分类关系）
-  const websitesList = await db
-    .select()
-    .from(websites)
-    .innerJoin(websiteCategories, eq(websites.id, websiteCategories.websiteId))
-    .where(
-      and(
-        eq(websiteCategories.categoryId, category.id),
-        eq(websites.status, 'approved')
+  // 优化：使用 Promise.all 并行执行所有独立查询，减少总 CPU 时间
+  const [
+    websitesList,
+    countResult,
+    allCategoriesData,
+    websiteCounts,
+    parentCatData,
+  ] = await Promise.all([
+    // 1. 获取该分类下的网站列表
+    db
+      .select()
+      .from(websites)
+      .innerJoin(websiteCategories, eq(websites.id, websiteCategories.websiteId))
+      .where(
+        and(
+          eq(websiteCategories.categoryId, category.id),
+          eq(websites.status, 'approved')
+        )
       )
-    )
-    .orderBy(desc(websites.isFeatured), desc(websites.qualityScore));
+      .orderBy(desc(websites.isFeatured), desc(websites.qualityScore))
+      .limit(pageSize)
+      .offset(offset),
+
+    // 2. 获取总数用于分页
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(websiteCategories)
+      .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
+      .where(
+        and(
+          eq(websiteCategories.categoryId, category.id),
+          eq(websites.status, 'approved')
+        )
+      ),
+
+    // 3. 获取所有分类（用于导航）
+    db.query.categories.findMany({
+      columns: {
+        id: true,
+        name: true,
+        slug: true,
+        parentId: true,
+      },
+      orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
+    }),
+
+    // 4. 获取所有分类的网站数量
+    db
+      .select({
+        categoryId: websiteCategories.categoryId,
+        count: sql<number>`count(distinct ${websiteCategories.websiteId})`.as('count'),
+      })
+      .from(websiteCategories)
+      .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
+      .where(eq(websites.status, 'approved'))
+      .groupBy(websiteCategories.categoryId),
+
+    // 5. 如果是子分类，获取父分类信息
+    category.parentId
+      ? db.query.categories.findFirst({
+          where: eq(categories.id, category.parentId),
+          columns: { id: true, name: true, slug: true },
+        })
+      : Promise.resolve(null),
+  ]);
 
   // Extract websites from join result
   const websitesData = websitesList.map(row => row.websites);
 
-  // 获取所有分类（用于导航）
-  const allCategoriesData = await db.query.categories.findMany({
-    columns: {
-      id: true,
-      name: true,
-      slug: true,
-      parentId: true,
-    },
-    orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
-  });
+  // 计算分页
+  const count = countResult[0].count;
+  const totalPages = Math.ceil(Number(count) / pageSize);
 
-  // 使用单次查询获取所有分类的网站数量，避免 N+1 问题
-  const websiteCounts = await db
-    .select({
-      categoryId: websiteCategories.categoryId,
-      count: sql<number>`count(distinct ${websiteCategories.websiteId})`.as('count'),
-    })
-    .from(websiteCategories)
-    .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
-    .where(eq(websites.status, 'approved'))
-    .groupBy(websiteCategories.categoryId);
-
-  // 创建一个 Map 用于快速查找
+  // 创建分类计数 Map
   const countMap = new Map(
     websiteCounts.map(item => [item.categoryId, Number(item.count)])
   );
@@ -136,43 +179,23 @@ export default async function CategoryPageRoute({
     },
   }));
 
-  // 如果是子分类，获取父分类信息
+  // 构建父分类信息（如果有）
   let parentCategory = null;
-  if (category.parentId) {
-    const parentCat = await db.query.categories.findFirst({
-      where: eq(categories.id, category.parentId),
-      columns: {
-        id: true,
-        name: true,
-        slug: true,
-      },
-    });
-
-    if (parentCat) {
-      // Get children
-      const children = await db.query.categories.findMany({
-        where: eq(categories.parentId, parentCat.id),
-        columns: {
-          id: true,
-          name: true,
-          slug: true,
-        },
-        orderBy: (table, { asc }) => [asc(table.sortOrder)],
-      });
-
-      // 使用已经获取的 countMap 来添加计数，避免额外查询
-      const childrenWithCounts = children.map(child => ({
+  if (parentCatData) {
+    // 从 allCategoriesData 中获取子分类，避免额外查询
+    const children = allCategoriesData
+      .filter(cat => cat.parentId === parentCatData.id)
+      .map(child => ({
         ...child,
         _count: {
           websites: countMap.get(child.id) || 0,
         },
       }));
 
-      parentCategory = {
-        ...parentCat,
-        children: childrenWithCounts,
-      };
-    }
+    parentCategory = {
+      ...parentCatData,
+      children,
+    };
   }
 
   return (
@@ -181,6 +204,12 @@ export default async function CategoryPageRoute({
       websites={websitesData}
       allCategories={categoriesWithCounts}
       parentCategory={parentCategory}
+      pagination={{
+        currentPage,
+        totalPages,
+        pageSize,
+        total: Number(count),
+      }}
     />
   );
 }

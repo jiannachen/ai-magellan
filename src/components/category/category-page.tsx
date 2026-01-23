@@ -42,6 +42,12 @@ interface CategoryPageProps {
       };
     }>;
   } | null;
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    pageSize: number;
+    total: number;
+  };
 }
 
 
@@ -98,7 +104,7 @@ const categoryIcons: Record<string, any> = {
   'default': Brain
 };
 
-export default function CategoryPage({ category, websites: initialWebsites }: CategoryPageProps) {
+export default function CategoryPage({ category, websites: initialWebsites, pagination }: CategoryPageProps) {
   const { user } = useUser();
   const tCategory = useTranslations('pages.categories');
   const tCommon = useTranslations('common');
@@ -357,6 +363,71 @@ export default function CategoryPage({ category, websites: initialWebsites }: Ca
           </motion.div>
         )}
       </div>
+
+      {/* 分页导航 */}
+      {pagination && pagination.totalPages > 1 && (
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex items-center justify-center gap-2">
+            <Link
+              href={`/categories/${category.slug}?page=${pagination.currentPage - 1}`}
+              className={`px-4 py-2 rounded-lg border transition-colors ${
+                pagination.currentPage === 1
+                  ? 'border-border bg-muted text-muted-foreground cursor-not-allowed pointer-events-none'
+                  : 'border-border bg-background hover:bg-muted text-foreground'
+              }`}
+            >
+              {tCommon('previous')}
+            </Link>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                let pageNum;
+                if (pagination.totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (pagination.currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (pagination.currentPage >= pagination.totalPages - 2) {
+                  pageNum = pagination.totalPages - 4 + i;
+                } else {
+                  pageNum = pagination.currentPage - 2 + i;
+                }
+
+                return (
+                  <Link
+                    key={pageNum}
+                    href={`/categories/${category.slug}?page=${pageNum}`}
+                    className={`px-3 py-1 rounded-lg border transition-colors ${
+                      pagination.currentPage === pageNum
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-background hover:bg-muted text-foreground'
+                    }`}
+                  >
+                    {pageNum}
+                  </Link>
+                );
+              })}
+            </div>
+
+            <Link
+              href={`/categories/${category.slug}?page=${pagination.currentPage + 1}`}
+              className={`px-4 py-2 rounded-lg border transition-colors ${
+                pagination.currentPage === pagination.totalPages
+                  ? 'border-border bg-muted text-muted-foreground cursor-not-allowed pointer-events-none'
+                  : 'border-border bg-background hover:bg-muted text-foreground'
+              }`}
+            >
+              {tCommon('next')}
+            </Link>
+          </div>
+
+          <div className="text-center mt-4 text-sm text-muted-foreground">
+            {tCategory('pagination_info', {
+              current: pagination.currentPage,
+              total: pagination.totalPages
+            })}
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }

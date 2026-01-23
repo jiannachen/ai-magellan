@@ -13,11 +13,13 @@ import {
 } from '@/ui/common/dropdown-menu'
 import {
   LogIn,
-  LogOut
+  LogOut,
+  Settings
 } from 'lucide-react'
 import { cn } from '@/lib/utils/utils'
 import { profileNavigationConfig } from '@/lib/config/profile-navigation'
 import { UserNavDropdownWrapper } from './user-nav-dropdown-wrapper'
+import { useIsAdmin } from '@/hooks/use-is-admin'
 
 export function UserNav() {
   const { isLoaded, isSignedIn, user } = useUser()
@@ -26,6 +28,8 @@ export function UserNav() {
   const pathname = usePathname()
   const t = useTranslations('auth')
   const tProfile = useTranslations('profile.navigation')
+  const tNav = useTranslations('navigation')
+  const { isAdmin } = useIsAdmin()
 
   // 头像弹窗简化版导航项 - 只保留核心功能
   const simpleNavItems = [
@@ -127,6 +131,27 @@ export function UserNav() {
             </DropdownMenuItem>
           )
         })}
+
+        {/* 管理后台入口 - 仅管理员可见 */}
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link
+                href="/admin"
+                className={cn(
+                  "flex items-center gap-2.5 px-3 py-2.5 cursor-pointer",
+                  pathname === '/admin' && "bg-primary text-white hover:bg-primary/90"
+                )}
+              >
+                <Settings className="h-4 w-4 flex-shrink-0" />
+                <span className="font-medium text-sm">
+                  {tNav('admin')}
+                </span>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
 
         <DropdownMenuSeparator />
 

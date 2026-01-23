@@ -16,13 +16,19 @@ export default getRequestConfig(async ({requestLocale}) => {
     locale = defaultLocale;
   }
 
-  // Only load core translations (34KB for en, 29KB for tw)
-  // Other translations (profile, landing, etc.) are loaded on-demand in their pages
-  const mainMessages = await import(`./i18n/messages/${locale}.json`);
+  // Load core translations and landing page translations
+  // Other translations (profile, etc.) are loaded on-demand in their pages
+  const [mainMessages, landingMessages] = await Promise.all([
+    import(`./i18n/messages/${locale}.json`),
+    import(`./i18n/pages/landing/${locale}.json`),
+  ]);
 
   return {
     locale,
-    messages: mainMessages.default,
+    messages: {
+      ...mainMessages.default,
+      landing: landingMessages.default,
+    },
     timeZone: 'Asia/Taipei',
     now: new Date(),
     // Enable rich text formatting

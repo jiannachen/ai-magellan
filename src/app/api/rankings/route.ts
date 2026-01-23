@@ -4,6 +4,7 @@ import { websites, categories, users, websiteCategories } from '@/lib/db/schema'
 import { eq, and, or, sql, desc, asc, inArray, gte } from 'drizzle-orm';
 
 
+// 优化：减少查询复杂度，避免 Cloudflare 10ms CPU 限制
 export async function GET(request: NextRequest) {
   try {
     const db = getDB();
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
     const priceFilter = searchParams.get('priceFilter') || 'all';
     const timeRange = searchParams.get('timeRange') || 'all';
     const searchQuery = searchParams.get('searchQuery');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50); // 限制最大 50
     const page = parseInt(searchParams.get('page') || '1');
 
     // Calculate date ranges
@@ -48,20 +49,26 @@ export async function GET(request: NextRequest) {
       conditions.push(gte(websites.createdAt, dateFilter));
     }
 
-    // Add category filter (use websiteCategories many-to-many table)
+    // Add category filter - 优化：使用子查询替代先查询所有分类
     if (category && category !== 'all') {
-      const allCategories = await db.query.categories.findMany({
-        with: { children: true },
+      // 单次查询获取分类及其子分类 ID
+      const categoryRecord = await db.query.categories.findFirst({
+        where: eq(categories.slug, category),
+        columns: { id: true, parentId: true },
       });
 
-      const categoryRecord = allCategories.find(cat => cat.slug === category);
       if (categoryRecord) {
-        // If parent category, include all child categories
-        const categoryIds = !categoryRecord.parentId && categoryRecord.children && categoryRecord.children.length > 0
-          ? [categoryRecord.id, ...categoryRecord.children.map((child: any) => child.id)]
-          : [categoryRecord.id];
+        // 获取子分类 ID（如果是父分类）
+        let categoryIds = [categoryRecord.id];
+        if (!categoryRecord.parentId) {
+          const children = await db.query.categories.findMany({
+            where: eq(categories.parentId, categoryRecord.id),
+            columns: { id: true },
+          });
+          categoryIds = [categoryRecord.id, ...children.map(c => c.id)];
+        }
 
-        // Use websiteCategories many-to-many table for querying
+        // 使用子查询获取网站 ID
         const websiteIds = await db
           .select({ websiteId: websiteCategories.websiteId })
           .from(websiteCategories)
@@ -70,7 +77,6 @@ export async function GET(request: NextRequest) {
         if (websiteIds.length > 0) {
           conditions.push(inArray(websites.id, websiteIds.map(w => w.websiteId)));
         } else {
-          // No websites in this category, return empty
           conditions.push(sql`false`);
         }
       }
@@ -96,7 +102,6 @@ export async function GET(request: NextRequest) {
         conditions.push(eq(websites.pricingModel, 'freemium'));
       }
     } else if (type === 'free') {
-      // If no user price filter, apply type='free' default
       conditions.push(
         or(
           eq(websites.pricingModel, 'free'),
@@ -116,44 +121,70 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Special handling for category leaders
+    // Special handling for category leaders - 优化：简化查询，避免深层嵌套
     if (type === 'category-leaders') {
+      // 获取一级分类列表（不带嵌套）
       const categoriesList = await db.query.categories.findMany({
-        with: {
-          websiteCategories: {
-            with: {
-              website: {
-                with: {
-                  websiteCategories: {
-                    with: {
-                      category: true,
-                    },
-                  },
-                  submitter: {
-                    columns: {
-                      id: true,
-                      name: true,
-                    },
-                  },
-                },
-              },
-            },
-            limit: 3,
-          },
-        },
+        where: sql`${categories.parentId} IS NULL`,
+        columns: { id: true, name: true, slug: true },
+        orderBy: asc(categories.sortOrder),
+        limit: 10, // 限制分类数量
       });
 
-      const categoryLeaders = categoriesList.flatMap(cat =>
-        cat.websiteCategories
-          .filter(wc => wc.website && wc.website.status === 'approved')
-          .sort((a, b) => (b.website?.qualityScore || 0) - (a.website?.qualityScore || 0))
-          .slice(0, 3)
-          .map((wc, index) => ({
-            ...wc.website,
-            categoryRank: index + 1,
-            categoryName: cat.name
-          }))
-      );
+      // 单次查询获取所有分类的 top 3 网站
+      const categoryIds = categoriesList.map(c => c.id);
+
+      // 使用 window function 获取每个分类的 top 3
+      const topWebsites = await db
+        .select({
+          websiteId: websiteCategories.websiteId,
+          categoryId: websiteCategories.categoryId,
+        })
+        .from(websiteCategories)
+        .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
+        .where(
+          and(
+            inArray(websiteCategories.categoryId, categoryIds),
+            eq(websites.status, 'approved')
+          )
+        )
+        .orderBy(desc(websites.qualityScore))
+        .limit(30); // 10 分类 × 3 = 30
+
+      // 按分类分组，取前 3
+      const websiteIdsByCategory = new Map<number, number[]>();
+      for (const row of topWebsites) {
+        const ids = websiteIdsByCategory.get(row.categoryId) || [];
+        if (ids.length < 3) {
+          ids.push(row.websiteId);
+          websiteIdsByCategory.set(row.categoryId, ids);
+        }
+      }
+
+      // 获取网站详情（简化字段，不带嵌套关联）
+      const allWebsiteIds = Array.from(websiteIdsByCategory.values()).flat();
+      const websitesData = allWebsiteIds.length > 0
+        ? await db.query.websites.findMany({
+            where: inArray(websites.id, allWebsiteIds),
+            columns: {
+              id: true, title: true, slug: true, url: true, description: true,
+              thumbnail: true, logoUrl: true, visits: true, likes: true,
+              qualityScore: true, isFeatured: true, pricingModel: true,
+            },
+          })
+        : [];
+
+      const websiteMap = new Map(websitesData.map(w => [w.id, w]));
+
+      // 构建结果
+      const categoryLeaders = categoriesList.flatMap(cat => {
+        const ids = websiteIdsByCategory.get(cat.id) || [];
+        return ids.map((id, index) => ({
+          ...websiteMap.get(id),
+          categoryRank: index + 1,
+          categoryName: cat.name,
+        })).filter(w => w.id);
+      });
 
       return NextResponse.json({
         success: true,
@@ -204,34 +235,58 @@ export async function GET(request: NextRequest) {
         orderByClause = desc(websites.qualityScore);
     }
 
-    // Get websites with pagination
+    // Get websites with pagination - 优化：简化查询，减少关联数据
     const websitesList = await db.query.websites.findMany({
       where: and(...conditions),
-      with: {
-        websiteCategories: {
-          with: {
-            category: true,
-          },
-        },
-        submitter: {
-          columns: {
-            id: true,
-            name: true,
-          },
-        },
+      columns: {
+        id: true, title: true, slug: true, url: true, description: true, tagline: true,
+        thumbnail: true, logoUrl: true, visits: true, likes: true,
+        qualityScore: true, isFeatured: true, isTrusted: true, pricingModel: true,
+        hasFreeVersion: true, createdAt: true, categoryId: true,
       },
       orderBy: (websites, { desc }) => [orderByClause],
       limit: limit,
       offset: (page - 1) * limit,
     });
 
+    // 单独获取分类信息（如果需要）
+    const websiteIds = websitesList.map(w => w.id);
+    const categoryData = websiteIds.length > 0
+      ? await db
+          .select({
+            websiteId: websiteCategories.websiteId,
+            categoryId: websiteCategories.categoryId,
+            categoryName: categories.name,
+            categorySlug: categories.slug,
+          })
+          .from(websiteCategories)
+          .innerJoin(categories, eq(websiteCategories.categoryId, categories.id))
+          .where(inArray(websiteCategories.websiteId, websiteIds))
+      : [];
+
+    // 构建分类映射
+    const categoryMap = new Map<number, Array<{ id: number; name: string; slug: string }>>();
+    for (const row of categoryData) {
+      const cats = categoryMap.get(row.websiteId) || [];
+      cats.push({ id: row.categoryId, name: row.categoryName, slug: row.categorySlug });
+      categoryMap.set(row.websiteId, cats);
+    }
+
+    // 合并数据
+    const websitesWithCategories = websitesList.map(website => ({
+      ...website,
+      websiteCategories: (categoryMap.get(website.id) || []).map(cat => ({
+        category: cat,
+      })),
+    }));
+
     // Calculate trending score for monthly hot rankings
-    let processedWebsites = websitesList;
+    let processedWebsites: typeof websitesWithCategories = websitesWithCategories;
     if (type === 'monthly-hot') {
-      processedWebsites = websitesList.map(website => ({
+      processedWebsites = websitesWithCategories.map(website => ({
         ...website,
         trendingScore: (website.visits * 0.7) + (website.likes * 0.3)
-      })).sort((a, b) => (b as any).trendingScore - (a as any).trendingScore);
+      })).sort((a, b) => ((b as any).trendingScore || 0) - ((a as any).trendingScore || 0));
     }
 
     return NextResponse.json({

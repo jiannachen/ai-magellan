@@ -9,9 +9,8 @@ import { ValuePropsSection } from "@/components/home/value-props-section";
 import { FAQSection } from "@/components/home/faq-section";
 import { CTASection } from "@/components/home/cta-section";
 import HomeClientWrapper from "@/components/home/home-client-wrapper";
-import { getTranslations, getMessages } from 'next-intl/server';
+import { getTranslations, getMessages, getLocale } from 'next-intl/server';
 import { NextIntlClientProvider } from 'next-intl';
-import { loadMessages } from '@/lib/i18n/load-messages';
 
 // 使用 ISR (Incremental Static Regeneration) 代替 force-dynamic
 // 每60秒重新验证一次,提供静态页面的性能优势,同时保持数据新鲜度
@@ -151,18 +150,12 @@ export default async function Home() {
     }
   ];
 
-  // Load landing translations on-demand for this page
-  const landingMessages = await loadMessages('landing');
-  const coreMessages = await getMessages();
-  const messages = {
-    ...coreMessages,
-    landing: landingMessages,
-  };
-
-  const tLanding = await getTranslations('landing');
+  const messages = await getMessages();
+  const locale = await getLocale();
+  const t = await getTranslations('landing');
 
   return (
-    <NextIntlClientProvider messages={messages}>
+    <NextIntlClientProvider messages={messages} locale={locale}>
       {/* JSON-LD结构化数据 */}
       <StructuredData type="website" />
       <StructuredData type="organization" />
@@ -183,16 +176,16 @@ export default async function Home() {
 
           {/* Rankings Sections - 服务端组件 */}
           <RankingSection
-            title={tLanding('sections.ranking_sections.premier_discoveries.title')}
-            description={tLanding('sections.ranking_sections.premier_discoveries.description')}
+            title={t('sections.ranking_sections.premier_discoveries.title')}
+            description={t('sections.ranking_sections.premier_discoveries.description')}
             websites={topRatedWebsites}
             iconName="crown"
             viewAllLink="/rankings/top-rated"
           />
 
           <RankingSection
-            title={tLanding('sections.ranking_sections.trending_expeditions.title')}
-            description={tLanding('sections.ranking_sections.trending_expeditions.description')}
+            title={t('sections.ranking_sections.trending_expeditions.title')}
+            description={t('sections.ranking_sections.trending_expeditions.description')}
             websites={mostPopularWebsites}
             iconName="trendingUp"
             viewAllLink="/rankings/popular"
@@ -200,16 +193,16 @@ export default async function Home() {
           />
 
           <RankingSection
-            title={tLanding('sections.ranking_sections.free_territory.title')}
-            description={tLanding('sections.ranking_sections.free_territory.description')}
+            title={t('sections.ranking_sections.free_territory.title')}
+            description={t('sections.ranking_sections.free_territory.description')}
             websites={topFreeWebsites}
             iconName="checkCircle"
             viewAllLink="/rankings/free"
           />
 
           <RankingSection
-            title={tLanding('sections.ranking_sections.new_horizons.title')}
-            description={tLanding('sections.ranking_sections.new_horizons.description')}
+            title={t('sections.ranking_sections.new_horizons.title')}
+            description={t('sections.ranking_sections.new_horizons.description')}
             websites={recentWebsites}
             iconName="clock"
             viewAllLink="/rankings/recent"
