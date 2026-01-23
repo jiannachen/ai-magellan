@@ -64,19 +64,14 @@ export async function generateMetadata({
 
 export default async function CategoryPageRoute({
   params,
-  searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ page?: string }>;
 }) {
   const { slug } = await params;
-  const { page } = await searchParams;
   const db = getDB();
 
-  // 分页配置：每页20条，减少CPU时间消耗
+  // 瀑布流配置：首页加载20条
   const pageSize = 20;
-  const currentPage = page ? parseInt(page) : 1;
-  const offset = (currentPage - 1) * pageSize;
 
   // 获取分类信息（必须先执行，后续查询依赖此结果）
   const category = await db.query.categories.findFirst({
@@ -129,8 +124,7 @@ export default async function CategoryPageRoute({
         )
       )
       .orderBy(desc(websites.isFeatured), desc(websites.qualityScore))
-      .limit(pageSize)
-      .offset(offset),
+      .limit(pageSize),
 
     // 2. 获取总数用于分页
     db
@@ -148,9 +142,11 @@ export default async function CategoryPageRoute({
   // websitesList 已经是扁平结构，不再需要 map
   const websitesData = websitesList;
 
-  // 计算分页
+  // 计算分页信息
   const count = countResult[0].count;
-  const totalPages = Math.ceil(Number(count) / pageSize);
+  const total = Number(count);
+  const totalPages = Math.ceil(total / pageSize);
+  const hasMore = totalPages > 1;
 
   // 如果是子分类，获取父分类及兄弟分类信息（用于导航）
   let parentCategory = null;
@@ -208,10 +204,10 @@ export default async function CategoryPageRoute({
       websites={websitesData}
       parentCategory={parentCategory}
       pagination={{
-        currentPage,
-        totalPages,
-        pageSize,
-        total: Number(count),
+        page: 1,
+        limit: pageSize,
+        total,
+        hasMore,
       }}
     />
   );

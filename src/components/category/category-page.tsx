@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/ui/common/button';
 import { CompactCard } from '@/components/website/compact-card';
@@ -15,7 +15,8 @@ import {
   PenTool,
   MessageSquare,
   Sparkles,
-  Telescope
+  Telescope,
+  Anchor
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
@@ -42,10 +43,10 @@ interface CategoryPageProps {
     }>;
   } | null;
   pagination?: {
-    currentPage: number;
-    totalPages: number;
-    pageSize: number;
+    page: number;
+    limit: number;
     total: number;
+    hasMore: boolean;
   };
 }
 
@@ -107,7 +108,14 @@ export default function CategoryPage({ category, websites: initialWebsites, pagi
   const { user } = useUser();
   const tCategory = useTranslations('pages.categories');
   const tCommon = useTranslations('common');
-  const [websites, setWebsites] = useState(initialWebsites);
+
+  // 瀑布流状态管理
+  const [allWebsites, setAllWebsites] = useState(initialWebsites);
+  const [currentPage, setCurrentPage] = useState(pagination?.page || 1);
+  const [hasMore, setHasMore] = useState(pagination?.hasMore || false);
+  const [isLoading, setIsLoading] = useState(false);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
   const [filteredWebsites, setFilteredWebsites] = useState(initialWebsites);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
@@ -128,7 +136,7 @@ export default function CategoryPage({ category, websites: initialWebsites, pagi
 
   // Filter and sort websites using the advanced search logic
   useEffect(() => {
-    let filtered = [...websites];
+    let filtered = [...allWebsites];
 
     // Apply search filter
     if (searchFilters.query) {
@@ -211,12 +219,12 @@ export default function CategoryPage({ category, websites: initialWebsites, pagi
     }
 
     setFilteredWebsites(filtered);
-  }, [websites, searchFilters]);
+  }, [allWebsites, searchFilters]);
 
   const handleVisit = async (website: any) => {
     try {
       await fetch(`/api/websites/${website.id}/visit`, { method: "POST" });
-      setWebsites(prev => prev.map(w => 
+      setAllWebsites(prev => prev.map(w =>
         w.id === website.id ? { ...w, visits: w.visits + 1 } : w
       ));
     } catch (error) {
@@ -224,6 +232,64 @@ export default function CategoryPage({ category, websites: initialWebsites, pagi
     }
     window.open(website.url, "_blank");
   };
+
+  // 加载下一页数据
+  const loadNextPage = useCallback(async () => {
+    if (isLoading || !hasMore) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `/api/categories/${category.slug}/websites?page=${currentPage + 1}&limit=${pagination?.limit || 20}`
+      );
+      if (!response.ok) throw new Error('Failed to fetch data');
+
+      const data = await response.json() as {
+        success: boolean;
+        data: {
+          websites: typeof initialWebsites;
+          pagination: { page: number; hasMore: boolean };
+        };
+      };
+
+      if (data.success && data.data.websites) {
+        setAllWebsites(prev => [...prev, ...data.data.websites]);
+        setCurrentPage(data.data.pagination.page);
+        setHasMore(data.data.pagination.hasMore);
+      }
+    } catch (error) {
+      console.error('Failed to load more websites:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading, hasMore, currentPage, category.slug, pagination?.limit]);
+
+  // 设置 Intersection Observer 监听滚动到底部
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const firstEntry = entries[0];
+        if (firstEntry.isIntersecting && hasMore && !isLoading) {
+          loadNextPage();
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '100px',
+      }
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [hasMore, isLoading, loadNextPage]);
 
   return (
     <motion.div 
@@ -298,10 +364,10 @@ export default function CategoryPage({ category, websites: initialWebsites, pagi
             <div className="flex items-center gap-2">
               <Telescope className="h-4 w-4 text-primary" />
               <span>
-                {tCategory('results_count', { 
-                  found: filteredWebsites.length, 
-                  total: websites.length, 
-                  category: category.name 
+                {tCategory('results_count', {
+                  found: filteredWebsites.length,
+                  total: pagination?.total || allWebsites.length,
+                  category: category.name
                 })}
               </span>
             </div>
@@ -363,70 +429,24 @@ export default function CategoryPage({ category, websites: initialWebsites, pagi
         )}
       </div>
 
-      {/* 分页导航 */}
-      {pagination && pagination.totalPages > 1 && (
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="flex items-center justify-center gap-2">
-            <Link
-              href={`/categories/${category.slug}?page=${pagination.currentPage - 1}`}
-              className={`px-4 py-2 rounded-lg border transition-colors ${
-                pagination.currentPage === 1
-                  ? 'border-border bg-muted text-muted-foreground cursor-not-allowed pointer-events-none'
-                  : 'border-border bg-background hover:bg-muted text-foreground'
-              }`}
-            >
-              {tCommon('previous')}
-            </Link>
-
-            <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                let pageNum;
-                if (pagination.totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (pagination.currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (pagination.currentPage >= pagination.totalPages - 2) {
-                  pageNum = pagination.totalPages - 4 + i;
-                } else {
-                  pageNum = pagination.currentPage - 2 + i;
-                }
-
-                return (
-                  <Link
-                    key={pageNum}
-                    href={`/categories/${category.slug}?page=${pageNum}`}
-                    className={`px-3 py-1 rounded-lg border transition-colors ${
-                      pagination.currentPage === pageNum
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border bg-background hover:bg-muted text-foreground'
-                    }`}
-                  >
-                    {pageNum}
-                  </Link>
-                );
-              })}
-            </div>
-
-            <Link
-              href={`/categories/${category.slug}?page=${pagination.currentPage + 1}`}
-              className={`px-4 py-2 rounded-lg border transition-colors ${
-                pagination.currentPage === pagination.totalPages
-                  ? 'border-border bg-muted text-muted-foreground cursor-not-allowed pointer-events-none'
-                  : 'border-border bg-background hover:bg-muted text-foreground'
-              }`}
-            >
-              {tCommon('next')}
-            </Link>
+      {/* 瀑布流加载指示器 */}
+      <div ref={loadMoreRef} className="flex justify-center py-8">
+        {isLoading ? (
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span className="text-sm">{tCommon('loading')}</span>
           </div>
-
-          <div className="text-center mt-4 text-sm text-muted-foreground">
-            {tCategory('pagination_info', {
-              current: pagination.currentPage,
-              total: pagination.totalPages
-            })}
+        ) : hasMore ? (
+          <div className="text-sm text-muted-foreground">
+            <Compass className="h-5 w-5 opacity-30" />
           </div>
-        </div>
-      )}
+        ) : allWebsites.length > 0 ? (
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            <Anchor className="h-4 w-4" />
+            <span>{tCategory('no_more_results')}</span>
+          </div>
+        ) : null}
+      </div>
     </motion.div>
   );
 }

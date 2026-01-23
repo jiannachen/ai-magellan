@@ -162,7 +162,8 @@
       "empty_state": {
         "title": "No treasures discovered in this territory",
         "description": "Try adjusting search conditions or filters to explore more {category} realm treasure tools."
-      }
+      },
+      "no_more_results": "— All Treasures Discovered —"
     },
     "categories_list": {
       "main_categories": "Main Categories",

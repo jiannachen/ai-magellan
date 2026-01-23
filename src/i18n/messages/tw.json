@@ -162,7 +162,8 @@
       "empty_state": {
         "title": "未發現此海域的寶藏",
         "description": "嘗試調整搜索條件或篩選器，探索更多 {category} 領域的寶藏工具。"
-      }
+      },
+      "no_more_results": "— 已發現全部寶藏 —"
     },
     "categories_list": {
       "main_categories": "主要分類",
