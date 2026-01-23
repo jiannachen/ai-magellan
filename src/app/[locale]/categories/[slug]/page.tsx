@@ -10,6 +10,14 @@ export const revalidate = 60; // 60秒重新验证
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
+  // For Cloudflare deployment, skip static generation at build time
+  // Pages will be generated dynamically on first request (ISR with revalidate)
+  // This avoids database connection issues during build
+  if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+    console.log('[Build] Skipping static param generation for categories (Cloudflare mode)');
+    return [];
+  }
+
   try {
     const db = getDB();
     const categoriesList = await db.query.categories.findMany({
