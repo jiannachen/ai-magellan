@@ -1,0 +1,19 @@
+# Cloudflare Pages 部署配置
+
+# 构建命令
+build.command = "npm run cf:build"
+
+# 构建输出目录
+build.destination = ".open-next"
+
+# 环境变量
+[build.environment]
+NODE_VERSION = "20"
+
+# 预览分支配置
+[preview]
+build.command = "npm run cf:build"
+
+# 生产环境配置
+[production]
+build.command = "npm run cf:build"

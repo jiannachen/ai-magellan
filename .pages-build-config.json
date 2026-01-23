@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run cf:build",
+  "buildOutputDirectory": ".open-next",
+  "nodeVersion": "20",
+  "installCommand": "npm ci"
+}
