@@ -53,7 +53,7 @@ export default function MyFavoritesPage() {
   const fetchFavorites = useCallback(async (page = 1) => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/user/favorites?page=${page}&limit=50`)
+      const response = await fetch(`/api/user/favorites?page=${page}&limit=20`)
 
       if (!response.ok) {
         throw new Error('Failed to fetch favorites')
@@ -336,9 +336,9 @@ export default function MyFavoritesPage() {
               {filteredFavorites.map((website, index) => (
                 <motion.div
                   key={website.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.03 }}
+                  transition={{ duration: 0.2, delay: Math.min(index * 0.02, 0.2) }}
                 >
                   <FavoriteCard
                     website={website}

@@ -47,26 +47,51 @@ export async function GET(request: NextRequest) {
       .from(websiteFavorites)
       .where(eq(websiteFavorites.userId, userId))
 
-    // 提取网站数据并添加计数
-    const websitesWithCounts = await Promise.all(
-      favorites.map(async (fav) => {
-        const [likesCount] = await db.select({ count: sql<number>`count(*)` })
-          .from(websiteLikes)
-          .where(eq(websiteLikes.websiteId, fav.website.id))
+    // 提取网站ID列表
+    const websiteIds = favorites.map(fav => fav.website.id)
 
-        const [favoritesCount] = await db.select({ count: sql<number>`count(*)` })
-          .from(websiteFavorites)
-          .where(eq(websiteFavorites.websiteId, fav.website.id))
+    // 批量查询点赞数和收藏数（避免N+1查询）
+    let likesCountMap: Record<number, number> = {}
+    let favoritesCountMap: Record<number, number> = {}
 
-        return {
-          ...fav.website,
-          _count: {
-            websiteLikes: Number(likesCount.count),
-            websiteFavorites: Number(favoritesCount.count)
-          }
-        }
-      })
-    )
+    if (websiteIds.length > 0) {
+      // 批量获取所有网站的点赞数
+      const likesCountResult = await db
+        .select({
+          websiteId: websiteLikes.websiteId,
+          count: sql<number>`count(*)`
+        })
+        .from(websiteLikes)
+        .where(sql`${websiteLikes.websiteId} IN (${sql.join(websiteIds.map(id => sql`${id}`), sql`, `)})`)
+        .groupBy(websiteLikes.websiteId)
+
+      likesCountMap = Object.fromEntries(
+        likesCountResult.map(r => [r.websiteId, Number(r.count)])
+      )
+
+      // 批量获取所有网站的收藏数
+      const favoritesCountResult = await db
+        .select({
+          websiteId: websiteFavorites.websiteId,
+          count: sql<number>`count(*)`
+        })
+        .from(websiteFavorites)
+        .where(sql`${websiteFavorites.websiteId} IN (${sql.join(websiteIds.map(id => sql`${id}`), sql`, `)})`)
+        .groupBy(websiteFavorites.websiteId)
+
+      favoritesCountMap = Object.fromEntries(
+        favoritesCountResult.map(r => [r.websiteId, Number(r.count)])
+      )
+    }
+
+    // 组装结果（无需额外数据库查询）
+    const websitesWithCounts = favorites.map(fav => ({
+      ...fav.website,
+      _count: {
+        websiteLikes: likesCountMap[fav.website.id] || 0,
+        websiteFavorites: favoritesCountMap[fav.website.id] || 0
+      }
+    }))
 
     return NextResponse.json({
       websites: websitesWithCounts,

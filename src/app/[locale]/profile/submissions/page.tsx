@@ -305,9 +305,9 @@ export default function MySubmissionsPage() {
                     {submissions.map((website, index) => (
                       <motion.div
                         key={website.id}
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                        transition={{ duration: 0.2, delay: Math.min(index * 0.03, 0.15) }}
                         className="group"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 border border-border rounded-lg hover:border-primary/30 hover:bg-muted/30 transition-all duration-200">
