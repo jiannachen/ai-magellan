@@ -94,13 +94,32 @@ export default async function CategoryPageRoute({
   }
 
   // 优化：只执行必要的查询，移除未使用的 allCategories 相关查询
+  // 只选择 CompactCard 和客户端过滤所需的字段，避免传递大量不必要的数据
   const [
     websitesList,
     countResult,
   ] = await Promise.all([
-    // 1. 获取该分类下的网站列表（分页）
+    // 1. 获取该分类下的网站列表（分页）- 只选择必要字段
     db
-      .select()
+      .select({
+        id: websites.id,
+        title: websites.title,
+        slug: websites.slug,
+        url: websites.url,
+        description: websites.description,
+        thumbnail: websites.thumbnail,
+        logoUrl: websites.logoUrl,
+        pricingModel: websites.pricingModel,
+        hasFreeVersion: websites.hasFreeVersion,
+        qualityScore: websites.qualityScore,
+        isFeatured: websites.isFeatured,
+        isTrusted: websites.isTrusted,
+        sslEnabled: websites.sslEnabled,
+        visits: websites.visits,
+        likes: websites.likes,
+        tagline: websites.tagline,
+        createdAt: websites.createdAt,
+      })
       .from(websites)
       .innerJoin(websiteCategories, eq(websites.id, websiteCategories.websiteId))
       .where(
@@ -126,8 +145,8 @@ export default async function CategoryPageRoute({
       ),
   ]);
 
-  // Extract websites from join result
-  const websitesData = websitesList.map(row => row.websites);
+  // websitesList 已经是扁平结构，不再需要 map
+  const websitesData = websitesList;
 
   // 计算分页
   const count = countResult[0].count;
