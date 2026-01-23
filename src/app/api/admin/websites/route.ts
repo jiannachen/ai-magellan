@@ -1,8 +1,8 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { getDB } from '@/lib/db';
-import { users } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { users, websites } from '@/lib/db/schema';
+import { eq, and, sql } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
@@ -38,17 +38,22 @@ export async function GET(request: NextRequest) {
 
     const offset = (page - 1) * pageSize;
 
-    // Get total count for pagination
-    const totalCountResult = await db.query.websites.findMany({
-      where: (websites, { eq, and }) => {
-        const conditions = [eq(websites.status, status as any)];
-        if (categoryId && categoryId !== 'all') {
-          conditions.push(eq(websites.categoryId, parseInt(categoryId)));
-        }
-        return conditions.length > 1 ? and(...conditions) : conditions[0];
+    // Build where conditions
+    const buildConditions = () => {
+      const conditions = [eq(websites.status, status as any)];
+      if (categoryId && categoryId !== 'all') {
+        conditions.push(eq(websites.categoryId, parseInt(categoryId)));
       }
-    });
-    const totalCount = totalCountResult.length;
+      return conditions;
+    };
+
+    const whereConditions = buildConditions();
+
+    // Get total count for pagination - 优化：使用 count(*) 避免获取所有记录
+    const [{ count: totalCount }] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(websites)
+      .where(whereConditions.length > 1 ? and(...whereConditions) : whereConditions[0]);
 
     // Get paginated websites
     const websitesList = await db.query.websites.findMany({
