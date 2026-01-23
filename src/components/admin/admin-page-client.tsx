@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { WebsiteList } from "@/components/admin/website-list";
 import { Button } from "@/ui/common/button";
@@ -12,9 +12,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/common/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/ui/common/pagination";
 import type { Website } from "@/lib/types";
 import { motion } from "framer-motion";
-import { ListFilter, Users, MessageSquare } from "lucide-react";
+import { ListFilter, Users, MessageSquare, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
 
 export function AdminPageClient({
@@ -27,23 +36,93 @@ export function AdminPageClient({
   const [activeStatus, setActiveStatus] =
     useState<Website["status"]>("pending");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-
-  if (!initialWebsites || !Array.isArray(initialWebsites)) return null;
-  if (!initialCategories || !Array.isArray(initialCategories)) return null;
-
-  const filteredWebsites = initialWebsites.filter((website) => {
-    const matchesStatus = website.status === activeStatus;
-    const matchesCategory =
-      selectedCategory === "all" ||
-      website.categoryId === parseInt(selectedCategory);
-    return matchesStatus && matchesCategory;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [websites, setWebsites] = useState<Website[]>(initialWebsites);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [statusCounts, setStatusCounts] = useState({
+    pending: 0,
+    approved: 0,
+    rejected: 0,
   });
 
-  const statusCounts = {
-    pending: initialWebsites.filter((w) => w.status === "pending").length,
-    approved: initialWebsites.filter((w) => w.status === "approved").length,
-    rejected: initialWebsites.filter((w) => w.status === "rejected").length,
+  if (!initialCategories || !Array.isArray(initialCategories)) return null;
+
+  // Fetch websites data
+  const fetchWebsites = async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        pageSize: pageSize.toString(),
+        status: activeStatus,
+        categoryId: selectedCategory,
+      });
+
+      const response = await fetch(`/api/admin/websites?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch websites');
+
+      const data = await response.json() as {
+        websites: Website[];
+        pagination: {
+          page: number;
+          pageSize: number;
+          totalCount: number;
+          totalPages: number;
+        };
+      };
+      setWebsites(data.websites);
+      setTotalPages(data.pagination.totalPages);
+      setTotalCount(data.pagination.totalCount);
+    } catch (error) {
+      console.error('Error fetching websites:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  // Fetch status counts
+  const fetchStatusCounts = async () => {
+    try {
+      const statuses = ['pending', 'approved', 'rejected'];
+      const counts = await Promise.all(
+        statuses.map(async (status) => {
+          const response = await fetch(
+            `/api/admin/websites?status=${status}&page=1&pageSize=1`
+          );
+          const data = await response.json() as {
+            pagination: { totalCount: number };
+          };
+          return { status, count: data.pagination.totalCount };
+        })
+      );
+
+      const newCounts: any = {};
+      counts.forEach(({ status, count }) => {
+        newCounts[status] = count;
+      });
+      setStatusCounts(newCounts);
+    } catch (error) {
+      console.error('Error fetching status counts:', error);
+    }
+  };
+
+  // Fetch data when filters change
+  useEffect(() => {
+    fetchWebsites();
+  }, [currentPage, pageSize, activeStatus, selectedCategory]);
+
+  // Fetch status counts on mount
+  useEffect(() => {
+    fetchStatusCounts();
+  }, []);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeStatus, selectedCategory, pageSize]);
 
   const getStatusColor = (status: Website["status"]) => {
     switch (status) {
@@ -142,37 +221,129 @@ export function AdminPageClient({
               ))}
             </div>
 
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-            >
-              <SelectTrigger className="w-full sm:w-[180px] bg-background/40 border-border/40">
-                <SelectValue placeholder="选择分类" />
-              </SelectTrigger>
-              <SelectContent
-                align="end"
-                className="bg-background/95 backdrop-blur-sm"
+            <div className="flex gap-2">
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
               >
-                <SelectItem value="all">全部分类</SelectItem>
-                {initialCategories.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <SelectTrigger className="w-full sm:w-[180px] bg-background/40 border-border/40">
+                  <SelectValue placeholder="选择分类" />
+                </SelectTrigger>
+                <SelectContent
+                  align="end"
+                  className="bg-background/95 backdrop-blur-sm"
+                >
+                  <SelectItem value="all">全部分类</SelectItem>
+                  {initialCategories.map((category) => (
+                    <SelectItem key={category.id} value={category.id.toString()}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={pageSize.toString()}
+                onValueChange={(value) => setPageSize(parseInt(value))}
+              >
+                <SelectTrigger className="w-[100px] bg-background/40 border-border/40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-background/95 backdrop-blur-sm">
+                  <SelectItem value="20">20 / 页</SelectItem>
+                  <SelectItem value="30">30 / 页</SelectItem>
+                  <SelectItem value="50">50 / 页</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
         {/* Website List */}
-        <div className="bg-background/20">
-          <WebsiteList
-            key={`${activeStatus}-${selectedCategory}`}
-            websites={filteredWebsites}
-            categories={initialCategories}
-            showActions={true}
-          />
+        <div className="bg-background/20 relative min-h-[400px]">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <WebsiteList
+              key={`${activeStatus}-${selectedCategory}-${currentPage}`}
+              websites={websites}
+              categories={initialCategories}
+              showActions={true}
+            />
+          )}
         </div>
+
+        {/* Pagination */}
+        {!isLoading && totalPages > 1 && (
+          <div className="border-t border-border/40 bg-background/20 p-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                显示 {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, totalCount)} 条，
+                共 {totalCount} 条
+              </div>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      className={cn(
+                        "cursor-pointer",
+                        currentPage === 1 && "pointer-events-none opacity-50"
+                      )}
+                    />
+                  </PaginationItem>
+
+                  {/* Page numbers */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter((page) => {
+                      // Show first page, last page, current page and adjacent pages
+                      return (
+                        page === 1 ||
+                        page === totalPages ||
+                        Math.abs(page - currentPage) <= 1
+                      );
+                    })
+                    .map((page, index, array) => {
+                      // Add ellipsis if there's a gap
+                      const prevPage = array[index - 1];
+                      const showEllipsis = prevPage && page - prevPage > 1;
+
+                      return (
+                        <div key={page} className="flex items-center">
+                          {showEllipsis && (
+                            <PaginationItem>
+                              <PaginationEllipsis />
+                            </PaginationItem>
+                          )}
+                          <PaginationItem>
+                            <PaginationLink
+                              onClick={() => setCurrentPage(page)}
+                              isActive={currentPage === page}
+                              className="cursor-pointer"
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        </div>
+                      );
+                    })}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      className={cn(
+                        "cursor-pointer",
+                        currentPage === totalPages && "pointer-events-none opacity-50"
+                      )}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   );

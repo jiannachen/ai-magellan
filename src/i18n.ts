@@ -10,26 +10,19 @@ export default getRequestConfig(async ({requestLocale}) => {
   // is available (e.g. during static export) or can be read from the user's
   // session or the database
   let locale = await requestLocale;
-  
+
   // Ensure a valid locale is used
   if (!locale || !locales.includes(locale as Locale)) {
     locale = defaultLocale;
   }
-  
-  // Load main translations, profile translations, and page-specific translations
-  const [mainMessages, profileMessages, landingMessages] = await Promise.all([
-    import(`./i18n/messages/${locale}.json`),
-    import(`./i18n/messages/profile.${locale}.json`),
-    import(`./i18n/pages/landing/${locale}.json`)
-  ]);
-  
+
+  // Only load core translations (34KB for en, 29KB for tw)
+  // Other translations (profile, landing, etc.) are loaded on-demand in their pages
+  const mainMessages = await import(`./i18n/messages/${locale}.json`);
+
   return {
     locale,
-    messages: {
-      ...mainMessages.default,
-      profile: profileMessages.default,
-      landing: landingMessages.default
-    },
+    messages: mainMessages.default,
     timeZone: 'Asia/Taipei',
     now: new Date(),
     // Enable rich text formatting

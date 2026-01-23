@@ -9,7 +9,9 @@ import { ValuePropsSection } from "@/components/home/value-props-section";
 import { FAQSection } from "@/components/home/faq-section";
 import { CTASection } from "@/components/home/cta-section";
 import HomeClientWrapper from "@/components/home/home-client-wrapper";
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, getMessages } from 'next-intl/server';
+import { NextIntlClientProvider } from 'next-intl';
+import { loadMessages } from '@/lib/i18n/load-messages';
 
 // 使用 ISR (Incremental Static Regeneration) 代替 force-dynamic
 // 每60秒重新验证一次,提供静态页面的性能优势,同时保持数据新鲜度
@@ -149,10 +151,18 @@ export default async function Home() {
     }
   ];
 
+  // Load landing translations on-demand for this page
+  const landingMessages = await loadMessages('landing');
+  const coreMessages = await getMessages();
+  const messages = {
+    ...coreMessages,
+    landing: landingMessages,
+  };
+
   const tLanding = await getTranslations('landing');
 
   return (
-    <>
+    <NextIntlClientProvider messages={messages}>
       {/* JSON-LD结构化数据 */}
       <StructuredData type="website" />
       <StructuredData type="organization" />
@@ -216,6 +226,6 @@ export default async function Home() {
           <CTASection />
         </div>
       </HomeClientWrapper>
-    </>
+    </NextIntlClientProvider>
   );
 }
