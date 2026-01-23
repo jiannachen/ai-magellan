@@ -16,11 +16,11 @@ export default getRequestConfig(async ({requestLocale}) => {
     locale = defaultLocale;
   }
 
-  // Load core translations and landing page translations
-  // Other translations (profile, etc.) are loaded on-demand in their pages
-  const [mainMessages, landingMessages] = await Promise.all([
+  // Load core translations, landing page translations, and profile translations
+  const [mainMessages, landingMessages, profileMessages] = await Promise.all([
     import(`./i18n/messages/${locale}.json`),
     import(`./i18n/pages/landing/${locale}.json`),
+    import(`./i18n/messages/profile.${locale}.json`),
   ]);
 
   return {
@@ -28,6 +28,7 @@ export default getRequestConfig(async ({requestLocale}) => {
     messages: {
       ...mainMessages.default,
       landing: landingMessages.default,
+      profile: profileMessages.default,
     },
     timeZone: 'Asia/Taipei',
     now: new Date(),
