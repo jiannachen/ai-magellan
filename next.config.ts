@@ -1,12 +1,6 @@
 import createNextIntlPlugin from 'next-intl/plugin';
 import type { NextConfig } from 'next';
 
-// Setup Cloudflare dev platform for local development
-if (process.env.NODE_ENV === 'development') {
-  const { setupDevPlatform } = require('@cloudflare/next-on-pages/next-dev');
-  setupDevPlatform().catch(console.error);
-}
-
 const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 /** @type {import('next').NextConfig} */

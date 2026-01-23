@@ -7,8 +7,8 @@ assets = { directory = ".open-next/assets", binding = "ASSETS" }
 # D1 Database binding
 [[d1_databases]]
 binding = "DB"
-database_name = "ai-magellan-db"
-database_id = "ac9ab675-7ce2-4c3b-b380-35dd64a4198d"
+database_name = "ai-magellan-db-production"
+database_id = "6fd1108f-a28c-44d3-8606-c654ae3f28b1"
 
 # Environment variables
 [vars]
