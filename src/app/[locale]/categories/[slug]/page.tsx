@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getDB } from '@/lib/db';
 import { categories, websites, websiteCategories } from '@/lib/db/schema';
-import { eq, and, desc, sql, like, or } from 'drizzle-orm';
+import { eq, and, desc, sql } from 'drizzle-orm';
 import CategoryPage from '@/components/category/category-page';
 
 // 使用 ISR 策略：保持缓存优势，同时定期更新数据
@@ -93,15 +93,12 @@ export default async function CategoryPageRoute({
     redirect(`/categories#${slug}`);
   }
 
-  // 优化：使用 Promise.all 并行执行所有独立查询，减少总 CPU 时间
+  // 优化：只执行必要的查询，移除未使用的 allCategories 相关查询
   const [
     websitesList,
     countResult,
-    allCategoriesData,
-    websiteCounts,
-    parentCatData,
   ] = await Promise.all([
-    // 1. 获取该分类下的网站列表
+    // 1. 获取该分类下的网站列表（分页）
     db
       .select()
       .from(websites)
@@ -127,36 +124,6 @@ export default async function CategoryPageRoute({
           eq(websites.status, 'approved')
         )
       ),
-
-    // 3. 获取所有分类（用于导航）
-    db.query.categories.findMany({
-      columns: {
-        id: true,
-        name: true,
-        slug: true,
-        parentId: true,
-      },
-      orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
-    }),
-
-    // 4. 获取所有分类的网站数量
-    db
-      .select({
-        categoryId: websiteCategories.categoryId,
-        count: sql<number>`count(distinct ${websiteCategories.websiteId})`.as('count'),
-      })
-      .from(websiteCategories)
-      .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
-      .where(eq(websites.status, 'approved'))
-      .groupBy(websiteCategories.categoryId),
-
-    // 5. 如果是子分类，获取父分类信息
-    category.parentId
-      ? db.query.categories.findFirst({
-          where: eq(categories.id, category.parentId),
-          columns: { id: true, name: true, slug: true },
-        })
-      : Promise.resolve(null),
   ]);
 
   // Extract websites from join result
@@ -166,43 +133,60 @@ export default async function CategoryPageRoute({
   const count = countResult[0].count;
   const totalPages = Math.ceil(Number(count) / pageSize);
 
-  // 创建分类计数 Map
-  const countMap = new Map(
-    websiteCounts.map(item => [item.categoryId, Number(item.count)])
-  );
-
-  // 合并分类和计数
-  const categoriesWithCounts = allCategoriesData.map(cat => ({
-    ...cat,
-    _count: {
-      websites: countMap.get(cat.id) || 0,
-    },
-  }));
-
-  // 构建父分类信息（如果有）
+  // 如果是子分类，获取父分类及兄弟分类信息（用于导航）
   let parentCategory = null;
-  if (parentCatData) {
-    // 从 allCategoriesData 中获取子分类，避免额外查询
-    const children = allCategoriesData
-      .filter(cat => cat.parentId === parentCatData.id)
-      .map(child => ({
-        ...child,
-        _count: {
-          websites: countMap.get(child.id) || 0,
-        },
-      }));
+  if (category.parentId) {
+    // 并行获取父分类信息和兄弟分类
+    const [parentCatData, siblingCategories, siblingCounts] = await Promise.all([
+      db.query.categories.findFirst({
+        where: eq(categories.id, category.parentId),
+        columns: { id: true, name: true, slug: true },
+      }),
+      // 获取同级子分类
+      db.query.categories.findMany({
+        where: eq(categories.parentId, category.parentId),
+        columns: { id: true, name: true, slug: true, parentId: true },
+        orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
+      }),
+      // 只获取同级分类的网站计数（而非所有分类）
+      db
+        .select({
+          categoryId: websiteCategories.categoryId,
+          count: sql<number>`count(distinct ${websiteCategories.websiteId})`.as('count'),
+        })
+        .from(websiteCategories)
+        .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
+        .innerJoin(categories, eq(websiteCategories.categoryId, categories.id))
+        .where(
+          and(
+            eq(categories.parentId, category.parentId),
+            eq(websites.status, 'approved')
+          )
+        )
+        .groupBy(websiteCategories.categoryId),
+    ]);
 
-    parentCategory = {
-      ...parentCatData,
-      children,
-    };
+    if (parentCatData) {
+      const countMap = new Map(
+        siblingCounts.map(item => [item.categoryId, Number(item.count)])
+      );
+
+      parentCategory = {
+        ...parentCatData,
+        children: siblingCategories.map(child => ({
+          ...child,
+          _count: {
+            websites: countMap.get(child.id) || 0,
+          },
+        })),
+      };
+    }
   }
 
   return (
     <CategoryPage
       category={category}
       websites={websitesData}
-      allCategories={categoriesWithCounts}
       parentCategory={parentCategory}
       pagination={{
         currentPage,

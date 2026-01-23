@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getDB } from '@/lib/db';
-import { websites, websiteCategories } from '@/lib/db/schema';
+import { websites, websiteCategories, categories } from '@/lib/db/schema';
 import { eq, and, or, desc, gte, inArray, sql, like } from 'drizzle-orm';
 import RankingPage from '@/components/rankings/ranking-page';
 import { Metadata } from 'next';
@@ -163,36 +163,41 @@ async function getRankingData({
     }
   }
 
-  // Add category filter
+  // Add category filter - 优化：只查询需要的分类，而非获取所有分类
   if (category && category !== 'all') {
-    const allCategories = await db.query.categories.findMany({
-      with: { children: true },
+    // 直接查询目标分类
+    const categoryRecord = await db.query.categories.findFirst({
+      where: eq(categories.slug, category),
+      columns: { id: true, parentId: true },
+      with: {
+        children: {
+          columns: { id: true },
+        },
+      },
     });
 
-    const categoryRecord = allCategories.find(cat => cat.slug === category);
     if (categoryRecord) {
-      // 如果是父分类，包含所有子分类
+      // 构建分类 ID 列表
+      let categoryIds: number[];
       if (!categoryRecord.parentId && categoryRecord.children && categoryRecord.children.length > 0) {
-        const categoryIds = [categoryRecord.id, ...categoryRecord.children.map((child: any) => child.id)];
-        // 使用 websiteCategories 表进行多对多查询
-        const websiteIds = await db
-          .select({ websiteId: websiteCategories.websiteId })
-          .from(websiteCategories)
-          .where(inArray(websiteCategories.categoryId, categoryIds));
-
-        if (websiteIds.length > 0) {
-          conditions.push(inArray(websites.id, websiteIds.map(w => w.websiteId)));
-        }
+        // 父分类：包含自身和所有子分类
+        categoryIds = [categoryRecord.id, ...categoryRecord.children.map(child => child.id)];
       } else {
-        // 单个分类筛选
-        const websiteIds = await db
-          .select({ websiteId: websiteCategories.websiteId })
-          .from(websiteCategories)
-          .where(eq(websiteCategories.categoryId, categoryRecord.id));
+        // 子分类或无子分类：只包含自身
+        categoryIds = [categoryRecord.id];
+      }
 
-        if (websiteIds.length > 0) {
-          conditions.push(inArray(websites.id, websiteIds.map(w => w.websiteId)));
-        }
+      // 获取该分类下的所有网站 ID
+      const websiteIds = await db
+        .select({ websiteId: websiteCategories.websiteId })
+        .from(websiteCategories)
+        .where(inArray(websiteCategories.categoryId, categoryIds));
+
+      if (websiteIds.length > 0) {
+        conditions.push(inArray(websites.id, websiteIds.map(w => w.websiteId)));
+      } else {
+        // 没有匹配的网站，添加一个永远为假的条件
+        conditions.push(eq(websites.id, -1));
       }
     }
   }

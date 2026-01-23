@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   description: 'Comprehensive expedition rankings of AI tools by discovery success, quality, and explorer engagement. Navigate to the best-charted AI territories.',
 };
 
+// 使用 ISR 策略：60秒缓存，减少重复数据库查询
+export const revalidate = 60;
+
 // 优化：移除深层嵌套的 with 关联，减少 CPU 时间消耗
 async function getRankingsData() {
   const db = getDB();

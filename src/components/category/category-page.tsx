@@ -28,7 +28,6 @@ interface CategoryPageProps {
     parentId: number | null;
   };
   websites: any[];
-  allCategories: any[];
   parentCategory?: {
     id: number;
     name: string;
