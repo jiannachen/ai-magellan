@@ -1,28 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth, currentUser } from '@clerk/nextjs/server'
-
-// 检查是否为管理员邮箱
-function isAdminEmail(email: string): boolean {
-  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || []
-  return adminEmails.includes(email)
-}
+import { auth } from '@clerk/nextjs/server'
+import { getDB } from '@/lib/db'
+import { users } from '@/lib/db/schema'
+import { eq } from 'drizzle-orm'
 
 export async function GET(request: NextRequest) {
   try {
+    // Only use auth() - avoid expensive currentUser() call
     const { userId } = await auth()
 
     if (!userId) {
       return NextResponse.json({ isAdmin: false })
     }
 
-    const user = await currentUser()
-    const userEmail = user?.emailAddresses[0]?.emailAddress
+    // Check admin role from database
+    const db = getDB()
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: { role: true },
+    })
 
-    if (!userEmail) {
-      return NextResponse.json({ isAdmin: false })
-    }
-
-    const isAdmin = isAdminEmail(userEmail)
+    const isAdmin = user?.role === 'admin'
 
     return NextResponse.json({ isAdmin })
 

@@ -5,7 +5,7 @@ import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
 
-// GET /api/admin/users - 获取所有用户列表
+// GET /api/admin/feedbacks - Get all feedbacks
 export async function GET() {
   try {
     const db = getDB();
@@ -33,39 +33,17 @@ export async function GET() {
       );
     }
 
-    // 获取用户列表
-    const usersList = await db.query.users.findMany({
-      columns: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-        role: true,
-        status: true,
-        locale: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      orderBy: (users, { desc }) => [desc(users.createdAt)],
-      limit: 100, // Add limit to reduce data transfer
+    // Get feedbacks list with pagination
+    const feedbacksList = await db.query.feedbacks.findMany({
+      orderBy: (feedbacks, { desc }) => [desc(feedbacks.createdAt)],
+      limit: 100, // Limit to reduce data transfer
     });
 
-    // Get counts for each user (simplified version without joins)
-    const usersWithCounts = usersList.map(user => ({
-      ...user,
-      _count: {
-        websites: 0,
-        likes: 0,
-        favorites: 0,
-        reviews: 0,
-      },
-    }));
-
-    return NextResponse.json(AjaxResponse.ok(usersWithCounts));
+    return NextResponse.json(AjaxResponse.ok(feedbacksList));
   } catch (error) {
-    console.error("Error fetching users:", error);
+    console.error("Error fetching feedbacks:", error);
     return NextResponse.json(
-      AjaxResponse.fail("Failed to fetch users"),
+      AjaxResponse.fail("Failed to fetch feedbacks"),
       { status: 500 }
     );
   }

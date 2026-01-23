@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { currentUser } from '@clerk/nextjs/server';
 import { AjaxResponse, generateSlug, ensureUserExists } from "@/lib/utils";
 import { getDB } from "@/lib/db";
 import { websites, websiteCategories, categories } from "@/lib/db/schema";
@@ -73,20 +73,29 @@ export async function POST(request: Request) {
 
   try {
     const db = getDB();
-    // 获取当前用户信息
-    const { userId } = await auth();
+
+    // Only call currentUser() once - it includes userId
     const user = await currentUser();
 
     // 检查用户是否已登录
-    if (!userId || !user) {
+    if (!user?.id) {
       return NextResponse.json(
         AjaxResponse.fail("Please login to submit a website"),
         { status: 401 }
       );
     }
 
-    // 确保用户在数据库中存在（用于外键关系）
-    const userExists = await ensureUserExists(userId);
+    const userId = user.id;
+    const userEmail = user.emailAddresses[0]?.emailAddress;
+    const userName = user.fullName || user.firstName || user.username || 'User';
+
+    // 确保用户在数据库中存在（传入用户信息避免额外的 Clerk 调用）
+    const userExists = await ensureUserExists(userId, {
+      email: userEmail,
+      name: userName,
+      imageUrl: user.imageUrl,
+    });
+
     if (!userExists) {
       return NextResponse.json(
         AjaxResponse.fail("Failed to authenticate user"),

@@ -1,125 +1,57 @@
-import { auth, currentUser } from '@clerk/nextjs/server';
-import { redirect } from "next/navigation";
+import { Metadata } from "next";
 import Link from "next/link";
 import { AdminPageClient } from "@/components/admin/admin-page-client";
-import { getDB } from "@/lib/db";
-import { websites, categories } from "@/lib/db/schema";
-import { desc, asc } from "drizzle-orm";
+import { ListFilter, Users, MessageSquare } from "lucide-react";
 
+export const metadata: Metadata = {
+  title: "网站管理 - AI Magellan Admin",
+  description: "管理网站提交和审核"
+};
+
+// Force dynamic rendering but minimize SSR work
 export const dynamic = 'force-dynamic';
 
-// 检查是否为管理员邮箱
-function isAdminEmail(email: string): boolean {
-  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
-  return adminEmails.includes(email);
-}
-
-async function getWebsites() {
-  const db = getDB();
-  // Only load initial data for first page
-  const websitesList = await db.query.websites.findMany({
-    where: (websites, { eq }) => eq(websites.status, 'pending'),
-    with: {
-      websiteCategories: {
-        with: {
-          category: true,
-        },
-      },
-      submitter: true,
-    },
-    orderBy: (websites, { desc }) => [desc(websites.createdAt)],
-    limit: 20,
-  });
-  // Type assertion for compatibility with Website interface
-  return websitesList as any;
-}
-
-async function getCategories() {
-  const db = getDB();
-  const categoriesList = await db.query.categories.findMany({
-    orderBy: (categories, { asc }) => [asc(categories.name)],
-  });
-  return categoriesList;
-}
-
-export default async function AdminPage() {
-  // Verify admin permissions
-  const { userId } = await auth();
-  if (!userId) {
-    redirect("/auth/signin");
-  }
-
-  // Get Clerk user info with error handling
-  let clerkUser;
-  let userEmail;
-
-  try {
-    clerkUser = await currentUser();
-    userEmail = clerkUser?.emailAddresses[0]?.emailAddress;
-
-    if (!userEmail) {
-      return (
-        <div className="min-h-screen bg-background flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <h1 className="text-2xl font-semibold text-foreground">访问受限</h1>
-            <p className="text-muted-foreground">无法获取用户邮箱信息</p>
+// Simple page component - authentication is handled by middleware
+// Data fetching is done on the client side to reduce CPU time
+export default function AdminPage() {
+  return (
+    <div className="container max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6 min-h-[calc(100vh-4rem)] space-y-6">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-background/30 backdrop-blur-sm p-6 rounded-xl border border-border/40">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-foreground">
+            后台管理
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            管理网站内容和系统设置
+          </p>
+        </div>
+        <div className="w-full sm:w-auto">
+          <div className="grid w-full sm:w-auto grid-cols-3 bg-background/50 rounded-lg p-1">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-background/60 text-foreground">
+              <ListFilter className="w-4 h-4" />
+              网站管理
+            </div>
             <Link
-              href="/"
-              className="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
+              href="/admin/users"
+              className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-background/60"
             >
-              返回首页
+              <Users className="w-4 h-4" />
+              用户管理
+            </Link>
+            <Link
+              href="/admin/feedback"
+              className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-background/60"
+            >
+              <MessageSquare className="w-4 h-4" />
+              反馈管理
             </Link>
           </div>
-        </div>
-      );
-    }
-
-    // Check admin email
-    if (!isAdminEmail(userEmail)) {
-      return (
-        <div className="min-h-screen bg-background flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <h1 className="text-2xl font-semibold text-foreground">访问受限</h1>
-            <p className="text-muted-foreground">
-              您需要管理员权限才能访问此页面
-            </p>
-            <p className="text-sm text-muted-foreground">
-              邮箱: {userEmail}<br/>
-              如需管理员权限，请联系系统管理员
-            </p>
-            <Link
-              href="/"
-              className="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
-            >
-              返回首页
-            </Link>
-          </div>
-        </div>
-      );
-    }
-  } catch (error) {
-    console.error('Error fetching Clerk user:', error);
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-semibold text-foreground">认证服务错误</h1>
-          <p className="text-muted-foreground">无法连接到认证服务</p>
-          <Link
-            href="/"
-            className="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
-          >
-            返回首页
-          </Link>
         </div>
       </div>
-    );
-  }
 
-  // Load data only after auth check passes
-  const [websitesData, categoriesData] = await Promise.all([
-    getWebsites(),
-    getCategories()
-  ]);
-
-  return <AdminPageClient initialWebsites={websitesData} initialCategories={categoriesData} />;
+      {/* Content - Client component fetches data */}
+      <AdminPageClient initialWebsites={[]} initialCategories={[]} />
+    </div>
+  );
 }

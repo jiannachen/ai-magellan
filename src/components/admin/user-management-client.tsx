@@ -2,16 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Users, 
-  UserCheck, 
-  UserX, 
-  Crown, 
-  Shield, 
-  Eye, 
+import {
+  Users,
+  UserCheck,
+  UserX,
+  Crown,
+  Shield,
+  Eye,
   MoreHorizontal,
-  Search,
-  Filter
+  Search
 } from "lucide-react";
 import { Badge } from "@/ui/common/badge";
 import { Button } from "@/ui/common/button";
@@ -71,7 +70,37 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(initialUsers.length === 0);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Fetch users on client side if not provided
+  useEffect(() => {
+    if (initialUsers.length === 0) {
+      fetchUsers();
+    }
+  }, []);
+
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/admin/users');
+      const result = await response.json() as { success: boolean; data?: User[]; message?: string };
+
+      if (result.success && result.data) {
+        setUsers(result.data);
+        setFilteredUsers(result.data);
+      } else {
+        setError(result.message || '获取用户列表失败');
+      }
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      setError('网络错误，请重试');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // 过滤用户
   const filterUsers = () => {
@@ -251,7 +280,29 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
         </div>
       </div>
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="p-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">加载用户列表...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !isLoading && (
+        <div className="p-8 text-center">
+          <div className="text-red-500 mb-4">
+            <Users className="h-12 w-12 mx-auto opacity-50" />
+          </div>
+          <p className="text-red-600 mb-4">{error}</p>
+          <Button onClick={fetchUsers} variant="outline">
+            重试
+          </Button>
+        </div>
+      )}
+
       {/* Users Table */}
+      {!isLoading && !error && (
       <div className="rounded-xl border border-border/40 bg-background/30 shadow-sm overflow-hidden backdrop-blur-sm">
         <Table>
           <TableHeader>
@@ -416,13 +467,14 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
           </TableBody>
         </Table>
         
-        {filteredUsers.length === 0 && (
+        {filteredUsers.length === 0 && !isLoading && (
           <div className="p-8 text-center text-muted-foreground">
             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>没有找到匹配的用户</p>
           </div>
         )}
       </div>
+      )}
 
       {/* User Detail Modal */}
       <UserDetailModal

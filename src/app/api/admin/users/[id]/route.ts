@@ -1,16 +1,9 @@
 import { NextResponse } from "next/server";
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs/server';
 import { getDB } from "@/lib/db";
-import { users, websites, categories } from "@/lib/db/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { users, websites } from "@/lib/db/schema";
+import { eq, sql } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
-
-
-// 检查是否为管理员邮箱
-function isAdminEmail(email: string): boolean {
-  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
-  return adminEmails.includes(email);
-}
 
 // GET /api/admin/users/[id] - 获取特定用户详情
 export async function GET(
@@ -20,7 +13,8 @@ export async function GET(
   const { id } = await params;
   try {
     const db = getDB();
-    // 验证管理员权限
+
+    // Only use auth() - avoid expensive currentUser() call
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json(
@@ -29,22 +23,13 @@ export async function GET(
       );
     }
 
-    // 获取Clerk用户信息
-    let clerkUser;
-    let userEmail;
-    
-    try {
-      clerkUser = await currentUser();
-      userEmail = clerkUser?.emailAddresses[0]?.emailAddress;
-    } catch (error) {
-      console.error('Error fetching Clerk user:', error);
-      return NextResponse.json(
-        AjaxResponse.fail("Authentication service error"),
-        { status: 500 }
-      );
-    }
+    // Get current user from database to check admin role
+    const currentDbUser = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: { role: true },
+    });
 
-    if (!userEmail || !isAdminEmail(userEmail)) {
+    if (!currentDbUser || currentDbUser.role !== 'admin') {
       return NextResponse.json(
         AjaxResponse.fail("Access denied"),
         { status: 403 }
@@ -121,7 +106,8 @@ export async function PUT(
   const { id } = await params;
   try {
     const db = getDB();
-    // 验证管理员权限
+
+    // Only use auth() - avoid expensive currentUser() call
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json(
@@ -130,22 +116,13 @@ export async function PUT(
       );
     }
 
-    // 获取Clerk用户信息
-    let clerkUser;
-    let userEmail;
-    
-    try {
-      clerkUser = await currentUser();
-      userEmail = clerkUser?.emailAddresses[0]?.emailAddress;
-    } catch (error) {
-      console.error('Error fetching Clerk user:', error);
-      return NextResponse.json(
-        AjaxResponse.fail("Authentication service error"),
-        { status: 500 }
-      );
-    }
+    // Get current user from database to check admin role
+    const currentDbUser = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: { role: true },
+    });
 
-    if (!userEmail || !isAdminEmail(userEmail)) {
+    if (!currentDbUser || currentDbUser.role !== 'admin') {
       return NextResponse.json(
         AjaxResponse.fail("Access denied - Only admins can update users"),
         { status: 403 }

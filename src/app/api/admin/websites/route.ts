@@ -1,26 +1,26 @@
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { getDB } from '@/lib/db';
-
-// Check if user is admin
-function isAdminEmail(email: string): boolean {
-  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
-  return adminEmails.includes(email);
-}
+import { users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify authentication
+    const db = getDB();
+
+    // Only use auth() - avoid expensive currentUser() call
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check admin permissions
-    const clerkUser = await currentUser();
-    const userEmail = clerkUser?.emailAddresses[0]?.emailAddress;
+    // Get current user from database to check admin role
+    const currentDbUser = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: { role: true },
+    });
 
-    if (!userEmail || !isAdminEmail(userEmail)) {
+    if (!currentDbUser || currentDbUser.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -36,14 +36,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
     }
 
-    const db = getDB();
     const offset = (page - 1) * pageSize;
-
-    // Build query conditions
-    let whereConditions: any = { status };
-    if (categoryId && categoryId !== 'all') {
-      whereConditions.categoryId = parseInt(categoryId);
-    }
 
     // Get total count for pagination
     const totalCountResult = await db.query.websites.findMany({

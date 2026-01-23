@@ -39,20 +39,35 @@ export function AdminPageClient({
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [websites, setWebsites] = useState<Website[]>(initialWebsites);
+  const [categories, setCategories] = useState<any[]>(initialCategories);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [statusCounts, setStatusCounts] = useState({
     pending: 0,
     approved: 0,
     rejected: 0,
   });
 
-  if (!initialCategories || !Array.isArray(initialCategories)) return null;
+  // Fetch categories on mount if not provided
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories');
+      if (!response.ok) throw new Error('Failed to fetch categories');
+      const data = await response.json() as { success: boolean; data: any[] };
+      if (data.success) {
+        setCategories(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   // Fetch websites data
   const fetchWebsites = async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const params = new URLSearchParams({
         page: currentPage.toString(),
@@ -62,7 +77,10 @@ export function AdminPageClient({
       });
 
       const response = await fetch(`/api/admin/websites?${params}`);
-      if (!response.ok) throw new Error('Failed to fetch websites');
+      if (!response.ok) {
+        const errorData = await response.json() as { message?: string };
+        throw new Error(errorData.message || 'Failed to fetch websites');
+      }
 
       const data = await response.json() as {
         websites: Website[];
@@ -78,6 +96,7 @@ export function AdminPageClient({
       setTotalCount(data.pagination.totalCount);
     } catch (error) {
       console.error('Error fetching websites:', error);
+      setError(error instanceof Error ? error.message : '获取网站列表失败');
     } finally {
       setIsLoading(false);
     }
@@ -114,8 +133,11 @@ export function AdminPageClient({
     fetchWebsites();
   }, [currentPage, pageSize, activeStatus, selectedCategory]);
 
-  // Fetch status counts on mount
+  // Fetch categories and status counts on mount
   useEffect(() => {
+    if (!initialCategories || initialCategories.length === 0) {
+      fetchCategories();
+    }
     fetchStatusCounts();
   }, []);
 
@@ -234,7 +256,7 @@ export function AdminPageClient({
                   className="bg-background/95 backdrop-blur-sm"
                 >
                   <SelectItem value="all">全部分类</SelectItem>
-                  {initialCategories.map((category) => (
+                  {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id.toString()}>
                       {category.name}
                     </SelectItem>
@@ -265,11 +287,18 @@ export function AdminPageClient({
             <div className="flex items-center justify-center py-20">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button onClick={fetchWebsites} variant="outline">
+                重试
+              </Button>
+            </div>
           ) : (
             <WebsiteList
               key={`${activeStatus}-${selectedCategory}-${currentPage}`}
               websites={websites}
-              categories={initialCategories}
+              categories={categories}
               showActions={true}
             />
           )}

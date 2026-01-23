@@ -1,16 +1,22 @@
-import { currentUser } from '@clerk/nextjs/server';
 import { getDB } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
+
+interface UserInfo {
+  email?: string;
+  name?: string;
+  imageUrl?: string;
+}
 
 /**
  * 确保用户在数据库中存在
  * 如果不存在就创建，存在就跳过
  *
  * @param userId - Clerk 用户 ID
+ * @param userInfo - 可选的用户信息，避免额外调用 Clerk API
  * @returns true 成功，false 失败
  */
-export async function ensureUserExists(userId: string): Promise<boolean> {
+export async function ensureUserExists(userId: string, userInfo?: UserInfo): Promise<boolean> {
   try {
     const db = getDB();
     // 检查用户是否已存在
@@ -23,18 +29,15 @@ export async function ensureUserExists(userId: string): Promise<boolean> {
       return true;
     }
 
-    // 不存在，获取 Clerk 用户信息并创建
-    const user = await currentUser();
-    if (!user) return false;
-
-    const userEmail = user.emailAddresses[0]?.emailAddress;
-    const userName = user.fullName || user.firstName || user.username || 'User';
+    // 不存在，创建用户
+    const userEmail = userInfo?.email || `${userId}@clerk.local`;
+    const userName = userInfo?.name || 'User';
 
     await db.insert(users).values({
       id: userId,
-      email: userEmail || `${userId}@clerk.local`,
+      email: userEmail,
       name: userName,
-      image: user.imageUrl,
+      image: userInfo?.imageUrl || null,
       createdAt: sql`CURRENT_TIMESTAMP`,
       updatedAt: sql`CURRENT_TIMESTAMP`,
     });
@@ -42,16 +45,15 @@ export async function ensureUserExists(userId: string): Promise<boolean> {
     return true;
   } catch (error: any) {
     // 处理 email 唯一性冲突
-    if (error.code === 'P2002') {
+    if (error.code === 'P2002' || error.message?.includes('unique constraint') || error.message?.includes('UNIQUE constraint')) {
       // email 冲突，使用 userId 作为唯一 email
       try {
         const db = getDB();
-        const user = await currentUser();
         await db.insert(users).values({
           id: userId,
           email: `${userId}@clerk.duplicate`,
-          name: user?.fullName || user?.firstName || 'User',
-          image: user?.imageUrl,
+          name: userInfo?.name || 'User',
+          image: userInfo?.imageUrl || null,
           createdAt: sql`CURRENT_TIMESTAMP`,
           updatedAt: sql`CURRENT_TIMESTAMP`,
         });
