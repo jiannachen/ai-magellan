@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { auth } from '@/lib/auth';
 import { getDB } from "@/lib/db";
 import { users, websites } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
+import { requireAdmin } from "@/lib/utils/admin";
 
 // GET /api/admin/users/[id] - 获取特定用户详情
 export async function GET(
@@ -12,30 +12,15 @@ export async function GET(
 ) {
   const { id } = await params;
   try {
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.success) {
+      return NextResponse.json(
+        AjaxResponse.fail(adminCheck.message),
+        { status: adminCheck.status }
+      );
+    }
+
     const db = getDB();
-
-    // Get auth session
-    const session = await auth();
-    const userId = session?.user?.id;
-    if (!userId) {
-      return NextResponse.json(
-        AjaxResponse.fail("Unauthorized"),
-        { status: 401 }
-      );
-    }
-
-    // Get current user from database to check admin role
-    const currentDbUser = await db.query.users.findFirst({
-      where: eq(users.id, userId),
-      columns: { role: true },
-    });
-
-    if (!currentDbUser || currentDbUser.role !== 'admin') {
-      return NextResponse.json(
-        AjaxResponse.fail("Access denied"),
-        { status: 403 }
-      );
-    }
 
     // 获取用户详情，包含提交的网站列表
     const user = await db.query.users.findFirst({
@@ -106,30 +91,15 @@ export async function PUT(
 ) {
   const { id } = await params;
   try {
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.success) {
+      return NextResponse.json(
+        AjaxResponse.fail(adminCheck.message),
+        { status: adminCheck.status }
+      );
+    }
+
     const db = getDB();
-
-    // Get auth session
-    const session = await auth();
-    const userId = session?.user?.id;
-    if (!userId) {
-      return NextResponse.json(
-        AjaxResponse.fail("Unauthorized"),
-        { status: 401 }
-      );
-    }
-
-    // Get current user from database to check admin role
-    const currentDbUser = await db.query.users.findFirst({
-      where: eq(users.id, userId),
-      columns: { role: true },
-    });
-
-    if (!currentDbUser || currentDbUser.role !== 'admin') {
-      return NextResponse.json(
-        AjaxResponse.fail("Access denied - Only admins can update users"),
-        { status: 403 }
-      );
-    }
 
     // 解析请求数据
     const { role, status } = await request.json() as { role?: string; status?: string };
@@ -153,7 +123,7 @@ export async function PUT(
     }
 
     // 防止管理员修改自己的角色或状态
-    if (id === userId) {
+    if (id === adminCheck.userId) {
       return NextResponse.json(
         AjaxResponse.fail("Cannot modify your own account"),
         { status: 400 }

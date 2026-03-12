@@ -1,37 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from '@/lib/auth';
 import { getDB } from "@/lib/db";
-import { users } from "@/lib/db/schema";
 import { feedbacks } from "@/lib/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
+import { requireAdmin } from "@/lib/utils/admin";
 
 // GET /api/admin/feedbacks - 获取反馈列表（分页）
 export async function GET(request: NextRequest) {
   try {
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.success) {
+      return NextResponse.json(
+        AjaxResponse.fail(adminCheck.message),
+        { status: adminCheck.status }
+      );
+    }
+
     const db = getDB();
-
-    const session = await auth();
-    const userId = session?.user?.id;
-    if (!userId) {
-      return NextResponse.json(
-        AjaxResponse.fail("Unauthorized"),
-        { status: 401 }
-      );
-    }
-
-    const currentDbUser = await db.query.users.findFirst({
-      where: eq(users.id, userId),
-      columns: { role: true },
-    });
-
-    if (!currentDbUser || currentDbUser.role !== 'admin') {
-      return NextResponse.json(
-        AjaxResponse.fail("Access denied"),
-        { status: 403 }
-      );
-    }
-
     const searchParams = request.nextUrl.searchParams;
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
     const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') || '20')));

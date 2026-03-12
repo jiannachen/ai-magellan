@@ -20,6 +20,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       try {
         const db = getDB()
+        const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+        const isAdmin = adminEmails.includes(user.email.toLowerCase())
+
         const existingUser = await db.query.users.findFirst({
           where: eq(users.email, user.email),
         })
@@ -30,6 +33,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             .set({
               name: user.name || existingUser.name,
               image: user.image || existingUser.image,
+              ...(isAdmin && existingUser.role !== 'admin' ? { role: 'admin' } : {}),
               updatedAt: sql`CURRENT_TIMESTAMP`,
             })
             .where(eq(users.id, existingUser.id))
@@ -40,6 +44,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             email: user.email,
             name: user.name || "User",
             image: user.image || null,
+            ...(isAdmin ? { role: 'admin' } : {}),
           })
         }
       } catch (error) {

@@ -1,29 +1,17 @@
-import { auth } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { getDB } from '@/lib/db';
-import { users, websites } from '@/lib/db/schema';
+import { websites } from '@/lib/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
+import { requireAdmin } from '@/lib/utils/admin';
 
 export async function GET(request: NextRequest) {
   try {
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.success) {
+      return NextResponse.json({ error: adminCheck.message }, { status: adminCheck.status });
+    }
+
     const db = getDB();
-
-    // Get auth session
-    const session = await auth();
-    const userId = session?.user?.id;
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Get current user from database to check admin role
-    const currentDbUser = await db.query.users.findFirst({
-      where: eq(users.id, userId),
-      columns: { role: true },
-    });
-
-    if (!currentDbUser || currentDbUser.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
 
     // Parse query parameters
     const searchParams = request.nextUrl.searchParams;

@@ -78,8 +78,8 @@ export function AdminPageClient({
 
       const response = await fetch(`/api/admin/websites?${params}`);
       if (!response.ok) {
-        const errorData = await response.json() as { message?: string };
-        throw new Error(errorData.message || 'Failed to fetch websites');
+        const errorData = await response.json() as { error?: string };
+        throw new Error(errorData.error || 'Failed to fetch websites');
       }
 
       const data = await response.json() as {
@@ -106,10 +106,13 @@ export function AdminPageClient({
   const fetchStatusCounts = async () => {
     try {
       const response = await fetch('/api/admin/websites?counts=true');
+      if (!response.ok) return;
       const data = await response.json() as {
-        counts: { pending: number; approved: number; rejected: number };
+        counts?: { pending: number; approved: number; rejected: number };
       };
-      setStatusCounts(data.counts);
+      if (data.counts) {
+        setStatusCounts(data.counts);
+      }
     } catch (error) {
       console.error('Error fetching status counts:', error);
     }
