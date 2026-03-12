@@ -102,27 +102,14 @@ export function AdminPageClient({
     }
   };
 
-  // Fetch status counts
+  // Fetch status counts - 单次请求获取所有状态计数
   const fetchStatusCounts = async () => {
     try {
-      const statuses = ['pending', 'approved', 'rejected'];
-      const counts = await Promise.all(
-        statuses.map(async (status) => {
-          const response = await fetch(
-            `/api/admin/websites?status=${status}&page=1&pageSize=1`
-          );
-          const data = await response.json() as {
-            pagination: { totalCount: number };
-          };
-          return { status, count: data.pagination.totalCount };
-        })
-      );
-
-      const newCounts: any = {};
-      counts.forEach(({ status, count }) => {
-        newCounts[status] = count;
-      });
-      setStatusCounts(newCounts);
+      const response = await fetch('/api/admin/websites?counts=true');
+      const data = await response.json() as {
+        counts: { pending: number; approved: number; rejected: number };
+      };
+      setStatusCounts(data.counts);
     } catch (error) {
       console.error('Error fetching status counts:', error);
     }

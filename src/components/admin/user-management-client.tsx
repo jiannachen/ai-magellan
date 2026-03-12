@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Users,
@@ -10,7 +10,8 @@ import {
   Shield,
   Eye,
   MoreHorizontal,
-  Search
+  Search,
+  Loader2,
 } from "lucide-react";
 import { Badge } from "@/ui/common/badge";
 import { Button } from "@/ui/common/button";
@@ -36,6 +37,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/ui/common/dropdown-menu";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/ui/common/pagination";
 import { UserDetailModal } from "./user-detail-modal";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/utils";
@@ -64,7 +74,6 @@ interface UserManagementClientProps {
 
 export function UserManagementClient({ initialUsers }: UserManagementClientProps) {
   const [users, setUsers] = useState<User[]>(initialUsers);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>(initialUsers);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -72,25 +81,47 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(initialUsers.length === 0);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const { toast } = useToast();
 
-  // Fetch users on client side if not provided
+  // Debounced search
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   useEffect(() => {
-    if (initialUsers.length === 0) {
-      fetchUsers();
-    }
-  }, []);
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/admin/users');
-      const result = await response.json() as { success: boolean; data?: User[]; message?: string };
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        pageSize: pageSize.toString(),
+        role: roleFilter,
+        status: statusFilter,
+      });
+      if (debouncedSearch) {
+        params.set('search', debouncedSearch);
+      }
+
+      const response = await fetch(`/api/admin/users?${params}`);
+      const result = await response.json() as {
+        success: boolean;
+        data?: {
+          users: User[];
+          pagination: { page: number; pageSize: number; totalCount: number; totalPages: number };
+        };
+        message?: string;
+      };
 
       if (result.success && result.data) {
-        setUsers(result.data);
-        setFilteredUsers(result.data);
+        setUsers(result.data.users);
+        setTotalPages(result.data.pagination.totalPages);
+        setTotalCount(result.data.pagination.totalCount);
       } else {
         setError(result.message || '获取用户列表失败');
       }
@@ -100,111 +131,88 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, pageSize, roleFilter, statusFilter, debouncedSearch]);
 
-  // 过滤用户
-  const filterUsers = () => {
-    let filtered = users.filter(user => {
-      const matchesSearch = 
-        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesRole = roleFilter === "all" || user.role === roleFilter;
-      const matchesStatus = statusFilter === "all" || user.status === statusFilter;
-      
-      return matchesSearch && matchesRole && matchesStatus;
-    });
-    
-    setFilteredUsers(filtered);
-  };
-
-  // 当搜索或过滤条件改变时更新结果
+  // Fetch when params change
   useEffect(() => {
-    filterUsers();
-  }, [searchTerm, roleFilter, statusFilter, users]);
+    fetchUsers();
+  }, [fetchUsers]);
 
-  // 获取角色显示信息
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [roleFilter, statusFilter, debouncedSearch, pageSize]);
+
   const getRoleInfo = (role: string) => {
     switch (role) {
       case 'admin':
-        return { 
-          label: '管理员', 
-          icon: Crown, 
+        return {
+          label: '管理员',
+          icon: Crown,
           variant: 'default' as const,
           className: 'bg-red-50 text-red-700 border-red-200'
         };
       case 'moderator':
-        return { 
-          label: '审核员', 
-          icon: Shield, 
+        return {
+          label: '审核员',
+          icon: Shield,
           variant: 'secondary' as const,
           className: 'bg-blue-50 text-blue-700 border-blue-200'
         };
       default:
-        return { 
-          label: '用户', 
-          icon: Users, 
+        return {
+          label: '用户',
+          icon: Users,
           variant: 'outline' as const,
           className: 'bg-gray-50 text-gray-700 border-gray-200'
         };
     }
   };
 
-  // 获取状态显示信息
   const getStatusInfo = (status: string) => {
     switch (status) {
       case 'active':
-        return { 
-          label: '正常', 
+        return {
+          label: '正常',
           className: 'bg-green-50 text-green-700 border-green-200'
         };
       case 'banned':
-        return { 
-          label: '封禁', 
+        return {
+          label: '封禁',
           className: 'bg-red-50 text-red-700 border-red-200'
         };
       case 'suspended':
-        return { 
-          label: '暂停', 
+        return {
+          label: '暂停',
           className: 'bg-yellow-50 text-yellow-700 border-yellow-200'
         };
       default:
-        return { 
-          label: '未知', 
+        return {
+          label: '未知',
           className: 'bg-gray-50 text-gray-700 border-gray-200'
         };
     }
   };
 
-  // 更新用户
   const updateUser = async (userId: string, updates: { role?: string; status?: string }) => {
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update user');
-      }
+      if (!response.ok) throw new Error('Failed to update user');
 
       const result = await response.json() as { success: boolean; message?: string };
 
       if (result.success) {
-        // 更新本地状态
-        setUsers(prev => prev.map(user => 
-          user.id === userId 
+        setUsers(prev => prev.map(user =>
+          user.id === userId
             ? { ...user, ...updates, updatedAt: new Date().toISOString() }
             : user
         ));
-        
-        toast({
-          title: "更新成功",
-          description: "用户信息已更新",
-        });
+        toast({ title: "更新成功", description: "用户信息已更新" });
       } else {
         throw new Error(result.message || 'Update failed');
       }
@@ -218,7 +226,6 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
     }
   };
 
-  // 查看用户详情
   const viewUserDetail = (user: User) => {
     setSelectedUser(user);
     setIsDetailModalOpen(true);
@@ -253,7 +260,7 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
               />
             </div>
           </div>
-          
+
           <Select value={roleFilter} onValueChange={setRoleFilter}>
             <SelectTrigger className="w-full sm:w-40">
               <SelectValue placeholder="角色筛选" />
@@ -265,7 +272,7 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
               <SelectItem value="admin">管理员</SelectItem>
             </SelectContent>
           </Select>
-          
+
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full sm:w-40">
               <SelectValue placeholder="状态筛选" />
@@ -277,13 +284,27 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
               <SelectItem value="banned">封禁</SelectItem>
             </SelectContent>
           </Select>
+
+          <Select
+            value={pageSize.toString()}
+            onValueChange={(value) => setPageSize(parseInt(value))}
+          >
+            <SelectTrigger className="w-[100px] bg-background/40 border-border/40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-background/95 backdrop-blur-sm">
+              <SelectItem value="20">20 / 页</SelectItem>
+              <SelectItem value="30">30 / 页</SelectItem>
+              <SelectItem value="50">50 / 页</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
       {/* Loading State */}
       {isLoading && (
         <div className="p-8 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
           <p className="text-muted-foreground">加载用户列表...</p>
         </div>
       )}
@@ -303,6 +324,7 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
 
       {/* Users Table */}
       {!isLoading && !error && (
+      <>
       <div className="rounded-xl border border-border/40 bg-background/30 shadow-sm overflow-hidden backdrop-blur-sm">
         <Table>
           <TableHeader>
@@ -317,10 +339,10 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
           </TableHeader>
           <TableBody>
             <AnimatePresence>
-              {filteredUsers.map((user, index) => {
+              {users.map((user, index) => {
                 const roleInfo = getRoleInfo(user.role);
                 const statusInfo = getStatusInfo(user.status);
-                
+
                 return (
                   <motion.tr
                     key={user.id}
@@ -353,9 +375,9 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
                         </div>
                       </div>
                     </TableCell>
-                    
+
                     <TableCell>
-                      <Badge 
+                      <Badge
                         variant={roleInfo.variant}
                         className={cn("gap-1", roleInfo.className)}
                       >
@@ -363,16 +385,16 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
                         {roleInfo.label}
                       </Badge>
                     </TableCell>
-                    
+
                     <TableCell>
-                      <Badge 
+                      <Badge
                         variant="outline"
                         className={statusInfo.className}
                       >
                         {statusInfo.label}
                       </Badge>
                     </TableCell>
-                    
+
                     <TableCell>
                       <div className="text-sm">
                         <div className="font-medium">
@@ -383,13 +405,13 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
                         </div>
                       </div>
                     </TableCell>
-                    
+
                     <TableCell>
                       <div className="text-sm text-muted-foreground">
                         {new Date(user.createdAt).toLocaleDateString('zh-CN')}
                       </div>
                     </TableCell>
-                    
+
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Button
@@ -400,7 +422,7 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
-                        
+
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
@@ -416,29 +438,29 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
                               <Eye className="h-4 w-4 mr-2" />
                               查看详情
                             </DropdownMenuItem>
-                            
+
                             {user.role !== 'admin' && (
                               <>
                                 {user.role === 'user' && (
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => updateUser(user.id, { role: 'moderator' })}
                                   >
                                     <Shield className="h-4 w-4 mr-2" />
                                     设为审核员
                                   </DropdownMenuItem>
                                 )}
-                                
+
                                 {user.role === 'moderator' && (
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => updateUser(user.id, { role: 'user' })}
                                   >
                                     <Users className="h-4 w-4 mr-2" />
                                     设为普通用户
                                   </DropdownMenuItem>
                                 )}
-                                
+
                                 {user.status === 'active' ? (
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => updateUser(user.id, { status: 'banned' })}
                                     className="text-red-600"
                                   >
@@ -446,7 +468,7 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
                                     封禁用户
                                   </DropdownMenuItem>
                                 ) : (
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     onClick={() => updateUser(user.id, { status: 'active' })}
                                     className="text-green-600"
                                   >
@@ -466,14 +488,78 @@ export function UserManagementClient({ initialUsers }: UserManagementClientProps
             </AnimatePresence>
           </TableBody>
         </Table>
-        
-        {filteredUsers.length === 0 && !isLoading && (
+
+        {users.length === 0 && !isLoading && (
           <div className="p-8 text-center text-muted-foreground">
             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>没有找到匹配的用户</p>
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            显示 {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, totalCount)} 条，
+            共 {totalCount} 条
+          </div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  className={cn(
+                    "cursor-pointer",
+                    currentPage === 1 && "pointer-events-none opacity-50"
+                  )}
+                />
+              </PaginationItem>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((page) => (
+                  page === 1 ||
+                  page === totalPages ||
+                  Math.abs(page - currentPage) <= 1
+                ))
+                .map((page, index, array) => {
+                  const prevPage = array[index - 1];
+                  const showEllipsis = prevPage && page - prevPage > 1;
+
+                  return (
+                    <div key={page} className="flex items-center">
+                      {showEllipsis && (
+                        <PaginationItem>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      )}
+                      <PaginationItem>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    </div>
+                  );
+                })}
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  className={cn(
+                    "cursor-pointer",
+                    currentPage === totalPages && "pointer-events-none opacity-50"
+                  )}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
+      </>
       )}
 
       {/* User Detail Modal */}

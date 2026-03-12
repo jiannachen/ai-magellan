@@ -26,6 +26,26 @@ export async function GET(request: NextRequest) {
 
     // Parse query parameters
     const searchParams = request.nextUrl.searchParams;
+    const countsOnly = searchParams.get('counts') === 'true';
+
+    // 优化：单次请求获取所有状态的计数
+    if (countsOnly) {
+      const counts = await db
+        .select({
+          status: websites.status,
+          count: sql<number>`count(*)`,
+        })
+        .from(websites)
+        .groupBy(websites.status);
+
+      const statusCounts: Record<string, number> = { pending: 0, approved: 0, rejected: 0 };
+      counts.forEach(({ status, count }) => {
+        statusCounts[status] = count;
+      });
+
+      return NextResponse.json({ counts: statusCounts });
+    }
+
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '20');
     const status = searchParams.get('status') || 'pending';
