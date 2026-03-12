@@ -1,15 +1,12 @@
 # Cloudflare deployment environment variables
 # Copy this file to .dev.vars for local development
 
-# Clerk Authentication
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-clerk-publishable-key
-CLERK_SECRET_KEY=your-clerk-secret-key
-
-# Clerk Redirect URLs
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/auth/signin
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/auth/signup
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+# NextAuth Configuration
+AUTH_SECRET=your-auth-secret-generate-with-openssl-rand-base64-32
+AUTH_GOOGLE_ID=your-google-client-id
+AUTH_GOOGLE_SECRET=your-google-client-secret
+AUTH_GITHUB_ID=your-github-client-id
+AUTH_GITHUB_SECRET=your-github-client-secret
 
 # Site Configuration
 NEXT_PUBLIC_BASE_URL=https://aimagellan.com

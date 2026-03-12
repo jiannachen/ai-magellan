@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth'
 import { getDB } from '@/lib/db'
 import { websiteLikes } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
@@ -10,7 +10,8 @@ import { eq, and } from 'drizzle-orm'
 export async function GET(request: Request) {
   try {
     const db = getDB();
-    const { userId } = await auth()
+    const session = await auth()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json({ isLiked: false })

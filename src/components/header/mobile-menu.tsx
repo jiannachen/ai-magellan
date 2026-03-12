@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/ui/common/button";
 import { LanguageSwitcher } from "@/components/language/language-switcher";
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { useTranslations } from 'next-intl';
 import { useAtom } from 'jotai';
 import { categoriesAtom } from '@/lib/atoms';
@@ -46,7 +46,7 @@ export default function MobileMenu() {
   const tRank = useTranslations('pages.rankings');
   const tCat = useTranslations('pages.categories');
   const [categories, setCategories] = useAtom(categoriesAtom);
-  const { isSignedIn } = useUser();
+  const { isSignedIn } = useAuth();
 
   // 分类图标映射 - 与桌面版保持一致
   const getCategoryIcon = (slug: string) => {

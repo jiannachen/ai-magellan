@@ -34,7 +34,7 @@ import {
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/use-auth';
 import { CompactCard } from '@/components/website/compact-card';
 
 interface RankingsHomePageProps {
@@ -95,7 +95,7 @@ const rankingTypes = [
 ];
 
 export default function RankingsHomePage({ rankings, categories, totalTools }: RankingsHomePageProps) {
-  const { user } = useUser();
+  const { user } = useAuth();
   const tRank = useTranslations('pages.rankings');
   const [userLikes, setUserLikes] = useState<Set<number>>(new Set());
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -55,7 +55,7 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
-  const { isLoaded, isSignedIn, user } = useUser()
+  const { isLoaded, isSignedIn, user } = useAuth()
   const [favorites, setFavorites] = useState<Website[]>([])
   const [stats, setStats] = useState<DashboardStats>({
     totalFavorites: 0,

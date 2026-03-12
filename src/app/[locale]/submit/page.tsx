@@ -2,8 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { RedirectToSignIn } from '@clerk/nextjs'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/ui/common/button'
 import GlobalLoading from '@/components/loading/global-loading'
@@ -23,7 +22,7 @@ import {
 } from 'lucide-react'
 
 export default function SubmitPage() {
-  const { isSignedIn, isLoaded } = useUser()
+  const { isSignedIn, isLoaded } = useAuth()
 
   // Translation hooks
   const t = useTranslations()
@@ -56,7 +55,10 @@ export default function SubmitPage() {
   }
 
   if (!isSignedIn) {
-    return <RedirectToSignIn />
+    if (typeof window !== 'undefined') {
+      window.location.href = '/auth/signin'
+    }
+    return null
   }
 
   return (

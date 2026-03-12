@@ -1,6 +1,6 @@
 import "./globals.css";
 import { Metadata, Viewport } from "next";
-import { ClerkProvider } from '@clerk/nextjs';
+import { AuthProvider } from '@/components/providers/auth-provider';
 import ThemeProvider from "@/components/providers/theme-provider";
 import { StoreProvider } from "@/components/providers/store-provider";
 import { Toaster } from "@/ui/common/sonner";
@@ -89,7 +89,7 @@ export default async function RootLayout({
             '/logo.png'
           ]}
         />
-        <ClerkProvider>
+        <AuthProvider>
           <ErrorDeduplicationProvider />
           <ThemeProvider
             attribute="class"
@@ -104,7 +104,7 @@ export default async function RootLayout({
               </SWRProvider>
             </StoreProvider>
           </ThemeProvider>
-        </ClerkProvider>
+        </AuthProvider>
         <VercelAnalytics />
         <OtherAnalytics 
           googleAnalyticsId="G-9MNGY82H1J"

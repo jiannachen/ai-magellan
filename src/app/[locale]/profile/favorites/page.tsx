@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -39,7 +39,7 @@ interface Website extends Omit<BaseWebsite, 'categoryId'> {
 }
 
 export default function MyFavoritesPage() {
-  const { isLoaded, isSignedIn } = useUser()
+  const { isLoaded, isSignedIn } = useAuth()
   const [favorites, setFavorites] = useState<Website[]>([])
   const [filteredFavorites, setFilteredFavorites] = useState<Website[]>([])
   const [loading, setLoading] = useState(true)

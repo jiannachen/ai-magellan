@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useRef, useEffect } from 'react'
-import { useUser, useClerk } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { usePathname, useRouter, Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
@@ -19,8 +19,7 @@ interface ProfileLayoutProps {
 }
 
 export function ProfileLayout({ children }: ProfileLayoutProps) {
-  const { user } = useUser()
-  const { signOut } = useClerk()
+  const { user, signOut } = useAuth()
   const pathname = usePathname()
   const router = useRouter()
   const scrollContainerRef = useRef<HTMLDivElement>(null)

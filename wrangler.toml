@@ -7,8 +7,8 @@ assets = { directory = ".open-next/assets", binding = "ASSETS" }
 # ============================================
 # Production Environment (main branch)
 # ============================================
-# 部署到: https://aimagellan.com
-# 部署命令: npm run cf:deploy:prod
+# Deploy to: https://aimagellan.com
+# Deploy command: npm run cf:deploy:prod
 
 [[d1_databases]]
 binding = "DB"
@@ -17,20 +17,20 @@ database_id = "6fd1108f-a28c-44d3-8606-c654ae3f28b1"
 
 [vars]
 NEXT_PUBLIC_BASE_URL = "https://aimagellan.com"
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsuYWltYWdlbGxhbi5jb20k"
-NEXT_PUBLIC_CLERK_SIGN_IN_URL = "/auth/signin"
-NEXT_PUBLIC_CLERK_SIGN_UP_URL = "/auth/signup"
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL = "/"
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL = "/"
 CLARITY_PROJECT_ID = "tqy0fo919a"
 
-# Secrets: npx wrangler secret put <NAME>
+# Secrets (set via wrangler secret put):
+# - AUTH_SECRET
+# - AUTH_GOOGLE_ID
+# - AUTH_GOOGLE_SECRET
+# - AUTH_GITHUB_ID
+# - AUTH_GITHUB_SECRET
 
 # ============================================
-# Dev Environment (dev branch - 云端预演环境)
+# Dev Environment (dev branch)
 # ============================================
-# 部署到: https://*.ai-magellan.pages.dev
-# 部署命令: npm run cf:deploy:dev
+# Deploy to: https://*.ai-magellan.pages.dev
+# Deploy command: npm run cf:deploy:dev
 
 [env.dev]
 name = "ai-magellan-dev"
@@ -42,11 +42,6 @@ database_id = "ac9ab675-7ce2-4c3b-b380-35dd64a4198d"
 
 [env.dev.vars]
 NEXT_PUBLIC_BASE_URL = "https://ai-magellan.pages.dev"
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsuYWltYWdlbGxhbi5jb20k"
-NEXT_PUBLIC_CLERK_SIGN_IN_URL = "/auth/signin"
-NEXT_PUBLIC_CLERK_SIGN_UP_URL = "/auth/signup"
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL = "/"
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL = "/"
 CLARITY_PROJECT_ID = "tqy0fo919a"
 
 # Secrets: npx wrangler secret put <NAME> --env dev

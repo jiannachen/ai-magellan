@@ -26,9 +26,14 @@ declare global {
       // Existing env vars
       DATABASE_URL?: string;
       NEXT_PUBLIC_BASE_URL?: string;
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?: string;
-      CLERK_SECRET_KEY?: string;
       ADMIN_EMAILS?: string;
+
+      // NextAuth
+      AUTH_SECRET?: string;
+      AUTH_GOOGLE_ID?: string;
+      AUTH_GOOGLE_SECRET?: string;
+      AUTH_GITHUB_ID?: string;
+      AUTH_GITHUB_SECRET?: string;
     }
   }
 }

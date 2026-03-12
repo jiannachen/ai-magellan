@@ -70,6 +70,8 @@
     "welcome": "歡迎回來",
     "login_with_google": "使用 Google 登入",
     "logout_confirm": "確定要登出嗎？",
+    "continue_with_google": "使用 Google 繼續",
+    "continue_with_github": "使用 GitHub 繼續",
     "expedition": {
       "title": "開始你的探險之旅",
       "subtitle": "加入AI探索船員，發現未知的領域",

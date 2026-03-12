@@ -18,7 +18,7 @@ import {
   Telescope,
   Anchor
 } from 'lucide-react';
-import { useUser } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/use-auth';
 import Link from 'next/link';
 
 interface CategoryPageProps {
@@ -105,7 +105,7 @@ const categoryIcons: Record<string, any> = {
 };
 
 export default function CategoryPage({ category, websites: initialWebsites, pagination }: CategoryPageProps) {
-  const { user } = useUser();
+  const { user } = useAuth();
   const tCategory = useTranslations('pages.categories');
   const tCommon = useTranslations('common');
 

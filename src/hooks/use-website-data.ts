@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { useTranslations } from 'next-intl'
 import { UseFormReset } from 'react-hook-form'
 import { WebsiteEditData } from '@/lib/validations/website'
@@ -39,7 +39,7 @@ interface Website {
 }
 
 export function useWebsiteData(websiteId: string | undefined, reset: UseFormReset<WebsiteEditData>) {
-  const { isLoaded, isSignedIn, user } = useUser()
+  const { isLoaded, isSignedIn, user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [website, setWebsite] = useState<Website | null>(null)

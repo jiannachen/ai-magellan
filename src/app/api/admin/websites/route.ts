@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { getDB } from '@/lib/db';
 import { users, websites } from '@/lib/db/schema';
@@ -8,8 +8,9 @@ export async function GET(request: NextRequest) {
   try {
     const db = getDB();
 
-    // Only use auth() - avoid expensive currentUser() call
-    const { userId } = await auth();
+    // Get auth session
+    const session = await auth();
+    const userId = session?.user?.id;
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

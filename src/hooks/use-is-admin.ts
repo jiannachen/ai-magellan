@@ -1,6 +1,6 @@
 'use client'
 
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import useSWR from 'swr'
 
 interface AdminStatusResponse {
@@ -11,7 +11,7 @@ const fetcher = (url: string): Promise<AdminStatusResponse> =>
   fetch(url).then(res => res.json())
 
 export function useIsAdmin() {
-  const { isSignedIn, isLoaded } = useUser()
+  const { isSignedIn, isLoaded } = useAuth()
 
   const { data, isLoading, error } = useSWR<AdminStatusResponse>(
     isLoaded && isSignedIn ? '/api/user/admin-status' : null,

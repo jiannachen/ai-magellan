@@ -19,7 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/ui/common/avatar'
 import { Textarea } from '@/ui/common/textarea'
 import { Separator } from '@/ui/common/separator'
 import { toast } from '@/hooks/use-toast'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils/utils'
 
@@ -46,7 +46,7 @@ interface ReviewsProps {
 }
 
 export function Reviews({ websiteId, websiteTitle }: ReviewsProps) {
-  const { isSignedIn, user } = useUser()
+  const { isSignedIn, user } = useAuth()
   const t = useTranslations()
   const [reviews, setReviews] = useState<Review[]>([])
   const [stats, setStats] = useState<ReviewStats>({ avgRating: 0, totalReviews: 0 })

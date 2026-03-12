@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@/lib/auth';
 import { AjaxResponse, ensureUserExists } from "@/lib/utils";
 import { getDB } from "@/lib/db";
 import { websites, websiteLikes } from "@/lib/db/schema";
@@ -13,7 +13,8 @@ export async function POST(
 ) {
   try {
     const db = getDB();
-    const { userId } = await auth();
+    const session = await auth();
+    const userId = session?.user?.id;
 
     if (!userId) {
       return NextResponse.json(AjaxResponse.fail("Please login first"), {

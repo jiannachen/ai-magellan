@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Heart, Bookmark, Share2, ExternalLink } from 'lucide-react'
 import { Button } from '@/ui/common/button'
 import { toast } from '@/hooks/use-toast'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { useTranslations } from 'next-intl'
 import { cn, addRefParam } from '@/lib/utils/utils'
 
@@ -15,7 +15,7 @@ interface ToolActionsProps {
 }
 
 export function ToolActions({ websiteId, websiteUrl, initialLikesCount }: ToolActionsProps) {
-  const { isSignedIn } = useUser()
+  const { isSignedIn } = useAuth()
   const t = useTranslations()
   const [isLiked, setIsLiked] = useState(false)
   const [isFavorited, setIsFavorited] = useState(false)

@@ -9,12 +9,12 @@ interface UserInfo {
 }
 
 /**
- * 确保用户在数据库中存在
- * 如果不存在就创建，存在就跳过
+ * Ensure user exists in database.
+ * If not found, create a new entry.
  *
- * @param userId - Clerk 用户 ID
- * @param userInfo - 可选的用户信息，避免额外调用 Clerk API
- * @returns true 成功，false 失败
+ * @param userId - User ID from auth session
+ * @param userInfo - Optional user info to avoid extra lookups
+ * @returns true on success, false on failure
  */
 export async function ensureUserExists(userId: string, userInfo?: UserInfo): Promise<boolean> {
   try {
@@ -30,7 +30,7 @@ export async function ensureUserExists(userId: string, userInfo?: UserInfo): Pro
     }
 
     // 不存在，创建用户
-    const userEmail = userInfo?.email || `${userId}@clerk.local`;
+    const userEmail = userInfo?.email || `${userId}@auth.local`;
     const userName = userInfo?.name || 'User';
 
     await db.insert(users).values({
@@ -51,7 +51,7 @@ export async function ensureUserExists(userId: string, userInfo?: UserInfo): Pro
         const db = getDB();
         await db.insert(users).values({
           id: userId,
-          email: `${userId}@clerk.duplicate`,
+          email: `${userId}@auth.duplicate`,
           name: userInfo?.name || 'User',
           image: userInfo?.imageUrl || null,
           createdAt: sql`CURRENT_TIMESTAMP`,

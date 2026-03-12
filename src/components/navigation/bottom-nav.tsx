@@ -2,7 +2,7 @@
 import { Link, usePathname } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { Home, Map, Trophy, User } from 'lucide-react'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { cn } from '@/lib/utils/utils'
 
 const NAVIGATION_HEIGHT = 80 // 导航栏高度
@@ -17,7 +17,7 @@ interface NavItem {
 export default function BottomNavigation() {
   const pathname = usePathname()
   const t = useTranslations('navigation')
-  const { isSignedIn } = useUser()
+  const { isSignedIn } = useAuth()
 
   const navItems: NavItem[] = [
     {

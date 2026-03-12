@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@/lib/auth';
 import { getDB } from "@/lib/db";
 import { users, websites } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
@@ -14,8 +14,9 @@ export async function GET(
   try {
     const db = getDB();
 
-    // Only use auth() - avoid expensive currentUser() call
-    const { userId } = await auth();
+    // Get auth session
+    const session = await auth();
+    const userId = session?.user?.id;
     if (!userId) {
       return NextResponse.json(
         AjaxResponse.fail("Unauthorized"),
@@ -107,8 +108,9 @@ export async function PUT(
   try {
     const db = getDB();
 
-    // Only use auth() - avoid expensive currentUser() call
-    const { userId } = await auth();
+    // Get auth session
+    const session = await auth();
+    const userId = session?.user?.id;
     if (!userId) {
       return NextResponse.json(
         AjaxResponse.fail("Unauthorized"),

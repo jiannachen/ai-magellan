@@ -1,6 +1,6 @@
 'use client'
 
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
@@ -20,7 +20,7 @@ import {
 import { format } from 'date-fns'
 
 export function UserProfile() {
-  const { isLoaded, isSignedIn, user } = useUser()
+  const { isLoaded, isSignedIn, user } = useAuth()
   const t = useTranslations()
 
   if (!isLoaded) {

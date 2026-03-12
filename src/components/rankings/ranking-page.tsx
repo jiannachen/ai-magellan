@@ -26,7 +26,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useUser } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/use-auth';
 import Link from 'next/link';
 import type { Website } from '@/lib/types';
 import { cn } from '@/lib/utils/utils';
@@ -65,7 +65,7 @@ const rankingIcons = {
 };
 
 function RankingPageContent({ type, rankingType, websites: initialWebsites, categories, pagination: initialPagination, initialFilters }: RankingPageProps) {
-  const { user } = useUser();
+  const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

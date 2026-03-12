@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@/lib/auth';
 import { AjaxResponse, generateSlug } from "@/lib/utils";
 import { getDB } from "@/lib/db";
 import { websites, categories, websiteLikes, websiteFavorites, websiteCategories } from "@/lib/db/schema";
@@ -131,7 +131,8 @@ export async function PUT(
   try {
     const db = getDB();
     // 获取当前用户信息
-    const { userId } = await auth();
+    const session = await auth();
+    const userId = session?.user?.id;
     
     if (!userId) {
       return NextResponse.json(AjaxResponse.fail("Unauthorized"), {

@@ -70,6 +70,8 @@
     "welcome": "Welcome back",
     "login_with_google": "Sign in with Google",
     "logout_confirm": "Are you sure you want to sign out?",
+    "continue_with_google": "Continue with Google",
+    "continue_with_github": "Continue with GitHub",
     "expedition": {
       "title": "Begin Your Expedition",
       "subtitle": "Join the AI exploration crew and discover uncharted territories",
