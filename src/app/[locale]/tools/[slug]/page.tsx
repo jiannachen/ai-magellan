@@ -40,7 +40,7 @@ import { Button } from '@/ui/common/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
 import { Badge } from '@/ui/common/badge'
 import { toast } from '@/hooks/use-toast'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { Reviews } from '@/components/reviews/reviews'
 import { useTranslations } from 'next-intl'
 import { StatCard } from '@/components/ui/stat-card'
@@ -122,7 +122,7 @@ interface Website {
 
 export default function ToolDetailPage() {
   const params = useParams()
-  const { isSignedIn } = useUser()
+  const { isSignedIn } = useAuth()
   const t = useTranslations()
   const [website, setWebsite] = useState<Website | null>(null)
   const [loading, setLoading] = useState(true)

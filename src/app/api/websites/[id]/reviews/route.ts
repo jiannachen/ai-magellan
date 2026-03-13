@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/db'
 import { websiteReviews } from '@/lib/db/schema'
 import { eq, and, desc, sql } from 'drizzle-orm'
@@ -54,7 +54,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth()
+    const session = await auth()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json({ error: 'Please login first' }, { status: 401 })
@@ -156,7 +157,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth()
+    const session = await auth()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json({ error: 'Please login first' }, { status: 401 })

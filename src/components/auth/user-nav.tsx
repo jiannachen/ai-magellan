@@ -1,5 +1,5 @@
 'use client'
-import { useUser, useClerk } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { useTranslations } from 'next-intl'
 import { useRouter, usePathname, Link } from '@/i18n/navigation'
 import { Button } from '@/ui/common/button'
@@ -20,8 +20,7 @@ import { profileNavigationConfig } from '@/lib/config/profile-navigation'
 import { UserNavDropdownWrapper } from './user-nav-dropdown-wrapper'
 
 export function UserNav() {
-  const { isLoaded, isSignedIn, user } = useUser()
-  const { signOut } = useClerk()
+  const { isLoaded, isSignedIn, user, signOut } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
   const t = useTranslations('auth')

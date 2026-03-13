@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -70,7 +70,7 @@ interface SubmissionsResponse {
 }
 
 export default function MySubmissionsPage() {
-  const { isLoaded, isSignedIn } = useUser()
+  const { isLoaded, isSignedIn } = useAuth()
   const [submissions, setSubmissions] = useState<Website[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

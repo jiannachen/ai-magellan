@@ -1,0 +1,31 @@
+'use client'
+
+import { useAuth } from '@/hooks/use-auth'
+import useSWR from 'swr'
+
+interface AdminStatusResponse {
+  isAdmin: boolean
+}
+
+const fetcher = (url: string): Promise<AdminStatusResponse> =>
+  fetch(url).then(res => res.json())
+
+export function useIsAdmin() {
+  const { isSignedIn, isLoaded } = useAuth()
+
+  const { data, isLoading, error } = useSWR<AdminStatusResponse>(
+    isLoaded && isSignedIn ? '/api/user/admin-status' : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60000,
+    }
+  )
+
+  return {
+    isAdmin: data?.isAdmin ?? false,
+    isLoading: !isLoaded || isLoading,
+    error,
+  }
+}

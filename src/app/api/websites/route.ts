@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { auth } from '@/lib/auth';
 import { AjaxResponse, generateSlug, ensureUserExists } from "@/lib/utils";
 import { db } from "@/lib/db/db";
 import { websites, websiteCategories, categories } from "@/lib/db/schema";
@@ -70,11 +70,11 @@ export async function POST(request: Request) {
 
   try {
     // 获取当前用户信息
-    const { userId } = await auth();
-    const user = await currentUser();
+    const session = await auth();
+    const userId = session?.user?.id;
 
     // 检查用户是否已登录
-    if (!userId || !user) {
+    if (!userId) {
       return NextResponse.json(
         AjaxResponse.fail("Please login to submit a website"),
         { status: 401 }

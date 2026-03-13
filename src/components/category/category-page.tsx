@@ -17,7 +17,7 @@ import {
   Sparkles,
   Telescope
 } from 'lucide-react';
-import { useUser } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/use-auth';
 import Link from 'next/link';
 
 interface CategoryPageProps {
@@ -99,7 +99,7 @@ const categoryIcons: Record<string, any> = {
 };
 
 export default function CategoryPage({ category, websites: initialWebsites }: CategoryPageProps) {
-  const { user } = useUser();
+  const { user } = useAuth();
   const tCategory = useTranslations('pages.categories');
   const tCommon = useTranslations('common');
   const [websites, setWebsites] = useState(initialWebsites);

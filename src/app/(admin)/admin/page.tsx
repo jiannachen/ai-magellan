@@ -1,4 +1,4 @@
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { auth } from '@/lib/auth';
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AdminPageClient } from "@/components/admin/admin-page-client";
@@ -39,35 +39,13 @@ async function getCategories() {
 
 export default async function AdminPage() {
   // 验证管理员权限
-  const { userId } = await auth();
-  if (!userId) {
+  const session = await auth();
+  if (!session?.user?.id) {
     redirect("/auth/signin");
   }
 
-  // 获取Clerk用户信息
-  let clerkUser;
-  let userEmail;
-
-  try {
-    clerkUser = await currentUser();
-    userEmail = clerkUser?.emailAddresses[0]?.emailAddress;
-  } catch (error) {
-    console.error('Error fetching Clerk user:', error);
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-semibold text-foreground">认证服务错误</h1>
-          <p className="text-muted-foreground">无法连接到认证服务</p>
-          <Link
-            href="/"
-            className="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
-          >
-            返回首页
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  // 获取用户信息
+  const userEmail = session.user.email;
 
   if (!userEmail) {
     return (

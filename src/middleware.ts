@@ -1,6 +1,7 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import createMiddleware from 'next-intl/middleware';
 import { locales, defaultLocale } from './i18n';
+import { NextResponse } from 'next/server';
 
 // Create the next-intl middleware
 const intlMiddleware = createMiddleware({
@@ -9,21 +10,20 @@ const intlMiddleware = createMiddleware({
   localePrefix: 'as-needed' // Only show locale prefix for non-default languages
 });
 
-const isPublicRoute = createRouteMatcher([
-  '/',
-  '/tw',
-  '/tw/(.*)',
-  '/(.*)', // Default language routes without prefix
-  '/auth/signin(.*)',
-  '/auth/signup(.*)', 
-  '/auth/error',
-  '/api/(.*)',
-]);
+function isPublicPath(pathname: string): boolean {
+  if (pathname.startsWith('/api/auth')) return true
+  if (pathname.startsWith('/api/')) return true
+  if (pathname.startsWith('/auth/')) return true
+  if (pathname === '/') return true
+  if (pathname.startsWith('/tw')) return true
 
-export default clerkMiddleware((auth, req) => {
+  return true // All routes are publicly accessible by default
+}
+
+export default auth((req) => {
   const { pathname } = req.nextUrl;
 
-  // Skip internationalization for API routes but not admin routes
+  // Skip internationalization for API routes
   if (pathname.startsWith('/api/')) {
     return;
   }
@@ -35,17 +35,21 @@ export default clerkMiddleware((auth, req) => {
 
   // Handle admin routes - protect them but don't use intl middleware
   if (pathname.startsWith('/admin')) {
-    auth.protect();
+    if (!req.auth) {
+      return NextResponse.redirect(new URL('/auth/signin', req.url));
+    }
     return;
   }
 
-  // Handle public routes without authentication
-  if (isPublicRoute(req)) {
+  // Handle public routes with intl
+  if (isPublicPath(pathname)) {
     return intlMiddleware(req);
   }
 
   // Protect private routes
-  auth.protect();
+  if (!req.auth) {
+    return NextResponse.redirect(new URL('/auth/signin', req.url));
+  }
   return intlMiddleware(req);
 });
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/db'
 import { websiteFavorites, websites, websiteLikes } from '@/lib/db/schema'
 import { eq, and, desc, sql } from 'drizzle-orm'
@@ -7,7 +7,8 @@ import { ensureUserExists } from '@/lib/utils'
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const session = await auth()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(
@@ -87,7 +88,8 @@ export async function GET(request: NextRequest) {
 // 添加收藏
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const session = await auth()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(
@@ -161,7 +163,8 @@ export async function POST(request: NextRequest) {
 // 移除收藏
 export async function DELETE(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const session = await auth()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json(

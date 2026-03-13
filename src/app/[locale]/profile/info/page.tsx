@@ -1,6 +1,6 @@
 'use client'
 
-import { useUser } from '@clerk/nextjs'
+import { useAuth } from '@/hooks/use-auth'
 import { useTranslations } from 'next-intl'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/card'
@@ -24,7 +24,7 @@ import {
 import { format } from 'date-fns'
 
 export default function ProfileInfoPage() {
-  const { isLoaded, isSignedIn, user } = useUser()
+  const { isLoaded, isSignedIn, user } = useAuth()
   
   // Translation hooks
   const t = useTranslations('common')

@@ -1,55 +1,55 @@
-import { currentUser } from '@clerk/nextjs/server';
 import { db } from "@/lib/db/db";
 import { users } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 
+interface UserInfo {
+  email?: string;
+  name?: string;
+  imageUrl?: string;
+}
+
 /**
- * 确保用户在数据库中存在
- * 如果不存在就创建，存在就跳过
+ * Ensure user exists in database.
+ * If not found, create a new entry.
  *
- * @param userId - Clerk 用户 ID
- * @returns true 成功，false 失败
+ * @param userId - User ID from auth session
+ * @param userInfo - Optional user info to avoid extra lookups
+ * @returns true on success, false on failure
  */
-export async function ensureUserExists(userId: string): Promise<boolean> {
+export async function ensureUserExists(userId: string, userInfo?: UserInfo): Promise<boolean> {
   try {
-    // 检查用户是否已存在
+    // Check if user already exists
     const existingUser = await db.query.users.findFirst({
       where: eq(users.id, userId),
     });
 
-    // 已存在，直接返回
     if (existingUser) {
       return true;
     }
 
-    // 不存在，获取 Clerk 用户信息并创建
-    const user = await currentUser();
-    if (!user) return false;
-
-    const userEmail = user.emailAddresses[0]?.emailAddress;
-    const userName = user.fullName || user.firstName || user.username || 'User';
+    // Create new user
+    const userEmail = userInfo?.email || `${userId}@auth.local`;
+    const userName = userInfo?.name || 'User';
 
     await db.insert(users).values({
       id: userId,
-      email: userEmail || `${userId}@clerk.local`,
+      email: userEmail,
       name: userName,
-      image: user.imageUrl,
+      image: userInfo?.imageUrl || null,
       createdAt: sql`CURRENT_TIMESTAMP`,
       updatedAt: sql`CURRENT_TIMESTAMP`,
     });
 
     return true;
   } catch (error: any) {
-    // 处理 email 唯一性冲突
-    if (error.code === 'P2002') {
-      // email 冲突，使用 userId 作为唯一 email
+    // Handle email uniqueness conflict
+    if (error.code === 'P2002' || error.message?.includes('unique constraint') || error.message?.includes('UNIQUE constraint')) {
       try {
-        const user = await currentUser();
         await db.insert(users).values({
           id: userId,
-          email: `${userId}@clerk.duplicate`,
-          name: user?.fullName || user?.firstName || 'User',
-          image: user?.imageUrl,
+          email: `${userId}@auth.duplicate`,
+          name: userInfo?.name || 'User',
+          image: userInfo?.imageUrl || null,
           createdAt: sql`CURRENT_TIMESTAMP`,
           updatedAt: sql`CURRENT_TIMESTAMP`,
         });

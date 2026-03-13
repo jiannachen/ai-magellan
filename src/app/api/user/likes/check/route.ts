@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/db'
 import { websiteLikes } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
@@ -8,7 +8,8 @@ import { eq, and } from 'drizzle-orm'
 // 检查用户是否已点赞某个工具
 export async function GET(request: Request) {
   try {
-    const { userId } = await auth()
+    const session = await auth()
+    const userId = session?.user?.id
 
     if (!userId) {
       return NextResponse.json({ isLiked: false })

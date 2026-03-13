@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { requireAdmin } from '@/lib/utils/admin';
 import { db } from "@/lib/db/db";
 import { users, websites, categories } from "@/lib/db/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
-
-// 检查是否为管理员邮箱
-function isAdminEmail(email: string): boolean {
-  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
-  return adminEmails.includes(email);
-}
 
 // GET /api/admin/users/[id] - 获取特定用户详情
 export async function GET(
@@ -19,37 +13,13 @@ export async function GET(
   const { id } = await params;
   try {
     // 验证管理员权限
-    const { userId } = await auth();
-    if (!userId) {
+    const adminCheck = await requireAdmin()
+    if (!adminCheck.success) {
       return NextResponse.json(
-        AjaxResponse.fail("Unauthorized"),
-        { status: 401 }
+        AjaxResponse.fail(adminCheck.message),
+        { status: adminCheck.status }
       );
     }
-
-    // 获取Clerk用户信息
-    let clerkUser;
-    let userEmail;
-    
-    try {
-      clerkUser = await currentUser();
-      userEmail = clerkUser?.emailAddresses[0]?.emailAddress;
-    } catch (error) {
-      console.error('Error fetching Clerk user:', error);
-      return NextResponse.json(
-        AjaxResponse.fail("Authentication service error"),
-        { status: 500 }
-      );
-    }
-
-    if (!userEmail || !isAdminEmail(userEmail)) {
-      return NextResponse.json(
-        AjaxResponse.fail("Access denied"),
-        { status: 403 }
-      );
-    }
-
-    // 获取用户详情，包含提交的网站列表
     const user = await db.query.users.findFirst({
       where: eq(users.id, id),
       with: {
@@ -119,33 +89,11 @@ export async function PUT(
   const { id } = await params;
   try {
     // 验证管理员权限
-    const { userId } = await auth();
-    if (!userId) {
+    const adminCheck = await requireAdmin()
+    if (!adminCheck.success) {
       return NextResponse.json(
-        AjaxResponse.fail("Unauthorized"),
-        { status: 401 }
-      );
-    }
-
-    // 获取Clerk用户信息
-    let clerkUser;
-    let userEmail;
-    
-    try {
-      clerkUser = await currentUser();
-      userEmail = clerkUser?.emailAddresses[0]?.emailAddress;
-    } catch (error) {
-      console.error('Error fetching Clerk user:', error);
-      return NextResponse.json(
-        AjaxResponse.fail("Authentication service error"),
-        { status: 500 }
-      );
-    }
-
-    if (!userEmail || !isAdminEmail(userEmail)) {
-      return NextResponse.json(
-        AjaxResponse.fail("Access denied - Only admins can update users"),
-        { status: 403 }
+        AjaxResponse.fail(adminCheck.message),
+        { status: adminCheck.status }
       );
     }
 
@@ -171,7 +119,7 @@ export async function PUT(
     }
 
     // 防止管理员修改自己的角色或状态
-    if (id === userId) {
+    if (id === adminCheck.userId) {
       return NextResponse.json(
         AjaxResponse.fail("Cannot modify your own account"),
         { status: 400 }
