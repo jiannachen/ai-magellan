@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from '@/lib/auth';
 import { AjaxResponse, generateSlug } from "@/lib/utils";
 import { db } from "@/lib/db/db";
-import { websites, categories, websiteLikes, websiteFavorites, websiteCategories } from "@/lib/db/schema";
+import { websites, categories, websiteLikes, websiteFavorites, websiteCategories, users } from "@/lib/db/schema";
 import { eq, and, ne, sql, desc } from "drizzle-orm";
 import { validateWebsiteEdit } from "@/lib/validations/website";
 
@@ -51,20 +51,21 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       });
     }
 
-    // Get counts separately
-    const [likesCount] = await db.select({ count: sql<number>`count(*)` })
-      .from(websiteLikes)
-      .where(eq(websiteLikes.websiteId, website.id));
-
-    const [favoritesCount] = await db.select({ count: sql<number>`count(*)` })
-      .from(websiteFavorites)
-      .where(eq(websiteFavorites.websiteId, website.id));
+    // 并行查询 likes 和 favorites 计数
+    const [likesCount, favoritesCount] = await Promise.all([
+      db.select({ count: sql<number>`count(*)` })
+        .from(websiteLikes)
+        .where(eq(websiteLikes.websiteId, website.id)),
+      db.select({ count: sql<number>`count(*)` })
+        .from(websiteFavorites)
+        .where(eq(websiteFavorites.websiteId, website.id)),
+    ]);
 
     const websiteWithCounts = {
       ...website,
       _count: {
-        websiteLikes: likesCount.count,
-        websiteFavorites: favoritesCount.count
+        websiteLikes: likesCount[0].count,
+        websiteFavorites: favoritesCount[0].count
       }
     };
 
@@ -78,9 +79,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 }
 
 // DELETE /api/websites/[id]
-// 删除网站
+// 删除网站（管理员或提交者可操作）
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      return NextResponse.json(AjaxResponse.fail("Unauthorized"), { status: 401 });
+    }
+
     const { id } = await params;
     if (!id) {
       return NextResponse.json(AjaxResponse.fail("Website ID is required"), {});
@@ -97,6 +105,16 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       return NextResponse.json(AjaxResponse.fail("Website not found"), {
         status: 404,
       });
+    }
+
+    // 检查权限：管理员或提交者
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: { role: true },
+    });
+
+    if (user?.role !== 'admin' && website.submittedBy !== userId) {
+      return NextResponse.json(AjaxResponse.fail("Access denied"), { status: 403 });
     }
 
     // Delete the website

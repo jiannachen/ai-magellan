@@ -42,3 +42,12 @@ next-env.d.ts
 
 # Drizzle
 drizzle/
+
+# OpenNext
+.open-next/
+
+# Wrangler
+.wrangler/
+
+# Backup
+backup.sql

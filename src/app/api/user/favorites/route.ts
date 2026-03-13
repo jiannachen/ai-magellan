@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { AjaxResponse } from '@/lib/utils'
 import { db } from '@/lib/db/db'
 import { websiteFavorites, websites, websiteLikes } from '@/lib/db/schema'
-import { eq, and, desc, sql } from 'drizzle-orm'
-import { ensureUserExists } from '@/lib/utils'
+import { eq, and, desc, sql, inArray } from 'drizzle-orm'
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,10 +11,7 @@ export async function GET(request: NextRequest) {
     const userId = session?.user?.id
 
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json(AjaxResponse.fail('Unauthorized'), { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -46,28 +43,37 @@ export async function GET(request: NextRequest) {
       .from(websiteFavorites)
       .where(eq(websiteFavorites.userId, userId))
 
-    // 提取网站数据并添加计数
-    const websitesWithCounts = await Promise.all(
-      favorites.map(async (fav) => {
-        const [likesCount] = await db.select({ count: sql<number>`count(*)` })
+    // 批量查询所有相关网站的 likes 和 favorites 计数，消除 N+1
+    const websiteIds = favorites.map(fav => fav.website.id)
+
+    let likesMap = new Map<number, number>()
+    let favsMap = new Map<number, number>()
+
+    if (websiteIds.length > 0) {
+      const [likesCounts, favsCounts] = await Promise.all([
+        db.select({ websiteId: websiteLikes.websiteId, count: sql<number>`count(*)` })
           .from(websiteLikes)
-          .where(eq(websiteLikes.websiteId, fav.website.id))
-
-        const [favoritesCount] = await db.select({ count: sql<number>`count(*)` })
+          .where(inArray(websiteLikes.websiteId, websiteIds))
+          .groupBy(websiteLikes.websiteId),
+        db.select({ websiteId: websiteFavorites.websiteId, count: sql<number>`count(*)` })
           .from(websiteFavorites)
-          .where(eq(websiteFavorites.websiteId, fav.website.id))
+          .where(inArray(websiteFavorites.websiteId, websiteIds))
+          .groupBy(websiteFavorites.websiteId),
+      ])
 
-        return {
-          ...fav.website,
-          _count: {
-            websiteLikes: Number(likesCount.count),
-            websiteFavorites: Number(favoritesCount.count)
-          }
-        }
-      })
-    )
+      likesMap = new Map(likesCounts.map(r => [r.websiteId, Number(r.count)]))
+      favsMap = new Map(favsCounts.map(r => [r.websiteId, Number(r.count)]))
+    }
 
-    return NextResponse.json({
+    const websitesWithCounts = favorites.map(fav => ({
+      ...fav.website,
+      _count: {
+        websiteLikes: likesMap.get(fav.website.id) || 0,
+        websiteFavorites: favsMap.get(fav.website.id) || 0,
+      }
+    }))
+
+    return NextResponse.json(AjaxResponse.ok({
       websites: websitesWithCounts,
       pagination: {
         page,
@@ -75,11 +81,11 @@ export async function GET(request: NextRequest) {
         total,
         pages: Math.ceil(total / limit)
       }
-    })
+    }))
 
   } catch (error) {
     return NextResponse.json(
-      { error: 'Internal server error' },
+      AjaxResponse.fail('Internal server error'),
       { status: 500 }
     )
   }
@@ -92,28 +98,13 @@ export async function POST(request: NextRequest) {
     const userId = session?.user?.id
 
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
-    // Ensure user exists in database
-    const userExists = await ensureUserExists(userId)
-    if (!userExists) {
-      return NextResponse.json(
-        { error: 'Failed to authenticate user' },
-        { status: 401 }
-      )
+      return NextResponse.json(AjaxResponse.fail('Unauthorized'), { status: 401 })
     }
 
     const { websiteId } = await request.json()
 
     if (!websiteId) {
-      return NextResponse.json(
-        { error: 'Website ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json(AjaxResponse.fail('Website ID is required'), { status: 400 })
     }
 
     // 检查网站是否存在
@@ -122,10 +113,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (!website) {
-      return NextResponse.json(
-        { error: 'Website not found' },
-        { status: 404 }
-      )
+      return NextResponse.json(AjaxResponse.fail('Website not found'), { status: 404 })
     }
 
     // 检查是否已经收藏
@@ -137,10 +125,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingFavorite) {
-      return NextResponse.json(
-        { error: 'Already favorited' },
-        { status: 400 }
-      )
+      return NextResponse.json(AjaxResponse.fail('Already favorited'), { status: 400 })
     }
 
     // 添加收藏
@@ -150,13 +135,10 @@ export async function POST(request: NextRequest) {
       websiteId: parseInt(websiteId)
     }).returning()
 
-    return NextResponse.json({ success: true, favorite })
+    return NextResponse.json(AjaxResponse.ok(favorite))
 
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json(AjaxResponse.fail('Internal server error'), { status: 500 })
   }
 }
 
@@ -167,29 +149,14 @@ export async function DELETE(request: NextRequest) {
     const userId = session?.user?.id
 
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
-    // 确保用户在数据库中存在（兜底机制）
-    const userExists = await ensureUserExists(userId)
-    if (!userExists) {
-      return NextResponse.json(
-        { error: 'Failed to authenticate user' },
-        { status: 401 }
-      )
+      return NextResponse.json(AjaxResponse.fail('Unauthorized'), { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
     const websiteId = searchParams.get('websiteId')
 
     if (!websiteId) {
-      return NextResponse.json(
-        { error: 'Website ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json(AjaxResponse.fail('Website ID is required'), { status: 400 })
     }
 
     // 删除收藏
@@ -200,12 +167,9 @@ export async function DELETE(request: NextRequest) {
       )
     )
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json(AjaxResponse.ok(null))
 
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json(AjaxResponse.fail('Internal server error'), { status: 500 })
   }
 }

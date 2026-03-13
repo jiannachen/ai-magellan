@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
+import { requireAdmin } from "@/lib/utils/admin";
 import { db } from "@/lib/db/db";
 import { categories, websiteCategories, websites } from "@/lib/db/schema";
 import { eq, isNull, sql, and, asc } from "drizzle-orm";
@@ -11,8 +12,20 @@ export async function GET(request: Request) {
     const includeSubcategories = searchParams.get('includeSubcategories') === 'true';
     const parentId = searchParams.get('parentId');
 
+    // 一次性批量查询所有分类的计数，消除 N+1
+    const allCounts = await db
+      .select({
+        categoryId: websiteCategories.categoryId,
+        count: sql<number>`count(*)`,
+      })
+      .from(websiteCategories)
+      .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
+      .where(eq(websites.status, 'approved'))
+      .groupBy(websiteCategories.categoryId);
+
+    const countMap = new Map(allCounts.map(c => [c.categoryId, Number(c.count)]));
+
     if (includeSubcategories) {
-      // 返回分级结构的分类数据
       const parentCategories = await db.query.categories.findMany({
         where: parentId
           ? eq(categories.parentId, parseInt(parentId))
@@ -25,73 +38,25 @@ export async function GET(request: Request) {
         orderBy: asc(categories.sortOrder),
       });
 
-      // Get counts for each category
-      const categoriesWithCounts = await Promise.all(
-        parentCategories.map(async (category) => {
-          const count = await db
-            .select({ count: sql<number>`count(*)` })
-            .from(websiteCategories)
-            .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
-            .where(
-              and(
-                eq(websiteCategories.categoryId, category.id),
-                eq(websites.status, 'approved')
-              )
-            );
-
-          const childrenWithCounts = await Promise.all(
-            (category.children || []).map(async (child) => {
-              const childCount = await db
-                .select({ count: sql<number>`count(*)` })
-                .from(websiteCategories)
-                .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
-                .where(
-                  and(
-                    eq(websiteCategories.categoryId, child.id),
-                    eq(websites.status, 'approved')
-                  )
-                );
-              return {
-                ...child,
-                _count: { websiteCategories: Number(childCount[0]?.count || 0) },
-              };
-            })
-          );
-
-          return {
-            ...category,
-            children: childrenWithCounts,
-            _count: { websiteCategories: Number(count[0]?.count || 0) },
-          };
-        })
-      );
+      const categoriesWithCounts = parentCategories.map((category) => ({
+        ...category,
+        children: (category.children || []).map((child) => ({
+          ...child,
+          _count: { websiteCategories: countMap.get(child.id) || 0 },
+        })),
+        _count: { websiteCategories: countMap.get(category.id) || 0 },
+      }));
 
       return NextResponse.json(AjaxResponse.ok(categoriesWithCounts));
     } else {
-      // 返回扁平的分类列表
       const allCategories = await db.query.categories.findMany({
         orderBy: asc(categories.sortOrder),
       });
 
-      // Get counts for all categories
-      const categoriesWithCounts = await Promise.all(
-        allCategories.map(async (category) => {
-          const count = await db
-            .select({ count: sql<number>`count(*)` })
-            .from(websiteCategories)
-            .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
-            .where(
-              and(
-                eq(websiteCategories.categoryId, category.id),
-                eq(websites.status, 'approved')
-              )
-            );
-          return {
-            ...category,
-            _count: { websiteCategories: Number(count[0]?.count || 0) },
-          };
-        })
-      );
+      const categoriesWithCounts = allCategories.map((category) => ({
+        ...category,
+        _count: { websiteCategories: countMap.get(category.id) || 0 },
+      }));
 
       return NextResponse.json(AjaxResponse.ok(categoriesWithCounts));
     }
@@ -103,9 +68,17 @@ export async function GET(request: Request) {
   }
 }
 
-// POST: 创建新分类
+// POST: 创建新分类（需要管理员权限）
 export async function POST(request: Request) {
   try {
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.success) {
+      return NextResponse.json(
+        AjaxResponse.fail(adminCheck.message),
+        { status: adminCheck.status }
+      );
+    }
+
     const { name, slug, parent_id, sort_order = 0 } = await request.json();
     const newCategory = await db.insert(categories).values({
       name: name,

@@ -69,9 +69,10 @@ export function Reviews({ websiteId, websiteTitle }: ReviewsProps) {
       setLoading(true)
       const response = await fetch(`/api/websites/${websiteId}/reviews`)
       if (response.ok) {
-        const data = await response.json()
-        setReviews(data.reviews)
-        setStats(data.stats)
+        const json = await response.json()
+        const data = json.data || json
+        setReviews(data.reviews || [])
+        setStats(data.stats || { avgRating: 0, totalReviews: 0 })
       }
     } catch (error) {
       console.error('Error fetching reviews:', error)
@@ -247,7 +248,7 @@ export function Reviews({ websiteId, websiteTitle }: ReviewsProps) {
         </div>
         
         {/* 评分统计 */}
-        {stats.totalReviews > 0 && (
+        {stats?.totalReviews > 0 && (
           <div className="flex items-center gap-4 pt-2">
             <div className="flex items-center gap-2">
               {renderStars(stats.avgRating)}

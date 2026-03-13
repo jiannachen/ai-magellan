@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { AjaxResponse } from '@/lib/utils'
 import { db } from '@/lib/db/db'
 import { websites, websiteLikes, websiteFavorites } from '@/lib/db/schema'
-import { eq, desc, sql } from 'drizzle-orm'
+import { eq, desc, sql, inArray } from 'drizzle-orm'
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,10 +11,7 @@ export async function GET(request: NextRequest) {
     const userId = session?.user?.id
 
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json(AjaxResponse.fail('Unauthorized'), { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -41,28 +39,37 @@ export async function GET(request: NextRequest) {
       .from(websites)
       .where(eq(websites.submittedBy, userId))
 
-    // Add counts for each website
-    const websitesWithCounts = await Promise.all(
-      websitesList.map(async (website) => {
-        const [likesCount] = await db.select({ count: sql<number>`count(*)` })
+    // 批量查询所有相关网站的 likes 和 favorites 计数，消除 N+1
+    const websiteIds = websitesList.map(w => w.id)
+
+    let likesMap = new Map<number, number>()
+    let favsMap = new Map<number, number>()
+
+    if (websiteIds.length > 0) {
+      const [likesCounts, favsCounts] = await Promise.all([
+        db.select({ websiteId: websiteLikes.websiteId, count: sql<number>`count(*)` })
           .from(websiteLikes)
-          .where(eq(websiteLikes.websiteId, website.id))
-
-        const [favoritesCount] = await db.select({ count: sql<number>`count(*)` })
+          .where(inArray(websiteLikes.websiteId, websiteIds))
+          .groupBy(websiteLikes.websiteId),
+        db.select({ websiteId: websiteFavorites.websiteId, count: sql<number>`count(*)` })
           .from(websiteFavorites)
-          .where(eq(websiteFavorites.websiteId, website.id))
+          .where(inArray(websiteFavorites.websiteId, websiteIds))
+          .groupBy(websiteFavorites.websiteId),
+      ])
 
-        return {
-          ...website,
-          _count: {
-            websiteLikes: likesCount.count,
-            websiteFavorites: favoritesCount.count
-          }
-        }
-      })
-    )
+      likesMap = new Map(likesCounts.map(r => [r.websiteId, Number(r.count)]))
+      favsMap = new Map(favsCounts.map(r => [r.websiteId, Number(r.count)]))
+    }
 
-    return NextResponse.json({
+    const websitesWithCounts = websitesList.map(website => ({
+      ...website,
+      _count: {
+        websiteLikes: likesMap.get(website.id) || 0,
+        websiteFavorites: favsMap.get(website.id) || 0,
+      }
+    }))
+
+    return NextResponse.json(AjaxResponse.ok({
       websites: websitesWithCounts,
       pagination: {
         page,
@@ -70,13 +77,10 @@ export async function GET(request: NextRequest) {
         total,
         pages: Math.ceil(total / limit)
       }
-    })
+    }))
 
   } catch (error) {
     console.error('Error fetching user submissions:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json(AjaxResponse.fail('Internal server error'), { status: 500 })
   }
 }

@@ -1,8 +1,10 @@
 import { Metadata } from 'next';
 import { db } from '@/lib/db/db';
 import { categories, websites, websiteCategories } from '@/lib/db/schema';
-import { isNull, eq, and, sql } from 'drizzle-orm';
+import { isNull, eq, sql } from 'drizzle-orm';
 import CategoriesListPage from '@/components/category/categories-list-page';
+
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'AI Tool Territories - Navigate by Purpose | AI Magellan',
@@ -14,59 +16,48 @@ export const metadata: Metadata = {
 };
 
 export default async function CategoriesPage() {
-  // 获取所有一级分类及其子分类
-  const categoriesData = await db.query.categories.findMany({
-    where: isNull(categories.parentId),
-    with: {
-      children: {
-        orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
+  // 并行查询：分类树 + 所有分类的网站计数
+  const [categoriesData, allCounts] = await Promise.all([
+    db.query.categories.findMany({
+      where: isNull(categories.parentId),
+      with: {
+        children: {
+          orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
+        },
       },
-    },
-    orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
+      orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
+    }),
+    db
+      .select({
+        categoryId: websiteCategories.categoryId,
+        count: sql<number>`count(distinct ${websiteCategories.websiteId})`,
+      })
+      .from(websiteCategories)
+      .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
+      .where(eq(websites.status, 'approved'))
+      .groupBy(websiteCategories.categoryId),
+  ]);
+
+  const countMap = new Map(allCounts.map(c => [c.categoryId, Number(c.count)]));
+
+  const categoriesWithCounts = categoriesData.map((category) => {
+    const subcategories = category.children.map((child) => ({
+      id: child.id,
+      name: child.name,
+      slug: child.slug,
+      toolCount: countMap.get(child.id) || 0,
+      description: `${child.name}相关的AI工具`,
+    }));
+
+    return {
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+      sort_order: category.sortOrder,
+      toolCount: subcategories.reduce((sum, sub) => sum + sub.toolCount, 0),
+      subcategories,
+    };
   });
-
-  // 获取每个分类的网站数量
-  const categoriesWithCounts = await Promise.all(
-    categoriesData.map(async (category) => {
-      // 获取子分类及其网站数量
-      const subcategories = await Promise.all(
-        category.children.map(async (child) => {
-          const result = await db
-            .select({ count: sql<number>`count(distinct ${websiteCategories.websiteId})` })
-            .from(websiteCategories)
-            .innerJoin(websites, eq(websiteCategories.websiteId, websites.id))
-            .where(
-              and(
-                eq(websiteCategories.categoryId, child.id),
-                eq(websites.status, 'approved')
-              )
-            );
-
-          const childCount = result[0]?.count || 0;
-
-          return {
-            id: child.id,
-            name: child.name,
-            slug: child.slug,
-            toolCount: Number(childCount),
-            description: `${child.name}相关的AI工具`,
-          };
-        })
-      );
-
-      // 一级分类的工具数量 = 所有子分类的工具数量之和
-      const mainCount = subcategories.reduce((sum, sub) => sum + sub.toolCount, 0);
-
-      return {
-        id: category.id,
-        name: category.name,
-        slug: category.slug,
-        sort_order: category.sortOrder,
-        toolCount: Number(mainCount),
-        subcategories,
-      };
-    })
-  );
 
   return <CategoriesListPage categories={categoriesWithCounts} />;
 }

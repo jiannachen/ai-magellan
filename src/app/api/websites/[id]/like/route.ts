@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from '@/lib/auth';
-import { AjaxResponse, ensureUserExists } from "@/lib/utils";
+import { AjaxResponse } from "@/lib/utils";
 import { db } from "@/lib/db/db";
 import { websites, websiteLikes } from "@/lib/db/schema";
 import { eq, and, sql } from "drizzle-orm";
@@ -16,14 +16,6 @@ export async function POST(
 
     if (!userId) {
       return NextResponse.json(AjaxResponse.fail("Please login first"), {
-        status: 401,
-      });
-    }
-
-    // Ensure user exists in database
-    const userExists = await ensureUserExists(userId);
-    if (!userExists) {
-      return NextResponse.json(AjaxResponse.fail("Failed to authenticate user"), {
         status: 401,
       });
     }

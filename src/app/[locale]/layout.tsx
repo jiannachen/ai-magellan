@@ -8,8 +8,6 @@ import Footer from "@/components/footer/index";
 import BottomNavigation from "@/components/navigation/bottom-nav";
 import { HrefLang } from "@/components/seo/hreflang";
 import FloatingFeedbackButton from "@/components/feedback/floating-feedback-button";
-import { NavigationLoading } from "@/components/loading";
-import { NavigationProvider } from "@/contexts/navigation-context";
 import { Metadata } from 'next';
 
 interface LocaleLayoutProps {
@@ -89,7 +87,6 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages} locale={locale}>
-      <NavigationProvider>
         <div className="min-h-screen flex flex-col">
           <HrefLang />
           <Header />
@@ -107,10 +104,7 @@ export default async function LocaleLayout({
           <BottomNavigation />
           {/* 浮动反馈按钮 */}
           <FloatingFeedbackButton />
-          {/* 全局导航加载状态 */}
-          <NavigationLoading />
         </div>
-      </NavigationProvider>
     </NextIntlClientProvider>
   );
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
+import { requireAdmin } from "@/lib/utils/admin";
 import { db } from "@/lib/db/db";
 import { websites } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -11,7 +12,7 @@ interface CheckUrlResponse {
 async function checkUrl(url: string): Promise<CheckUrlResponse> {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     const response = await fetch(url, {
       method: "HEAD",
@@ -35,6 +36,14 @@ async function checkUrl(url: string): Promise<CheckUrlResponse> {
 
 export async function POST(request: Request) {
   try {
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.success) {
+      return NextResponse.json(
+        AjaxResponse.fail(adminCheck.message),
+        { status: adminCheck.status }
+      );
+    }
+
     const { url, id: websiteId } = await request.json();
 
     if (isNaN(websiteId)) {

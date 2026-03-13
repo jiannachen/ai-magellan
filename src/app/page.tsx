@@ -1,7 +1,7 @@
 import { db } from "@/lib/db/db";
 import { websites, categories } from "@/lib/db/schema";
 import { eq, isNull, desc } from "drizzle-orm";
-import { cachedPrismaQuery } from "@/lib/db/cache";
+import { cachedQuery } from "@/lib/db/cache";
 import { StructuredData } from "@/components/seo/structured-data";
 import { HeroSection } from "@/components/home/hero-section";
 import { RankingSection } from "@/components/home/ranking-section";
@@ -18,7 +18,7 @@ export const revalidate = 60;
 export default async function Home() {
   // 在服务端获取初始数据，使用缓存，只选择需要的字段
   const [websitesData, categoriesData] = await Promise.all([
-    cachedPrismaQuery(
+    cachedQuery(
       "approved-websites",
       async () => {
         const result = await db.query.websites.findMany({
@@ -48,7 +48,7 @@ export default async function Home() {
       },
       { ttl: 86400 } // 1天缓存
     ),
-    cachedPrismaQuery(
+    cachedQuery(
       "all-categories",
       async () => {
         const result = await db.query.categories.findMany({

@@ -1,25 +1,25 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { AjaxResponse } from '@/lib/utils'
 import { db } from '@/lib/db/db'
 import { websiteLikes } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 
 // GET /api/user/likes/check
-// 检查用户是否已点赞某个工具
 export async function GET(request: Request) {
   try {
     const session = await auth()
     const userId = session?.user?.id
 
     if (!userId) {
-      return NextResponse.json({ isLiked: false })
+      return NextResponse.json(AjaxResponse.ok({ isLiked: false }))
     }
 
     const { searchParams } = new URL(request.url)
     const websiteId = searchParams.get('websiteId')
 
     if (!websiteId) {
-      return NextResponse.json({ error: 'websiteId is required' }, { status: 400 })
+      return NextResponse.json(AjaxResponse.fail('websiteId is required'), { status: 400 })
     }
 
     const like = await db.query.websiteLikes.findFirst({
@@ -29,9 +29,9 @@ export async function GET(request: Request) {
       )
     })
 
-    return NextResponse.json({ isLiked: !!like })
+    return NextResponse.json(AjaxResponse.ok({ isLiked: !!like }))
   } catch (error) {
     console.error('Error checking like status:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json(AjaxResponse.fail('Internal server error'), { status: 500 })
   }
 }

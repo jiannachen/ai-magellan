@@ -8,8 +8,6 @@ import SWRProvider from "@/components/providers/swr-provider";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { Analytics as OtherAnalytics } from "@/components/analytics";
 import { getLocale } from 'next-intl/server';
-import { CriticalResources } from "@/components/performance/critical-resources";
-import ErrorDeduplicationProvider from "@/components/providers/error-deduplication-provider";
 
 // 全局配置 - 仅保留与语言无关的设置
 export const metadata: Metadata = {
@@ -83,14 +81,7 @@ export default async function RootLayout({
         suppressHydrationWarning
         className="min-h-screen flex flex-col bg-background"
       >
-        <CriticalResources
-          images={[
-            '/images/og-image.avif',
-            '/logo.png'
-          ]}
-        />
         <AuthProvider>
-          <ErrorDeduplicationProvider />
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

@@ -72,7 +72,7 @@ export default function DashboardPage() {
       throw new Error(`Failed to fetch favorites: ${response.status}`)
     }
     const data = await response.json()
-    setFavorites(data.websites || [])
+    setFavorites(data.data?.websites || [])
   }, [])
 
   const fetchStats = useCallback(async () => {

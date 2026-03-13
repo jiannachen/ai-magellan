@@ -3,11 +3,11 @@ import { footerLinks } from "@/lib/db/schema";
 import { asc } from "drizzle-orm";
 import FooterContent from "./footer-content";
 import type { FooterSettings } from "@/lib/types";
-import { cachedPrismaQuery } from "@/lib/db/cache";
+import { cachedQuery } from "@/lib/db/cache";
 
 export async function Footer() {
   // 在服务端获取数据
-  const footerLinksList = await cachedPrismaQuery(
+  const footerLinksList = await cachedQuery(
     "footer-links",
     async () => {
       const result = await db.query.footerLinks.findMany({

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { AjaxResponse } from '@/lib/utils';
 import { db } from '@/lib/db/db';
 import { websites, categories, users, websiteCategories } from '@/lib/db/schema';
 import { eq, and, or, sql, desc, asc, inArray, gte } from 'drizzle-orm';
@@ -116,62 +117,61 @@ export async function GET(request: NextRequest) {
 
     // Special handling for category leaders
     if (type === 'category-leaders') {
-      const categoriesList = await db.query.categories.findMany({
-        with: {
-          websiteCategories: {
-            with: {
-              website: {
-                with: {
-                  websiteCategories: {
-                    with: {
-                      category: true,
-                    },
-                  },
-                  submitter: {
-                    columns: {
-                      id: true,
-                      name: true,
-                    },
-                  },
-                },
-              },
-            },
-            limit: 3,
-          },
+      // Use a window function to get top 3 approved websites per category
+      const rankedRows = await db.execute(sql`
+        SELECT * FROM (
+          SELECT
+            wc.category_id,
+            c.name as category_name,
+            w.*,
+            ROW_NUMBER() OVER (PARTITION BY wc.category_id ORDER BY w.quality_score DESC) as rn
+          FROM website_categories wc
+          INNER JOIN websites w ON w.id = wc.website_id AND w.status = 'approved'
+          INNER JOIN categories c ON c.id = wc.category_id
+        ) ranked
+        WHERE rn <= 3
+      `);
+
+      // Format results
+      const rows = rankedRows as any[];
+      const categoryLeaders = rows
+        .map((row: any) => ({
+          id: row.id,
+          title: row.title,
+          slug: row.slug,
+          url: row.url,
+          description: row.description,
+          thumbnail: row.thumbnail,
+          status: row.status,
+          visits: row.visits,
+          likes: row.likes,
+          qualityScore: row.quality_score,
+          pricingModel: row.pricing_model,
+          hasFreeVersion: row.has_free_version,
+          tagline: row.tagline,
+          logoUrl: row.logo_url,
+          tags: row.tags,
+          createdAt: row.created_at,
+          categoryRank: Number(row.rn),
+          categoryName: row.category_name,
+        }));
+
+      return NextResponse.json(AjaxResponse.ok({
+        websites: categoryLeaders,
+        pagination: {
+          page: 1,
+          limit: categoryLeaders.length,
+          total: categoryLeaders.length,
+          pages: 1
         },
-      });
-
-      const categoryLeaders = categoriesList.flatMap(cat =>
-        cat.websiteCategories
-          .filter(wc => wc.website && wc.website.status === 'approved')
-          .sort((a, b) => (b.website?.qualityScore || 0) - (a.website?.qualityScore || 0))
-          .slice(0, 3)
-          .map((wc, index) => ({
-            ...wc.website,
-            categoryRank: index + 1,
-            categoryName: cat.name
-          }))
-      );
-
-      return NextResponse.json({
-        success: true,
-        data: {
-          websites: categoryLeaders,
-          pagination: {
-            page: 1,
-            limit: categoryLeaders.length,
-            total: categoryLeaders.length,
-            pages: 1
-          },
-          meta: {
-            type,
-            category,
-            timeRange,
-            totalTools: categoryLeaders.length,
-            groupedByCategory: true
-          }
+        meta: {
+          type,
+          category,
+          timeRange,
+          totalTools: categoryLeaders.length,
+          groupedByCategory: true
         }
-      });
+      }));
     }
 
     // Get total count
@@ -232,33 +232,30 @@ export async function GET(request: NextRequest) {
       })).sort((a, b) => (b as any).trendingScore - (a as any).trendingScore);
     }
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        websites: processedWebsites,
-        pagination: {
-          page,
-          limit,
-          total: Number(total),
-          pages: Math.ceil(Number(total) / limit)
-        },
-        meta: {
-          type,
-          category,
-          timeRange,
-          totalTools: Number(total),
-          dateRange: dateFilter ? {
-            from: dateFilter.toISOString(),
-            to: now.toISOString()
-          } : null
-        }
+    return NextResponse.json(AjaxResponse.ok({
+      websites: processedWebsites,
+      pagination: {
+        page,
+        limit,
+        total: Number(total),
+        pages: Math.ceil(Number(total) / limit)
+      },
+      meta: {
+        type,
+        category,
+        timeRange,
+        totalTools: Number(total),
+        dateRange: dateFilter ? {
+          from: dateFilter.toISOString(),
+          to: now.toISOString()
+        } : null
       }
-    });
+    }));
 
   } catch (error) {
     console.error('Rankings API error:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to fetch rankings' },
+      AjaxResponse.fail('Failed to fetch rankings'),
       { status: 500 }
     );
   }

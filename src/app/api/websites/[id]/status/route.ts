@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AjaxResponse } from "@/lib/utils";
+import { requireAdmin } from "@/lib/utils/admin";
 import { db } from "@/lib/db/db";
 import { websites } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -7,6 +8,15 @@ import { eq } from "drizzle-orm";
 export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   try {
+    // 验证管理员权限
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.success) {
+      return NextResponse.json(
+        AjaxResponse.fail(adminCheck.message),
+        { status: adminCheck.status }
+      );
+    }
+
     const { status } = await request.json();
     const websiteId = parseInt(params.id);
 

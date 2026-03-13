@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from '@/lib/auth';
-import { AjaxResponse, generateSlug, ensureUserExists } from "@/lib/utils";
+import { AjaxResponse, generateSlug } from "@/lib/utils";
 import { db } from "@/lib/db/db";
 import { websites, websiteCategories, categories } from "@/lib/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
@@ -77,15 +77,6 @@ export async function POST(request: Request) {
     if (!userId) {
       return NextResponse.json(
         AjaxResponse.fail("Please login to submit a website"),
-        { status: 401 }
-      );
-    }
-
-    // 确保用户在数据库中存在（用于外键关系）
-    const userExists = await ensureUserExists(userId);
-    if (!userExists) {
-      return NextResponse.json(
-        AjaxResponse.fail("Failed to authenticate user"),
         { status: 401 }
       );
     }

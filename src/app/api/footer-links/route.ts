@@ -3,8 +3,9 @@ import { db } from "@/lib/db/db";
 import { footerLinks } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
+import { requireAdmin } from "@/lib/utils/admin";
 
-// 获取所有页脚链接
+// 获取所有页脚链接（公开）
 export async function GET() {
   try {
     const links = await db.query.footerLinks.findMany({
@@ -20,16 +21,23 @@ export async function GET() {
   }
 }
 
-// 创建新的页脚链接
+// 创建新的页脚链接（需要管理员权限）
 export async function POST(request: Request) {
   try {
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.success) {
+      return NextResponse.json(
+        AjaxResponse.fail(adminCheck.message),
+        { status: adminCheck.status }
+      );
+    }
+
     const { title, url } = await request.json();
 
     if (!title || !url) {
       return NextResponse.json(AjaxResponse.fail("标题和URL都是必需的"));
     }
 
-    // 验证 URL 格式
     try {
       new URL(url);
     } catch (_e) {
@@ -43,16 +51,24 @@ export async function POST(request: Request) {
 
     return NextResponse.json(AjaxResponse.ok(link));
   } catch (error) {
-    if ((error as any)?.code === "23505") { // Unique violation
+    if ((error as any)?.code === "23505") {
       return NextResponse.json(AjaxResponse.fail("该URL已存在"));
     }
     return NextResponse.json(AjaxResponse.fail("创建页脚链接失败"));
   }
 }
 
-// 更新页脚链接
+// 更新页脚链接（需要管理员权限）
 export async function PUT(request: Request) {
   try {
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.success) {
+      return NextResponse.json(
+        AjaxResponse.fail(adminCheck.message),
+        { status: adminCheck.status }
+      );
+    }
+
     const { id, title, url } = await request.json();
 
     if (!id || !title || !url) {
@@ -74,9 +90,17 @@ export async function PUT(request: Request) {
   }
 }
 
-// 删除页脚链接
+// 删除页脚链接（需要管理员权限）
 export async function DELETE(request: Request) {
   try {
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.success) {
+      return NextResponse.json(
+        AjaxResponse.fail(adminCheck.message),
+        { status: adminCheck.status }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 

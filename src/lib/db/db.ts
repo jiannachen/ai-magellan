@@ -17,7 +17,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 // 创建一个类型安全的全局对象来存储 Drizzle 实例
-const globalForDb = global as { db?: PostgresJsDatabase<typeof schema>; client?: postgres.Sql };
+const globalForDb = globalThis as unknown as { db?: PostgresJsDatabase<typeof schema>; client?: postgres.Sql };
 
 // 创建 postgres 客户端
 // - 在生产环境中创建新的客户端
@@ -27,7 +27,7 @@ const globalForDb = global as { db?: PostgresJsDatabase<typeof schema>; client?:
 // - idle_timeout: close idle connections after 20 seconds
 // - connect_timeout: connection timeout (10 seconds)
 const client = globalForDb.client ?? postgres(process.env.DATABASE_URL, {
-  max: process.env.NODE_ENV === 'production' ? 1 : 10, // Serverless-friendly: 1 connection in prod
+  max: process.env.NODE_ENV === 'production' ? 5 : 10, // Serverless: small pool per instance
   idle_timeout: 20,
   connect_timeout: 10,
   // Prepare statements for better performance

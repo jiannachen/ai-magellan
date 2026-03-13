@@ -60,7 +60,7 @@ export default function MyFavoritesPage() {
       }
 
       const data = await response.json()
-      const websites = data.data || data.websites || []
+      const websites = data.data?.websites || []
       setFavorites(websites)
     } catch (_error) {
       console.error('Error fetching favorites:', _error)
@@ -107,10 +107,8 @@ export default function MyFavoritesPage() {
 
   const removeFavorite = async (websiteId: number) => {
     try {
-      const response = await fetch('/api/user/favorites', {
+      const response = await fetch(`/api/user/favorites?websiteId=${websiteId}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ websiteId })
       })
 
       if (!response.ok) {

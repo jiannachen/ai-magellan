@@ -3,6 +3,7 @@ import { db } from "@/lib/db/db";
 import { feedbacks } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
+import { requireAdmin } from "@/lib/utils/admin";
 
 // POST /api/feedback - submit feedback
 export async function POST(request: Request) {
@@ -42,9 +43,17 @@ export async function POST(request: Request) {
   }
 }
 
-// GET /api/feedback - list feedback (optional public listing)
+// GET /api/feedback - list feedback (admin only)
 export async function GET() {
   try {
+    const adminCheck = await requireAdmin();
+    if (!adminCheck.success) {
+      return NextResponse.json(
+        AjaxResponse.fail(adminCheck.message),
+        { status: adminCheck.status }
+      );
+    }
+
     const items = await db.query.feedbacks.findMany({
       orderBy: desc(feedbacks.createdAt),
       limit: 100,

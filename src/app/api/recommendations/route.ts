@@ -1,7 +1,8 @@
 import { db } from '@/lib/db/db';
 import { websites } from '@/lib/db/schema';
-import { eq, and, or, gte, ne, sql } from 'drizzle-orm';
+import { eq, and, or, gte, ne } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
+import { AjaxResponse } from '@/lib/utils';
 
 // 获取网站推荐
 export async function GET(request: NextRequest) {
@@ -55,44 +56,10 @@ export async function GET(request: NextRequest) {
       limit: limit,
     });
 
-    return NextResponse.json({
-      success: true,
-      data: recommendations,
-      count: recommendations.length,
-    });
+    return NextResponse.json(AjaxResponse.ok(recommendations));
 
   } catch (error) {
     console.error('获取推荐失败:', error);
-    return NextResponse.json(
-      { error: '获取推荐失败' },
-      { status: 500 }
-    );
-  }
-}
-
-// 记录用户行为用于改进推荐算法
-export async function POST(request: NextRequest) {
-  try {
-    const { websiteId, action, categoryId } = await request.json();
-    
-    // 这里可以记录用户行为，用于改进推荐算法
-    // 比如记录用户点击、喜欢、分享等行为
-    
-    // 暂时只是简单地增加访问量
-    if (action === 'visit' && websiteId) {
-      await db
-        .update(websites)
-        .set({ visits: sql`${websites.visits} + 1` })
-        .where(eq(websites.id, websiteId));
-    }
-
-    return NextResponse.json({ success: true });
-
-  } catch (error) {
-    console.error('记录用户行为失败:', error);
-    return NextResponse.json(
-      { error: '记录失败' },
-      { status: 500 }
-    );
+    return NextResponse.json(AjaxResponse.fail('获取推荐失败'), { status: 500 });
   }
 }
