@@ -65,13 +65,18 @@ export async function GET(request: NextRequest) {
       favsMap = new Map(favsCounts.map(r => [r.websiteId, Number(r.count)]))
     }
 
-    const websitesWithCounts = favorites.map(fav => ({
-      ...fav.website,
-      _count: {
-        websiteLikes: likesMap.get(fav.website.id) || 0,
-        websiteFavorites: favsMap.get(fav.website.id) || 0,
+    const websitesWithCounts = favorites.map(fav => {
+      const { websiteCategories, ...website } = fav.website
+      const firstCategory = websiteCategories?.[0]?.category
+      return {
+        ...website,
+        category: firstCategory ? { id: firstCategory.id, name: firstCategory.name, slug: firstCategory.slug } : null,
+        _count: {
+          websiteLikes: likesMap.get(fav.website.id) || 0,
+          websiteFavorites: favsMap.get(fav.website.id) || 0,
+        }
       }
-    }))
+    })
 
     return NextResponse.json(AjaxResponse.ok({
       websites: websitesWithCounts,

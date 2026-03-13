@@ -22,8 +22,11 @@ export function useAuth() {
           ? [{ emailAddress: session.user.email, verification: { status: 'verified' as const } }]
           : [],
         createdAt: null as Date | null,
+        role: session.user.role || 'user',
       }
     : null
+
+  const isAdmin = user?.role === 'admin'
 
   const handleSignOut = (callback?: () => void) => {
     nextAuthSignOut({ redirect: false }).then(() => {
@@ -31,5 +34,5 @@ export function useAuth() {
     })
   }
 
-  return { isLoaded, isSignedIn, user, signOut: handleSignOut }
+  return { isLoaded, isSignedIn, isAdmin, user, signOut: handleSignOut }
 }

@@ -150,6 +150,7 @@ export async function POST(request: Request) {
         categoryId: Number(categoryIds[0]), // 保留旧字段为主分类
         status: "pending", // 默认为待审核状态
         submittedBy: userId,
+        updatedAt: new Date(),
 
         // 图片资源
         logoUrl: validatedData.logoUrl?.trim() || null,

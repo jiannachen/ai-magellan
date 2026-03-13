@@ -109,7 +109,7 @@ export function FavoriteCard({
                 variant="secondary"
                 className="text-[10px] px-1.5 py-0.5 h-5 rounded font-medium"
               >
-                {website.category.name}
+                {website.category?.name}
               </Badge>
               <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
                 {website.visits !== undefined && (
@@ -245,7 +245,7 @@ export function FavoriteCard({
             variant="secondary"
             className="text-[10px] px-1.5 py-0.5 h-5 rounded font-medium truncate max-w-[120px]"
           >
-            {website.category.name}
+            {website.category?.name}
           </Badge>
           <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
             {website.visits !== undefined && (

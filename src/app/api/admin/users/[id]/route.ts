@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from '@/lib/utils/admin';
 import { db } from "@/lib/db/db";
-import { users, websites, categories } from "@/lib/db/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { users } from "@/lib/db/schema";
+import { eq, sql } from "drizzle-orm";
 import { AjaxResponse } from "@/lib/utils";
 
 // GET /api/admin/users/[id] - 获取特定用户详情
@@ -20,33 +20,42 @@ export async function GET(
         { status: adminCheck.status }
       );
     }
-    const user = await db.query.users.findFirst({
-      where: eq(users.id, id),
-      with: {
-        submittedWebsites: {
-          columns: {
-            id: true,
-            title: true,
-            url: true,
-            status: true,
-            createdAt: true,
-          },
-          with: {
-            websiteCategories: {
-              with: {
-                category: {
-                  columns: {
-                    name: true,
-                    slug: true,
+
+    const [user, [counts]] = await Promise.all([
+      db.query.users.findFirst({
+        where: eq(users.id, id),
+        with: {
+          submittedWebsites: {
+            columns: {
+              id: true,
+              title: true,
+              url: true,
+              status: true,
+              createdAt: true,
+            },
+            with: {
+              websiteCategories: {
+                with: {
+                  category: {
+                    columns: {
+                      name: true,
+                      slug: true,
+                    },
                   },
                 },
               },
             },
+            orderBy: (websites, { desc }) => [desc(websites.createdAt)],
           },
-          orderBy: (websites, { desc }) => [desc(websites.createdAt)],
         },
-      },
-    });
+      }),
+      db.select({
+        websites: sql<number>`(SELECT count(*) FROM websites WHERE submitted_by = ${id})`,
+        likes: sql<number>`(SELECT count(*) FROM website_likes WHERE user_id = ${id})`,
+        favorites: sql<number>`(SELECT count(*) FROM website_favorites WHERE user_id = ${id})`,
+        reviews: sql<number>`(SELECT count(*) FROM website_reviews WHERE user_id = ${id})`,
+      }).from(users).where(eq(users.id, id)),
+    ]);
 
     if (!user) {
       return NextResponse.json(
@@ -55,23 +64,27 @@ export async function GET(
       );
     }
 
-    // Get counts separately
-    const [websitesCount] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(websites)
-      .where(eq(websites.submittedBy, id));
+    // Transform submittedWebsites to match frontend expected structure
+    const { submittedWebsites, ...userInfo } = user;
+    const websites = (submittedWebsites || []).map(w => ({
+      id: w.id,
+      title: w.title,
+      url: w.url,
+      status: w.status,
+      createdAt: w.createdAt,
+      category: w.websiteCategories?.[0]?.category || { name: 'Uncategorized', slug: 'uncategorized' },
+    }));
 
-    const userWithCount = {
-      ...user,
+    return NextResponse.json(AjaxResponse.ok({
+      ...userInfo,
+      websites,
       _count: {
-        websites: Number(websitesCount?.count || 0),
-        likes: 0,
-        favorites: 0,
-        reviews: 0,
+        websites: Number(counts?.websites || 0),
+        likes: Number(counts?.likes || 0),
+        favorites: Number(counts?.favorites || 0),
+        reviews: Number(counts?.reviews || 0),
       },
-    };
-
-    return NextResponse.json(AjaxResponse.ok(userWithCount));
+    }));
   } catch (error) {
     console.error("Error fetching user:", error);
     return NextResponse.json(

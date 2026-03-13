@@ -1,51 +1,40 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { WebsiteList } from "@/components/admin/website-list";
 import { Button } from "@/ui/common/button";
 import { Badge } from "@/ui/common/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/ui/common/select";
 import type { Website } from "@/lib/types";
 import { motion } from "framer-motion";
-import { ListFilter, Users, MessageSquare } from "lucide-react";
+import { ListFilter, Users, MessageSquare, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils/utils";
+
+interface AdminPageClientProps {
+  initialWebsites: Website[];
+  initialCategories: any[];
+  statusCounts: Record<string, number>;
+  currentStatus: string;
+  currentPage: number;
+  totalPages: number;
+  total: number;
+}
 
 export function AdminPageClient({
   initialWebsites,
   initialCategories,
-}: {
-  initialWebsites: Website[];
-  initialCategories: any[];
-}) {
-  const [activeStatus, setActiveStatus] =
-    useState<Website["status"]>("pending");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  statusCounts,
+  currentStatus,
+  currentPage,
+  totalPages,
+  total,
+}: AdminPageClientProps) {
+  const router = useRouter();
 
   if (!initialWebsites || !Array.isArray(initialWebsites)) return null;
   if (!initialCategories || !Array.isArray(initialCategories)) return null;
 
-  const filteredWebsites = initialWebsites.filter((website) => {
-    const matchesStatus = website.status === activeStatus;
-    const matchesCategory =
-      selectedCategory === "all" ||
-      website.categoryId === parseInt(selectedCategory);
-    return matchesStatus && matchesCategory;
-  });
-
-  const statusCounts = {
-    pending: initialWebsites.filter((w) => w.status === "pending").length,
-    approved: initialWebsites.filter((w) => w.status === "approved").length,
-    rejected: initialWebsites.filter((w) => w.status === "rejected").length,
-  };
-
-  const getStatusColor = (status: Website["status"]) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
         return "text-yellow-500";
@@ -56,6 +45,14 @@ export function AdminPageClient({
       default:
         return "";
     }
+  };
+
+  const handleStatusChange = (status: string) => {
+    router.push(`/admin?status=${status}&page=1`);
+  };
+
+  const handlePageChange = (page: number) => {
+    router.push(`/admin?status=${currentStatus}&page=${page}`);
   };
 
   return (
@@ -103,76 +100,84 @@ export function AdminPageClient({
       <div className="rounded-xl border border-border/40 bg-background/30 shadow-sm overflow-hidden backdrop-blur-sm">
         {/* Filter Section */}
         <div className="border-b border-border/40 bg-background/20 p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex flex-wrap gap-2 flex-1">
-              {["pending", "approved", "rejected"].map((status) => (
-                <motion.button
-                  key={status}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setActiveStatus(status as Website["status"])}
-                  className={`
-                    flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200
-                    ${
-                      activeStatus === status
-                        ? "bg-background/40 border-primary/30 shadow-sm " +
-                          getStatusColor(status as Website["status"])
-                        : "bg-background/20 border-border/40 hover:border-border/60 text-muted-foreground hover:text-foreground"
-                    }
-                  `}
-                >
-                  <span className="text-sm font-medium">
-                    {status === "pending"
-                      ? "待审核"
-                      : status === "approved"
-                      ? "已通过"
-                      : "已拒绝"}
-                  </span>
-                  <Badge
-                    variant={activeStatus === status ? "secondary" : "outline"}
-                    className={cn(
-                      "ml-1 bg-background/50",
-                      activeStatus === status &&
-                        getStatusColor(status as Website["status"])
-                    )}
-                  >
-                    {statusCounts[status as keyof typeof statusCounts]}
-                  </Badge>
-                </motion.button>
-              ))}
-            </div>
-
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-            >
-              <SelectTrigger className="w-full sm:w-[180px] bg-background/40 border-border/40">
-                <SelectValue placeholder="选择分类" />
-              </SelectTrigger>
-              <SelectContent
-                align="end"
-                className="bg-background/95 backdrop-blur-sm"
+          <div className="flex flex-wrap gap-2">
+            {["pending", "approved", "rejected"].map((status) => (
+              <motion.button
+                key={status}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleStatusChange(status)}
+                className={`
+                  flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200
+                  ${
+                    currentStatus === status
+                      ? "bg-background/40 border-primary/30 shadow-sm " +
+                        getStatusColor(status)
+                      : "bg-background/20 border-border/40 hover:border-border/60 text-muted-foreground hover:text-foreground"
+                  }
+                `}
               >
-                <SelectItem value="all">全部分类</SelectItem>
-                {initialCategories.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <span className="text-sm font-medium">
+                  {status === "pending"
+                    ? "待审核"
+                    : status === "approved"
+                    ? "已通过"
+                    : "已拒绝"}
+                </span>
+                <Badge
+                  variant={currentStatus === status ? "secondary" : "outline"}
+                  className={cn(
+                    "ml-1 bg-background/50",
+                    currentStatus === status && getStatusColor(status)
+                  )}
+                >
+                  {statusCounts[status] ?? 0}
+                </Badge>
+              </motion.button>
+            ))}
           </div>
         </div>
 
         {/* Website List */}
         <div className="bg-background/20">
           <WebsiteList
-            key={`${activeStatus}-${selectedCategory}`}
-            websites={filteredWebsites}
+            key={`${currentStatus}-${currentPage}`}
+            websites={initialWebsites}
             categories={initialCategories}
             showActions={true}
           />
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="border-t border-border/40 bg-background/20 px-4 py-3 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              共 {total} 条，第 {currentPage}/{totalPages} 页
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage <= 1}
+                onClick={() => handlePageChange(currentPage - 1)}
+                className="h-8 px-3"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                上一页
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={currentPage >= totalPages}
+                onClick={() => handlePageChange(currentPage + 1)}
+                className="h-8 px-3"
+              >
+                下一页
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   );

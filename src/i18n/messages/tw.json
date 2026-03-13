@@ -69,6 +69,8 @@
     "account": "帳戶",
     "welcome": "歡迎回來",
     "login_with_google": "使用 Google 登入",
+    "continue_with_google": "使用 Google 繼續",
+    "continue_with_github": "使用 GitHub 繼續",
     "logout_confirm": "確定要登出嗎？",
     "expedition": {
       "title": "開始你的探險之旅",
@@ -465,7 +467,14 @@
     "desktop_apps": "桌面應用程式",
     "macos": "macOS",
     "windows": "Windows",
-    "linux": "Linux"
+    "linux": "Linux",
+    "useCases": "用例",
+    "targetAudience": "目標受眾",
+    "pricingModel": "定價模式",
+    "hasFreeVersion": "有免費版本",
+    "iosAppUrl": "iOS 應用程式 URL",
+    "androidAppUrl": "Android 應用程式 URL",
+    "webAppUrl": "Web 應用程式 URL"
   },
   "edit": {
     "title": "編輯網站",
@@ -786,6 +795,204 @@
       "feedback_placeholder": "告訴我們做得好的地方或需要改進之處",
       "submit_button": "提交",
       "submitting": "提交中..."
+    }
+  },
+  "profile": {
+    "navigation": {
+      "dashboard": "儀表板",
+      "dashboard_desc": "總覽與快速操作",
+      "favorites": "收藏",
+      "favorites_desc": "你收藏的工具",
+      "submissions": "提交記錄",
+      "submissions_desc": "你提交的工具",
+      "settings": "設定",
+      "settings_desc": "帳戶設定",
+      "default_user": "用戶"
+    },
+    "submit": {
+      "page_title": "提交工具",
+      "page_description": "與社區分享你發現的AI工具",
+      "submit_tool": "提交工具",
+      "fill_information": "填寫工具資訊",
+      "submit_button": "提交",
+      "basic_info": "基本資訊",
+      "basic_info_desc": "工具基本詳情",
+      "key_features": "主要功能",
+      "features_desc": "這個工具的特色功能",
+      "use_cases_audience": "用例與受眾",
+      "audience_desc": "誰在使用以及如何使用",
+      "pricing_info": "定價資訊",
+      "pricing_desc": "定價模式與方案",
+      "social_integrations": "社群與整合",
+      "social_desc": "社群媒體和整合平台",
+      "platform_support": "平台支援",
+      "platforms_desc": "可用平台",
+      "use_cases_help": "描述此工具的常見用例",
+      "target_audience_help": "此工具的目標受眾是誰？",
+      "pricing_plans_help": "新增最多 6 個定價方案（選填）",
+      "integrations_help": "選擇或新增此工具支援的整合",
+      "validation": {
+        "valid_url": "請輸入有效的 URL"
+      },
+      "simple_form": {
+        "tool_url_required": "工具網址",
+        "tool_url_placeholder": "https://example.com",
+        "auto_fill": "自動填入",
+        "business_email_required": "商務電郵",
+        "business_email_placeholder": "contact@example.com",
+        "tool_name_required": "工具名稱",
+        "tool_name_placeholder": "請輸入工具名稱",
+        "category_required": "分類",
+        "tagline": "標語",
+        "tagline_placeholder": "簡短、引人注目的標語",
+        "description_required": "描述",
+        "description_placeholder": "描述這個工具的功能和特點",
+        "tags": "標籤"
+      },
+      "messages": {
+        "auto_fill_success": "資訊自動填入成功",
+        "auto_fill_error": "自動填入失敗，請手動輸入資訊",
+        "url_already_exists": "此網址已被提交",
+        "url_exists_pending": "目前正在審核中",
+        "url_exists_approved": "已審核通過",
+        "fix_form_errors": "請修正表單中的錯誤",
+        "fill_required_fields": "請填寫所有必填欄位"
+      }
+    },
+    "edit": {
+      "page_title": "編輯工具",
+      "page_description": "更新你的工具資訊",
+      "edit_tool": "編輯工具",
+      "update_information": "更新工具資訊",
+      "save_changes": "儲存變更",
+      "sign_in_required": "需要登入",
+      "sign_in_description": "請登入以編輯工具資訊",
+      "navigation_error": "錯誤",
+      "return_to_submissions": "返回提交記錄",
+      "retry": "重試",
+      "success": {
+        "updated": "工具資訊已成功更新"
+      },
+      "errors": {
+        "required_fields": "請填寫所有必填欄位",
+        "update_failed": "更新失敗",
+        "fetch_failed": "取得工具資訊失敗",
+        "website_not_found": "工具不存在",
+        "permission_denied": "您沒有權限編輯此工具",
+        "only_own_websites": "您只能編輯自己提交的工具"
+      }
+    },
+    "submissions": {
+      "title": "我的提交",
+      "description": "管理你提交的工具",
+      "load_error": "載入提交記錄失敗",
+      "retry": "重試",
+      "login_required": "需要登入",
+      "login_description": "請登入以查看你的提交記錄",
+      "login_now": "立即登入",
+      "total_submissions": "總提交數",
+      "approved": "已通過",
+      "pending_review": "審核中",
+      "no_submissions": "尚無提交記錄",
+      "no_submissions_desc": "開始提交你發現的第一個 AI 工具",
+      "submit_first_tool": "提交你的第一個工具",
+      "page_info": "第 {current} 頁，共 {total} 頁",
+      "status_pending": "審核中",
+      "status_approved": "已通過",
+      "status_rejected": "已拒絕"
+    },
+    "dashboard": {
+      "welcome": "歡迎，{name}",
+      "welcome_back": "繼續你的 AI 探索之旅",
+      "quick_actions": "快速操作",
+      "recent_favorites": "最近收藏",
+      "no_favorites": "尚無收藏",
+      "no_favorites_desc": "開始探索，發現並收藏 AI 工具",
+      "unfavorite_success": "已從收藏中移除",
+      "unfavorite_error": "移除收藏失敗",
+      "stats": {
+        "bookmarked_tools": "已收藏工具",
+        "collected_favorites": "收藏的工具",
+        "submitted_tools": "已提交工具",
+        "discoveries_shared": "分享的發現",
+        "endorsed_tools": "已按讚工具",
+        "users_helped": "幫助的用戶"
+      },
+      "actions": {
+        "submit_new_tool": "提交新工具",
+        "share_tool": "分享新發現的 AI 工具",
+        "review_submissions": "查看提交",
+        "manage_tools": "管理你提交的工具",
+        "browse_tools": "瀏覽工具",
+        "discover_tools": "發現新的 AI 工具",
+        "view_all_favorites": "查看所有收藏",
+        "view_all": "查看全部",
+        "get_started": "開始探索",
+        "browse": "造訪"
+      }
+    },
+    "favorites": {
+      "title": "我的收藏",
+      "description": "你收藏的 AI 工具",
+      "load_error": "載入收藏失敗",
+      "remove_success": "已從收藏中移除",
+      "remove_error": "移除收藏失敗",
+      "stats": {
+        "total_bookmarks": "總收藏數",
+        "featured_tools": "精選",
+        "high_quality": "高品質"
+      },
+      "search": {
+        "placeholder": "搜尋收藏..."
+      },
+      "sort": {
+        "placeholder": "排序方式",
+        "recent": "最近新增",
+        "popular": "最受歡迎",
+        "quality": "品質最高",
+        "alphabetical": "字母順序"
+      },
+      "empty": {
+        "no_matching": "沒有符合的收藏",
+        "no_bookmarks": "尚無收藏",
+        "try_different_search": "嘗試使用不同的關鍵詞搜尋「{query}」",
+        "start_exploring": "開始探索以發現 AI 工具",
+        "start_button": "探索工具"
+      },
+      "actions": {
+        "clear_search": "清除搜尋",
+        "visit": "造訪",
+        "remove": "移除"
+      },
+      "results": {
+        "showing_search": "顯示 {current} / {total} 個收藏",
+        "showing_total": "共 {count} 個收藏"
+      }
+    },
+    "info": {
+      "title": "探險家檔案",
+      "description": "查看和管理你的個人資料",
+      "login_required": "需要登入",
+      "login_description": "請登入以查看你的個人資料",
+      "basic_info": "基本資訊",
+      "default_user": "用戶",
+      "regular_user": "一般用戶",
+      "name_label": "姓名",
+      "email_label": "電子郵件",
+      "user_id_label": "用戶 ID",
+      "not_set": "未設定",
+      "account_settings": "帳戶與安全",
+      "registration_date": "註冊日期",
+      "email_verification_status": "電郵狀態",
+      "verified": "已驗證",
+      "unverified": "未驗證",
+      "email_verification": "電郵驗證",
+      "email_verification_desc": "驗證電郵以保障帳戶安全",
+      "two_factor_auth": "雙重驗證",
+      "two_factor_desc": "為帳戶增加額外安全層",
+      "not_enabled": "未啟用",
+      "usage_tips": "使用提示",
+      "tip_1": "探索和發現 AI 工具，收藏你喜愛的工具"
     }
   }
 }

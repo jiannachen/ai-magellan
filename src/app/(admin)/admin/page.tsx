@@ -4,9 +4,11 @@ import Link from "next/link";
 import { AdminPageClient } from "@/components/admin/admin-page-client";
 import { db } from "@/lib/db/db";
 import { websites, categories } from "@/lib/db/schema";
-import { desc, asc } from "drizzle-orm";
+import { desc, eq, sql, and } from "drizzle-orm";
 
 export const dynamic = 'force-dynamic';
+
+const PAGE_SIZE = 20;
 
 // 检查是否为管理员邮箱
 function isAdminEmail(email: string): boolean {
@@ -14,20 +16,49 @@ function isAdminEmail(email: string): boolean {
   return adminEmails.includes(email);
 }
 
-async function getWebsites() {
-  const websitesList = await db.query.websites.findMany({
-    with: {
-      websiteCategories: {
-        with: {
-          category: true,
+async function getWebsitesPaginated(status: string, page: number) {
+  const offset = (page - 1) * PAGE_SIZE;
+
+  const [websitesList, countResult] = await Promise.all([
+    db.query.websites.findMany({
+      where: eq(websites.status, status),
+      with: {
+        websiteCategories: {
+          with: {
+            category: true,
+          },
         },
+        submitter: true,
       },
-      submitter: true,
-    },
-    orderBy: (websites, { desc }) => [desc(websites.createdAt)],
-  });
-  // Type assertion for compatibility with Website interface
-  return websitesList as any;
+      orderBy: (websites, { desc }) => [desc(websites.createdAt)],
+      limit: PAGE_SIZE,
+      offset,
+    }),
+    db.select({ count: sql<number>`count(*)::int` })
+      .from(websites)
+      .where(eq(websites.status, status)),
+  ]);
+
+  return {
+    websites: websitesList as any,
+    total: countResult[0]?.count ?? 0,
+  };
+}
+
+async function getStatusCounts() {
+  const result = await db
+    .select({
+      status: websites.status,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(websites)
+    .groupBy(websites.status);
+
+  const counts: Record<string, number> = { pending: 0, approved: 0, rejected: 0 };
+  for (const row of result) {
+    counts[row.status] = row.count;
+  }
+  return counts;
 }
 
 async function getCategories() {
@@ -37,7 +68,11 @@ async function getCategories() {
   return categoriesList;
 }
 
-export default async function AdminPage() {
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string; page?: string }>;
+}) {
   // 验证管理员权限
   const session = await auth();
   if (!session?.user?.id) {
@@ -88,11 +123,28 @@ export default async function AdminPage() {
     );
   }
 
+  const params = await searchParams;
+  const status = params.status || 'pending';
+  const page = Math.max(1, parseInt(params.page || '1', 10) || 1);
+
   // 获取网站和分类数据
-  const [websitesData, categoriesData] = await Promise.all([
-    getWebsites(),
-    getCategories()
+  const [{ websites: websitesData, total }, statusCounts, categoriesData] = await Promise.all([
+    getWebsitesPaginated(status, page),
+    getStatusCounts(),
+    getCategories(),
   ]);
 
-  return <AdminPageClient initialWebsites={websitesData} initialCategories={categoriesData} />;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  return (
+    <AdminPageClient
+      initialWebsites={websitesData}
+      initialCategories={categoriesData}
+      statusCounts={statusCounts}
+      currentStatus={status}
+      currentPage={page}
+      totalPages={totalPages}
+      total={total}
+    />
+  );
 }

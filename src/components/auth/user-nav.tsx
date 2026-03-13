@@ -13,14 +13,15 @@ import {
 } from '@/ui/common/dropdown-menu'
 import {
   LogIn,
-  LogOut
+  LogOut,
+  Settings,
 } from 'lucide-react'
 import { cn } from '@/lib/utils/utils'
 import { profileNavigationConfig } from '@/lib/config/profile-navigation'
 import { UserNavDropdownWrapper } from './user-nav-dropdown-wrapper'
 
 export function UserNav() {
-  const { isLoaded, isSignedIn, user, signOut } = useAuth()
+  const { isLoaded, isSignedIn, isAdmin, user, signOut } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
   const t = useTranslations('auth')
@@ -126,6 +127,21 @@ export function UserNav() {
             </DropdownMenuItem>
           )
         })}
+
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <a
+                href="/admin"
+                className="flex items-center gap-2.5 px-3 py-2.5 cursor-pointer"
+              >
+                <Settings className="h-4 w-4 flex-shrink-0" />
+                <span className="font-medium text-sm">后台管理</span>
+              </a>
+            </DropdownMenuItem>
+          </>
+        )}
 
         <DropdownMenuSeparator />
 

@@ -52,7 +52,7 @@ interface Website {
     id: number
     name: string
     slug: string
-  }
+  } | null
   _count: {
     websiteLikes: number
     websiteFavorites: number
@@ -94,7 +94,8 @@ export default function MySubmissionsPage() {
         throw new Error('Failed to fetch submissions')
       }
 
-      const data: SubmissionsResponse = await response.json()
+      const res = await response.json()
+      const data: SubmissionsResponse = res.data
       setSubmissions(data.websites)
       setPagination({
         page: data.pagination.page,
@@ -357,9 +358,11 @@ export default function MySubmissionsPage() {
                                 <Bookmark className="h-3 w-3" />
                                 {website._count.websiteFavorites}
                               </span>
+                              {website.category && (
                               <Badge variant="outline" className="text-xs hidden sm:inline-flex">
                                 {website.category.name}
                               </Badge>
+                              )}
                               <div className="flex items-center gap-1 text-xs hidden sm:flex">
                                 <Star className="h-3 w-3" />
                                 {website.qualityScore}

@@ -16,12 +16,23 @@ export async function requireAdmin(): Promise<AdminCheckResult> {
 
   const user = await db.query.users.findFirst({
     where: eq(users.id, userId),
-    columns: { role: true },
+    columns: { role: true, email: true },
   })
 
-  if (!user || user.role !== 'admin') {
+  if (!user) {
     return { success: false, status: 403, message: 'Access denied' }
   }
 
-  return { success: true, userId }
+  if (user.role === 'admin') {
+    return { success: true, userId }
+  }
+
+  // Fallback: auto-promote if email is in ADMIN_EMAILS
+  const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+  if (user.email && adminEmails.includes(user.email.toLowerCase())) {
+    await db.update(users).set({ role: 'admin' }).where(eq(users.id, userId))
+    return { success: true, userId }
+  }
+
+  return { success: false, status: 403, message: 'Access denied' }
 }

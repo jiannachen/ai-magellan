@@ -57,10 +57,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           const dbUser = await db.query.users.findFirst({
             where: eq(users.email, user.email),
-            columns: { id: true },
+            columns: { id: true, role: true },
           })
           if (dbUser) {
             token.dbUserId = dbUser.id
+            token.role = dbUser.role
           }
         } catch (error) {
           console.error("Failed to get user ID:", error)
@@ -71,6 +72,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       if (token.dbUserId) {
         session.user.id = token.dbUserId as string
+      }
+      if (token.role) {
+        session.user.role = token.role as string
       }
       return session
     },

@@ -41,6 +41,7 @@ import { Badge } from '@/ui/common/badge'
 import { toast } from '@/hooks/use-toast'
 import { useAuth } from '@/hooks/use-auth'
 import { Reviews } from '@/components/reviews/reviews'
+import { LoginDialog } from '@/components/auth/login-dialog'
 import { useTranslations } from 'next-intl'
 import { StatCard } from '@/components/ui/stat-card'
 
@@ -130,6 +131,7 @@ export default function ToolDetailContent({ initialWebsite }: ToolDetailContentP
   const [isLiked, setIsLiked] = useState(false)
   const [isFavorited, setIsFavorited] = useState(false)
   const [likesCount, setLikesCount] = useState(initialWebsite._count?.websiteLikes || 0)
+  const [showLoginDialog, setShowLoginDialog] = useState(false)
 
   // Navigation sections for the detail page
   const detailSections = [
@@ -143,9 +145,7 @@ export default function ToolDetailContent({ initialWebsite }: ToolDetailContentP
   ]
 
   useEffect(() => {
-    if (isSignedIn) {
-      checkUserInteractions()
-    }
+    checkUserInteractions()
     recordVisit(website.id)
   }, [isSignedIn])
 
@@ -160,21 +160,22 @@ export default function ToolDetailContent({ initialWebsite }: ToolDetailContentP
 
   const checkUserInteractions = async () => {
     if (!website) return
-    
-    try {
-      const [likesResponse, favoritesResponse] = await Promise.all([
-        fetch(`/api/user/likes/check?websiteId=${website.id}`),
-        fetch(`/api/user/favorites/check?websiteId=${website.id}`)
-      ])
 
+    try {
+      // 点赞状态：匿名用户也检查（基于 IP 去重）
+      const likesResponse = await fetch(`/api/user/likes/check?websiteId=${website.id}`)
       if (likesResponse.ok) {
         const likesData = await likesResponse.json()
         setIsLiked(likesData.data?.isLiked || false)
       }
 
-      if (favoritesResponse.ok) {
-        const favoritesData = await favoritesResponse.json()
-        setIsFavorited(favoritesData.data?.isFavorited || false)
+      // 收藏状态：仅登录用户检查
+      if (isSignedIn) {
+        const favoritesResponse = await fetch(`/api/user/favorites/check?websiteId=${website.id}`)
+        if (favoritesResponse.ok) {
+          const favoritesData = await favoritesResponse.json()
+          setIsFavorited(favoritesData.data?.isFavorited || false)
+        }
       }
     } catch (error) {
       console.error('Error checking user interactions:', error)
@@ -182,17 +183,12 @@ export default function ToolDetailContent({ initialWebsite }: ToolDetailContentP
   }
 
   const handleLike = async () => {
-    if (!isSignedIn || !website) {
-      toast.error(t('profile.tools.detail.messages.sign_in_to_like'))
-      return
-    }
+    if (!website) return
+
+    // 已点赞则不再重复请求
+    if (isLiked) return
 
     try {
-      // 点赞只能增加，不能取消；已点赞则不再重复请求
-      if (isLiked) {
-        return
-      }
-
       const response = await fetch(`/api/websites/${website.id}/like`, {
         method: 'POST'
       })
@@ -210,7 +206,7 @@ export default function ToolDetailContent({ initialWebsite }: ToolDetailContentP
 
   const handleFavorite = async () => {
     if (!isSignedIn || !website) {
-      toast.error(t('profile.tools.detail.messages.sign_in_to_bookmark'))
+      setShowLoginDialog(true)
       return
     }
 
@@ -1038,7 +1034,7 @@ export default function ToolDetailContent({ initialWebsite }: ToolDetailContentP
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="px-0">
-                  <Reviews websiteId={website.id} websiteTitle={website.title} />
+                  <Reviews websiteId={website.id} websiteTitle={website.title} onLoginRequired={() => setShowLoginDialog(true)} />
                 </CardContent>
               </Card>
 
@@ -1046,6 +1042,8 @@ export default function ToolDetailContent({ initialWebsite }: ToolDetailContentP
           </div>
         </div>
       </div>
+
+      <LoginDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
     </div>
   )
 }

@@ -43,9 +43,10 @@ interface ReviewStats {
 interface ReviewsProps {
   websiteId: number
   websiteTitle: string
+  onLoginRequired?: () => void
 }
 
-export function Reviews({ websiteId, websiteTitle }: ReviewsProps) {
+export function Reviews({ websiteId, websiteTitle, onLoginRequired }: ReviewsProps) {
   const { isSignedIn, user } = useAuth()
   const t = useTranslations()
   const [reviews, setReviews] = useState<Review[]>([])
@@ -84,7 +85,7 @@ export function Reviews({ websiteId, websiteTitle }: ReviewsProps) {
 
   const handleSubmitReview = async () => {
     if (!isSignedIn) {
-      toast.error(t('reviews.login_required'))
+      onLoginRequired?.()
       return
     }
 
@@ -236,8 +237,18 @@ export function Reviews({ websiteId, websiteTitle }: ReviewsProps) {
             {t('reviews.title')}
           </CardTitle>
           {isSignedIn && !showForm && (
-            <Button 
+            <Button
               onClick={() => setShowForm(true)}
+              size="sm"
+              className="gap-2 w-fit self-start sm:self-auto"
+            >
+              <Edit3 className="h-4 w-4" />
+              {t('reviews.write_review')}
+            </Button>
+          )}
+          {!isSignedIn && (
+            <Button
+              onClick={() => onLoginRequired?.()}
               size="sm"
               className="gap-2 w-fit self-start sm:self-auto"
             >

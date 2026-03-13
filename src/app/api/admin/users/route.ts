@@ -17,30 +17,40 @@ export async function GET() {
       );
     }
 
-    // 获取用户列表，包含提交网站数量
-    const usersList = await db.query.users.findMany({
-      columns: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-        role: true,
-        status: true,
-        locale: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      orderBy: (users, { desc }) => [desc(users.createdAt)],
-    });
+    const usersList = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        image: users.image,
+        role: users.role,
+        status: users.status,
+        locale: users.locale,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+        websitesCount: sql<number>`(SELECT count(*) FROM websites WHERE submitted_by = ${users.id})`,
+        likesCount: sql<number>`(SELECT count(*) FROM website_likes WHERE user_id = ${users.id})`,
+        favoritesCount: sql<number>`(SELECT count(*) FROM website_favorites WHERE user_id = ${users.id})`,
+        reviewsCount: sql<number>`(SELECT count(*) FROM website_reviews WHERE user_id = ${users.id})`,
+      })
+      .from(users)
+      .orderBy(desc(users.createdAt));
 
-    // Get counts for each user (simplified version without joins)
     const usersWithCounts = usersList.map(user => ({
-      ...user,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      image: user.image,
+      role: user.role,
+      status: user.status,
+      locale: user.locale,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
       _count: {
-        websites: 0,
-        likes: 0,
-        favorites: 0,
-        reviews: 0,
+        websites: Number(user.websitesCount || 0),
+        likes: Number(user.likesCount || 0),
+        favorites: Number(user.favoritesCount || 0),
+        reviews: Number(user.reviewsCount || 0),
       },
     }));
 

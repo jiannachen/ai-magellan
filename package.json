@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "NODE_OPTIONS='--require ./proxy-setup.js' next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -20,7 +20,6 @@
     "migrate:unify-columns": "ts-node --project tsconfig.script.json scripts/unify-column-names.ts"
   },
   "dependencies": {
-    "next-auth": "^5.0.0-beta.30",
     "@formatjs/intl-localematcher": "^0.6.2",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "^1.2.2",
@@ -69,6 +68,7 @@
     "lucide-react": "^0.468.0",
     "negotiator": "^1.0.0",
     "next": "^15.2.8",
+    "next-auth": "^5.0.0-beta.30",
     "next-intl": "^4.3.11",
     "next-themes": "^0.4.4",
     "node-fetch": "^3.3.2",
@@ -82,6 +82,7 @@
     "sonner": "^1.7.1",
     "swr": "^2.2.5",
     "tailwind-merge": "^2.5.5",
+    "undici": "^7.24.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {

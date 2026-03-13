@@ -69,6 +69,8 @@
     "account": "Account",
     "welcome": "Welcome back",
     "login_with_google": "Sign in with Google",
+    "continue_with_google": "Continue with Google",
+    "continue_with_github": "Continue with GitHub",
     "logout_confirm": "Are you sure you want to sign out?",
     "expedition": {
       "title": "Begin Your Expedition",
@@ -465,7 +467,14 @@
     "desktop_apps": "Desktop Applications",
     "macos": "macOS",
     "windows": "Windows",
-    "linux": "Linux"
+    "linux": "Linux",
+    "useCases": "Use Cases",
+    "targetAudience": "Target Audience",
+    "pricingModel": "Pricing Model",
+    "hasFreeVersion": "Has free version",
+    "iosAppUrl": "iOS App URL",
+    "androidAppUrl": "Android App URL",
+    "webAppUrl": "Web App URL"
   },
   "edit": {
     "title": "Edit Website",
@@ -888,5 +897,4 @@
       "submit_button": "Submit",
       "submitting": "Submitting..."
     }
-  }
-}
+}}

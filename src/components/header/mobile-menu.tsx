@@ -3,14 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import NavigationLink from "@/components/navigation/navigation-link";
-import { 
-  Trophy, 
-  Plus, 
-  Menu, 
-  X, 
-  ChevronDown, 
-  TrendingUp, 
-  Star, 
+import {
+  Trophy,
+  Plus,
+  Menu,
+  X,
+  ChevronDown,
+  TrendingUp,
+  Star,
   CheckCircle,
   Map,
   Code,
@@ -27,7 +27,8 @@ import {
   Heart,
   GraduationCap,
   ShoppingCart,
-  Wrench
+  Wrench,
+  Settings
 } from "lucide-react";
 import { Button } from "@/ui/common/button";
 import { LanguageSwitcher } from "@/components/language/language-switcher";
@@ -45,7 +46,7 @@ export default function MobileMenu() {
   const tRank = useTranslations('pages.rankings');
   const tCat = useTranslations('pages.categories');
   const [categories, setCategories] = useAtom(categoriesAtom);
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, isAdmin } = useAuth();
 
   // 分类图标映射 - 与桌面版保持一致
   const getCategoryIcon = (slug: string) => {
@@ -193,7 +194,7 @@ export default function MobileMenu() {
                       rankingsOpen && "rotate-180"
                     )} />
                   </Button>
-                  
+
                   {rankingsOpen && (
                     <div className="mt-2 pl-6 sm:pl-8 space-y-1">
                       <NavigationLink href="/rankings" className="block">
@@ -225,6 +226,22 @@ export default function MobileMenu() {
                     </div>
                   )}
                 </div>
+
+                {/* Admin Entry - 管理后台入口 */}
+                {isSignedIn && isAdmin && (
+                  <>
+                    <div className="h-px bg-border/50" />
+                    <a href="/admin" onClick={() => setIsOpen(false)}>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start hover:bg-secondary font-medium text-sm sm:text-base rounded-lg h-11 sm:h-12 px-3 sm:px-4 min-h-[44px]"
+                      >
+                        <Settings className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 text-primary" />
+                        后台管理
+                      </Button>
+                    </a>
+                  </>
+                )}
 
                 {/* 分隔线 */}
                 <div className="h-px bg-border/50" />

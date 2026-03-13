@@ -26,11 +26,13 @@ function AuthErrorContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-background p-4">
+      <Card className="w-full max-w-md border-border/60 shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <div className="flex items-center justify-center mb-4">
-            <AlertTriangle className="h-8 w-8 text-destructive" />
+            <div className="p-3 rounded-full bg-destructive/10">
+              <AlertTriangle className="h-8 w-8 text-destructive" />
+            </div>
           </div>
           <CardTitle className="text-2xl">登录错误</CardTitle>
           <CardDescription>
